@@ -1,0 +1,36 @@
+{{$page = 1}}
+{{$limit = 25}}
+{{$search =  }}
+{{if {get_var.page} }}
+{{$page = {get_var.page} }}
+{{/if}}
+{{if {get_var.limit} }}
+{{$limit = {get_var.limit} }}
+{{/if}}
+{{if {get_var.exact_name} }}
+{{$search = WHERE npo.name = '{get_var.exact_name}'  }}
+{{else-if {get_var.search} }}
+{{$search = WHERE npo.name LIKE '%{get_var.search}%'  }}
+{{else-if {get_var.followed} }}
+{{$search = WHERE FIND_IN_SET (npo._zuid, '{get_var.followed}')  }}
+{{else-if {get_var.featured} }}
+{{$search = WHERE npo.featured = '{get_var.featured}'  }}
+{{else-if {get_var.zuid} }}
+{{$search = WHERE npo.zuid = '{get_var.zuid}' }}
+{{else-if {get_var.admin_zuid} }}
+{{$search = WHERE FIND_IN_SET ('{get_var.admin_zuid}', npo.admins) }}
+{{/if}}
+{{$start = {math(({$page} - 1) * {$limit})} }} 
+{
+    "data" :
+    [
+        {{each non_profits as npo {$search} limit {$start}, {$limit} }}
+        {{npo.toJSON(2)}}
+        {{npo._arraycomma}}
+        {{/each}}
+    ],
+    "meta" : {
+        "page" : {{$page}},
+        "limit" : {{$limit}}
+    }
+}

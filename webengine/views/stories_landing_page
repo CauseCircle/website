@@ -1,0 +1,282 @@
+<style>
+  .title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+  }
+  .search-bar {
+    display: flex;
+    gap: 10px;
+  }
+  .search-input,
+  .filter-dropdown {
+    /* background-color: #f0f0f0; */
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  .search-input {
+    width: 300px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    padding-left: 35px;
+  }
+  .filter-dropdown {
+    appearance: none;
+    padding-right: 30px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+  .filter-dropdown::-ms-expand {
+    display: none;
+  }
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+</style>
+
+<div class="container">
+  <section id="header" class="py-4">
+    <div class="row gy-3 align-items-center">
+      <div class="col-12 col-md-6">
+        <div class="d-flex flex-column gap-2">
+          <p class="fs-5 fw-bold">Stories</p>
+          <p class="fs-6 text-muted">
+            Discover inspiring stories from our community and beyond
+          </p>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="d-flex flex-column flex-md-row gap-2">
+          <input
+            type="text"
+            id="story-search"
+            class="search-input form-control w-100 mb-2 mb-md-0"
+            placeholder="Search stories..."
+            aria-label="Search"
+          />
+          <select class="filter-dropdown w-100 w-md-auto">
+            <option>All Causes</option>
+          </select>
+          <select class="filter-dropdown w-100 w-md-auto">
+            <option>Worldwide</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="causes" class="py-4 d-flex flex-column gap-4">
+    <div class="d-flex justify-content-between">
+      <p class="fs-5 fw-bold">Explore by Causes</p>
+      <a
+        href="{{ causes_landing_page.first().path_full }}"
+        class="text-decoration-none text-primary"
+        >Explore More
+        <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+    <div class="row">
+      {{each causes as cause where cause.featured = '1' limit 6 }}
+      <div class="col-12 col-sm-6 col-md-2">
+        <!--prettier-ignore-->
+        {{ include /components/global/causes_card.html }}
+      </div>
+      {{/each}}
+    </div>
+  </section>
+
+  <section id="featured-stories" class="py-4 d-flex flex-column gap-4">
+    <div class="d-flex justify-content-between">
+      <p class="fs-5 fw-bold">Featured Stories</p>
+      <a
+        href="{{ stories_landing_page.first().path_full }}"
+        class="text-decoration-none text-primary d-none"
+        >Explore More
+        <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+    <div class="row">
+      {{each {this.featured_stories} as story limit 4}}
+      <div class="col-12 col-sm-6 col-md-3">
+        <!--prettier-ignore-->
+        {{ include /components/global/story_card.html }}
+      </div>
+      {{/each}}
+    </div>
+  </section>
+
+  <section id="latest-stories" class="py-4 d-flex flex-column gap-4">
+    <div class="d-flex justify-content-between">
+      <p class="fs-5 fw-bold">Latest Stories</p>
+      <a
+        href="{{ stories_landing_page.first().path_full }}"
+        class="text-decoration-none text-primary d-none"
+        >View All
+        <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+    <div class="row">
+      {{each stories as story sort_by published_date desc limit 4}}
+      <div class="col-12 col-sm-6 col-md-3">
+        <!--prettier-ignore-->
+        {{ include /components/global/story_card.html }}
+      </div>
+      {{/each}}
+    </div>
+  </section>
+
+  <section id="search-results" class="py-4 d-none flex-column gap-4">
+    <div class="d-flex justify-content-between">
+      <p class="fs-5 fw-bold">Search Results</p>
+    </div>
+    <div id="search-stories-container" class="row row-gap-4">
+      <!-- Search results will be dynamically inserted here -->
+    </div>
+  </section>
+</div>
+
+<script>
+  $(document).ready(function () {
+    const $storySearch = $("#story-search");
+    const $featuredStories = $("#featured-stories");
+    const $latestStories = $("#latest-stories");
+    const $searchResults = $("#search-results");
+    const $searchStoriesContainer = $("#search-stories-container");
+    const $loadingIndicator = $(
+      '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+    );
+    const $noResultsMessage = $(
+      '<div class="text-center py-4">No results found</div>'
+    );
+
+    // Debounce function
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    // Attach debounced search function to input event
+    $storySearch.on("input", debounce(searchStories, 300));
+
+    // Get the filter parameter from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParam = urlParams.get("search");
+
+    // Set the initial value of the search input if filter parameter exists
+    if (searchParam) {
+      $storySearch.val(searchParam);
+    }
+
+    // Initial search on page load
+    searchStories();
+
+    function searchStories() {
+      const searchInput = $storySearch.val();
+
+      if (searchInput.trim() === "") {
+        $featuredStories.removeClass("d-none").addClass("d-flex");
+        $latestStories.removeClass("d-none").addClass("d-flex");
+        $searchResults.addClass("d-none").removeClass("d-flex");
+        return;
+      }
+
+      $featuredStories.addClass("d-none").removeClass("d-flex");
+      $latestStories.addClass("d-none").removeClass("d-flex");
+      $searchResults.removeClass("d-none").addClass("d-flex");
+
+      // Show loading indicator
+      $searchStoriesContainer.empty().append($loadingIndicator);
+
+      // Fetch search results from API
+      $.ajax({
+        url: `https://causecircle.org/mobileapp/stories.json`,
+        method: "GET",
+        data: {
+          limit: 12,
+          search: searchInput,
+        },
+        success: function (data) {
+          $searchStoriesContainer.empty();
+          if (data.data && data.data.length > 0) {
+            $.each(data.data, function (index, story) {
+              const $storyCard = createStoryCard(story);
+              $searchStoriesContainer.append($storyCard);
+            });
+          } else {
+            $searchStoriesContainer.append($noResultsMessage);
+          }
+        },
+        error: function (error) {
+          console.error("Error fetching search results:", error);
+          $searchStoriesContainer
+            .empty()
+            .append(
+              $(
+                '<div class="text-center py-4">An error occurred. Please try again.</div>'
+              )
+            );
+        },
+      });
+    }
+
+    function createStoryCard(story) {
+      return `
+      <div class="col-12 col-sm-6 col-md-3">
+        <div class="card d-flex flex-column h-100 p-3 gap-2 story-card">
+          <img src="${
+            story.story_image
+          }" class="story-image" alt="${story.title}" />
+          <div class="d-flex flex-column gap-2 h-100">
+            <div class="d-flex justify-content-between">
+              <p class="story-date">${story.date_published}</p>
+              ${
+                story.related_causes && story.related_causes.length > 0
+                  ? `<div class="story-cause d-flex align-items-center">
+                    <p class="text-center">
+                      ${story.related_causes[0]?.title || ""}
+                    </p>
+                  </div>`
+                  : ""
+              }
+            </div>
+            <p class="story-title">${story.title}</p>
+            <div class="story-subtitle">${story.description}</div>
+            <div class="d-flex flex-grow-1 align-items-end gap-2">
+              <img src="${
+                story.related_npos && story.related_npos.data.length > 0
+                  ? story.related_npos.data[0]?.logo?.data
+                    ? story.related_npos.data[0]?.logo?.data[0]?.url
+                    : story.related_npos.data[0]?.logo || ""
+                  : ""
+              }" class="story-npo-logo" alt="" />
+              <p class="npo-name my-auto">${
+                story.related_npos && story.related_npos.data.length > 0
+                  ? story.related_npos.data[0]?.name || ""
+                  : ""
+              }</p>
+            </div>
+            <a href="${
+              story.meta.web.uri
+            }" class="btn btn-secondary story-btn card-btn">
+              Read More
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+    }
+  });
+</script>

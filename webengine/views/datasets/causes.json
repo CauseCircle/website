@@ -1,0 +1,61 @@
+{{$skip = 0 }}
+{{$limit = 0 }}
+{{$totalNpo = 0}}
+{{$sort = desc}}
+{{$filter = "" }}
+
+
+{{if {request.queryParam(skip)} }}
+{{$skip = {request.queryParam(skip)} }}
+{{else}}
+{{$skip = 0}}
+{{end-if}}
+
+
+{{if {request.queryParam(limit)} }}
+{{$limit = {request.queryParam(limit)} }}
+{{else}}
+{{$limit = 10}}
+{{end-if}}
+
+{{if {request.queryParam(sort)} &&  {request.queryParam(sort)} === 'asc'}}
+{{$sort = asc }}
+{{else}}
+{{$sort = desc }}
+{{end-if}}
+
+
+{{if {request.queryParam(filter)} }}
+{{$filter = "%{request.queryParam(filter)}%" }}
+{{else}}
+{{$filter = "%%" }}
+{{end-if}}
+
+{{each causes as cause}}
+{{$totalCauses = {cause._num} }}
+{{/each}}
+
+{
+    "data": [
+        {{each causes as cause where cause.title like {$filter} limit {$skip}, {$limit} }}
+        {
+            "title": "{{cause.title}}",
+            "description": "{{cause.description}}",
+            "image": "{{cause.image.getImage()}}",
+            "sort_order": "{{cause.sort_order}}",
+            "zuid": "{{z.zuid}}",
+            "href": "{{npo.path_full}}"
+
+        }{{cause._arraycomma}}
+        {{/each}}
+    ],
+    "meta": {
+        "skip": {{$skip}},
+        "limit": {{$limit}},
+        "page": {{math({$skip} / {$limit} + 1)}},
+        "pages": {{ math(round({$totalCauses} / {$limit})) }},
+        "totalItems": {{$totalCauses}},
+        "sort": "{{$sort}}",
+        "filter": {{$filter}}
+    }
+}

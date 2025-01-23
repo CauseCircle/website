@@ -1,0 +1,160 @@
+<style>
+  .article-category {
+    font-size: 12px;
+  }
+  .author-img{
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+
+  iframe{
+    width: 100%;
+    height: 500px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .article-container p {
+    padding-bottom: 12px;
+  }
+
+  .article-card:hover h2{
+    color: #6936ca
+  }
+
+  .article-img img {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .article-card:hover .article-img img{
+    transform: scale(1.01);
+  }
+
+  .article-card:hover .article-details .article-title{
+    color: #6936ca
+  }
+
+  @media (max-width: 550px) {
+  .article-container img {
+    max-width: 100%;
+    max-height: auto;
+  }
+}
+</style>
+
+<section class="d-flex flex-column align-items-center justify-content-center py-7 px-3 px-md-4">
+  <div style="max-width: 800px" class="d-flex flex-column gap-3">
+    <p>PRODUCT</p>
+    <h2>{{ this.title }}</h2>
+    {{each {this.author} as author }}
+    <div class="d-flex gap-2">
+      <div>
+        <img class="author-img" src="{{author.headshot.getImage()}}" alt=""></img>
+      </div>
+      <div>
+        <p>{{author.name}}</p>
+        <p>{{this.date.date(F Y)}}</p>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</section>
+
+<section>
+  <div>
+    <img src="{{this.hero_image.getImage()}}" alt="" class="w-100">
+  </div>
+</section>
+
+<section class="d-flex flex-column align-items-center justify-content-center py-7 px-3 px-md-4">
+  <div style="max-width: 800px">
+    <div class="article-container">{{this.article}}</div>
+    <hr style="border-top: 1px solid rgb(179, 179, 179);" class="my-5">
+    {{each {this.author} as author }}
+    <div class="d-flex flex-column gap-4">
+      <a href="{{author.path_full}}">
+        <div>
+          <img style="height: 80px; width: 80px; border-radius: 50%;" src="{{author.headshot.getImage()}}" alt=""></img>
+        </div>
+      </a>
+      <div class="d-flex flex-column gap-3">
+        <p style="text-transform: uppercase;" class="lead fw-bold">By {{author.name}}</p>
+        <p class="lead">{{author.description}}</p>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</section>
+
+<section class="container my-3 my-md-7">
+  <h2>Related Articles</h2>
+  <div class="row g-5 pt-5">
+    {{each {this.related_articles} as article}}
+    {{if {article._index} === 0}}
+    <a href="{{article.path_full}}" class="text-decoration-none" style="color: inherit">
+      <div class="col-12 pb-4 pb-xl-7 article-card">
+        <div class="row">
+          <div class="col-12 d-block d-xl-none">
+            <div class="article-img">
+              <img src="{{article.hero_image.getImage()}}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
+            </div>
+          </div>
+          <div class="col-12 col-xl-6 pt-4 pt-xl-0">
+            <div class="d-flex flex-column gap-2 p-2 justify-content-center h-100">
+              <p class="article-category">PRODUCT</p>
+              <h2>{{ article.title }}</h2>
+              <p>{{ article.description }}</p>
+              {{ $authorZuid = {article.author} }}
+              {{each authors as author where find_in_set(author.zuid, '{$authorZuid}')}}
+              <div class="d-flex gap-2">
+                <div>
+                  <img class="author-img" src="{{author.headshot.getImage()}}" alt=""></img>
+                </div>
+                <div>
+                  <p>{{author.name}}</p>
+                  <p>{{article.date.date(F Y)}}</p>
+                </div>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+          <div class="col-6 d-none d-xl-block">
+            <div class="article-img">
+              <img src="{{article.hero_image.getImage()}}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+    {{else}}
+    <div class="col-12 col-xl-4 pb-4 pb-xl-0">
+      <a href="{{article.path_full}}" class="text-decoration-none" style="color: inherit">
+        <div class="d-flex flex-column gap-4 h-100 article-card">
+          <div class="article-img">
+            <img src="{{article.hero_image.getImage()}}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
+          </div>
+          <div class="d-flex flex-column gap-2 p-2 justify-content-center h-100 article-details">
+            <p class="article-category">PRODUCT</p>
+            <h4 class="article-title">{{ article.title }}</h4>
+            <p>{{ article.description }}</p>
+            {{ $authorZuid = {article.author} }}
+            {{each authors as author where find_in_set(author.zuid, '{$authorZuid}')}}
+            <div class="d-flex gap-2 mt-auto">
+              <div>
+                <img class="author-img" src="{{author.headshot.getImage()}}" alt=""></img>
+              </div>
+              <div>
+                <p>{{author.name}}</p>
+                <p>{{article.date.date(F Y)}}</p>
+              </div>
+            </div>
+            {{/each}}
+          </div>
+        </div>
+      </a>
+    </div>
+    {{end-if}}
+    {{/each}}
+  </div>
+</section>

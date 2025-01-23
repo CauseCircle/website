@@ -1,0 +1,367 @@
+<style>
+  .metric-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .mini-chart {
+    height: 40px !important;
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  .percentage-badge {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 12px;
+  }
+
+  .percentage-badge.positive {
+    background-color: rgba(0, 255, 0, 0.1);
+    color: green;
+  }
+
+  .percentage-badge.negative {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: red;
+  }
+
+  .engagement-card {
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .profile-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+
+  .location-bar {
+    height: 8px;
+    background: #6c5ce7;
+    border-radius: 4px;
+  }
+
+  /* Add fixed height for audience chart */
+  #audienceChart {
+    height: 300px !important;
+    width: 100%;
+  }
+</style>
+
+<div class="container py-6">
+  <!-- Header -->
+  <div class="container mb-4">
+    <div class="d-flex align-items-center gap-3">
+      <img
+        id="profile-img"
+        src="/placeholder.svg?height=48&width=48"
+        class="profile-img"
+        alt="Profile"
+      />
+      <div>
+        <h4 id="welcome-text" class="mb-0">Welcome, Emma!</h4>
+        <p class="text-muted mb-0">Stay updated with your favorite causes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overview Section -->
+  <div class="container mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5>Overview</h5>
+      <select class="form-select" style="width: auto">
+        <option>Last 30 days</option>
+      </select>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="metric-card">
+          <small class="text-muted">Total Reach</small>
+          <div class="d-flex align-items-center gap-2">
+            <h3 class="mb-0">15,000</h3>
+            <span class="percentage-badge positive">7%</span>
+          </div>
+          <canvas class="mini-chart" id="reachChart"></canvas>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="metric-card">
+          <small class="text-muted">Impressions</small>
+          <div class="d-flex align-items-center gap-2">
+            <h3 class="mb-0">40,000</h3>
+            <span class="percentage-badge positive">12%</span>
+          </div>
+          <canvas class="mini-chart" id="impressionsChart"></canvas>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="metric-card">
+          <small class="text-muted">Engagement Rate</small>
+          <div class="d-flex align-items-center gap-2">
+            <h3 class="mb-0">8.5%</h3>
+            <span class="percentage-badge negative">-2%</span>
+          </div>
+          <canvas class="mini-chart" id="engagementChart"></canvas>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="metric-card">
+          <small class="text-muted">Followers Growth</small>
+          <div class="d-flex align-items-center gap-2">
+            <h3 class="mb-0">+500</h3>
+            <span class="percentage-badge positive">5%</span>
+          </div>
+          <canvas class="mini-chart" id="followersChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audience Insights -->
+  <div class="container mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5>Audience Insights</h5>
+      <select class="form-select" style="width: auto">
+        <option>Last 30 days</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div class="metric-card">
+          <div class="d-flex justify-content-between mb-3">
+            <div class="btn-group">
+              <button class="btn btn-primary active">12 Months</button>
+              <button class="btn btn-outline-primary">6 Months</button>
+              <button class="btn btn-outline-primary">30 Days</button>
+              <button class="btn btn-outline-primary">7 Days</button>
+            </div>
+            <button class="btn btn-outline-primary">Export PDF</button>
+          </div>
+          <canvas id="audienceChart" height="300"></canvas>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="metric-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0">Top Locations</h6>
+            <select class="form-select" style="width: auto">
+              <option>Last 30 Days</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span>New York</span>
+              <span>1,43,382</span>
+            </div>
+            <div class="location-bar w-100"></div>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span>Los Angeles</span>
+              <span>87,974</span>
+            </div>
+            <div class="location-bar w-75"></div>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span>Chicago</span>
+              <span>45,211</span>
+            </div>
+            <div class="location-bar w-50"></div>
+          </div>
+          <div>
+            <div class="d-flex justify-content-between mb-1">
+              <span>Others</span>
+              <span>21,893</span>
+            </div>
+            <div class="location-bar w-25"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Engagement Insights -->
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5>Engagement Insights</h5>
+      <select class="form-select" style="width: auto">
+        <option>Last 30 days</option>
+      </select>
+    </div>
+
+    <div class="row g-3">
+      <div class="col">
+        <div class="engagement-card">
+          <div class="mb-2">❤️</div>
+          <small class="text-muted">Likes</small>
+          <h4>3,200</h4>
+        </div>
+      </div>
+      <div class="col">
+        <div class="engagement-card">
+          <div class="mb-2">💬</div>
+          <small class="text-muted">Comments</small>
+          <h4>250</h4>
+        </div>
+      </div>
+      <div class="col">
+        <div class="engagement-card">
+          <div class="mb-2">🔄</div>
+          <small class="text-muted">Shares</small>
+          <h4>150</h4>
+        </div>
+      </div>
+      <div class="col">
+        <div class="engagement-card">
+          <div class="mb-2">🔖</div>
+          <small class="text-muted">Saved Posts</small>
+          <h4>80</h4>
+        </div>
+      </div>
+      <div class="col">
+        <div class="engagement-card">
+          <div class="mb-2">🔗</div>
+          <small class="text-muted">Link Clicks</small>
+          <h4>600</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const currentUser = localStorage.getItem("user");
+
+  if (currentUser) {
+    const user = JSON.parse(currentUser);
+    $("#welcome-text").text(`Welcome, ${user.firstName}!`);
+    $("#profile-img").attr("src", user.profilePhoto);
+  }
+
+  $(document).ready(function () {
+    // Helper function to create mini charts
+    function createMiniChart(elementId, data) {
+      const ctx = document.getElementById(elementId).getContext("2d");
+      return new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: Array(10).fill(""),
+          datasets: [
+            {
+              data: data,
+              borderColor: "#6c5ce7",
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 0,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          aspectRatio: 3,
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+          scales: {
+            x: {
+              display: false,
+            },
+            y: {
+              display: false,
+            },
+          },
+        },
+      });
+    }
+
+    // Create mini charts
+    createMiniChart("reachChart", [15, 13, 16, 14, 15, 17, 14, 16, 15, 16]);
+    createMiniChart(
+      "impressionsChart",
+      [35, 32, 38, 34, 36, 39, 35, 37, 34, 36]
+    );
+    createMiniChart(
+      "engagementChart",
+      [9, 8.5, 8.7, 8.3, 8.6, 8.4, 8.8, 8.5, 8.7, 8.6]
+    );
+    createMiniChart(
+      "followersChart",
+      [180, 175, 185, 178, 182, 180, 184, 179, 183, 182]
+    );
+
+    // Create main audience chart
+    const audienceCtx = document
+      .getElementById("audienceChart")
+      .getContext("2d");
+    new Chart(audienceCtx, {
+      type: "line",
+      data: {
+        labels: [
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+          "Jan",
+        ],
+        datasets: [
+          {
+            label: "Audience Growth",
+            data: [
+              30000, 35000, 32000, 40000, 45000, 43000, 47000, 45000, 50000,
+              52000, 55000, 58000,
+            ],
+            borderColor: "#6c5ce7",
+            backgroundColor: "rgba(108, 92, 231, 0.1)",
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 2,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              display: true,
+              drawBorder: false,
+            },
+          },
+          x: {
+            grid: {
+              display: false,
+            },
+          },
+        },
+      },
+    });
+  });
+</script>

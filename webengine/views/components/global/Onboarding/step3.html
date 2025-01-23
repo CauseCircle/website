@@ -1,0 +1,285 @@
+<style>
+  .card-img-top {
+    width: 100%; /* ensure the image covers the width */
+    height: 200px; /* fixed height */
+    object-fit: cover; /* cover the container without losing aspect ratio */
+    object-position: top; /* center the image within the container */
+  }
+  .hero-section {
+    background-size: cover;
+    text-align: center;
+    padding: 100px 0 50px 0;
+  }
+  .search-bar {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    width: 100%;
+    max-width: 640px;
+  }
+  .search-bar input {
+    width: 100%;
+    max-width: 640px;
+    height: 66px;
+    padding: 20px 44px 20px 24px;
+    font-size: 16px;
+    border: 1px solid #dfe1e7;
+    border-radius: 10px;
+  }
+  .search-bar button {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #ccc;
+  }
+  .search-bar button:hover {
+    color: #333;
+  }
+  .member-card {
+    background-size: cover;
+    min-height: 470px;
+    border-radius: 20px;
+    border: none;
+  }
+  .gradient-overlay {
+    background: linear-gradient(
+      179.63deg,
+      rgba(113, 61, 221, 0) 0.32%,
+      #3d2177 99.68%
+    );
+    border-radius: 20px;
+  }
+  .floating-btn {
+    top: 20px;
+    right: 20px;
+    font-size: 40px;
+    padding: 0;
+    height: 40px;
+    width: 40px;
+  }
+  .floating-btn i {
+    height: 40px;
+    width: 40px;
+  }
+</style>
+
+<style>
+  .category-card {
+    background-size: cover;
+    min-height: 223px;
+    border-radius: 20px;
+    border: none;
+  }
+  .gradient-overlay {
+    background: linear-gradient(
+      179.63deg,
+      rgba(113, 61, 221, 0) 0.32%,
+      #3d2177 99.68%
+    );
+    border-radius: 20px;
+  }
+  .floating-btn {
+    top: 40px;
+    right: 10px;
+    font-size: 40px;
+    padding: 0;
+    height: 24px;
+    width: 24px;
+    border: none;
+  }
+  .floating-btn .form-check-input {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+  }
+</style>
+
+<div class="hero-section">
+  <div class="container d-flex flex-column gap-2">
+    <h1>{{ this.hero_title }}</h1>
+    <p>{{ this.hero_description }}</p>
+  </div>
+</div>
+
+<div class="container d-flex align-items-center justify-content-center mb-5">
+  <div class="search-bar">
+    <button type="button" onclick="loadNPOdata()">
+      <i class="bi bi-search"></i>
+    </button>
+    <input id="npo-search" type="text" placeholder="Search" />
+  </div>
+</div>
+
+<div class="container d-flex flex-column justify-content-center my-5" id="npos">
+  <div id="selected-npos-container" class="row"></div>
+  <div id="search-result-container" class="row"></div>
+  <div class="d-flex justify-content-center mt-3">
+    <button onclick="nextStep()" class="btn btn-primary">Continue</button>
+  </div>
+</div>
+
+<script>
+  let selectedNPOs = [];
+  let npos;
+
+  $(document).ready(function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set("limit", 6);
+    // urlParams.set("filter", "");
+
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}?${urlParams}`
+    );
+
+    loadNPOdata();
+
+    $("#causes-search").on("keyup", function (e) {
+      if (e.key === "Enter") {
+        loadNPOdata();
+      }
+    });
+  });
+
+  const fetchData = async (url) => {
+    if (!url) return;
+
+    const response = await fetch(url);
+    const data = response.json();
+    return data;
+  };
+
+  const loadNPOdata = async (limitToAdd = 0) => {
+    const addLimit = (limit) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set("limit", limit);
+
+      window.history.pushState(
+        {},
+        "",
+        `${window.location.pathname}?${urlParams}`
+      );
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let limitParam = urlParams.get("limit");
+
+    if (!limitParam) {
+      limitParam = 0;
+    }
+
+    const newLimit = parseInt(limitParam) + limitToAdd;
+    addLimit(newLimit);
+
+    const searchResultContainer = document.getElementById(
+      "search-result-container"
+    );
+
+    const filter = document.getElementById("npo-search").value;
+
+    searchResultContainer.innerHTML = `
+        <div class="d-flex justify-content-center">
+                <div class="spinner-border" role="status">
+
+                </div>
+        </div>
+        `;
+
+    npos = await fetchData(
+      window.location.origin +
+        "/datasets/npo.json?filter=" +
+        filter +
+        "&limit=" +
+        newLimit
+    );
+
+    if (!npos || npos?.data.length < 1) {
+      searchResultContainer.innerHTML = `
+            <div class="d-flex flex-column col-md-12 gap-3 mb-5">
+              <div>
+                  No result/s found.
+              </div>
+              <div class="position-relative d-flex flex-column gap-4 text-center align-items-center justify-content-center p-2 p-md-5" style="background-color: #e4e6f4">
+                  <h1 style="max-width: 980px">Can't find your nonprofit? Register your nonprofit profile on CauseCircle today.</h1>
+                  <p class="fs-5" style="max-width: 980px">Creating your CauseCircle nonprofit is free and fast. Claim your free profile to expand your reach, connect with new donor bases, and engage a wider community of volunteers and supporters.</p>
+                  <a href="/non-profits/register" class="btn btn-primary fs-2" style="position: absolute; bottom: 0%; transform: translateY(50%); width: 400px; border-radius: 32px">Register Profile</a>
+              </div>
+            </div>
+        `;
+      return;
+    }
+
+    searchResultContainer.innerHTML = "";
+
+    npos.data.forEach((item) => {
+      searchResultContainer.innerHTML += `
+        <div class="col-12 col-sm-6 col-md-6 col-lg-4 cause-card" data-zuid="${item.zuid}">
+            <div class="card mb-3">
+              <div class="card-body p-0 d-flex align-items-center" style="height: 120px">
+                  <div class="h-100 p-2 d-flex align-items-center justify-content-center" style="width: 30%">
+                    <img
+                      class="w-100 h-100"
+                      src="${item.logo}"
+                      alt="${item.name}"
+                      style="
+                          object-fit: contain;
+                      "
+                    />
+                  </div>
+                  <div class="h-100 p-3 d-flex align-items-center text-white" style="width: 70%; border-radius: 0px 5px 5px 0px; background: linear-gradient(rgba(0, 0, 0, 0.5) 15%, #613aaf), url('${item.hero_image}'); background-size: cover;">
+                    <h5 class="text-white" style="opacity: 0.9;">${item.name}</h5>
+                  </div>
+              </div>
+              <div
+                class="btn position-absolute floating-btn text-white"
+              >
+                <input class="form-check-input" type="checkbox" zuid="${item.zuid}">
+              </div>
+            </div>
+        </div>
+      `;
+    });
+
+    $(".form-check-input").on("change", function () {
+      const zuid = $(this).attr("zuid");
+      const card = $(this).closest(".cause-card");
+
+      if (this.checked) {
+        $("#selected-npos-container").append(card);
+        selectedNPOs.push(zuid);
+      } else {
+        $("#search-result-container").append(card);
+        selectedNPOs = selectedNPOs.filter((id) => id !== zuid);
+      }
+    });
+  };
+
+  const nextStep = () => {
+    if (selectedNPOs.length < 1) {
+      alert("Please select at least one nonprofit.");
+      return;
+    }
+
+    const onboarding = JSON.parse(localStorage.getItem("onboarding"));
+    onboarding.npos = selectedNPOs;
+
+    localStorage.setItem("onboarding", JSON.stringify(onboarding));
+
+    // window.location.href = `/onboarding/step3`;
+
+    // console.log("🚀 ~ nextStep ~ onboarding:", onboarding);
+    createZestyUser({
+      ...onboarding,
+      user_type: onboarding.userType,
+      email: onboarding.user_email,
+      first_name: onboarding.user_name.split(" ").slice(0, -1).join(" "),
+      last_name: onboarding.user_name.split(" ").slice(-1)[0],
+    });
+  };
+</script>

@@ -1,0 +1,244 @@
+<style>
+  .nav-link {
+    background-color: white;
+    color: gray;
+  }
+
+  .nav-link .bi {
+    background-color: gray;
+    border-radius: 50%;
+    padding: 5px;
+    color: white;
+  }
+
+  .nav-link.active {
+    background-color: white;
+    color: #0d6efd; /* Bootstrap primary color */
+  }
+
+  .nav-link.active .bi {
+    background-color: #0d6efd; /* Bootstrap primary color */
+    color: white;
+  }
+
+  .category-card {
+    background-size: cover;
+    min-height: 223px;
+    /* display: inline-block; */
+    width: 384px;
+    border-radius: 20px;
+    border: none;
+  }
+  .gradient-overlay {
+    background: linear-gradient(
+      179.63deg,
+      rgba(113, 61, 221, 0) 0.32%,
+      #3d2177 99.68%
+    );
+    border-radius: 20px;
+  }
+  .floating-btn {
+    top: 20px;
+    right: 20px;
+    font-size: 40px;
+    padding: 0;
+    height: 40px;
+    width: 40px;
+    border: none;
+  }
+  .floating-btn .form-check-input {
+    height: 32px;
+    width: 32px;
+    border-radius: 50%;
+  }
+
+  .scroll-container {
+    overflow-x: auto; 
+    white-space: nowrap;
+  }
+
+  .scroll-container::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+  }
+
+  .scroll-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+  }
+
+  .scroll-container::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 10px;
+  }
+
+  .scroll-container::-webkit-scrollbar-thumb:hover {
+      background: #555;
+  }
+
+  #description p {
+    font-size: 1.5rem;
+    color: #5e5e5e;
+  }
+</style>
+
+<section id="hero">
+  <div class="container">
+    <div class="d-flex w-100 gap-6">
+      <div style="width: 140px" class="d-none">
+        <div class="d-flex flex-column vh-100 p-3 bg-light">
+          <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+              <a href="#" class="nav-link active" aria-current="page">
+                <i class="bi bi-house-door"></i>
+                Home
+              </a>
+            </li>
+            <li>
+              <a href="#" class="nav-link">
+                <i class="bi bi-building"></i>
+                NPOs
+              </a>
+            </li>
+            <li>
+              <a href="#" class="nav-link">
+                <i class="bi bi-journal"></i>
+                Stories
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div
+        class="d-flex align-items-center justify-content-between flex-grow-1 py-6"
+      >
+        <div>
+          <h1>{{ this.title }}</h1>
+          <div id="description">{{ this.description }}</div>
+        </div>
+        <div>
+          <button class="btn btn-primary">Create Story</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="causes" class="py-6">
+  <div class="container">
+    <div class="d-flex flex-column gap-4">
+      <div class="d-flex justify-content-between">
+        <div>
+          <h4>Browse by cause</h4>
+        </div>
+        <div>
+          <a href="#" class="text-decoration-none">See all</a>
+        </div>
+      </div>
+      <div
+        class="w-100 d-flex gap-4 scroll-container"
+        style="overflow-x: auto; white-space: nowrap"
+      >
+        <div id="causes-container" class="d-flex gap-3 w-auto"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="npos" class="py-6">
+  <div class="container">
+    <div class="d-flex flex-column gap-4">
+      <div class="d-flex justify-content-between">
+        <div>
+          <h4>My NPOs</h4>
+        </div>
+        <div>
+          <a href="#" class="text-decoration-none">See all</a>
+        </div>
+      </div>
+      <div id="npos-container" class="row"></div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  $(document).ready(async function () {
+    $(".scroll-container").on('wheel', function (evt) {
+      evt.preventDefault();
+      var scrollLeft = $(this).scrollLeft();
+      var scrollWidth = $(this).get(0).scrollWidth;
+      var width = $(this).width();
+      var scrollPercentage = (scrollLeft / (scrollWidth - width)) * 100;
+      $(this).scrollLeft(scrollLeft + evt.originalEvent.deltaY);
+    });
+
+    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+
+    const userData = await getZestyUserInfo(loggedInUser?.email);
+
+    loadCausesNPOs(userData);
+  });
+
+  const loadCausesNPOs = async (data) => {
+
+    if (!data) {
+      window.location.href = "/";
+    }
+
+    const { favorite_causes, favorite_npos } = data;
+
+    const causes_container = document.getElementById("causes-container");
+    const npos_container = document.getElementById("npos-container");
+
+    causes_container.innerHTML = "";
+    npos_container.innerHTML = "";
+
+    favorite_causes?.data.forEach((cause) => {
+      causes_container.innerHTML += `
+          <div
+            class="card mb-3 text-white position-relative category-card"
+            style="background-image: url(${cause?.image?.data[0].url});"
+          >
+            <div
+              class="position-absolute start-0 end-0 top-0 bottom-0 gradient-overlay"
+            ></div>
+            <div class="card-body d-flex align-items-end position-relative">
+              <h4 class="card-title text-center fw-bold">${cause.title}</h4>
+            </div>
+            <a
+              href="${cause.meta.web.uri}"
+              class="btn position-absolute floating-btn text-white"
+            >
+              <i class="bi bi-arrow-up-right-circle-fill d-flex"></i>
+            </a>
+          </div>
+        </div>
+      `;
+    });
+
+    favorite_npos?.data.forEach((npo) => {
+      npos_container.innerHTML += `
+        <div class="col-12 col-sm-6 col-md-6 col-lg-4 cause-card" >
+            <div class="card mb-3">
+              <div class="card-body p-0 d-flex align-items-center" style="height: 120px">
+                  <div class="h-100 p-2 d-flex align-items-center justify-content-center" style="width: 30%">
+                    <img
+                      class="w-100 h-100"
+                      src="${npo?.logo?.data[0]?.url}"
+                      alt="${npo?.name}"
+                      style="
+                          object-fit: contain;
+                      "
+                    />
+                  </div>
+                  <div class="h-100 p-3 d-flex align-items-center text-white" style="width: 70%; border-radius: 0px 5px 5px 0px; background: linear-gradient(rgba(0, 0, 0, 0.5) 15%, #613aaf), url('${npo?.hero_image?.data[0]?.url}'); background-size: cover;">
+                    <h5 class="text-white" style="opacity: 0.9;">${npo?.name}</h5>
+                  </div>
+              </div>
+            </div>
+        </div>
+        `;
+    });
+  };
+</script>

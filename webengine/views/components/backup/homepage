@@ -1,0 +1,351 @@
+<style>
+  .hero-section {
+    /* background: url("{{this.hero_image.getImage()}}") no-repeat center center; */
+    background-size: cover;
+    /* color: #fff; */
+    text-align: center;
+    padding: 100px 0;
+  }
+  .card-img-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+  }
+  .featurette-divider {
+    margin: 5rem 0;
+  }
+  .featured-category-card {
+    background-size: cover;
+    min-height: 223px;
+    border-radius: 20px;
+    border: none;
+  }
+  .featured-gradient-overlay {
+    background: linear-gradient(100deg, #613aaf 5%, #9a6ef3 95%);
+    border-radius: 20px;
+  }
+  .featured-floating-btn {
+    bottom: 20px;
+    right: 20px;
+    font-size: 40px;
+    padding: 0;
+    height: 40px;
+    width: 40px;
+    border: none;
+  }
+  .customer-images {
+    display: flex;
+    position: relative;
+  }
+  .customer-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: -10px;
+    position: relative;
+    z-index: 1;
+    object-fit: cover;
+    filter: grayscale(100%);
+  }
+  .customer-img:nth-child(2) {
+    z-index: 2;
+  }
+  .customer-img:nth-child(3) {
+    z-index: 3;
+  }
+  .customer-img:nth-child(4) {
+    z-index: 4;
+  }
+  .customer-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .customer-info .card-title {
+    margin: 0;
+  }
+
+  .progress {
+    background-color: #e0e0e0;
+  }
+
+  .progress-bar {
+    background-color: #6c63ff;
+  }
+  .causes-card {
+    background-size: cover;
+    min-height: 223px;
+    border-radius: 20px;
+    border: none;
+  }
+</style>
+
+<div class="hero-section">
+  <div class="container">
+    <h1>{{ this.title }}</h1>
+    <p>{{ this.description }}</p>
+    <!-- Example links, ensure you have the correct URLs or Zesty.io Parsley references -->
+    <div
+      class="container mt-5 d-flex gap-2 align-items-center justify-content-center"
+    >
+      <a
+        href="{{ this.secondary_cta_link.truepath() }}"
+        class="btn btn-secondary"
+        >{{ this.secondary_cta_label }}</a
+      >
+      <a
+        href="{{ this.primary_cta_link.truepath() }}"
+        class="btn btn-primary"
+        >{{ this.primary_cta_label }}</a
+      >
+    </div>
+  </div>
+</div>
+
+<div style="margin-bottom: 80px">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        {{each {this.featured_causes} as causes}}
+        {{if {causes._index} == 1}}
+        <div
+          class="card text-white position-relative causes-card h-100"
+          style="background-image: url({{ causes.image.getImage() }});"
+        >
+          <div
+            class="position-absolute start-0 end-0 top-0 bottom-0 gradient-overlay"
+          ></div>
+          <div class="card-body d-flex align-items-end position-relative">
+            <h4 class="card-title text-center fw-bold">{{ causes.title }}</h4>
+          </div>
+          <a
+            href="{{ causes.getUrl() }}"
+            class="btn position-absolute floating-btn text-white"
+          >
+            <i class="bi bi-arrow-up-right-circle-fill d-flex"></i>
+          </a>
+        </div>
+        {{/if}}
+        {{/each}}
+      </div>
+      <div class="col-md-4">
+        <div class="d-flex flex-column gap-4">
+          <div
+            class="text-white position-relative category-card align-items-start p-4"
+          >
+            <div
+              class="position-absolute start-0 end-0 top-0 bottom-0 featured-gradient-overlay"
+            ></div>
+            <div class="card-body d-flex align-items-end position-relative">
+              <h3 class="card-title text-start fw-bold w-75">
+                Your Pathway to Financial Prosperity Starts Here!
+              </h3>
+            </div>
+            <a
+              href="{{ this.getUrl() }}"
+              class="btn position-absolute featured-floating-btn"
+            >
+              <i class="bi bi-arrow-up-right-circle-fill d-flex"></i>
+            </a>
+          </div>
+          <div
+            class="text-black position-relative category-card align-items-start p-4"
+            style="background-color: #f4eeff"
+          >
+            <div class="position-absolute start-0 end-0 top-0 bottom-0"></div>
+            <div class="card-body d-flex align-items-end position-relative">
+              <h3 class="card-title text-start fw-bold w-75">
+                Amplify Your Cause With a Dedicated Community. Claim Your
+                Nonprofit
+              </h3>
+            </div>
+            <a
+              href="{{ this.getUrl() }}"
+              class="btn position-absolute featured-floating-btn"
+            >
+              <i class="bi bi-arrow-up-right-circle-fill d-flex"></i>
+            </a>
+          </div>
+          <!-- <div
+            class="align-items-start p-4 text-primary position-relative category-card"
+            style="background-color: #f4eeff"
+          >
+            <div class="card-body d-flex flex-column align-items-end position-relative">
+              <div class="d-flex justify-content-between w-100 align-items-center">
+                <div class="customer-images">
+                  <img
+                    src="{{ this.hero_image.getImage() }}"
+                    alt="Customer 1"
+                    class="customer-img"
+                  />
+                  <img
+                    src="{{ this.hero_image.getImage() }}"
+                    alt="Customer 2"
+                    class="customer-img"
+                  />
+                  <img
+                    src="{{ this.hero_image.getImage() }}"
+                    alt="Customer 3"
+                    class="customer-img"
+                  />
+                  <img
+                    src="{{ this.hero_image.getImage() }}"
+                    alt="Customer 4"
+                    class="customer-img"
+                  />
+                </div>
+                <h1 class="fw-bold text-black text-center">77K+</h1`>
+              </div>
+              <div class="customer-info w-100 mt-3 ">
+                <div class="mb-3 d-flex justify-content-between">
+                  <h5 class="card-title fw-bold">Lovely Customer</h5>
+                  <h5 class="card-title fw-bold">79.79%</h5>
+                </div>
+                <div class="progress" style="height: 8px; width: 100%;">
+                  <div class="progress-bar" role="progressbar" style="width: 79.79%;" aria-valuenow="79.79" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+            </div>
+            <a
+              href="{{ this.getUrl() }}"
+              class="btn position-absolute featured-floating-btn text-white"
+            >
+              <i class="bi bi-arrow-up-right-circle-fill d-flex"></i>
+            </a>
+            <a
+              href="{{ this.getUrl() }}"
+              class="btn position-absolute text-white"
+              style="
+                bottom: 20px;
+                left: 20px;
+                padding: 0;
+                border: none;
+              "
+            >
+              <h6 class="text-black fw-bold">More Reviews</h6>
+            </a>
+          </div> -->
+        </div>
+      </div>
+      <div class="col-md-4">
+        {{each {this.featured_causes} as causes}}
+        {{if {causes._index} == 0}}
+        <div
+          class="card text-white position-relative causes-card h-100"
+          style="background-image: url({{ causes.image.getImage() }});"
+        >
+          <div
+            class="position-absolute start-0 end-0 top-0 bottom-0 gradient-overlay"
+          ></div>
+          <div class="card-body d-flex align-items-end position-relative">
+            <h4 class="card-title text-center fw-bold">{{ causes.title }}</h4>
+          </div>
+          <a
+            href="{{ causes.getUrl() }}"
+            class="btn position-absolute floating-btn text-white"
+          >
+            <i class="bi bi-arrow-up-right-circle-fill d-flex"></i>
+          </a>
+        </div>
+        {{/if}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="logos" style="margin-top: 80px; margin-bottom: 80px">
+  <div class="container d-flex gap-5 justify-content-center">
+    {{each {this.logos} as logo}}
+    <img
+      src="{{ logo.logo.getImage() }}"
+      alt="logo"
+      class="img-fluid w-auto"
+      style="height: 46px; filter: grayscale(100%)"
+    />
+    {{/each}}
+  </div>
+</div>
+
+<div class="container my-5" id="stories">
+  <h2 class="mb-5 text-center">Featured Stories</h2>
+  <!-- prettier-ignore -->
+  {{include /components/global/Homepage/stories_card.html}}
+  <div class="d-flex justify-content-center mt-3">
+    <button class="btn btn-primary">Load More</button>
+  </div>
+</div>
+
+<!-- <hr class="featurette-divider" /> -->
+
+<div class="container d-flex flex-column justify-content-center" id="causes">
+  <h2 class="mb-5 text-center">NPO's We Support</h2>
+  <!-- prettier-ignore -->
+  {{include /components/global/Homepage/npo_card.html}}
+  <div class="d-flex justify-content-center mt-3">
+    <button class="btn btn-primary">Load More</button>
+  </div>
+</div>
+
+<div
+  class="w-100 bg-primary d-flex flex-column justify-content-center mt-5 py-5"
+  id="causes"
+>
+  <div
+    class="container d-flex flex-column justify-content-center align-items-center"
+  >
+    <h2 class="mb-5 text-center text-white w-75">{{ this.causes_title }}</h2>
+    <!-- prettier-ignore -->
+    {{include /components/global/Homepage/category_card.html}}
+  </div>
+</div>
+
+<!-- prettier-ignore -->
+{{ include /components/global/fundraising_banner.html }}
+
+<div class="">
+  <!-- prettier-ignore -->
+  {{include /components/global/cause_banner.html}}
+</div>
+
+<div class="row w-100">
+  <div
+    class="bg-light col-12 col-md-6 text-center overflow-hidden pt-md-5 d-flex flex-column align-items-center justify-content-between"
+    style="min-height: 600px"
+  >
+    <div class="w-75 mb-5 h-100">
+      <h2 class="display-5 mb-3">{{ this.product_demo_left_title }}</h2>
+      <p class="lead mb-5">
+        {{ this.product_demo_left_description }}
+      </p>
+      <a
+        href="{{ this.product_demo_left_cta_link.truepath() }}"
+        class="btn btn-primary"
+        >{{ this.product_demo_left_cta_label }}</a
+      >
+    </div>
+    <div
+      class="bg-dark shadow-sm mx-auto"
+      style="width: 80%; min-height: 300px; border-radius: 21px 21px 0 0"
+    ></div>
+  </div>
+  <div
+    class="bg-dark col-12 col-md-6 text-center text-white overflow-hidden pt-md-5 d-flex flex-column align-items-center justify-content-between"
+    style="min-height: 600px"
+  >
+    <div class="w-75 mb-5 h-100">
+      <h2 class="display-5 mb-3">{{ this.product_demo_right_title }}</h2>
+      <p class="lead mb-5">
+        {{ this.product_demo_right_description }}
+      </p>
+      <a
+        href="{{ this.product_demo_right_cta_link.truepath() }}"
+        class="btn btn-primary"
+        >{{ this.product_demo_right_cta_label }}</a
+      >
+    </div>
+    <div
+      class="bg-light shadow-sm mx-auto"
+      style="width: 80%; min-height: 300px; border-radius: 21px 21px 0 0"
+    ></div>
+  </div>
+</div>

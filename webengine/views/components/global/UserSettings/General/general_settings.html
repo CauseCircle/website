@@ -1,0 +1,175 @@
+<div id="generalSettings" class="w-100 mt-4">
+  <div class="d-flex">
+    <div style="max-width: 260px; width: 100%">
+      <div class="sidebar sidebar-general">
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title text-muted mb-3">SELECT MENU</h6>
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">
+                  <i class="bi bi-globe me-2"></i> Regional Preferences
+                </a>
+              </li>
+              <li class="nav-item d-none">
+                <a class="nav-link" href="#">
+                  <i class="bi bi-palette me-2"></i> Theme Options
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="regionalPreferences" class="w-100">
+      <div class="mx-auto" style="max-width: 500px; width: 100%">
+        <div class="p-4">
+          <h5 class="mb-2">Regional Preferences</h5>
+          <p class="text-muted mb-4">
+            Select your preferences for your region.
+          </p>
+          <hr class="my-4" />
+          <form id="regionalForm">
+            <div class="mb-3">
+              <label for="language" class="form-label">
+                Language <span class="text-danger">*</span>
+                <i
+                  class="bi bi-info-circle ms-1"
+                  data-bs-toggle="tooltip"
+                  title="Select your preferred language"
+                ></i>
+              </label>
+              <select class="form-select" id="language" required>
+                <option value="en-US">English (US)</option>
+                <option value="en-GB">English (UK)</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="timezone" class="form-label">
+                Timezone <span class="text-danger">*</span>
+                <i
+                  class="bi bi-info-circle ms-1"
+                  data-bs-toggle="tooltip"
+                  title="Select your timezone"
+                ></i>
+              </label>
+              <select class="form-select" id="timezone" required>
+                <option value="GMT-4">
+                  GMT-4:00 - Atlantic Standard Time (AST)
+                </option>
+                <option value="GMT-5">
+                  GMT-5:00 - Eastern Standard Time (EST)
+                </option>
+                <option value="GMT-6">
+                  GMT-6:00 - Central Standard Time (CST)
+                </option>
+                <option value="GMT-7">
+                  GMT-7:00 - Mountain Standard Time (MST)
+                </option>
+                <option value="GMT-8">
+                  GMT-8:00 - Pacific Standard Time (PST)
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="timeFormat" class="form-label">
+                Time Format <span class="text-muted">(Optional)</span>
+                <i
+                  class="bi bi-info-circle ms-1"
+                  data-bs-toggle="tooltip"
+                  title="Choose your preferred time format"
+                ></i>
+              </label>
+              <select class="form-select" id="timeFormat">
+                <option value="24">24 hours</option>
+                <option value="12">12 hours</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="dateFormat" class="form-label">
+                Date Format <span class="text-muted">(Optional)</span>
+                <i
+                  class="bi bi-info-circle ms-1"
+                  data-bs-toggle="tooltip"
+                  title="Choose your preferred date format"
+                ></i>
+              </label>
+              <select class="form-select" id="dateFormat">
+                <option value="DD/MM/YY">DD/MM/YY</option>
+                <option value="MM/DD/YY">MM/DD/YY</option>
+                <option value="YY/MM/DD">YY/MM/DD</option>
+              </select>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+              <button type="button" class="btn btn-light me-2">Discard</button>
+              <button type="submit" class="btn btn-primary">
+                Apply Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="themeOptions" class="w-100" style="display: none">
+      <div class="mx-auto" style="max-width: 500px; width: 100%">
+        <div class="p-4">
+          <h5>Theme Options</h5>
+          <!-- Theme options content will go here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    // Hide all content sections initially except regionalPreferences
+    $("#themeOptions").hide();
+
+    // Handle sidebar navigation clicks
+    $(".sidebar-general .nav-link").on("click", function (e) {
+      e.preventDefault();
+
+      // Remove active class from all nav items
+      $(".sidebar-general .nav-link").removeClass("active");
+      // Add active class to clicked item
+      $(this).addClass("active");
+
+      // Hide all content sections
+      $("#regionalPreferences, #themeOptions").hide();
+
+      // Show the corresponding content section based on the clicked link
+      const linkText = $(this).text().trim().toLowerCase();
+      if (linkText.includes("regional")) {
+        $("#regionalPreferences").show();
+      } else if (linkText.includes("theme")) {
+        $("#themeOptions").show();
+      }
+    });
+
+    // Initialize tooltips
+    $('[data-bs-toggle="tooltip"]').tooltip();
+
+    // Handle form submission
+    $("#regionalForm").on("submit", function (e) {
+      e.preventDefault();
+      const formData = {
+        language: $("#language").val(),
+        timezone: $("#timezone").val(),
+        timeFormat: $("#timeFormat").val(),
+        dateFormat: $("#dateFormat").val(),
+      };
+      // console.log("Regional preferences:", formData);
+      // Add your form submission logic here
+    });
+  });
+</script>

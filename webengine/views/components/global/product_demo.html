@@ -1,0 +1,46 @@
+<div class="row w-100">
+  <div
+    class="bg-light col-12 col-md-6 text-center overflow-hidden pt-md-5 d-flex flex-column align-items-center justify-content-between"
+    style="min-height: 600px"
+  >
+    <div class="w-75 mb-5 h-100">
+      <h2 class="display-5 mb-3">
+        {{ homepage.first().product_demo_left_title }}
+      </h2>
+      <p class="lead mb-5">
+        {{ homepage.first().product_demo_left_description }}
+      </p>
+      <a
+        href="{{ homepage.first().product_demo_left_cta_link.truepath() }}"
+        class="btn btn-primary"
+        >{{ homepage.first().product_demo_left_cta_label }}</a
+      >
+    </div>
+    <div
+      class="bg-dark shadow-sm mx-auto"
+      style="width: 80%; min-height: 300px; border-radius: 21px 21px 0 0"
+    ></div>
+  </div>
+  <div
+    class="bg-dark col-12 col-md-6 text-center text-white overflow-hidden pt-md-5 d-flex flex-column align-items-center justify-content-between"
+    style="min-height: 600px"
+  >
+    <div class="w-75 mb-5 h-100">
+      <h2 class="display-5 mb-3">
+        {{ homepage.first().product_demo_right_title }}
+      </h2>
+      <p class="lead mb-5">
+        {{ homepage.first().product_demo_right_description }}
+      </p>
+      <a
+        href="{{ homepage.first().product_demo_right_cta_link.truepath() }}"
+        class="btn btn-primary"
+        >{{ homepage.first().product_demo_right_cta_label }}</a
+      >
+    </div>
+    <div
+      class="bg-light shadow-sm mx-auto"
+      style="width: 80%; min-height: 300px; border-radius: 21px 21px 0 0"
+    ></div>
+  </div>
+</div>

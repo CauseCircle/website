@@ -1,0 +1,15 @@
+{{ $followed = {users.filter({get_var.zuid}).followed_users} }}
+{{ $count = 0 }}
+{
+  "data" : [
+    {{each {$followed} as userData}}
+    {{userData.toJSON()}}
+    {{ $count = {userData._length} }}
+    {{ userData._arraycomma }}
+    {{/each}}
+  ],
+  "meta" : {
+    "zuid" : "{{get_var.zuid}}",
+    "count" : {{ $count }}
+  }
+}

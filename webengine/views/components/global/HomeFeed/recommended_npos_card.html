@@ -1,0 +1,42 @@
+<style>
+  .npo-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    font-size: 16px;
+  }
+  .npo-description,
+  .npo-description * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    font-size: 12px;
+    font-weight: 400;
+    color: #525866;
+  }
+</style>
+
+<div class="card p-3">
+  <p class="fw-medium mb-3">Recommended NPOs</p>
+  <div class="d-flex flex-column gap-2">
+    {{ each non_profits as npo where npo.featured = '1' limit 5 }}
+    <a href="{{npo.getUrl()}}" class="text-decoration-none text-reset">
+      <div class="d-flex align-items-center gap-2">
+        <img
+          src="{{npo.logo.getImage()}}"
+          class="rounded border border-light-subtle"
+          width="48"
+          height="48"
+          style="border-radius: 8px; object-fit: cover"
+        />
+        <div class="d-flex flex-column justify-content-between overflow-hidden">
+          <p class="m-0 p-0 fw-medium npo-name">{{npo.name}}</p>
+          <div class="npo-description">{{npo.cause_description}}</div>
+        </div>
+      </div>
+    </a>
+    {{/each}}
+  </div>
+</div>

@@ -1,0 +1,49 @@
+<style>
+  .radial-bg {
+    background: radial-gradient(
+      ellipse 60% 40% at 95% 50%,
+      #6936ca 1%,
+      #ffffff 80%
+    );
+  }
+
+  @media (max-width: 575.98px) {
+    .radial-bg {
+      background: none;
+    }
+  }
+</style>
+
+<div class="container py-6 py-sm-7 radial-bg">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="d-flex flex-column gap-4">
+        <div>{{about.first().integrations_title}}</div>
+        <div>
+          <a
+            href="{{about.first().integrations_primary_cta_link.truepath()}}"
+            class="btn btn-primary"
+            >{{about.first().integrations_primary_cta_label}}</a
+          >
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <!-- prettier-ignore -->
+      {{ $integrations = {about.first().integrations} }}
+      <div
+        class="d-flex flex-wrap justify-content-center justify-content-sm-end align-items-center gap-3 mt-5 mt-sm-0"
+      >
+        <!-- prettier-ignore -->
+        {{ each integrations as integration where find_in_set(integration.zuid, '{$integrations}') sort by sort_order }}
+        <img
+          src="{{ integration.image.getImage() }}"
+          alt="{{ integration.name }}"
+          class="img-fluid"
+          style="max-height: 88px; width: auto"
+        />
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>

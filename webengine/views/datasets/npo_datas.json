@@ -1,0 +1,11 @@
+[
+  {{each non_profits as npo limit 0, 2000}}
+  {
+      "name": "{{npo.name}}",
+      "phone_number": "{{npo.phone_number}}",
+      "npo_website": "{{npo.website}}",
+      "donation_link": "{{npo.donate_link}}",
+      "url": "https://causecircle.org{{npo.path_full}}",
+      "zuid": "{{z.zuid}}"
+  }{{npo._arraycomma}}{{/each}}
+]

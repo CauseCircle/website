@@ -1,0 +1,473 @@
+<style>
+  .section-title p,
+  .section-title {
+    font-size: 2rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  .hero-description p,
+  .hero-description {
+    font-size: 1.125rem;
+    font-weight: 400;
+    text-align: center;
+    color: var(--bs-gray-500);
+    max-width: 53.125rem;
+  }
+  .role-card,
+  .cause-card,
+  .npo-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: pointer;
+  }
+  .role-card:hover,
+  .cause-card:hover,
+  .npo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .role-card.selected,
+  .cause-card.selected,
+  .npo-card.selected {
+    border: 2px solid #7b3fee;
+    background-color: #f8f4ff;
+  }
+  .search-input {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    padding-left: 35px;
+  }
+  #stepsIndicator {
+    font-size: 0.875rem;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    color: var(--bs-gray-600);
+  }
+  .step-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--bs-gray-300);
+    color: var(--bs-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+  }
+  .step-separator {
+    width: 16px;
+    height: 2px;
+    background-color: var(--bs-gray-300);
+    margin: 0 8px;
+  }
+  .step-item.active {
+    color: var(--bs-primary);
+  }
+  .step-item.active .step-icon {
+    background-color: var(--bs-primary);
+  }
+  .step-item.completed .step-icon {
+    background-color: var(--bs-success);
+  }
+  .modal-fullscreen .modal-header {
+    padding: 1rem 2rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+  }
+  .modal-fullscreen .modal-body {
+    padding: 2rem;
+  }
+  .close-button {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    opacity: 0.5;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  .close-button:hover {
+    opacity: 0.75;
+  }
+</style>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="claimListingModal"
+  tabindex="-1"
+  aria-labelledby="claimListingModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content p-0">
+      <div class="modal-header w-100">
+        <div class="row w-100">
+          <div class="col-2 d-flex justify-content-start align-items-center">
+            <img
+              src="{{ globals.logo.getImage() }}"
+              style="max-width: 160px"
+              alt="cause circle brand logo"
+            />
+          </div>
+          <div class="col-8 d-flex justify-content-center align-items-center">
+            <!-- Steps indicator -->
+            <div
+              id="stepsIndicator"
+              class="d-flex align-items-center justify-content-center d-none"
+            >
+              <div class="step-item" data-step="1">
+                <span class="step-icon">1</span>
+                <span class="step-text">Verify</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-2 d-flex justify-content-end align-items-center">
+            <button
+              type="button"
+              class="close-button"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div>
+            <button id="backBtn" class="btn btn-secondary">
+              <i class="bi bi-arrow-left"></i>
+              Back
+            </button>
+          </div>
+          <!-- Content sections -->
+          <div class="row">
+            <div class="col-12">
+              <!-- prettier-ignore -->
+              {{ include /components/global/Nonprofits/Claimlisting Modal/verify.html }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const selectionHeaderTexts = [
+    {
+      title: "Verify Your Nonprofit",
+      description:
+        "To ensure you’re the rightful representative, please verify your identity.",
+      icon: "https://4xxglxlj.media.zestyio.com/verify.png",
+    },
+    {
+      title: "Claim Pending!",
+      description:
+        "Your listing claim has been submitted and is under review. You will receive a confirmation email once it's approved.",
+      icon: "https://4xxglxlj.media.zestyio.com/clock.png",
+    },
+  ];
+
+  $(document).ready(function () {
+    let currentStep = 1;
+    const totalSteps = 1;
+
+    function updateStepIndicator() {
+      $(".step-item").removeClass("active completed");
+      for (let i = 1; i <= totalSteps; i++) {
+        if (i < currentStep) {
+          $(`.step-item[data-step="${i}"]`).addClass("completed");
+        } else if (i === currentStep) {
+          $(`.step-item[data-step="${i}"]`).addClass("active");
+        }
+      }
+    }
+
+    function showSection(step) {
+      $(".section-container").addClass("d-none");
+      $(`#${getSectionId(step)}`).removeClass("d-none");
+
+      // Update section content
+      const content = selectionHeaderTexts[step - 1];
+      $(`#${getSectionId(step)} .section-title`).text(content.title);
+      $(`#${getSectionId(step)} .section-description`).text(
+        content.description
+      );
+      $(`#${getSectionId(step)} .section-icon`).attr("src", content.icon);
+
+      // Show/hide back button
+      $("#backBtn").toggle(step > 1);
+
+      // Enable Next button for all steps except the first one
+      $("#nextBtn").prop("disabled", step === 1);
+
+      updateStepIndicator();
+    }
+
+    function getSectionId(step) {
+      const sections = ["verifySelection", "completeSelection"];
+      return sections[step - 1];
+    }
+
+    // Initialize first step
+    showSection(currentStep);
+
+    // Handle back button clicks
+    $(document).on("click", "#backBtn", function () {
+      // console.log("Back button clicked");
+      $("#claimListingModal #nextBtn").prop("disabled", false);
+      if (currentStep > 1) {
+        currentStep--;
+        showSection(currentStep);
+      }
+    });
+
+    // Add this function to reset all states
+    function resetModalStates() {
+      // Reset step counter
+      currentStep = 1;
+      showSection(currentStep);
+
+      // Reset form
+      $("#profileInformationForm")[0].reset();
+      $("#profileInformationForm").removeClass("was-validated");
+
+      // Reset file inputs
+      $("#idUpload").val("");
+      $("#nonprofitDocsUpload").val("");
+
+      // Reset category selection
+      $("#categorySearchInput").val("");
+      $("#selectedCategory").val("");
+      $("#categorySearchInput").removeClass("is-valid is-invalid");
+
+      // Reset validation state
+      validationState = {
+        selectedCategory: false,
+      };
+
+      // Reset checkboxes
+      $("#termsCheck").prop("checked", false);
+      $("#updatesCheck").prop("checked", false);
+
+      // Disable next button
+      $("#claimListingModal #nextBtn").prop("disabled", true);
+
+      // Hide category dropdown if it's visible
+      $("#categoryDropdown").hide();
+    }
+
+    // Add this to the modal's hidden event handler
+    // $("#claimListingModal").on("hidden.bs.modal", function () {
+
+    // });
+
+    // Log when the modal is shown
+    $("#claimListingModal").on("shown.bs.modal", function () {
+      // console.log("Claim Listing Modal shown");
+      resetModalStates();
+    });
+
+    // Add new form submission handler
+    $("#profileInformationForm").on("submit", async function (e) {
+      e.preventDefault();
+
+      if (this.checkValidity()) {
+        try {
+          // Get the current user
+          const localUser = JSON.parse(localStorage.getItem("user"));
+          const zestyUser = await getZestyUser(localUser.zuid);
+
+          // Prepare form data
+          const formData = {
+            First_Name: localUser.firstName,
+            Last_Name: localUser.lastName,
+            Email: localUser.email,
+            Work_Email: $("#workEmail").val(),
+            Company: $("#organizationName").val(),
+            NPO_Multiple_Locations: $("#DecisionBox1").is(":checked"),
+            NPO_ZUID: $("#npoZuid").val(),
+            NPO_URL: window.location.href,
+            User_URL: `${window.location.origin}${zestyUser.user.web.path}`,
+            CC_User_ZUID: localUser.zuid,
+          };
+
+          // Show loading state
+          $("#submitClaimBtn")
+            .prop("disabled", true)
+            .html(
+              '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...'
+            );
+
+          // Submit to our API
+          const response = await fetch(
+            `${CONFIG.API_ROUTES["claim-listing"]}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localUser.uid}`,
+              },
+              body: JSON.stringify(formData),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to submit claim");
+          }
+
+          const result = await response.json();
+
+          // Handle success
+          const multipleLocations = $("#DecisionBox1").is(":checked");
+          const redirectUrl = multipleLocations
+            ? "{{claim_listing_confirmation_page.first().path_full}}?multiplelocations=true"
+            : "{{claim_listing_confirmation_page.first().path_full}}";
+
+          window.location.href = redirectUrl;
+        } catch (error) {
+          console.error("Error submitting claim:", error);
+          alert("There was an error submitting your claim. Please try again.");
+
+          // Reset button state
+          $("#submitClaimBtn")
+            .prop("disabled", false)
+            .text("Verify and Continue");
+        }
+      } else {
+        $(this).addClass("was-validated");
+      }
+    });
+  });
+</script>
+
+<script>
+  $(document).ready(function () {
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    const categorySearchInput = $("#categorySearchInput");
+    const categoryDropdown = $("#categoryDropdown");
+    const selectedCategory = $("#selectedCategory");
+
+    let validationState = {
+      selectedCategory: false,
+    };
+
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    const debouncedSearchCategory = debounce(function () {
+      const searchTerm = categorySearchInput.val().trim();
+      searchCategories(searchTerm);
+    }, 300);
+
+    function searchCategories(searchTerm) {
+      const limit = searchTerm ? 20 : 100;
+
+      $.ajax({
+        url: "https://causecircle.org/mobileapp/causes.json",
+        method: "GET",
+        data: {
+          limit: limit,
+          search: searchTerm,
+          page: 1,
+        },
+        success: function (data) {
+          categoryDropdown.empty();
+          if (data.data && data.data.length > 0) {
+            window.category_data = data.data;
+            data.data.forEach((category) => {
+              categoryDropdown.append(
+                `<li><a class="dropdown-item" href="#" data-category-id="${category.meta.zuid}">${category.title}</a></li>`
+              );
+            });
+          } else {
+            categoryDropdown.append(
+              '<li><span class="dropdown-item">No categories found</span></li>'
+            );
+          }
+          categoryDropdown.show();
+        },
+        error: function (error) {
+          console.error("Error fetching categories:", error);
+          categoryDropdown
+            .empty()
+            .append(
+              '<li><span class="dropdown-item">Error fetching categories</span></li>'
+            );
+          categoryDropdown.show();
+        },
+      });
+    }
+
+    function checkAllValid() {
+      const allValid = Object.values(validationState).every(Boolean);
+      updateNextButtonState(!allValid);
+    }
+
+    function validateSelectedCategory() {
+      const value = selectedCategory.val().trim();
+      if (value === "") {
+        categorySearchInput.addClass("is-invalid");
+        validationState.selectedCategory = false;
+      } else {
+        categorySearchInput.removeClass("is-invalid").addClass("is-valid");
+        validationState.selectedCategory = true;
+      }
+      checkAllValid();
+    }
+
+    function updateNextButtonState() {
+      const idUploadFile = $("#idUpload")[0].files[0];
+      const nonprofitDocsFile = $("#nonprofitDocsUpload")[0].files[0];
+      const isFormValid = $("#profileInformationForm")[0].checkValidity();
+
+      $("#claimListingModal #nextBtn").prop(
+        "disabled",
+        !(idUploadFile && nonprofitDocsFile && isFormValid)
+      );
+    }
+
+    categorySearchInput.on("input", debouncedSearchCategory);
+    categorySearchInput.on("input focus", validateSelectedCategory);
+    categorySearchInput.on("focus", function () {
+      if (categoryDropdown.children().length === 0) {
+        searchCategories("");
+      } else {
+        categoryDropdown.show();
+      }
+    });
+    categoryDropdown.on("click", "a.dropdown-item", function (e) {
+      e.preventDefault();
+      const categoryId = $(this).data("category-id");
+      const categoryName = $(this).text();
+      selectedCategory.val(categoryId);
+      categorySearchInput.val(categoryName);
+      categoryDropdown.hide();
+      validateSelectedCategory();
+    });
+
+    $(document).on("click", function (e) {
+      if (!$(e.target).closest(".dropdown").length) {
+        categoryDropdown.hide();
+      }
+    });
+
+    $("#idUpload, #nonprofitDocsUpload").on("change", updateNextButtonState);
+    $("#profileInformationForm input, #profileInformationForm select").on(
+      "input change",
+      updateNextButtonState
+    );
+  });
+</script>

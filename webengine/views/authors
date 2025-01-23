@@ -1,0 +1,121 @@
+<style>
+  .author-card {
+    width: 100%;
+    max-width: 768px;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px 0 rgba(140, 152, 164, 0.25);
+    background-color: #fff;
+    padding: 32px;
+    padding-top: 112px;
+  }
+  .author-img {
+    height: 160px;
+    width: 160px;
+    border: 10px solid #fff;
+    border-radius: 50%;
+    background-image: url("{{this.headshot.getImage()}}");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .author-img-small{
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.2vw;
+    font-weight: 400;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.2vw, 20px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.2vw, 16px);
+    }
+  }
+
+  .article-category {
+    font-size: 12px;
+  }
+
+  .article-card:hover h2{
+    color: #6936ca
+  }
+
+  .article-img img {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .article-card:hover .article-img img{
+    transform: scale(1.01);
+  }
+
+  .article-card:hover .article-details .article-title{
+    color: #6936ca
+  }
+</style>
+
+<div
+  class="d-flex align-items-center justify-content-center w-100 position-relative"
+  style="height: 550px"
+>
+  <div
+    class="position-absolute w-100"
+    style="top: 0px; background-color: blueviolet; height: 275px"
+  ></div>
+  <div class="h-100 w-100 py-5">
+    <div
+      class="d-flex flex-column align-items-center justify-content-center position-relative w-100"
+    >
+      <div class="author-img position-relative z-3"></div>
+      <div
+        class="position-absolute author-card d-flex flex-column align-items-center justify-content-center"
+        style="top: 80px"
+      >
+        <h2>{{ this.name }}</h2>
+        <h5>{{ this.title }}</h5>
+        <h5 class="py-3 text-center">{{ this.description }}</h5>
+        <p class="text-primary">{{ this.twitter_handle }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="container my-7">
+  <div class="row g-5">
+    {{ $authorZuid = {this.zuid} }}
+    {{each blog_articles as article where find_in_set(article.author, '{$authorZuid}')}}
+    <div class="col-12 col-md-6 col-lg-4">
+      <a href="{{article.path_full}}" class="text-decoration-none" style="color: inherit">
+        <div class="d-flex flex-column gap-4 h-100 article-card">
+          <div class="article-img">
+            <img src="{{article.hero_image.getImage()}}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
+          </div>
+          <div class="d-flex flex-column gap-2 p-2 justify-content-center h-100 article-details">
+            <p class="article-category">PRODUCT</p>
+            <h4 class="article-title">{{ article.title }}</h4>
+            <p>{{ article.description }}</p>
+            <div class="d-flex gap-2 mt-auto">
+              <div>
+                <img class="author-img-small" src="{{this.headshot.getImage()}}" alt=""></img>
+              </div>
+              <div>
+                <p>{{this.name}}</p>
+                <p>{{article.date.date(F Y)}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    {{/each}}
+  </div>
+</section>

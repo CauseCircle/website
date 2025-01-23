@@ -1,0 +1,52 @@
+<div
+  class="position-relative bg-primary d-flex flex-column justify-content-center py-5"
+  style="height: 752px"
+  id="causes"
+>
+  <div
+    class="container d-flex flex-column justify-content-center position-relative z-3"
+    style="background-color: #e6e0e9; border-radius: 30px; min-height: 512px"
+  >
+    <div class="row h-100">
+      <div
+        class="col-md-6 mb-4 mb-md-0 p-5 h-100 d-flex flex-column justify-content-center gap-5"
+      >
+        <div class="d-flex flex-column gap-4">
+          <h1>{{fundraising_banner.first().title}}</h1>
+          <h5>{{fundraising_banner.first().description}}</h5>
+        </div>
+        <a
+          data-target="#demo-section"
+          class="btn btn-primary mt-4 scroll-to-demo"
+          style="align-self: start"
+        >
+          {{fundraising_banner.first().primary_cta_label}}
+        </a>
+      </div>
+      <div
+        class="col-md-6 p-0 d-none d-md-block"
+        style="height: 100%; border-radius: 0px 30px 30px 0px"
+      >
+        <img
+          src="{{fundraising_banner.first().image.getImage()}}"
+          style="
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0px 30px 30px 0px;
+          "
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    style="
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 261px;
+      background-color: #f9f9f9;
+    "
+  ></div>
+</div>

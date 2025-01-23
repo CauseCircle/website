@@ -1,0 +1,323 @@
+<style>
+  .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+  .form-input {
+    border: 1px solid #dfe1e7;
+    background-color: #f8fafb;
+    border-radius: 5px;
+    height: 48px;
+    padding: 8px 12px 8px 12px;
+  }
+  .form-dropdown {
+    /* Base styles for the select */
+    /* appearance: none; Remove browser default styling */
+    /* -webkit-appearance: none; For Safari */
+    /* -moz-appearance: none; For Firefox */
+    width: 100%;
+    height: 48px;
+    padding: 8px 12px 8px 12px;
+    border: 1px solid #dfe1e7;
+    background-color: #f8fafb;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 400;
+    color: black;
+    position: relative;
+  }
+  .form-dropdown::-ms-expand {
+    /* display: none; Hide the default arrow for IE11 */
+  }
+  .form-dropdown:focus {
+    outline: none;
+    border-color: black;
+    border-width: 2px;
+  }
+  .form-dropdown option {
+    padding: 8px 12px;
+    background-color: #fff;
+    font-size: 16px;
+  }
+
+  select {
+    appearance: none;
+    /*  safari  */
+    -webkit-appearance: none;
+    /*  other styles for aesthetics */
+  }
+  .form-dropdown::before,
+  .form-dropdown::after {
+    --size: 0.3rem;
+    content: "";
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+  }
+
+  .form-dropdown::before {
+    border-left: 0.3rem solid transparent;
+    border-right: 0.3rem solid transparent;
+    border-bottom: 0.3rem solid black;
+    top: 40%;
+  }
+
+  .form-dropdown::after {
+    border-left: 0.3rem solid transparent;
+    border-right: 0.3rem solid transparent;
+    border-top: 0.3rem solid black;
+    top: 55%;
+  }
+
+  ul.custom-bullet {
+    list-style: none; /* Remove default bullets */
+    padding: 0;
+  }
+
+  ul.custom-bullet li {
+    margin-left: 25px; /* Adjust as needed */
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  ul.custom-bullet li::before {
+    content: "";
+    position: absolute;
+    left: -25px; /* Adjust to position the image */
+    top: 4px;
+    width: 16px; /* Adjust image width */
+    height: 16px; /* Adjust image height */
+    background-image: url("{{cause_circle_cms_page.first().list_icon.getImage()}}"); /* Replace with your image path */
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+</style>
+
+<div id="demo-section" class="container py-6 py-sm-7">
+  <div class="row">
+    <div class="col-md-6 d-flex align-items-start justify-content-center">
+      <div
+        class="d-flex flex-column align-items-start justify-content-center w-100 w-sm-75 gap-4"
+      >
+        <h1>{{ demo_page.first().demo_title }}</h1>
+        <div id="hero-description" class="d-flex flex-column gap-3">
+          {{ demo_page.first().demo_description }}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 d-flex align-items-start justify-content-start">
+      <!-- Change or deletion of the name attributes in the input tag will lead to empty values on record submission-->
+      <div
+        class="d-flex flex-column align-items-start justify-content-start h-100 w-100 w-lg-75"
+      >
+        <form
+          action="https://forms.zohopublic.com/zestyio/form/test/formperma/J6A2YBPtSZBBoKGtcRVtOCL6D6x0t905w43usoM_Bsw/htmlRecords/submit"
+          name="form"
+          id="form"
+          method="POST"
+          accept-charset="UTF-8"
+          enctype="multipart/form-data"
+          class="d-flex justify-content-center align-items-center flex-column"
+          onsubmit="return validateForm()"
+        >
+          <input
+            id="referrer-name"
+            type="hidden"
+            name="zf_referrer_name"
+            value=""
+          /><!-- To Track referrals , place the referrer name within the " " in the above hidden input field -->
+          <input
+            type="hidden"
+            name="zf_redirect_url"
+            value="https://causecircle.org/about/confirmation-page/"
+          /><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
+          <input
+            type="hidden"
+            name="zc_gad"
+            value=""
+          /><!-- If GCLID is enabled in Zoho CRM Integration, click details of AdWords Ads will be pushed to Zoho CRM -->
+          <!--Name-->
+          <div class="row gap-4 mt-5 mt-sm-0">
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-1">
+                <label>First Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  maxlength="255"
+                  name="Name_First"
+                  fieldType="7"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="firstNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-1">
+                <label>Last Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  maxlength="255"
+                  name="Name_Last"
+                  fieldType="7"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="lastNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-1">
+                <label> Work Email </label>
+                <input
+                  class="form-input"
+                  type="email"
+                  maxlength="255"
+                  name="Email"
+                  value=""
+                  fieldType="9"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="emailError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-1">
+                <label> Organization Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  name="SingleLine"
+                  value=""
+                  fieldType="1"
+                  maxlength="255"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="orgNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 mt-3">
+                <button
+                  type="submit"
+                  class="btn btn-primary w-100"
+                  style="height: 48px"
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function validateForm() {
+    let isValid = true;
+    let firstNameError = document.getElementById("firstNameError");
+    let lastNameError = document.getElementById("lastNameError");
+    let emailError = document.getElementById("emailError");
+    let orgNameError = document.getElementById("orgNameError");
+
+    firstNameError.textContent = "";
+    lastNameError.textContent = "";
+    emailError.textContent = "";
+    orgNameError.textContent = "";
+
+    // Validate first name
+    if (document.forms["form"]["Name_First"].value === "") {
+      firstNameError.textContent = "Please enter your first name.";
+      isValid = false;
+    }
+
+    // Validate last name
+    if (document.forms["form"]["Name_Last"].value === "") {
+      lastNameError.textContent = "Please enter your last name.";
+      isValid = false;
+    }
+
+    // Validate email
+    let email = document.forms["form"]["Email"].value;
+    if (email === "" || !isValidEmail(email)) {
+      emailError.textContent = "Please enter a valid work email address.";
+      isValid = false;
+    }
+
+    // Validate organization name
+    if (document.forms["form"]["SingleLine"].value === "") {
+      orgNameError.textContent = "Please enter your organization name.";
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  function isValidEmail(email) {
+    // Define common free email domain patterns
+    const freeEmailDomains = [
+      "gmail.com",
+      "yahoo.com",
+      "hotmail.com",
+      "outlook.com",
+      "icloud.com",
+      "aol.com",
+      "zoho.com",
+      "gmx.com",
+      "mail.com",
+      "live.com",
+      "yandex.com",
+      "protonmail.com",
+      "tutanota.com",
+      "fastmail.com",
+      "mail.ru",
+      "inbox.com",
+      // Add more free email domains as needed
+    ];
+
+    // Check if the email is valid and doesn't end with a free domain
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(email)) {
+      return false; // Invalid email format
+    }
+
+    const domain = email.split("@")[1]; // Extract domain part
+    return !freeEmailDomains.includes(domain); // Check if it's a free domain
+  }
+  $(document).ready(function () {
+    $("#hero-description ul").each(function () {
+      $(this).addClass("custom-bullet");
+    });
+
+    const referrerField = $("#referrer-name");
+
+    if (referrerField.length) {
+      referrerField.val(window.location.href);
+    }
+  });
+</script>

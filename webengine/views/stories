@@ -1,0 +1,345 @@
+<style>
+  .hero {
+    background-image: url("{{this.story_image.getImage()}}");
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    position: relative;
+    z-index: 1;
+  }
+  .hero::after {
+    content: "";
+    background: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+  }
+  .article-content {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 5px;
+    padding: 20px;
+  }
+  .back-btn {
+    background: #eceff3;
+    /* border: none; */
+    color: black;
+    font-size: 1.5rem;
+    cursor: pointer;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .back-btn:hover {
+    color: #7b3fee;
+  }
+  .back-btn i {
+    font-size: 1.6rem;
+  }
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .story-container img {
+    max-width: 100%;
+    max-height: auto;
+    padding: 20px 0;
+  }
+  .story-container p {
+    padding-bottom: 12px;
+  }
+  .author-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .story-description p,
+  .npo-description p,
+  .npo-description,
+  .story-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .one-line-text,
+  .one-line-text p {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  .npo-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 3px;
+    object-fit: cover;
+  }
+
+  .badge {
+    background-color: #7c3fee2d;
+  }
+
+  .story-card {
+    transition: all 0.3s ease;
+  }
+  .story-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<section class="container py-4 pb-md-7">
+  <div class="row">
+    <!-- Main content column -->
+    <div class="col-12 col-md-7 col-xl-8">
+      <div class="w-100 d-flex flex-column gap-2">
+        <img class="hero-img" src="{{ this.story_image.getImage() }}" alt="" />
+
+        <!-- Story title and description -->
+        <div id="active-story" data-zuid="{{ this.zuid }}" class="d-flex">
+          <div class="flex-grow-1">
+            <p class="fs-4 fw-normal story-title mt-3">{{ this.title }}</p>
+          </div>
+          <div
+            class="flex-grow-1 d-flex align-items-center justify-content-end"
+          >
+            <div class="dropdown">
+              <button
+                class="btn btn-secondary"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="bi bi-three-dots-vertical"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <button class="dropdown-item" id="report-story">
+                    <i class="bi bi-flag"></i> Report
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="fs-5 text-muted story-description d-none">
+          {{ this.description }}
+        </div>
+
+        <!-- Author card -->
+        {{ if {this.author} }}
+        <div class="card my-2">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div class="d-flex gap-2">
+                <div>
+                  {{ $profile_image = {users.filter({this.author}).profile_image.getImage()} }}
+                  {{ if {$profile_image} }}
+                  <img class="author-img" src="{{ $profile_image }}" />
+                  {{ else }}
+                  <img
+                    class="author-img"
+                    src="https://placehold.co/600x400?text=Profile"
+                  />
+                  {{ end-if }}
+                </div>
+                <div class="d-flex flex-column justify-content-between">
+                  <p class="fs-6 fw-medium">
+                    {{ users.filter({this.author}).first_name }}
+                    {{ users.filter({this.author}).last_name }}
+                  </p>
+                  <p class="fs-6 text-muted">{{ this.date_published }}</p>
+                </div>
+              </div>
+              <div class="d-flex gap-3 align-items-center">
+                <a
+                  href="{{ users.filter({this.author}).path_full }}"
+                  class="btn btn-secondary"
+                >
+                  View Profile
+                </a>
+                <a href="" class="btn btn-primary">
+                  <i class="bi bi-plus"></i>
+                  Follow
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{ else}}
+        <div class="table-group-divider border-light-subtle"></div>
+        {{ end-if }}
+
+        <!-- Story content -->
+        <p class="fs-4 fw-normal">Story</p>
+        <div class="story-container py-2">{{ this.story_body }}</div>
+      </div>
+    </div>
+
+    <!-- Sidebar column -->
+    <div class="col-md-5 col-xl-4 d-none d-md-block">
+      <div class="w-100 d-flex flex-column gap-2">
+        {{ if {this.related_npos} }}
+        <!-- NPO description card -->
+        {{each {this.related_npos} as npo limit 1}}
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-column gap-2">
+              <p class="fw-normal">Support Our Mission</p>
+              <div class="text-muted npo-description">
+                {{ npo.cause_description }}
+              </div>
+              <a href="{{ npo.donate_link }}" class="btn btn-primary w-100 mt-2"
+                >Donate Now</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- NPO information card -->
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-column gap-2">
+              <p class="fw-normal">About the Nonprofit</p>
+              <div class="d-flex gap-2">
+                <img src="{{ npo.logo.getImage() }}" class="npo-logo" />
+                <div class="d-flex flex-column justify-content-between">
+                  <p class="fw-normal">{{ npo.name }}</p>
+                  <div class="text-muted one-line-text">
+                    {{ npo.cause_description }}
+                  </div>
+                </div>
+              </div>
+              <a href="{{ npo.path_full }}" class="btn btn-secondary w-100 mt-2"
+                >Visit Nonprofit Profile</a
+              >
+            </div>
+          </div>
+        </div>
+        {{/each}}
+        {{ end-if}}
+
+        <!-- Story stats card -->
+        <div class="card d-none">
+          <div class="card-body">
+            <div class="d-flex flex-column gap-2">
+              <p class="fw-normal">Story Statistics</p>
+              <div class="d-flex gap-3">
+                <p><strong>2,345 </strong> Reads</p>
+                <p><strong>80 </strong> Shares</p>
+                <p><strong>320 </strong> Likes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{ if {this.related_causes} }}
+        <!-- Tags card -->
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-column gap-2">
+              <p class="fw-normal">Tags</p>
+              <div class="d-flex gap-2 flex-wrap">
+                {{ each {this.related_causes} as tag }}
+                <span class="badge text-primary">{{ tag.title }}</span>
+                {{ /each }}
+              </div>
+            </div>
+          </div>
+        </div>
+        {{ end-if }}
+
+        <!-- Related stories card -->
+        <p class="fw-normal fs-6 py-2">Related Stories</p>
+        <div class="d-flex flex-column gap-2">
+          {{ each stories as story limit 5 where story.zuid != '{this.zuid}' and story.related_npos = '{this.related_npos}'}}
+          <a
+            href="{{ story.getUrl() }}"
+            class="text-decoration-none text-reset"
+          >
+            <div class="card story-card">
+              <div class="card-body p-2">
+                <div class="d-flex align-items-center gap-2">
+                  <img
+                    src="{{ story.story_image.getImage() }}"
+                    class="rounded border border-light-subtle"
+                    width="72"
+                    height="72"
+                    style="border-radius: 8px; object-fit: cover"
+                  />
+                  <div
+                    class="d-flex flex-column justify-content-between overflow-hidden"
+                  >
+                    <p class="fw-light text-muted">
+                      {{ story.date_published }}
+                    </p>
+                    <p class="m-0 p-0 fw-normal one-line-text">
+                      {{ story.title }}
+                    </p>
+                    <div class="one-line-text text-muted">
+                      {{ story.description }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- prettier-ignore -->
+{{include /components/global/NPO Admin/Dashboard/Review Story Modal/report_modal.html}}
+
+<script>
+  $(document).ready(function () {
+    // Back button functionality
+    $(".back-btn").click(function () {
+      window.history.back();
+    });
+
+    // Restructure paragraphs with embedded images
+    $(".story-container p span").each(function () {
+      const $span = $(this);
+      const $img = $span.find("img");
+
+      if ($img.length) {
+        const [textBefore, textAfter] = $span
+          .html()
+          .split($img[0].outerHTML)
+          .map((text) => text.trim());
+
+        $span
+          .closest("p")
+          .before($("<p>").append($("<span>").text(textBefore)));
+        $span.closest("p").before($img);
+        $span.closest("p").before($("<p>").append($("<span>").text(textAfter)));
+
+        $span.closest("p").remove();
+      }
+    });
+  });
+</script>

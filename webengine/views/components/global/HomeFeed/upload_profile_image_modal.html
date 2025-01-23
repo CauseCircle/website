@@ -1,0 +1,202 @@
+<style>
+  .image-upload-container {
+    width: 100%;
+  }
+  .image-preview {
+    width: 100%;
+    height: 270px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #f8f9fa;
+  }
+  .preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .custom-file-input {
+    display: none;
+  }
+  #removeProfileImageBtn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  #removeProfileImageBtn i {
+    font-size: 14px;
+  }
+  .upload-message {
+    text-align: center;
+    padding: 20px;
+  }
+</style>
+
+<div
+  class="modal fade"
+  id="uploadProfileImageModal"
+  tabindex="-1"
+  aria-labelledby="uploadProfileImageModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom: none">
+        <button
+          type="button"
+          class="btn-close btn"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div
+          class="d-flex justify-content-center align-items-center flex-column"
+        >
+          <div style="max-width: 480px; width: 100%">
+            <div class="image-upload-container">
+              <div id="profileImagePreview" class="image-preview">
+                <div
+                  id="profileUploadMessage"
+                  class="d-flex flex-column gap-2 align-items-center upload-message"
+                >
+                  <p>Choose a file or drag & drop it here.</p>
+                  <p>JPEG, PNG, GIF, BMP, TIFF, and WEBP formats.</p>
+                  <label class="btn btn-secondary mt-2" for="profileImageInput"
+                    >Choose Image</label
+                  >
+                </div>
+                <img
+                  id="previewProfileImage"
+                  class="preview-image d-none"
+                  src=""
+                  alt="Preview"
+                />
+                <button
+                  id="removeProfileImageBtn"
+                  class="btn position-absolute top-0 end-0 m-2 d-none rounded-circle bg-white"
+                >
+                  <i class="bi bi-x text-black"></i>
+                </button>
+              </div>
+              <input
+                type="file"
+                class="custom-file-input btn btn-outline-secondary w-100"
+                id="profileImageInput"
+                accept="image/*"
+              />
+            </div>
+          </div>
+          <button id="uploadProfileImageBtn" class="btn btn-primary w-100 mt-4">
+            Upload
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    const profileImageInput = $("#profileImageInput");
+    const profileImagePreview = $("#profileImagePreview");
+    const previewProfileImage = $("#previewProfileImage");
+    const removeProfileImageBtn = $("#removeProfileImageBtn");
+    const profileUploadMessage = $("#profileUploadMessage");
+    const uploadProfileImageBtn = $("#uploadProfileImageBtn");
+
+    profileImageInput.on("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewProfileImage
+            .attr("src", e.target.result)
+            .removeClass("d-none");
+          profileUploadMessage.addClass("d-none");
+          removeProfileImageBtn.removeClass("d-none");
+          // uploadHeroImage();
+          updateUploadButtonState(true);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        resetImagePreview();
+      }
+    });
+
+    removeProfileImageBtn.on("click", function () {
+      profileImageInput.val("");
+      resetImagePreview();
+    });
+
+    uploadProfileImageBtn.on("click", async function () {
+      try {
+        uploadProfileImageBtn
+          .prop("disabled", true)
+          .html(
+            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...'
+          );
+
+        const file = profileImageInput.prop("files")[0];
+        if (!file) {
+          throw new Error("No file selected");
+        }
+
+        const image = await uploadImages([file]);
+
+        if (image && image.length > 0) {
+          updateNextButtonState(false);
+
+          const localUser = await window.localStorage.getItem("user");
+          const user = JSON.parse(localUser);
+          const userZuid = user.zuid;
+
+          let userData = await getZestyUser(userZuid);
+          if (!userData?.user) return;
+
+          // Edit the user data
+          userData.user.data.image = image[0].data[0].id;
+          userData.user.data.profile_image = image[0].data[0].id;
+
+          const updatedUser = await updateZestyUser(userZuid, userData.user.data);
+
+          // console.log("User profile updated:", updatedUser);
+
+          $("#uploadProfileImageModal").modal("hide");
+          $("#profile-card")
+            .find(".profile-image")
+            .attr("src", image[0].data[0].url);
+        } else {
+          throw new Error("Upload failed");
+        }
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        alert("An error occurred while uploading the image. Please try again.");
+      } finally {
+        uploadProfileImageBtn.prop("disabled", false).html("Upload");
+      }
+    });
+
+    function resetImagePreview() {
+      previewProfileImage.attr("src", "").addClass("d-none");
+      profileUploadMessage.removeClass("d-none");
+      removeProfileImageBtn.addClass("d-none");
+      updateUploadButtonState(false);
+    }
+
+    function updateUploadButtonState(enabled) {
+      uploadProfileImageBtn.prop("disabled", !enabled);
+    }
+
+    updateUploadButtonState(false);
+  });
+</script>

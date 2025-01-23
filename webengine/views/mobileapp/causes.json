@@ -1,0 +1,28 @@
+{{$page = 1}}
+{{$limit = 25}}
+{{$search =  }}
+{{if {get_var.page} }}
+{{$page = {get_var.page} }}
+{{/if}}
+{{if {get_var.limit} }}
+{{$limit = {get_var.limit} }}
+{{/if}}
+{{if {get_var.search} }}
+{{$search = WHERE cause.title LIKE '%{get_var.search}%'  }}
+{{else-if {get_var.featured} }}
+{{$search = WHERE cause.featured = '{get_var.featured}'  }}
+{{/if}}
+{{$start = {math(({$page} - 1) * {$limit})} }}
+{
+    "data" :
+    [
+        {{each causes as cause {$search} limit {$start}, {$limit} }}
+        {{cause.toJSON(2)}}
+        {{cause._arraycomma}}
+        {{/each}}
+    ],
+    "meta" : {
+        "page" : {{$page}},
+        "limit" : {{$limit}}
+    }
+}

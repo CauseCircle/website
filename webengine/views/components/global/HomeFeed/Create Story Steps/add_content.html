@@ -1,0 +1,99 @@
+<style>
+  .card-header {
+    background-color: #f8f9fa !important;
+    height: 40px !important;
+  }
+  #storyContent {
+    max-width: 600px;
+    min-height: 200px;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    resize: vertical;
+  }
+</style>
+
+<section id="addContentSelection" class="section-container d-none">
+  <div class="py-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img class="section-icon" src="" style="max-width: 160px" />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="section-title fs-1 fw-normal mb-0"></p>
+        <p class="section-description fs-5 text-muted mb-0"></p>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <textarea
+      class="form-control"
+      id="storyContent"
+      placeholder="Create your story here..."
+    ></textarea>
+    <div class="mb-4" style="max-width: 380px; width: 100%">
+      <button id="nextBtn" class="btn btn-primary w-100 mt-4">Next</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  function updateNextButtonState(enable) {
+    $("#createStoryModal #nextBtn").prop("disabled", enable);
+  }
+
+  function validateContent(content) {
+    updateNextButtonState(!(content.length > 0));
+  }
+
+  function uploadHeroImage(dataUrl) {
+    // Convert data URL to File object
+    const byteString = atob(dataUrl.split(",")[1]);
+    const mimeString = dataUrl.split(",")[0].split(":")[1].split(";")[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    const file = new File([ab], "image." + mimeString.split("/")[1], {
+      type: mimeString,
+    });
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("bin_id", "1-114d3b24-8tkmzd");
+    formData.append("group_id", "1-114d3b24-8tkmzd");
+
+    const authToken = "PTK-7s2jvqh3tq5q9421m6hh34zwlkt3dbfrg0vszfp69lhzl";
+
+    $.ajax({
+      url: "https://media-storage.api.zesty.io/upload/gcp/zesty-8497a10216721e22d9db331448fbfb8b46ebee3c",
+      type: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        // console.log("Image uploaded successfully:", response);
+        updateNextButtonState(false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error("Image upload failed:", textStatus, errorThrown);
+        alert("Failed to upload image. Please try again.");
+      },
+    });
+  }
+
+  $(document).ready(function () {
+    const initialContent = $("#storyContent").val().trim();
+    validateContent(initialContent);
+
+    $("#storyContent").on("input", function () {
+      const content = $(this).val().trim();
+      window.story_content = content;
+      validateContent(content);
+    });
+  });
+</script>

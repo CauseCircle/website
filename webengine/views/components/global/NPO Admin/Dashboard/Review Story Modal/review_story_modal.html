@@ -1,0 +1,390 @@
+<!-- Review Stories Modal -->
+<style>
+  /* Custom Modal Classes */
+  .review-modal-content {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .review-modal-body {
+    height: calc(100vh - 150px);
+    overflow-y: auto;
+    padding: 1.5rem;
+  }
+
+  .review-stories-header {
+    position: relative;
+    padding-bottom: 1rem;
+  }
+
+  .review-stories-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, 
+      rgba(0,0,0,0.02), 
+      rgba(0,0,0,0.1) 20%, 
+      rgba(0,0,0,0.1) 80%, 
+      rgba(0,0,0,0.02)
+    );
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  /* Story Navigation */
+  .story-navigation {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+  }
+
+  /* Story Content */
+  #story-content {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .story-container {
+    max-height: none;
+    overflow-y: visible;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .story-container p {
+    max-width: 100%;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Media Elements */
+  .story-image {
+    max-height: 400px;
+    object-fit: cover;
+    width: 100%;
+    border-radius: 0.5rem;
+  }
+
+  .author-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  /* Custom Scrollbar for review modal */
+  .review-modal-body::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .review-modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .review-modal-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  .review-modal-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+</style>
+
+<div
+  class="modal fade"
+  id="reviewStoriesModal"
+  tabindex="-1"
+  aria-labelledby="reviewStoriesModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content review-modal-content">
+      <div class="modal-header border-0 d-flex justify-content-between review-stories-header">
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-transparent" data-bs-dismiss="modal">
+            <i class="bi bi-arrow-left fs-4"></i>
+          </button>
+          <h5 id="modal-review-stories-count" class="header-title mb-0"></h5>
+        </div>
+        <div class="action-buttons ms-3">
+          <button
+            class="btn btn-secondary border-0"
+            id="report-story"
+            title="Report"
+          >
+            <i class="bi bi-flag"></i>
+          </button>
+          <button
+            class="btn btn-secondary border-0"
+            id="reject-story"
+            title="Reject"
+          >
+            <span class="icon-container">
+              <i class="bi bi-x"></i>
+              <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+            </span>
+            Reject
+          </button>
+          <button
+            class="btn btn-secondary border-0"
+            id="request-changes"
+            title="Request Changes"
+          >
+            <i class="bi bi-pencil"></i> Request Changes
+          </button>
+          <button id="approve-story" class="btn btn-primary" title="Approve">
+            <span class="icon-container">
+              <i class="bi bi-check"></i>
+              <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+            </span>
+            Approve
+          </button>
+        </div>
+      </div>
+      <div class="modal-body review-modal-body px-0 pt-0">
+        <!-- Story Navigation -->
+        <div class="story-navigation">
+          <div class="container">
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-secondary" id="prev-story" disabled>
+                <i class="bi bi-chevron-left"></i> Previous
+              </button>
+              <button class="btn btn-secondary" id="next-story" disabled>
+                Next <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Story Content Container -->
+        <div class="container">
+          <div id="story-content" class="w-100">
+            <!-- Story will be rendered here by jQuery -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- prettier-ignore -->
+{{include /components/global/NPO Admin/Dashboard/Review Story Modal/report_modal.html}}
+
+<!-- prettier-ignore -->
+{{include /components/global/NPO Admin/Dashboard/Review Story Modal/request_changes.html}}
+
+
+
+<script>
+  let currentStoryIndex = 0;
+  let stories = [];
+
+  async function loadStories(zuid) {
+    stories = await getStories(zuid, 0, "null");
+    const actionButtons = $(".action-buttons button"); // Get all action buttons
+
+    if (stories?.length > 0) {
+      currentStoryIndex = 0;
+      renderCurrentStory();
+      updateNavigationButtons();
+      getApprovedStories(zuid);
+      // Enable action buttons since we have stories
+      actionButtons.prop("disabled", false);
+    } else {
+      // Disable action buttons if no stories
+      actionButtons.prop("disabled", true);
+      $("#story-content").html(`
+        <div class="text-center py-5">
+          <h4 class="text-muted">No stories to review</h4>
+        </div>
+      `);
+    }
+  }
+
+  function renderCurrentStory() {
+    const story = stories[currentStoryIndex];
+    const storyContent = $("#story-content");
+    const actionButtons = $(".action-buttons button"); // Get all action buttons
+
+    if (!stories[currentStoryIndex]) {
+      $("#reviewStoriesModal").modal("hide");
+      storyContent.html("");
+      // Disable all action buttons
+      actionButtons.prop("disabled", true);
+      return;
+    }
+
+    // Enable all action buttons since we have a story
+    actionButtons.prop("disabled", false);
+
+    storyContent.html(`
+    <div id="active-story" class="w-100 d-flex flex-column gap-2" data-zuid="${
+      story?.meta?.zuid
+    }">
+      <img class="story-image" src="${story.story_image.data[0].url}" alt="${story.title}" />
+
+      <!-- Story title and description -->
+      <h2 class="fs-4 fw-normal story-title mt-3">${escapeHtml(story.title)}</h2>
+      <div class="fs-5 text-muted story-description">
+        ${escapeHtml(story.description || "")}
+      </div>
+
+      <!-- Author card -->
+      <div class="card my-2">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div class="d-flex gap-2">
+              <div>
+                <img 
+                  class="author-img" 
+                  src="${typeof story.author.data[0].profile_image === 'string' ? story.author.data[0].profile_image : "https://placehold.co/600x400?text=Profile"}" 
+                  alt="Author profile"
+                />
+              </div>
+              <div class="d-flex flex-column justify-content-center">
+                <p class="fs-5 fw-medium mb-0">${escapeHtml(story.author.data[0].first_name)} ${escapeHtml(story.author.data[0].last_name)}</p>
+                <p class="fs-6 text-muted mb-0">${formatDate(story.date_published) || ""}</p>
+              </div>
+            </div>
+            <div class="d-flex gap-3 align-items-center">
+              <a href="https://causecircle.org${story.author.data[0]?.meta?.web?.uri}" class="btn btn-secondary">
+                View Profile
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story content -->
+      <h3 class="fs-4 fw-normal">Story</h3>
+      <div class="story-container">${formatStoryBody(story.story_body)}</div>
+    </div>
+  `);
+  }
+
+  function updateNavigationButtons() {
+    $("#prev-story").prop("disabled", currentStoryIndex === 0);
+    $("#next-story").prop("disabled", currentStoryIndex === stories.length - 1);
+  }
+
+  async function handleStoryAction(action, changeRequest = null) {
+    const zuid = $("#active-story").data("zuid");
+    
+    // Only handle loading states for approve/reject buttons here
+    const button = action === "approved" ? $("#approve-story") : 
+                  action === "rejected" ? $("#reject-story") : null;
+    
+    if (button) {
+      const icon = button.find(".bi");
+      const spinner = button.find(".spinner-border");
+      
+      try {
+        // Disable button and show loading
+        button.prop("disabled", true);
+        icon.addClass("d-none");
+        spinner.removeClass("d-none");
+        
+        await window.approveStory(zuid, action, changeRequest);
+
+        await window.loadStories("{{get_var.zuid}}");
+        await window.getNewStoriesCount("{{get_var.zuid}}");
+        await window.getApprovedStories("{{get_var.zuid}}");
+        renderCurrentStory();
+        updateNavigationButtons();
+      } catch (error) {
+        console.error(`Error ${action} story:`, error);
+        // Show error toast or feedback here
+      } finally {
+        // Reset button state
+        button.prop("disabled", false);
+        icon.removeClass("d-none");
+        spinner.addClass("d-none");
+      }
+    } else {
+      // For changes_requested, just make the API call
+      try {
+        await window.approveStory(zuid, action, changeRequest);
+        await window.loadStories("{{get_var.zuid}}");
+        await window.getNewStoriesCount("{{get_var.zuid}}");
+        await window.getApprovedStories("{{get_var.zuid}}");
+        renderCurrentStory();
+        updateNavigationButtons();
+      } catch (error) {
+        console.error(`Error ${action} story:`, error);
+        throw error; // Propagate error to be handled by the calling function
+      }
+    }
+  }
+
+  $(document).ready(function () {
+    // Event Handlers
+    $("#reviewStoriesModal").on("show.bs.modal", async function () {
+      await loadStories("{{get_var.zuid}}");
+    });
+
+    $("#next-story").click(function () {
+      if (currentStoryIndex < stories.length - 1) {
+        currentStoryIndex++;
+        renderCurrentStory();
+        updateNavigationButtons();
+      }
+    });
+
+    $("#prev-story").click(function () {
+      if (currentStoryIndex > 0) {
+        currentStoryIndex--;
+        renderCurrentStory();
+        updateNavigationButtons();
+      }
+    });
+
+    $("#approve-story").click(async () => await handleStoryAction("approved"));
+    $("#reject-story").click(async () => await handleStoryAction("rejected"));
+    $("#request-changes").click(async () => {
+      $("#requestChangesModal").modal("show");
+    });
+  });
+
+  function escapeHtml(unsafe) {
+    if (!unsafe) return '';
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function formatStoryBody(storyBody) {
+    if (!storyBody) return '';
+    
+    // Convert newlines to <br> tags and preserve paragraphs
+    return storyBody
+      .split('\n\n')
+      .map(paragraph => `<p class="mb-4">${paragraph.trim().replace(/\n/g, '<br>')}</p>`)
+      .join('');
+  }
+
+  function formatDate(dateString) {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+</script>
+
+{{include /components/global/Report Modal/report_modal.html}}

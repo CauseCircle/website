@@ -1,0 +1,947 @@
+<style>
+  .profile-form {
+    max-width: 800px;
+  }
+
+  .profile-image-upload {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-image-upload:hover {
+    background-color: #e9ecef;
+  }
+
+  .profile-image-upload input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .upload-icon {
+    font-size: 24px;
+    color: #6c757d;
+  }
+
+  .char-count {
+    font-size: 12px;
+    color: #6c757d;
+    text-align: right;
+  }
+
+  .form-text {
+    font-size: 12px;
+    color: #6c757d;
+  }
+
+  /* Add new hero image specific styles */
+  #hero-upload {
+    width: 100%;
+    height: 200px;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+    background-color: #f8f9fa;
+    margin-bottom: 2rem;
+  }
+
+  #hero-upload:hover {
+    background-color: #e9ecef;
+  }
+
+  #hero-upload .upload-icon {
+    font-size: 32px; /* Larger icon for hero section */
+  }
+
+  /* Add a label for the hero image */
+  .hero-upload-label {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 8px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  #cancelBtn {
+    display: none; /* Hidden by default */
+  }
+
+  /* Add new styles for custom select */
+  .custom-select-container {
+    width: 100%;
+    position: relative;
+  }
+
+  .select-input {
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    min-height: 32px;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+
+  .select-input:focus {
+    border-color: #4096ff;
+    box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
+    outline: none;
+  }
+
+  .selected-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .selected-tag {
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 4px;
+    padding: 0 4px;
+    margin: 2px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .remove-tag {
+    margin-left: 4px;
+    cursor: pointer;
+    color: #666;
+  }
+
+  .dropdown-menu.categories-menu {
+    width: 100%;
+    padding: 4px;
+    max-height: 256px;
+    overflow-y: auto;
+    display: none;
+    position: absolute;
+    z-index: 1000;
+  }
+
+  .dropdown-item {
+    padding: 5px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .dropdown-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .dropdown-item.selected {
+    background-color: #e6f4ff;
+    color: #4096ff;
+  }
+
+  .search-input {
+    border: none;
+    width: 100%;
+    padding: 4px;
+  }
+
+  .search-input:focus {
+    outline: none;
+  }
+</style>
+
+<div class="tab-pane" id="profile">
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title mb-4">Profile Details</h4>
+      <form class="profile-form">
+        <!--Hero Image Uplaod-->
+        <div class="mb-4">
+          <div class="hero-upload-label">Cover Image</div>
+          <div id="hero-upload" class="profile-image-upload">
+            <input
+              type="file"
+              accept="image/png,image/jpeg"
+              name="hero_image"
+            />
+            <i class="bi bi-camera upload-icon"></i>
+          </div>
+        </div>
+        <!-- Profile Image Upload -->
+        <div class="mb-4">
+          <div id="profile-upload" class="profile-image-upload">
+            <input type="file" accept="image/png,image/jpeg" name="logo" />
+            <i class="bi bi-camera upload-icon"></i>
+          </div>
+        </div>
+
+        <hr class="text-muted" />
+
+        <h5 class="mb-4">About your NPO</h5>
+        <!-- NPO Name -->
+        <div class="mb-4">
+          <label class="form-label"
+            >NPO Name <span class="text-danger">*</span></label
+          >
+          <input type="text" class="form-control" name="name" required />
+        </div>
+
+        <!-- Add EIN Number field -->
+        <div class="mb-4">
+          <label class="form-label">EIN Number</label>
+          <input
+            type="text"
+            class="form-control"
+            name="ein_number"
+            maxlength="10"
+            placeholder="XX-XXXXXXX"
+            title="Please enter a valid EIN in the format XX-XXXXXXX"
+          />
+          <div class="form-text">
+            Enter your organization's 9-digit EIN in the format XX-XXXXXXX
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+          <label class="form-label">Description</label>
+          <textarea
+            class="form-control"
+            name="cause_description"
+            rows="4"
+            placeholder="Describe yourself..."
+            maxlength="200"
+          ></textarea>
+          <div class="d-flex justify-content-between mt-1">
+            <div class="form-text">It will be displayed on your profile.</div>
+            <div class="char-count">0/200</div>
+          </div>
+        </div>
+
+        <!-- Mission -->
+        <div class="mb-4">
+          <label class="form-label">Mission</label>
+          <textarea
+            class="form-control"
+            name="mission"
+            rows="4"
+            placeholder="What's your organization's mission..."
+            maxlength="500"
+          ></textarea>
+          <div class="d-flex justify-content-between mt-1">
+            <div class="form-text">
+              Describe your organization's mission and goals.
+            </div>
+            <div class="char-count">0/500</div>
+          </div>
+        </div>
+
+        <!-- Website -->
+        <div class="mb-4">
+          <label class="form-label">Website</label>
+          <input type="url" class="form-control" name="website" />
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Donation Link</label>
+          <input type="url" class="form-control" name="donate_link" />
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Address</label>
+          <div class="address-fields">
+            <div class="mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="street_address"
+                placeholder="Street Address"
+              />
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="address_city"
+                  placeholder="City"
+                />
+              </div>
+              <div class="col-md-3 mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="address_state"
+                  placeholder="State"
+                />
+              </div>
+              <div class="col-md-3 mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="address_zip"
+                  placeholder="ZIP"
+                />
+              </div>
+            </div>
+            <div class="mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="address_country"
+                placeholder="Country"
+              />
+            </div>
+
+            <!-- Hidden field for API compatibility -->
+            <input type="hidden" name="headquarters_address" />
+          </div>
+        </div>
+
+        <!-- Add NPO Categories Select -->
+        <div class="mb-4">
+          <label class="form-label">Causes</label>
+          <div class="custom-select-container">
+            <div class="select-input" tabindex="0">
+              <div class="selected-items">
+                <input
+                  type="text"
+                  class="search-input"
+                  placeholder="Select categories..."
+                />
+              </div>
+            </div>
+            <div class="dropdown-menu categories-menu">
+              <div class="dropdown-item" data-value="education">Education</div>
+              <div class="dropdown-item" data-value="health">Health</div>
+              <div class="dropdown-item" data-value="environment">
+                Environment
+              </div>
+              <div class="dropdown-item" data-value="animals">Animals</div>
+              <div class="dropdown-item" data-value="arts">Arts & Culture</div>
+              <div class="dropdown-item" data-value="community">
+                Community Development
+              </div>
+              <div class="dropdown-item" data-value="humanitarian">
+                Humanitarian Aid
+              </div>
+              <div class="dropdown-item" data-value="social">
+                Social Services
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="action-buttons">
+          <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+            <span class="normal-state">Save</span>
+            <span class="loading-state d-none">
+              <span
+                class="spinner-border spinner-border-sm me-1"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Saving...
+            </span>
+          </button>
+          <button type="button" class="btn btn-danger" id="cancelBtn">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Move selectedItems to global scope (outside of any function)
+  const selectedItems = new Set();
+
+  async function getNPOAdminProfile(zuid) {
+    const url = window.CONFIG.API_ROUTES["get-npo-admin-profile"];
+    const response = await fetch(`${url}/${zuid}`);
+    const data = await response.json();
+    return data;
+  }
+
+  function loadNPOAdminProfile(npo) {
+    // Clear existing selections when loading new profile
+    selectedItems.clear();
+
+    //reset the form
+    $(".profile-form")[0].reset();
+
+    // Clear existing selected tags
+    $(".custom-select-container .selected-tag").remove();
+
+    // Reset dropdown items selected state
+    $(".custom-select-container .dropdown-item").removeClass("selected");
+
+    // Load logo image
+    let logoUrl;
+    if (typeof npo.logo === "string") {
+      logoUrl = npo.logo;
+    } else {
+      logoUrl = npo.logo.data[0].url;
+    }
+
+    $("#profile-upload").css({
+      "background-image": `url(${logoUrl})`,
+      "background-size": "cover",
+      "background-position": "center",
+    });
+
+    // Load hero image
+    let heroUrl;
+    if (typeof npo.hero_image === "string") {
+      heroUrl = npo.hero_image;
+    } else if (npo.hero_image?.data?.[0]?.url) {
+      heroUrl = npo.hero_image.data[0].url;
+    }
+
+    if (heroUrl) {
+      $("#hero-upload").css({
+        "background-image": `url(${heroUrl})`,
+        "background-size": "cover",
+        "background-position": "center",
+      });
+    }
+
+    $(".profile-form input[name='name']").val(npo.name);
+
+    // Add EIN loading
+    $(".profile-form input[name='ein_number']").val(npo.ein_number);
+
+    $(".profile-form textarea[name='cause_description']").val(
+      $("<div>").html(npo.cause_description).text()
+    );
+
+    $(".profile-form textarea[name='mission']").val(
+      $("<div>").html(npo.mission).text()
+    );
+
+    $(".profile-form input[name='website']").val(npo.website);
+
+    $(".profile-form input[name='donate_link']").val(npo.donate_link);
+
+    if (npo.headquarters_address) {
+      // Set the hidden field
+      $('input[name="headquarters_address"]').val(npo.headquarters_address);
+
+      // Split address by commas and trim whitespace
+      const addressParts = npo.headquarters_address
+        .split(",")
+        .map((part) => part.trim());
+
+      if (addressParts.length >= 4) {
+        $("#street_address").val(addressParts[0]);
+        $("#address_city").val(addressParts[1]);
+        $("#address_state").val(addressParts[2]);
+        $("#address_zip").val(addressParts[3]);
+        if (addressParts[4]) {
+          $("#address_country").val(addressParts[4]);
+        }
+      }
+    }
+
+    // Load NPO categories
+    if (npo?.category?.data) {
+      const categoryContainer = $(".custom-select-container");
+      const searchInput = categoryContainer.find(".search-input");
+
+      // Add each existing category as a selected tag
+      npo.category.data.forEach((category) => {
+        const tag = $(`
+          <div class="selected-tag" data-value="${category.meta.zuid}" data-title="${category.title}">
+            <span>${category.title}</span>
+            <span class="remove-tag">×</span>
+          </div>
+        `);
+        searchInput.before(tag);
+
+        // Mark the dropdown item as selected if it exists
+        const dropdownItem = categoryContainer.find(
+          `.dropdown-item[data-value="${category.meta.zuid}"]`
+        );
+        if (dropdownItem.length) {
+          dropdownItem.addClass("selected");
+          selectedItems.add(category.meta.zuid);
+        }
+      });
+    }
+  }
+
+  $(document).ready(async function () {
+    const npoAdminProfile = await getNPOAdminProfile("{{get_var.zuid}}");
+    let originalData = npoAdminProfile.data[0];
+    loadNPOAdminProfile(originalData);
+
+    // Function to check if form has changes
+    function hasFormChanges() {
+      const currentData = {
+        name: $("input[name='name']").val(),
+        ein_number: $("input[name='ein_number']").val(),
+        cause_description: $("textarea[name='cause_description']").val(),
+        mission: $("textarea[name='mission']").val(),
+        website: $("input[name='website']").val(),
+        donate_link: $("input[name='donate_link']").val(),
+        headquarters_address: $("input[name='headquarters_address']").val(),
+      };
+
+      // Check if any text fields changed
+      const hasTextChanges = Object.keys(currentData).some(
+        (key) => currentData[key] !== originalData[key]
+      );
+
+      // Check if categories changed
+      const originalCategories = new Set(
+        originalData?.category?.data?.map((cat) => cat.meta.zuid) || []
+      );
+      const categoriesChanged =
+        selectedItems.size !== originalCategories.size ||
+        !Array.from(selectedItems).every((zuid) =>
+          originalCategories.has(zuid)
+        );
+
+      // Check if any files were selected
+      const hasFileChanges =
+        $('input[name="hero_image"]')[0].files.length > 0 ||
+        $('input[name="logo"]')[0].files.length > 0;
+
+      return hasTextChanges || hasFileChanges || categoriesChanged;
+    }
+
+    // Function to show/hide cancel button
+    function toggleCancelButton() {
+      if (hasFormChanges()) {
+        $("#cancelBtn").show();
+      } else {
+        $("#cancelBtn").hide();
+      }
+    }
+
+    // Monitor form changes
+    $(".profile-form input, .profile-form textarea").on(
+      "input",
+      toggleCancelButton
+    );
+    $('.profile-image-upload input[type="file"]').on(
+      "change",
+      toggleCancelButton
+    );
+
+    // Handle cancel button click
+    $("#cancelBtn").on("click", function () {
+      if (confirm("Are you sure you want to discard your changes?")) {
+        // Reset form to original data
+        loadNPOAdminProfile(originalData);
+
+        // Clear file inputs
+        $('input[type="file"]').val("");
+
+        // Reset background images to original state
+        $(".profile-image-upload .upload-icon").show();
+
+        // Hide cancel button
+        $(this).hide();
+      }
+    });
+
+    // Handle character count for description
+    $(".profile-form textarea").on("input", function () {
+      const maxLength = $(this).attr("maxlength");
+      const currentLength = $(this).val().length;
+      $(this)
+        .closest(".mb-4")
+        .find(".char-count")
+        .text(`${currentLength}/${maxLength}`);
+    });
+
+    // Handle file upload preview
+    $('.profile-image-upload input[type="file"]').on("change", function (e) {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        const $uploadDiv = $(this).closest(".profile-image-upload");
+
+        reader.onload = function (event) {
+          $uploadDiv
+            .css({
+              "background-image": `url(${event.target.result})`,
+              "background-size": "cover",
+              "background-position": "center",
+            })
+            .find(".upload-icon")
+            .hide();
+        };
+
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    // Handle form submission
+    $(".profile-form").on("submit", async function (e) {
+      e.preventDefault();
+
+      // Show loading state
+      const $saveBtn = $("#saveProfileBtn");
+      $saveBtn.prop("disabled", true);
+      $saveBtn.find(".normal-state").addClass("d-none");
+      $saveBtn.find(".loading-state").removeClass("d-none");
+
+      try {
+        // Upload both hero and profile images
+        const heroFile = $('input[name="hero_image"]')[0].files[0];
+        const logoFile = $('input[name="logo"]')[0].files[0];
+        let filesToUpload = [];
+
+        if (heroFile) filesToUpload.push(heroFile);
+        if (logoFile) filesToUpload.push(logoFile);
+
+        const uploadedImages = await window.uploadImages(filesToUpload);
+
+        // Create payload object
+        const formData = {
+          data: {
+            name: $("input[name='name']").val(),
+            ein_number: $("input[name='ein_number']").val(),
+            cause_description: $("textarea[name='cause_description']").val(),
+            mission: $("textarea[name='mission']").val(),
+            website: $("input[name='website']").val(),
+            donate_link: $("input[name='donate_link']").val(),
+            headquarters_address: $("input[name='headquarters_address']").val(),
+            category: Array.from(selectedItems).join(","),
+          },
+        };
+
+        // Add hero image if uploaded
+        if (heroFile && uploadedImages[0]) {
+          formData.data.hero_image = uploadedImages[0].data[0].id;
+        }
+
+        // Add logo if uploaded
+        if (logoFile) {
+          const logoIndex = heroFile ? 1 : 0;
+          if (uploadedImages[logoIndex]) {
+            formData.data.logo = uploadedImages[logoIndex].data[0].id;
+          }
+        }
+
+        const data = await window.updateNPOAdminProfile(
+          "{{get_var.zuid}}",
+          formData
+        );
+
+        if (data) {
+          originalData = data.data;
+          loadNPOAdminProfile(originalData);
+          $("#cancelBtn").hide();
+        }
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        alert("Failed to update profile. Please try again.");
+      } finally {
+        // Reset button state
+        $saveBtn.prop("disabled", false);
+        $saveBtn.find(".normal-state").removeClass("d-none");
+        $saveBtn.find(".loading-state").addClass("d-none");
+      }
+    });
+
+    // Add Custom Select functionality
+    const container = $(".custom-select-container");
+    const dropdownMenu = container.find(".dropdown-menu");
+    const searchInput = container.find(".search-input");
+
+    // Clear existing static dropdown items
+    dropdownMenu.empty();
+
+    // First, populate selectedItems with existing selections
+    if (originalData?.category?.data) {
+      originalData.category.data.forEach((category) => {
+        selectedItems.add(category.meta.zuid);
+      });
+    }
+
+    // Load additional categories from causes API
+    async function loadCategories() {
+      try {
+        const causesUrl = `https://causecircle.org/mobileapp/causes.json`;
+        const response = await $.getJSON(causesUrl);
+
+        if (response?.data) {
+          // Create a Set to track unique categories we've already added
+          const addedCategories = new Set(Array.from(selectedItems));
+
+          response.data.forEach((cause) => {
+            // Skip if we've already added this category
+            if (addedCategories.has(cause.meta.zuid)) return;
+
+            addedCategories.add(cause.meta.zuid);
+
+            const dropdownItem = $(`
+              <div class="dropdown-item" 
+                   data-value="${cause.meta.zuid}" 
+                   data-title="${cause.title}">
+                ${cause.title}
+              </div>
+            `);
+            dropdownMenu.append(dropdownItem);
+          });
+        }
+      } catch (error) {
+        console.error("Error loading categories:", error);
+      }
+    }
+
+    // Load the initial selected categories
+    if (originalData?.category?.data) {
+      originalData.category.data.forEach((category) => {
+        const isSelected = selectedItems.has(category.meta.zuid);
+        const dropdownItem = $(`
+          <div class="dropdown-item ${isSelected ? "selected" : ""}" 
+               data-value="${category.meta.zuid}" 
+               data-title="${category.title}">
+            ${category.title}
+          </div>
+        `);
+        dropdownMenu.append(dropdownItem);
+      });
+    }
+
+    // Load additional categories
+    loadCategories();
+
+    // Show dropdown
+    function showDropdown() {
+      dropdownMenu.show();
+    }
+
+    // Hide dropdown
+    function hideDropdown() {
+      dropdownMenu.hide();
+    }
+
+    // Toggle dropdown on input container click
+    container.on("click", ".select-input", function (e) {
+      e.stopPropagation();
+      dropdownMenu.toggle();
+    });
+
+    // Show dropdown on input focus
+    searchInput.on("focus", function (e) {
+      e.stopPropagation();
+      showDropdown();
+    });
+
+    // Show dropdown and filter on input
+    searchInput.on(
+      "input",
+      debounce(async (event) => {
+        const searchText = $(event.target).val() || "";
+        showDropdown();
+
+        // Check if searchText exists and is not null/undefined
+        if (searchText.length > 0) {
+          try {
+            // Fetch filtered categories from API
+            const causesUrl = `https://causecircle.org/mobileapp/causes.json?search=${encodeURIComponent(
+              searchText
+            )}`;
+            const response = await $.getJSON(causesUrl);
+
+            // Clear existing dropdown items but keep selected ones
+            dropdownMenu.empty();
+
+            // First add back all selected items to ensure they're always visible
+            if (originalData?.category?.data) {
+              originalData.category.data.forEach((category) => {
+                const isSelected = selectedItems.has(category.meta.zuid);
+                const dropdownItem = $(`
+                  <div class="dropdown-item ${isSelected ? "selected" : ""}" 
+                       data-value="${category.meta.zuid}" 
+                       data-title="${category.title}">
+                    ${category.title}
+                  </div>
+                `);
+                dropdownMenu.append(dropdownItem);
+              });
+            }
+
+            // Add new items from search results
+            if (response?.data) {
+              const addedCategories = new Set(Array.from(selectedItems));
+
+              response.data.forEach((cause) => {
+                // Skip if we've already added this category
+                if (addedCategories.has(cause.meta.zuid)) return;
+
+                addedCategories.add(cause.meta.zuid);
+
+                const dropdownItem = $(`
+                  <div class="dropdown-item" 
+                       data-value="${cause.meta.zuid}" 
+                       data-title="${cause.title}">
+                    ${cause.title}
+                  </div>
+                `);
+                dropdownMenu.append(dropdownItem);
+              });
+            }
+          } catch (error) {
+            console.error("Error searching categories:", error);
+          }
+        } else {
+          // If search is empty, reload all categories
+          dropdownMenu.empty();
+
+          // Add back selected categories
+          if (originalData?.category?.data) {
+            originalData.category.data.forEach((category) => {
+              const isSelected = selectedItems.has(category.meta.zuid);
+              const dropdownItem = $(`
+                <div class="dropdown-item ${isSelected ? "selected" : ""}" 
+                     data-value="${category.meta.zuid}" 
+                     data-title="${category.title}">
+                  ${category.title}
+                </div>
+              `);
+              dropdownMenu.append(dropdownItem);
+            });
+          }
+
+          // Reload additional categories
+          loadCategories();
+        }
+      }, 300)
+    );
+
+    // Add debounce function at the top of your script
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Hide dropdown when clicking outside
+    $(document).on("click", function (e) {
+      if (!container.is(e.target) && container.has(e.target).length === 0) {
+        hideDropdown();
+      }
+    });
+
+    // Handle item selection
+    dropdownMenu.on("click", ".dropdown-item", function (e) {
+      e.stopPropagation();
+      const value = $(this).data("value");
+      const title = $(this).data("title");
+
+      if (selectedItems.has(value)) {
+        // Remove item
+        selectedItems.delete(value);
+        $(this).removeClass("selected");
+        container.find(`.selected-tag[data-value="${value}"]`).remove();
+      } else {
+        // Add item
+        selectedItems.add(value);
+        $(this).addClass("selected");
+
+        const tag = $(`
+          <div class="selected-tag" data-value="${value}" data-title="${title}">
+            <span>${title}</span>
+            <span class="remove-tag">×</span>
+          </div>
+        `);
+
+        searchInput.before(tag);
+      }
+      searchInput.val("").focus();
+      toggleCancelButton();
+    });
+
+    // Handle tag removal
+    container.on("click", ".remove-tag", function (e) {
+      e.stopPropagation();
+      const value = $(this).parent().data("value");
+      selectedItems.delete(value);
+      $(this).parent().remove();
+      dropdownMenu.find(`[data-value="${value}"]`).removeClass("selected");
+      toggleCancelButton();
+    });
+
+    // Prevent dropdown from closing when clicking search input
+    searchInput.on("click", function (e) {
+      e.stopPropagation();
+    });
+
+    // EIN input formatting
+    $("input[name='ein_number']").on("input", function (e) {
+      // Get input value and remove all non-digits
+      let value = this.value.replace(/\D/g, "");
+
+      // Limit to 9 digits
+      value = value.substring(0, 9);
+
+      // Format as XX-XXXXXXX
+      if (value.length > 2) {
+        value = value.substring(0, 2) + "-" + value.substring(2);
+      }
+
+      // Update input value
+      this.value = value;
+    });
+
+    // Validate EIN on blur
+    $("input[name='ein_number']").on("blur", function () {
+      const value = this.value;
+      const einPattern = /^\d{2}-\d{7}$/;
+
+      if (value && !einPattern.test(value)) {
+        // Invalid format
+        $(this).addClass("is-invalid");
+        if (!$(this).next(".invalid-feedback").length) {
+          $(this).after(
+            '<div class="invalid-feedback">Please enter a valid EIN (XX-XXXXXXX)</div>'
+          );
+        }
+      } else {
+        // Valid format or empty
+        $(this).removeClass("is-invalid");
+        $(this).next(".invalid-feedback").remove();
+      }
+    });
+
+    // Handle address field updates
+    $(".address-fields input").on("input", function () {
+      const street = $("#street_address").val();
+      const city = $("#address_city").val();
+      const state = $("#address_state").val();
+      const zip = $("#address_zip").val();
+      const country = $("#address_country").val();
+
+      // Combine all fields with commas
+      const formattedAddress = [street, city, state, zip, country]
+        .filter(Boolean)
+        .join(", ");
+
+      // Update the hidden field
+      $('input[name="headquarters_address"]').val(formattedAddress);
+
+      // Trigger form change detection
+      toggleCancelButton();
+    });
+  });
+</script>

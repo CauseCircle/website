@@ -1,0 +1,101 @@
+<style>
+  .sidebar-card {
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+  }
+  .sidebar-card p {
+    margin: 0;
+    color: #525866;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .sidebar-card .badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background-color: #ffcccb;
+    color: #000;
+    font-size: 12px;
+    font-weight: 400;
+    width: auto;
+    max-width: max-content;
+  }
+  .sidebar-card .verified {
+    display: inline-block;
+    text-align: center;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background-color: #e0f7fa;
+    color: #00796b;
+    font-size: 12px;
+    width: auto;
+    max-width: max-content;
+  }
+  .sidebar-card .social a {
+    margin-right: 8px;
+    text-decoration: none;
+    color: #000;
+  }
+  .sidebar-card .social a:hover {
+    color: #00796b;
+  }
+  .npo-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    font-size: 16px;
+  }
+  .npo-description,
+  .npo-description * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    font-size: 12px;
+    font-weight: 400;
+    color: #525866;
+  }
+</style>
+
+<div class="card sidebar-card">
+  <p>Badge</p>
+  <div class="badge">Top Contributor</div>
+  <div class="table-group-divider border-light-subtle my-3"></div>
+  <p class="p-0 m-0">Links</p>
+  <div class="links">
+    <a
+      href="{{this.getUrl()}}"
+      target="_blank"
+      class="d-flex align-items-center gap-2 text-decoration-none"
+    >
+      <i class="bi bi-link fs-4 text-muted"></i>
+      <p class="m-0 p-0 text-primary">Go to Website</p>
+    </a>
+  </div>
+</div>
+
+<div class="my-3 d-flex flex-column gap-2">
+  <div><h4 class="fs-5">Featured Nonprofits</h4></div>
+  <div class="d-flex flex-column gap-3">
+    {{ each non_profits as npo where npo.featured = '1' limit 5 }}
+    <a href="{{npo.getUrl()}}" class="text-decoration-none text-reset">
+      <div class="d-flex align-items-center gap-2">
+        <img
+          src="{{npo.logo.getImage()}}"
+          class="rounded border border-light-subtle"
+          width="48"
+          height="48"
+          style="border-radius: 8px; object-fit: cover"
+        />
+        <div class="d-flex flex-column justify-content-between overflow-hidden">
+          <p class="m-0 p-0 fw-medium npo-name">{{npo.name}}</p>
+          <div class="npo-description">{{npo.cause_description}}</div>
+        </div>
+      </div>
+    </a>
+    {{/each}}
+  </div>
+</div>

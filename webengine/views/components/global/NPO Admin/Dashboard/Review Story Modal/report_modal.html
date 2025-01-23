@@ -1,0 +1,220 @@
+<style>
+  .success-circle {
+    width: 48px;
+    height: 48px;
+    background-color: #0d6efd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .report-option {
+    transition: all 0.2s ease;
+    border: 1px solid #e9e6e9;
+  }
+
+  .report-option:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+    border: 1px solid #e9e6e9;
+  }
+</style>
+
+<!-- Report Story Modal -->
+<div class="modal fade" id="reportStoryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- Step 1: Report Reason -->
+      <div class="modal-body report-step" id="reportStep1">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="modal-title">Report Story</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <hr class="text-muted" />
+        <h4>Why are you reporting this Story?</h4>
+        <p class="text-muted small mb-4">
+          Your report is anonymous, except if you're reporting an intellectual
+          property infringement. If someone is in immediate danger, call the
+          local emergency services - don't wait.
+        </p>
+        <div class="report-options d-flex flex-column gap-2">
+          <button
+            class="btn text-start p-3 report-option"
+            data-reason="dislike"
+          >
+            I just don't like it
+          </button>
+          <button class="btn text-start p-3 report-option" data-reason="spam">
+            It's spam
+          </button>
+          <button class="btn text-start p-3 report-option" data-reason="nsfw">
+            Nudity or sexual activity
+          </button>
+          <button class="btn text-start p-3 report-option" data-reason="hate">
+            Hate speech or symbols
+          </button>
+          <button
+            class="btn text-start p-3 report-option"
+            data-reason="violence"
+          >
+            Violence or dangerous organisations
+          </button>
+          <button
+            class="btn text-start p-3 report-option"
+            data-reason="bullying"
+          >
+            Bullying or harassment
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Additional Notes -->
+      <div class="modal-body report-step d-none" id="reportStep2">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="modal-title">Report Story</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <hr class="text-muted" />
+        <h4>Any Additional Notes</h4>
+        <p class="text-muted small mb-4">
+          Your report is anonymous, except if you're reporting an intellectual
+          property infringement. If someone is in immediate danger, call the
+          local emergency services - don't wait.
+        </p>
+        <textarea
+          class="form-control"
+          id="reportNotes"
+          rows="4"
+          placeholder="Additional details..."
+        ></textarea>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button class="btn btn-light" id="skipNotes">Skip</button>
+          <button class="btn btn-primary" id="submitReport">Submit</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Confirmation -->
+      <div class="modal-body report-step d-none" id="reportStep3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="modal-title">Report Story</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <hr class="text-muted" />
+        <div class="text-center py-4">
+          <div class="mb-3">
+            <img
+              src="https://4xxglxlj.media.zestyio.com/check.png"
+              alt=""
+              class="img-fluid"
+              style="width: 96px; height: 96px"
+            />
+          </div>
+          <h5 class="mb-3">Thanks for letting us know</h5>
+          <p class="text-muted mb-4">We use these reports to:</p>
+          <ul class="list-unstyled text-start text-muted">
+            <li
+              class="d-flex gap-2 mb-2 border-1 border-dark border-opacity-50 rounded-2"
+            >
+              <i class="bi bi-info text-muted"></i>
+              <span class="text-muted"
+                >Understand problems that people are having with different types
+                of content on CauseCircle</span
+              >
+            </li>
+            <li
+              class="d-flex gap-2 border-1 border-dark border-opacity-50 rounded-2"
+            >
+              <i class="bi bi-eye-slash text-muted"></i>
+              <span class="text-muted"
+                >Show you less of this kind of content in the future</span
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentStoryZuid = null;
+  let selectedReason = null;
+
+  function showReportStep(stepNumber) {
+    $(".report-step").addClass("d-none");
+    $(`#reportStep${stepNumber}`).removeClass("d-none");
+  }
+
+  async function submitReport(reason, notes = "") {
+    // construct the reason and notes into a single string
+    const reasonAndNotes = `Reason: ${reason} - Notes: ${notes}`;
+    try {
+      window.submitFeedback({
+        feedback: reasonAndNotes,
+        type: "report",
+      });
+
+      showReportStep(3);
+
+      // Auto close after 3 seconds
+      setTimeout(() => {
+        $("#reportStoryModal").modal("hide");
+        showReportStep(1);
+      }, 3000);
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      alert("Failed to submit report. Please try again.");
+    }
+  }
+
+  $(document).ready(function () {
+    // Handle report button click in the review modal
+    $("#report-story").click(function () {
+      currentStoryZuid = $("#active-story").data("zuid");
+      $("#reportStoryModal").modal("show");
+    });
+
+    // Handle report option selection
+    $(".report-option").click(function () {
+      selectedReason = $(this).data("reason");
+      showReportStep(2);
+    });
+
+    // Handle skip button
+    $("#skipNotes").click(function () {
+      submitReport(selectedReason);
+    });
+
+    // Handle submit button
+    $("#submitReport").click(function () {
+      const notes = $("#reportNotes").val();
+      submitReport(selectedReason, notes);
+      showReportStep(3);
+    });
+
+    // Reset modal when hidden
+    $("#reportStoryModal").on("hidden.bs.modal", function () {
+      showReportStep(1);
+      $("#reportNotes").val("");
+      selectedReason = null;
+      currentStoryZuid = null;
+    });
+  });
+</script>

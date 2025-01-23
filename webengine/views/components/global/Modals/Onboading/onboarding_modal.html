@@ -1,0 +1,161 @@
+<!-- Modal -->
+
+<style>
+  .icon-image {
+    filter: brightness(0) invert(0); /* Default to black */
+  }
+  .btn-primary .icon-image {
+    filter: brightness(0) invert(1); /* White when selected */
+  }
+
+  #volunteer,
+  #staff,
+  #donor {
+    width: 86px;
+    height: 86px;
+  }
+</style>
+
+<div
+  class="modal fade"
+  id="onboardingModal"
+  tabindex="-1"
+  aria-labelledby="onboardingModalLabel"
+  aria-hidden="true"
+>
+  <div
+    class="modal-dialog modal-dialog-centered"
+    style="width: 100%; max-width: 586px"
+  >
+    <div class="modal-content p-3 gap-3">
+      <div class="w-100 d-flex justify-content-end">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div class="d-flex flex-column gap-5 p-3">
+        <div
+          class="d-flex flex-column align-items-center justify-content-center"
+        >
+          <p class="text-primary">Step 1 of 3</p>
+          <p class="fw-semibold fs-5">Tell Us About Yourself</p>
+        </div>
+        <div id="user-type" class="w-100 d-flex justify-content-between px-4">
+          <div
+            class="d-flex flex-column align-items-center justify-content-center gap-2"
+          >
+            <button
+              id="volunteer"
+              onclick="toggleBtn('volunteer')"
+              class="btn btn-secondary"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/hearts.png"
+                alt="Hearts"
+                class="icon-image"
+              />
+            </button>
+            <p class="fw-semibold">Volunteer</p>
+          </div>
+          <div
+            class="d-flex flex-column align-items-center justify-content-center gap-2"
+          >
+            <button
+              id="staff"
+              onclick="toggleBtn('staff')"
+              class="btn btn-secondary"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/users-01.png"
+                alt="Hearts"
+                class="icon-image"
+              />
+            </button>
+            <p class="fw-semibold">Staff</p>
+          </div>
+          <div
+            class="d-flex flex-column align-items-center justify-content-center gap-2"
+          >
+            <button
+              id="donor"
+              onclick="toggleBtn('donor')"
+              class="btn btn-secondary"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/gift-02.png"
+                alt="Hearts"
+                class="icon-image"
+              />
+            </button>
+            <p class="fw-semibold">Donor</p>
+          </div>
+        </div>
+        <div class="w-100 d-flex align-items-center justify-content-center">
+          <p>* Help hands-on</p>
+        </div>
+        <div
+          class="d-flex flex-column gap-4 align-items-center justify-content-center"
+        >
+          <p style="font-size: 12px; color: rgb(161, 161, 161)">
+            By starting in application, I agree to Terms of Services and Privacy
+            Policy
+          </p>
+          <button
+            id="continueBtn"
+            class="btn btn-primary w-100"
+            disabled
+            onclick="nextStep()"
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleBtn(selectedId) {
+    // Remove btn-primary class from all buttons inside #user-type and add btn-secondary
+    $("#user-type .btn").removeClass("btn-primary").addClass("btn-secondary");
+
+    // Add btn-primary class to the selected button inside #user-type
+    $("#user-type #" + selectedId)
+      .removeClass("btn-secondary")
+      .addClass("btn-primary");
+
+    // Enable the continue button
+    $("#continueBtn").prop("disabled", false);
+  }
+
+  function nextStep() {
+    $("#onboardingModal").modal("hide");
+
+    // save the user type to the local storage as json object
+    const userType = $("#user-type .btn-primary").attr("id");
+
+    const onboarding_data = {
+      userType: userType,
+    };
+
+    const onboarding = JSON.parse(localStorage.getItem("onboarding")) || {};
+
+    onboarding.userType = userType;
+
+    localStorage.setItem("onboarding", JSON.stringify(onboarding));
+
+    // go to this URL
+    window.location.href = "/onboarding/step2";
+  }
+
+  $(document).ready(function () {
+    $("#loginModal .btn-secondary").click(function () {
+      loginWithFacebook();
+      $("#loginModal").modal("hide");
+    });
+  });
+</script>

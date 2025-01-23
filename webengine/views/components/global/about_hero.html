@@ -1,0 +1,35 @@
+<div class="container d-flex align-items-center" style="height: 763px">
+  <div class="row">
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-start gap-3 pe-4 justify-content-center"
+    >
+      <div class="w-75">
+        <h1>{{ about.first().hero_title }}</h1>
+        <p>{{ about.first().hero_description }}</p>
+      </div>
+      <div class="d-flex gap-2 mt-md-3">
+        <a
+          href="{{ about.first().hero_secondary_cta_link.truepath() }}"
+          class="btn btn-secondary"
+        >
+          {{ about.first().hero_secondary_cta_label }}
+        </a>
+        <a
+          href="{{ about.first().hero_primary_cta_link.truepath() }}"
+          class="btn btn-primary"
+        >
+          {{ about.first().hero_primary_cta_label }}
+        </a>
+      </div>
+    </div>
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-start gap-4 pe-4 justify-content-center"
+    >
+      <img
+        src="{{ about.first().hero_image.getImage() }}"
+        alt=""
+        style="width: 100%; max-width: 100%; height: auto"
+      />
+    </div>
+  </div>
+</div>

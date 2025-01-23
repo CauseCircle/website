@@ -1,0 +1,48 @@
+{{$page = 1}}
+{{$limit = 25}}
+{{$filter = }}
+{{if {get_var.page} }}
+{{$page = {get_var.page} }}
+{{/if}}
+{{if {get_var.limit} }}
+{{$limit = {get_var.limit} }}
+{{/if}}
+
+{{if {get_var.npo} }}
+    {{$filter = WHERE FIND_IN_SET(story.related_npos, '{get_var.npo}') AND story.npo_approved = '{get_var.approved}' }}
+    {{if {get_var.status} }}
+        {{$status = {get_var.status} }}
+        {{if {$status} == "null" }}
+            {{$filter = {$filter} AND story.npo_approval_status = 'pending' }}
+        {{else}}
+            {{$filter = {$filter} AND story.npo_approval_status = '{get_var.status}' }}
+        {{/if}}
+    {{/if}}
+{{else-if {get_var.npo} }}
+    {{$filter = WHERE story.related_npos='{get_var.npo}'  }}
+{{else-if {get_var.search} }}
+    {{$filter = WHERE story.title LIKE '%{get_var.search}%'  }}
+{{else-if {get_var.author} }}
+    {{$filter = WHERE story.author = '{get_var.author}' }}
+{{/if}}
+
+
+
+
+{{$start = {math(({$page} - 1) * {$limit})} }}
+{{$approved = }}
+{
+    "data" :
+    [
+        {{each stories as story {$filter} limit {$start}, {$limit} }}
+        {{story.toJSON(2)}}
+        {{$approved = {story.npo_approved} }}
+        {{story._arraycomma}}
+        {{/each}}
+    ],
+    "meta" : {
+        "page" : {{$page}},
+        "start" : {{$start}},
+        "limit" : {{$limit}}
+    }
+}

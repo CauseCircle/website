@@ -1,0 +1,484 @@
+<div id="profileSettings" class="mt-4">
+  <div class="d-flex">
+    <div style="max-width: 260px; width: 100%">
+      <div class="sidebar sidebar-profile">
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title text-muted mb-3">SELECT MENU</h6>
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">
+                  <i class="bi bi-person-circle me-2"></i> Profile Settings
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <i class="bi bi-envelope me-2"></i> Contact Information
+                </a>
+              </li>
+              <li class="nav-item d-none">
+                <a class="nav-link" href="#">
+                  <i class="bi bi-link-45deg me-2"></i> Social Links
+                </a>
+              </li>
+              <li class="nav-item d-none">
+                <a class="nav-link" href="#">
+                  <i class="bi bi-box-arrow-up-right me-2"></i> Export Data
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="profileSettingsContent" class="w-100">
+      <div class="mx-auto" style="max-width: 500px; width: 100%">
+        <div class="p-4">
+          <div class="mb-4 d-flex align-items-center gap-3">
+            <div class="upload-image mb-2">
+              <img
+                id="profileImage"
+                src="https://via.placeholder.com/100"
+                alt="Profile Placeholder"
+                class="fs-1 text-muted object-fit-cover"
+                style="border-radius: 50%; width: 100px; height: 100px"
+              />
+            </div>
+            <div>
+              <h5>Upload Image</h5>
+              <small class="text-muted">Min 400x400px, PNG or JPEG</small>
+              <div class="mt-2">
+                <button
+                  class="btn btn-secondary btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#uploadProfileImageModal"
+                >
+                  <i class="bi bi-upload me-1"></i> Upload
+                </button>
+              </div>
+            </div>
+          </div>
+          <form id="profileForm">
+            <div class="mb-3">
+              <label for="fullName" class="form-label"
+                >Full Name <span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="fullName"
+                value=""
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="userType" class="form-label"
+                >User Type <span class="text-danger">*</span></label
+              >
+              <select class="form-select" id="userType" required>
+                <option value="volunteer">Volunteer</option>
+                <option value="donor">Donor</option>
+                <option value="staff">Staff</option>
+                <option value="individual">Individual</option>
+                <option value="beneficiary">Beneficiary</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="aboutme" class="form-label"
+                >About Me (Optional)</label
+              >
+              <textarea
+                class="form-control"
+                id="aboutme"
+                rows="3"
+                placeholder="Describe yourself..."
+              ></textarea>
+              <div class="d-flex justify-content-between mt-1">
+                <small class="text-muted"
+                  >It will be displayed on your profile.</small
+                >
+                <small class="text-muted"
+                  ><span id="charCount">0</span>/200</small
+                >
+              </div>
+            </div>
+            <div class="d-flex justify-content-end mt-4 form-actions d-none">
+              <button id="discardBtn" type="button" class="btn btn-light me-2">
+                Discard
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Apply Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="contactInformation" class="w-100">
+      <div class="mx-auto" style="max-width: 500px; width: 100%">
+        <div class="p-4">
+          <h5 class="mb-2">Contact Information</h5>
+          <p class="text-muted mb-4">
+            Enter your contact details for communication.
+          </p>
+          <hr class="my-4" />
+          <form id="contactForm">
+            <div class="mb-3">
+              <label for="emailAddress" class="form-label">
+                Email Address <span class="text-danger">*</span>
+              </label>
+              <input
+                type="email"
+                class="form-control"
+                id="emailAddress"
+                placeholder="example@domain.com"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="phoneNumber" class="form-label">
+                Phone Number <span class="text-muted">(Optional)</span>
+                <i
+                  class="bi bi-info-circle ms-1"
+                  data-bs-toggle="tooltip"
+                  title="Enter your contact number"
+                ></i>
+              </label>
+              <input
+                type="tel"
+                class="form-control"
+                id="phoneNumber"
+                placeholder="(555) 000-0000"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="address" class="form-label">
+                Address <span class="text-danger">*</span>
+              </label>
+              <textarea
+                class="form-control"
+                id="address"
+                rows="3"
+                placeholder="Enter your full address here..."
+                required
+              ></textarea>
+              <div class="d-flex justify-content-between mt-1">
+                <small class="text-muted"
+                  >Input your residential address for HR records.</small
+                >
+                <small class="text-muted"
+                  ><span id="addressCharCount">0</span>/200</small
+                >
+              </div>
+            </div>
+
+            <div
+              class="d-flex justify-content-end mt-4 contact-form-actions d-none"
+            >
+              <button
+                type="button"
+                class="btn btn-light me-2"
+                id="discardContactBtn"
+              >
+                Discard
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Apply Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="socialLinks" class="w-100">
+      <div class="mx-auto" style="max-width: 500px; width: 100%">
+        <div class="p-4">
+          <h5 class="mb-2">Social Links</h5>
+          <p class="text-muted mb-4">Manage your social media connections.</p>
+          <hr class="my-4" />
+          <form id="socialForm">
+            <div id="socialLinksContainer">
+              <!-- Default social links -->
+              <div class="mb-3">
+                <label for="facebook" class="form-label">
+                  Facebook <span class="text-muted">(Optional)</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-secondary"
+                    >facebook.com</span
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="facebook"
+                    placeholder="username"
+                  />
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="instagram" class="form-label">
+                  Instagram <span class="text-muted">(Optional)</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-secondary"
+                    >instagram.com</span
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="instagram"
+                    placeholder="username"
+                  />
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="twitter" class="form-label">
+                  X <span class="text-muted">(Optional)</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text bg-secondary">x.com</span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="twitter"
+                    placeholder="username"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-secondary w-100 mb-4"
+              id="addSocialLink"
+            >
+              <i class="bi bi-plus"></i> Add Social Link
+            </button>
+
+            <div class="d-flex justify-content-end d-none">
+              <button type="button" class="btn btn-light me-2">Discard</button>
+              <button type="submit" class="btn btn-primary">
+                Apply Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="exportData" class="row mt-4">
+      <div class="mx-auto" style="max-width: 500px; width: 100%">
+        <div class="p-4">
+          <h5>Export Data</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add this modal for new social link -->
+<div class="modal fade" id="addSocialLinkModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Social Link</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Platform Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="newPlatformName"
+            placeholder="e.g., LinkedIn"
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">URL Format</label>
+          <input
+            type="text"
+            class="form-control"
+            id="newPlatformUrl"
+            placeholder="e.g., linkedin.com/"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="confirmAddSocialLink">
+          Add
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    // Hide all content sections initially except profileSettings
+    $("#contactInformation, #socialLinks, #exportData").hide();
+
+    // Handle sidebar navigation clicks
+    $(".sidebar-profile .nav-link").on("click", function (e) {
+      e.preventDefault();
+
+      // Remove active class from all nav items
+      $(".sidebar-profile .nav-link").removeClass("active");
+      // Add active class to clicked item
+      $(this).addClass("active");
+
+      // Hide all content sections
+      $(
+        "#profileSettingsContent, #contactInformation, #socialLinks, #exportData"
+      ).hide();
+
+      // Show the corresponding content section based on the clicked link
+      const linkText = $(this).text().trim().toLowerCase();
+      if (linkText.includes("profile")) {
+        $("#profileSettingsContent").show();
+      } else if (linkText.includes("contact")) {
+        $("#contactInformation").show();
+      } else if (linkText.includes("social")) {
+        $("#socialLinks").show();
+      } else if (linkText.includes("export")) {
+        $("#exportData").show();
+      }
+    });
+
+    // Character counter for address
+    $("#address").on("input", function () {
+      const count = $(this).val().length;
+      $("#addressCharCount").text(count);
+    });
+
+    // Initialize tooltips
+    $('[data-bs-toggle="tooltip"]').tooltip();
+
+    // Handle contact form submission
+    $("#contactForm").on("submit", function (e) {
+      e.preventDefault();
+      // Add your form submission logic here
+    });
+
+    // Phone number formatting and validation
+    let selectedCountryCode = "+1";
+
+    // Handle country code selection
+    $(".dropdown-item").on("click", function (e) {
+      e.preventDefault();
+      const country = $(this).data("country");
+      const code = $(this).data("code");
+      const flagHtml = $(this).html();
+
+      selectedCountryCode = code;
+      $("#countryCode").html(flagHtml);
+    });
+
+    // Phone number input validation and formatting
+    $("#phoneNumber").on("input", function (e) {
+      // Remove any non-numeric characters but keep the + sign
+      let value = $(this)
+        .val()
+        .replace(/[^\d+]/g, "");
+
+      $(this).val(value);
+    });
+
+    // Get full phone number when submitting form
+    $("#contactForm").on("submit", function (e) {
+      e.preventDefault();
+      const phoneNumber = $("#phoneNumber").val();
+      const fullPhoneNumber = phoneNumber
+        ? `${selectedCountryCode} ${phoneNumber}`
+        : "";
+      // console.log("Full phone number:", fullPhoneNumber);
+      // Add your form submission logic here
+    });
+
+    // Initialize modal
+    const addSocialLinkModal = new bootstrap.Modal(
+      document.getElementById("addSocialLinkModal")
+    );
+
+    // Handle "Add Social Link" button click
+    $("#addSocialLink").on("click", function () {
+      addSocialLinkModal.show();
+    });
+
+    // Handle adding new social link
+    $("#confirmAddSocialLink").on("click", function () {
+      const platformName = $("#newPlatformName").val().trim();
+      const platformUrl = $("#newPlatformUrl").val().trim();
+
+      if (platformName && platformUrl) {
+        // Create unique ID for the new input
+        const id = "social-" + Date.now();
+
+        // Create new social link input group
+        const newSocialLink = `
+          <div class="mb-3" id="${id}-container">
+            <label for="${id}" class="form-label d-flex justify-content-between align-items-center">
+              ${platformName} <span class="text-muted">(Optional)</span>
+              <button type="button" class="btn btn-link text-danger p-0 remove-social-link" 
+                      data-id="${id}-container">
+                <i class="bi bi-trash"></i>
+              </button>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text bg-light">${platformUrl}</span>
+              <input type="text" class="form-control" id="${id}" placeholder="username"/>
+            </div>
+          </div>
+        `;
+
+        // Add the new social link to the container
+        $("#socialLinksContainer").append(newSocialLink);
+
+        // Clear modal inputs
+        $("#newPlatformName").val("");
+        $("#newPlatformUrl").val("");
+
+        // Close modal
+        addSocialLinkModal.hide();
+      }
+    });
+
+    // Handle removing social links (using event delegation)
+    $("#socialLinksContainer").on("click", ".remove-social-link", function () {
+      const containerId = $(this).data("id");
+      $(`#${containerId}`).remove();
+    });
+
+    // Handle form submission
+    $("#socialForm").on("submit", function (e) {
+      e.preventDefault();
+
+      // Collect all social links
+      const socialLinks = {};
+      $('#socialLinksContainer input[type="text"]').each(function () {
+        const id = $(this).attr("id");
+        const value = $(this).val();
+        if (value) {
+          socialLinks[id] = value;
+        }
+      });
+
+      // console.log("Social links data:", socialLinks);
+      // Add your form submission logic here
+    });
+  });
+</script>

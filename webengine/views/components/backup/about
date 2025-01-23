@@ -1,0 +1,364 @@
+<div class="container d-flex align-items-center" style="height: 763px">
+  <div class="row">
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-start gap-3 pe-4 justify-content-center"
+    >
+      <div class="w-75">
+        <h1>
+          {{ this.hero_title }}
+        </h1>
+        <p>{{ this.hero_description }}</p>
+      </div>
+      <div class="d-flex gap-2 mt-md-3">
+        <a
+          href="{{ this.hero_secondary_cta_link.truepath() }}"
+          class="btn btn-secondary"
+        >
+          {{ this.hero_secondary_cta_label }}
+        </a>
+        <a
+          href="{{ this.hero_primary_cta_link.truepath() }}"
+          class="btn btn-primary"
+        >
+          {{ this.hero_primary_cta_label }}
+        </a>
+      </div>
+    </div>
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-start gap-4 pe-4 justify-content-center"
+    >
+      <img
+        src="{{ this.hero_image.getImage() }}"
+        alt=""
+        style="width: 100%; max-width: 100%; height: auto"
+      />
+    </div>
+  </div>
+</div>
+
+<div id="logos" style="margin-top: 100px; margin-bottom: 80px">
+  <div class="container d-flex gap-5 justify-content-center">
+    {{each {this.logos} as logo}}
+    <img
+      src="{{ logo.logo.getImage() }}"
+      alt="logo"
+      class="img-fluid w-auto"
+      style="height: 46px; filter: grayscale(100%)"
+    />
+    {{/each}}
+  </div>
+</div>
+
+<!-- <div
+  id="fundraising-steps"
+  class="container d-flex align-items-center"
+  style="height: 763px"
+>
+  <div class="row">
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-start gap-4 pe-4 justify-content-center"
+    >
+      <img
+        src="{{ this.fundraising_steps_image.getImage() }}"
+        alt=""
+        style="width: 100%; max-width: 100%; height: auto"
+      />
+    </div>
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-start gap-4 pe-4 justify-content-center"
+    >
+      <h1>
+        {{ this.fundraising_steps_title }}
+      </h1>
+      <p>{{ this.fundraising_steps_description }}</p>
+
+      <div>
+        {{each fundraising_steps as step}}
+        <div class="d-flex gap-4 mb-4">
+          <div
+            class="d-flex justify-content-center align-items-center"
+            style="
+              position: relative;
+              width: 48px;
+              height: 48px;
+              overflow: hidden;
+              border-radius: 50%;
+            "
+          >
+            <div
+              style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 48px;
+                height: 48px;
+                background: linear-gradient(
+                  142.75deg,
+                  #713ddd 6.3%,
+                  #8d64e4 93.63%
+                );
+                z-index: 1;
+              "
+            ></div>
+            <img
+              src="{{ step.image.getImage() }}"
+              alt=""
+              style="
+                position: relative;
+
+                width: 22px;
+                object-fit: cover;
+                z-index: 2;
+              "
+            />
+          </div>
+          <div class="flex-grow-1" style="max-width: 417px">
+            <h5>{{ step.title }}</h5>
+            <p>{{ step.description }}</p>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<div
+  id="first-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <h1 class="text-center mb-5">{{ this.first_use_cases_title }}</h1>
+  {{each {this.first_use_cases} as usecase}}
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
+      <div class="w-75">
+        <h2>{{ usecase.title }}</h2>
+        <p>{{ usecase.description }}</p>
+      </div>
+    </div>
+  </div>
+  {{else}}
+  <div class="row">
+    <div class="col-12 col-md 6 d-flex flex-column justify-content-center">
+      <div class="w-75">
+        <h2>{{ usecase.title }}</h2>
+        <p>{{ usecase.description }}</p>
+      </div>
+    </div>
+    <div class="col-12 col-md 6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100"
+      />
+    </div>
+  </div>
+  {{end-if}}
+  {{/each}}
+
+  <div class="d-flex gap-2 mt-5">
+    <a
+      href="{{ this.use_cases_secondary_cta_link.truepath() }}"
+      class="btn btn-secondary"
+    >
+      {{ this.use_cases_secondary_cta_label }}
+    </a>
+    <a
+      href="{{ this.use_cases_primary_cta_link.truepath() }}"
+      class="btn btn-primary"
+    >
+      {{ this.use_cases_primary_cta_label }}
+    </a>
+  </div>
+</div>
+
+<div
+  id="second-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <h1 class="text-center mb-5">{{ this.second_use_cases_title }}</h1>
+  {{each {this.second_use_cases} as usecase}}
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
+      <div class="w-75">
+        <h2>{{ usecase.title }}</h2>
+        <p>{{ usecase.description }}</p>
+      </div>
+    </div>
+  </div>
+  {{else}}
+  <div class="row">
+    <div class="col-12 col-md 6 d-flex flex-column justify-content-center">
+      <div class="w-75">
+        <h2>{{ usecase.title }}</h2>
+        <p>{{ usecase.description }}</p>
+      </div>
+    </div>
+    <div class="col-12 col-md 6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100"
+      />
+    </div>
+  </div>
+  {{end-if}}
+  {{/each}}
+
+  <div class="d-flex gap-2 mt-5">
+    <a
+      href="{{ this.use_cases_secondary_cta_link.truepath() }}"
+      class="btn btn-secondary"
+    >
+      {{ this.use_cases_secondary_cta_label }}
+    </a>
+    <a
+      href="{{ this.use_cases_primary_cta_link.truepath() }}"
+      class="btn btn-primary"
+    >
+      {{ this.use_cases_primary_cta_label }}
+    </a>
+  </div>
+</div>
+
+<div
+  id="third-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <h1 class="text-center mb-5">{{ this.third_use_cases_title }}</h1>
+  {{each {this.third_use_cases} as usecase}}
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
+      <div class="w-75">
+        <h2>{{ usecase.title }}</h2>
+        <p>{{ usecase.description }}</p>
+      </div>
+    </div>
+  </div>
+  {{else}}
+  <div class="row">
+    <div class="col-12 col-md 6 d-flex flex-column justify-content-center">
+      <div class="w-75">
+        <h2>{{ usecase.title }}</h2>
+        <p>{{ usecase.description }}</p>
+      </div>
+    </div>
+    <div class="col-12 col-md 6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100"
+      />
+    </div>
+  </div>
+  {{end-if}}
+  {{/each}}
+
+  <div class="d-flex gap-2 mt-5">
+    <a
+      href="{{ this.use_cases_secondary_cta_link.truepath() }}"
+      class="btn btn-secondary"
+    >
+      {{ this.use_cases_secondary_cta_label }}
+    </a>
+    <a
+      href="{{ this.use_cases_primary_cta_link.truepath() }}"
+      class="btn btn-primary"
+    >
+      {{ this.use_cases_primary_cta_label }}
+    </a>
+  </div>
+</div>
+
+<div
+  class="w-100 bg-primary d-flex flex-column justify-content-center mt-5 py-5"
+  id="causes"
+>
+  <div class="container d-flex flex-column justify-content-center">
+    <h2 class="mb-5 text-center text-white">Cause We Support</h2>
+    <!-- prettier-ignore -->
+    {{include /components/global/Homepage/category_card.html}}
+  </div>
+</div>
+
+<div
+  class="position-relative bg-primary d-flex flex-column justify-content-center py-5"
+  style="height: 752px"
+  id="causes"
+>
+  <div
+    class="container d-flex flex-column justify-content-center position-relative z-3"
+    style="background-color: #e6e0e9; border-radius: 30px; height: 512px"
+  >
+    <div class="row h-100">
+      <div
+        class="col-md-6 mb-4 mb-md-0 px-5 h-100 d-flex flex-column justify-content-center"
+      >
+        <h2 style="font-size: 40px">Your fundraising empowers nonprofits</h2>
+        <p class="mt-4">
+          Get what you need to help your fundraiser succeed on CauseMobile,
+          whether you're raising money for yourself, friends, family, or
+          charity. With no fee to start, CauseMobile is the world's leading
+          crowdfunding platform—from memorial tributes and funerals to medical
+          emergencies and nonprofits.
+        </p>
+        <button class="btn btn-primary mt-4" style="align-self: start">
+          Load More
+        </button>
+      </div>
+      <div
+        class="col-6"
+        style="
+          background-image: url('https://chaptermentalhealth.org/wp-content/uploads/2020/01/Fundraising-Ideas.jpg');
+          background-size: cover;
+          background-position: center;
+          height: 100%;
+          border-radius: 0px 30px 30px 0px;
+        "
+      ></div>
+    </div>
+  </div>
+  <div
+    style="
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 261px;
+      background-color: #f9f9f9;
+    "
+  ></div>
+</div>
+
+<!-- prettier-ignore -->
+{{ include /components/global/cause_banner.html }}
+
+<!-- prettier-ignore -->
+{{ include /components/global/demo.html}}

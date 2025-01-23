@@ -1,0 +1,13 @@
+{{ $about_var = {about.first().logos} }}
+
+{
+    "data": [
+        {{each non_profits as npo where find_in_set(npo.zuid, '{$about_var}')}}
+        {
+            "image": "{{npo.logo.getImage()}}"
+            "npo": "{{npo.zuid}}"
+            "logos": "{{$about_var}}"
+        }{{logo._arraycomma}}
+        {{/each}}
+    ],
+},

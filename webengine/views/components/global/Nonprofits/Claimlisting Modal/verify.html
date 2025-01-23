@@ -1,0 +1,280 @@
+<style>
+  .image-upload-container {
+    width: 100%;
+  }
+  .image-preview {
+    width: 100%;
+    height: 270px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #f8f9fa;
+  }
+  .preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .custom-file-input {
+    display: none;
+  }
+  #removeImageBtn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  #removeImageBtn i {
+    font-size: 14px;
+  }
+  .upload-message {
+    text-align: center;
+    padding: 20px;
+  }
+</style>
+
+<section id="verifySelection" class="section-container">
+  <div class="py-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img class="section-icon" src="" style="max-width: 160px" />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="section-title fs-1 fw-normal mb-0"></p>
+        <p class="section-description fs-5 text-muted mb-0"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="max-width: 480px; width: 100%">
+      <form id="profileInformationForm" class="needs-validation" novalidate>
+        <input type="hidden" id="firstName" name="First_Name" value="" />
+        <input type="hidden" id="lastName" name="Last_Name" value="" />
+        <input
+          type="hidden"
+          id="npoZuid"
+          name="NPO_ZUID"
+          value="{{this.zuid}}"
+        />
+        <input type="hidden" id="npoUrl" name="NPO_URL" value="" />
+        <input type="hidden" id="userUrl" name="User_URL" value="" />
+
+        <div class="mb-4 row">
+          <div class="col-md-12">
+            <label for="organizationName" class="form-label"
+              >Organization Name <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="organizationName"
+              name="SingleLine"
+              value="{{this.name}}"
+              required
+            />
+            <div class="invalid-feedback">
+              Please enter an organization name.
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4 row">
+          <div class="col-md-12">
+            <label for="workEmail" class="form-label"
+              >Work Email <span class="text-danger">*</span></label
+            >
+            <input
+              type="email"
+              class="form-control"
+              id="workEmail"
+              name="Email"
+              required
+            />
+            <div class="invalid-feedback">Please enter a valid work email.</div>
+          </div>
+        </div>
+        <div class="mb-4 row">
+          <div class="col-md-12">
+            <input
+              type="checkbox"
+              id="DecisionBox1"
+              name="DecisionBox1"
+              class="form-check-input"
+            />
+            <label for="DecisionBox1" class="form-check-label"
+              >Does your Nonprofit have multiple locations?
+            </label>
+          </div>
+        </div>
+
+        <div class="mb-4 row d-none">
+          <div class="col-md-12">
+            <label for="einNumber" class="form-label">EIN Number</label>
+            <input
+              type="text"
+              class="form-control"
+              id="einNumber"
+              name="Number"
+              maxlength="9"
+              pattern="\d{9}"
+              oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9);"
+            />
+            <small class="form-text text-muted"
+              >Optional: Please enter the 9-digit EIN number of your
+              organization</small
+            >
+          </div>
+        </div>
+
+        <div class="mb-4 row d-none">
+          <div class="col-md-12">
+            <label for="roleInOrganization" class="form-label"
+              >Title/Role in Organization</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="roleInOrganization"
+              name="SingleLine3"
+            />
+            <small class="form-text text-muted"
+              >Optional: Please enter your title/role in the organization</small
+            >
+            <div class="invalid-feedback">
+              Please enter your title/role in organization.
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4 row d-none">
+          <div class="col-md-12">
+            <label for="linkedinUrl" class="form-label">LinkedIn URL</label>
+            <input
+              type="url"
+              class="form-control"
+              id="linkedinUrl"
+              name="Website"
+            />
+            <small class="form-text text-muted"
+              >Optional: Please insert your LinkedIn profile URL. This will help
+              verify your identity.</small
+            >
+          </div>
+        </div>
+
+        <div class="mb-4 row d-none">
+          <div class="col-md-12">
+            <label for="causeCategory" class="form-label">Cause Category</label>
+            <div class="dropdown">
+              <input
+                type="text"
+                class="form-control"
+                id="categorySearchInput"
+                placeholder="Search Categories..."
+                autocomplete="off"
+              />
+              <ul
+                class="dropdown-menu w-100"
+                id="categoryDropdown"
+                style="max-height: 300px; overflow-y: auto"
+              >
+                <!-- Category options will be dynamically added here -->
+              </ul>
+              <small class="form-text text-muted"
+                >Optional: Please select the cause category of your
+                organization</small
+              >
+            </div>
+            <input type="hidden" id="selectedCategory" name="SingleLine1" />
+            <div class="invalid-feedback">Please select a category.</div>
+          </div>
+        </div>
+
+        <div class="mb-4 row d-none">
+          <div class="col-md-12">
+            <label for="idUpload" class="form-label"
+              >ID Verification Upload</label
+            >
+            <input
+              type="file"
+              class="form-control"
+              id="idUpload"
+              name="FileUpload"
+              accept="image/*,application/pdf"
+            />
+            <small class="form-text text-muted"
+              >Optional: Acceptable docs include Driver's License, Passport or
+              Employee Badge</small
+            >
+          </div>
+        </div>
+
+        <div class="mb-4 row d-none">
+          <div class="col-md-12">
+            <label for="nonprofitDocsUpload" class="form-label"
+              >Nonprofit Verification Upload</label
+            >
+            <input
+              type="file"
+              class="form-control"
+              id="nonprofitDocsUpload"
+              name="FileUpload1"
+              accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            />
+            <small class="form-text text-muted"
+              >Optional: Form 990 or other nonprofit documentation</small
+            >
+          </div>
+        </div>
+
+        <div id="termsAndConditions" class="mt-4">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="termsCheck"
+              required
+            />
+            <label class="form-check-label text-muted" for="termsCheck">
+              I agree to the
+              <a href="/terms-of-service"
+                ><u><b>User Terms</b></u></a
+              >
+              ,
+              <a href="/admin-terms"
+                ><u><b>Admin Terms</b></u></a
+              >
+              and
+              <a href="/privacy-policy"
+                ><u><b>Privacy Policy</b></u></a
+              >
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="updatesCheck" />
+            <label class="form-check-label text-muted" for="updatesCheck">
+              I would like to receive periodic news and product updates
+            </label>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary w-100 mt-4"
+          id="submitClaimBtn"
+        >
+          Verify and Continue
+        </button>
+      </form>
+    </div>
+  </div>
+</section>

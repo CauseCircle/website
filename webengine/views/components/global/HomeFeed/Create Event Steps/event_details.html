@@ -1,0 +1,309 @@
+<style>
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-text {
+    color: var(--bs-gray-600);
+    font-size: 0.875rem;
+  }
+
+  .image-upload-container {
+    width: 100%;
+  }
+
+  .image-preview {
+    width: 100%;
+    height: 270px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #f8f9fa;
+  }
+
+  .upload-area {
+    border: 2px dashed #ced4da;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .upload-area:hover {
+    background-color: #f8f9fa;
+  }
+
+  .preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .preview-item {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+
+  #locationDropdown {
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+</style>
+
+<section id="eventDetailsSelection" class="section-container d-none">
+  <div class="py-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img class="section-icon" src="" style="max-width: 160px" />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="section-title fs-1 fw-normal mb-0"></p>
+        <p class="section-description fs-5 text-muted mb-0"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="max-width: 480px; width: 100%">
+      <form id="eventDetailsForm" novalidate>
+        <!-- Event Title -->
+        <div class="mb-4">
+          <label for="eventTitle" class="form-label">
+            Event Title <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="eventTitle"
+            required
+            placeholder="Annual Fundraising Gala"
+          />
+          <div class="invalid-feedback">Please enter an event title.</div>
+        </div>
+
+        <!-- Event Date & Time -->
+        <div class="mb-4">
+          <label for="eventDateTime" class="form-label">
+            Event Date & Time <span class="text-danger">*</span>
+          </label>
+          <input
+            type="datetime-local"
+            class="form-control"
+            id="eventDateTime"
+            required
+          />
+          <div class="invalid-feedback">Please select event date and time.</div>
+        </div>
+
+        <!-- Event Location -->
+        <div class="mb-4">
+          <label for="eventLocation" class="form-label">
+            Event Location <span class="text-danger">*</span>
+          </label>
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              id="eventLocation"
+              required
+              placeholder="Search location"
+            />
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              id="currentLocationBtn"
+            >
+              <i class="bi bi-geo-alt"></i>
+              Current
+            </button>
+          </div>
+          <ul class="dropdown-menu w-100" id="locationDropdown"></ul>
+          <div class="invalid-feedback">Please enter event location.</div>
+        </div>
+
+        <!-- Event Description -->
+        <div class="mb-4">
+          <label for="eventDescription" class="form-label">
+            Event Description <span class="text-danger">*</span>
+          </label>
+          <textarea
+            class="form-control"
+            id="eventDescription"
+            rows="4"
+            required
+            placeholder="Write brief description"
+          ></textarea>
+          <div class="form-text text-end">0/200</div>
+          <div class="invalid-feedback">Please enter event description.</div>
+        </div>
+
+        <!-- Event Type -->
+        <div class="mb-4">
+          <label for="eventType" class="form-label">
+            Event Type <span class="text-danger">*</span>
+          </label>
+          <select class="form-select" id="eventType" required>
+            <option value="">Select event type</option>
+            <option value="workshop">Workshop</option>
+            <option value="seminar">Seminar</option>
+            <option value="conference">Conference</option>
+            <option value="fundraiser">Fundraiser</option>
+            <option value="other">Other</option>
+          </select>
+          <div class="invalid-feedback">Please select event type.</div>
+        </div>
+
+        <!-- Category -->
+        <div class="mb-4">
+          <label for="eventCategory" class="form-label">
+            Category <span class="text-danger">*</span>
+          </label>
+          <select class="form-select" id="eventCategory" required>
+            <option value="">Select category</option>
+            <option value="education">Education</option>
+            <option value="environment">Environment</option>
+            <option value="health">Health</option>
+            <option value="community">Community</option>
+            <option value="other">Other</option>
+          </select>
+          <div class="invalid-feedback">Please select a category.</div>
+        </div>
+      </form>
+
+      <button id="nextBtn" class="btn btn-primary w-100 mt-4" disabled>
+        Next
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  $(document).ready(function () {
+    let validationState = {
+      eventTitle: false,
+      eventDateTime: false,
+      eventLocation: false,
+      eventDescription: false,
+      eventType: false,
+      eventCategory: false,
+    };
+
+    // Character counter for description
+    $("#eventDescription").on("input", function () {
+      const maxLength = 200;
+      const currentLength = $(this).val().length;
+      $(this).next(".form-text").text(`${currentLength}/${maxLength}`);
+
+      if (currentLength > maxLength) {
+        $(this).val($(this).val().substring(0, maxLength));
+      }
+    });
+
+    // Validation functions
+    function validateField(fieldId, fieldName) {
+      const value = $(`#${fieldId}`).val().trim();
+      if (value === "") {
+        $(`#${fieldId}`).addClass("is-invalid").removeClass("is-valid");
+        validationState[fieldName] = false;
+      } else {
+        $(`#${fieldId}`).removeClass("is-invalid").addClass("is-valid");
+        validationState[fieldName] = true;
+      }
+      checkAllValid();
+    }
+
+    // Input event listeners
+    $("#eventTitle").on("input", () =>
+      validateField("eventTitle", "eventTitle")
+    );
+    $("#eventDateTime").on("change", () =>
+      validateField("eventDateTime", "eventDateTime")
+    );
+    $("#eventLocation").on("input", () =>
+      validateField("eventLocation", "eventLocation")
+    );
+    $("#eventDescription").on("input", () =>
+      validateField("eventDescription", "eventDescription")
+    );
+    $("#eventType").on("change", () => validateField("eventType", "eventType"));
+    $("#eventCategory").on("change", () =>
+      validateField("eventCategory", "eventCategory")
+    );
+
+    // Current location button
+    $("#currentLocationBtn").on("click", function () {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+
+          // Reverse geocoding using OpenStreetMap Nominatim
+          $.ajax({
+            url: `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
+            type: "GET",
+            success: function (data) {
+              if (data.address) {
+                const location = [
+                  data.address.road,
+                  data.address.city,
+                  data.address.state,
+                  data.address.country,
+                ]
+                  .filter(Boolean)
+                  .join(", ");
+
+                $("#eventLocation").val(location);
+                validateField("eventLocation", "eventLocation");
+              }
+            },
+          });
+        });
+      }
+    });
+
+    function checkAllValid() {
+      const allValid = Object.values(validationState).every(Boolean);
+      $("#nextBtn").prop("disabled", !allValid);
+    }
+
+    // Reset form function
+    window.resetEventForm = function () {
+      $("#eventDetailsForm")[0].reset();
+      $(".form-control, .form-select").removeClass("is-valid is-invalid");
+      $("#eventDescription").next(".form-text").text("0/200");
+
+      validationState = {
+        eventTitle: false,
+        eventDateTime: false,
+        eventLocation: false,
+        eventDescription: false,
+        eventType: false,
+        eventCategory: false,
+      };
+
+      checkAllValid();
+    };
+
+    // Initialize form
+    checkAllValid();
+  });
+</script>

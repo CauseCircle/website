@@ -1,0 +1,66 @@
+{{$skip = 0 }}
+{{$limit = 0 }}
+{{$totalArticle = 0}}
+{{$sort = desc}}
+{{$filter = "" }}
+
+
+{{if {request.queryParam(skip)} }}
+{{$skip = {request.queryParam(skip)} }}
+{{else}}
+{{$skip = 0}}
+{{end-if}}
+
+
+{{if {request.queryParam(limit)} }}
+{{$limit = {request.queryParam(limit)} }}
+{{else}}
+{{$limit = 10}}
+{{end-if}}
+
+{{if {request.queryParam(sort)} &&  {request.queryParam(sort)} === 'asc'}}
+{{$sort = asc }}
+{{else}}
+{{$sort = desc }}
+{{end-if}}
+
+
+{{if {request.queryParam(filter)} }}
+{{$filter = "%{request.queryParam(filter)}%" }}
+{{else}}
+{{$filter = "%%" }}
+{{end-if}}
+
+{{each authors as author}}
+{{$totalAuthors = {author._num} }}
+{{/each}}
+
+{
+    "data": [
+        {{each authors as author where author.zuid like {$filter} limit {$skip}, {$limit} }}
+        {
+            "headshot": "{{author.headshot.getImage()}}",
+            "hero_image": "{{author.hero_image.getImage()}}",
+            "name": "{{author.name}}",
+            "company": "{{author.company}}",
+            "title": "{{author.title}}",
+            "description": "{{author.description.escapeForJS()}}",
+            "twitter_handle": "{{author.twitter_handle}}",
+            "sort_order": "{{author.sort_order}}",
+            "index": "{{author._index}}",
+            "zuid": "{{z.zuid}}",
+            "href": "{{author.path_full}}"
+
+        }{{npo._arraycomma}}
+        {{/each}}
+    ],
+    "meta": {
+        "skip": {{$skip}},
+        "limit": {{$limit}},
+        "page": {{math({$skip} / {$limit} + 1)}},
+        "pages": {{ math(round({$totalAuthors} / {$limit})) }},
+        "totalItems": {{$totalAuthors}},
+        "sort": "{{$sort}}",
+        "filter": {{$filter}}
+    }
+}

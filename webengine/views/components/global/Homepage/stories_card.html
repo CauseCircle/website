@@ -1,0 +1,56 @@
+<div class="row">
+  {{each stories as story limit 6}}
+  <div class="col-sm-6 col-md-4 g-4">
+    <a href="{{ story.getUrl() }}" style="text-decoration: none">
+      <div class="card d-flex flex-column h-100">
+        <img
+          src="{{ story.story_image.getImage('w_400,h_300,c_fill') }}"
+          class="card-img-top"
+          style="max-height: 180px; object-fit: cover"
+          alt="{{ story.title }}"
+        />
+        <div class="p-3 d-flex flex-column gap-2 h-100">
+          <div class="d-flex align-items-center gap-2">
+            {{ $related_npo = {story.related_npos} }}
+            <!--prettier-ignore-->
+            {{each non_profits as npo where find_in_set(z.zuid, '{$related_npo}') limit 1}}
+            <img
+              style="
+                width: 40px;
+                height: 40px;
+                border: 1px solid #aeaeae;
+                border-radius: 50%;
+              "
+              src="{{ npo.logo.getImage('w_40,h_40,c_fill') }}"
+              class="img-fluid"
+              alt="{{ npo.name }}"
+            />
+            <p class="fw-medium" style="font-size: 18px">{{npo.name}}</p>
+            {{/each}}
+          </div>
+          <p class="card-title fw-semibold fs-5">{{ story.title }}</p>
+          <div class="d-flex gap-2 flex-grow-1 align-items-end flex-wrap">
+            {{ $related_causes = {story.related_causes} }}
+            <!--prettier-ignore-->
+            {{each causes as cause where find_in_set(z.zuid, '{$related_causes}') limit 3}}
+            <div
+              class="d-flex align-items-center"
+              style="
+                padding: 0 10px;
+                height: 28px;
+                border-radius: 14px;
+                background-color: #eceff3;
+              "
+            >
+              <p class="text-center fw-medium" style="font-size: 14px">
+                {{ cause.title }}
+              </p>
+            </div>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  {{/each}}
+</div>

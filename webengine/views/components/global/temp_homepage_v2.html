@@ -1,0 +1,1180 @@
+<style>
+  .usecase-image {
+    border-radius: 20px;
+    max-height: 450px;
+    object-fit: cover;
+  }
+  ul.custom-bullet {
+    list-style: none; /* Remove default bullets */
+    padding: 0;
+  }
+
+  ul.custom-bullet li {
+    margin-left: 25px; /* Adjust as needed */
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  ul.custom-bullet li::before {
+    content: "";
+    position: absolute;
+    left: -25px; /* Adjust to position the image */
+    top: 4px;
+    width: 16px; /* Adjust image width */
+    height: 16px; /* Adjust image height */
+    background-image: url("{{cause_circle_cms_page.first().list_icon.getImage()}}"); /* Replace with your image path */
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+</style>
+
+<style>
+  .hero-section {
+    /* background: url("{{this.hero_image.getImage()}}") no-repeat center center; */
+    background-size: cover;
+    /* color: #fff; */
+    text-align: center;
+    padding: 100px 0;
+  }
+  .card-img-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+  }
+  .featurette-divider {
+    margin: 5rem 0;
+  }
+  .featured-category-card {
+    background-size: cover;
+    min-height: 223px;
+    border-radius: 20px;
+    border: none;
+  }
+  .featured-gradient-overlay {
+    background: linear-gradient(100deg, #613aaf 5%, #9a6ef3 95%);
+    border-radius: 20px;
+  }
+  .featured-floating-btn {
+    bottom: 20px;
+    right: 20px;
+    font-size: 40px;
+    padding: 0;
+    height: 40px;
+    width: 40px;
+    border: none;
+  }
+  .customer-images {
+    display: flex;
+    position: relative;
+  }
+  .customer-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: -10px;
+    position: relative;
+    z-index: 1;
+    object-fit: cover;
+    filter: grayscale(100%);
+  }
+  .customer-img:nth-child(2) {
+    z-index: 2;
+  }
+  .customer-img:nth-child(3) {
+    z-index: 3;
+  }
+  .customer-img:nth-child(4) {
+    z-index: 4;
+  }
+  .customer-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .customer-info .card-title {
+    margin: 0;
+  }
+
+  .progress {
+    background-color: #e0e0e0;
+  }
+
+  .progress-bar {
+    background-color: #6c63ff;
+  }
+  .causes-card {
+    background-size: cover;
+    min-height: 223px;
+    border-radius: 20px;
+    border: none;
+  }
+
+  .search-bar {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    width: 100%;
+    max-width: 640px;
+  }
+  .search-bar input {
+    width: 100%;
+    max-width: 640px;
+    height: 66px;
+    padding: 20px 44px 20px 24px; /* Add padding for the icon */
+    font-size: 16px;
+    border: 1px solid #dfe1e7;
+    border-radius: 10px;
+  }
+  .search-bar button {
+    position: absolute;
+    right: 20px; /* Adjust position as needed */
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #ccc;
+  }
+  .search-bar button:hover {
+    color: #333;
+  }
+
+  .logo-container {
+    overflow: hidden;
+    /* width: 300px;
+    height: 100px; */
+    /* position: relative; */
+  }
+
+  .logo-track {
+    display: flex;
+    animation: scroll infinite linear;
+  }
+
+  .logo {
+    object-fit: contain;
+    width: auto;
+    max-height: 80px;
+    flex-shrink: 0;
+    animation: rotate 8s linear infinite;
+  }
+
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+</style>
+
+<style>
+  .category-card {
+    background-size: cover;
+    min-height: 120px;
+    border-radius: 15px;
+    border: none;
+  }
+
+  .category-card:hover {
+    transform: scale(1.02);
+    transition: transform 0.5s ease;
+  }
+
+  .gradient-overlay {
+    background: linear-gradient(
+      179.63deg,
+      rgba(113, 61, 221, 0) 0.32%,
+      #3d2177 99.68%
+    );
+    border-radius: 15px;
+  }
+  .floating-btn {
+    top: 20px;
+    right: 20px;
+    font-size: 40px;
+    padding: 0;
+    height: 40px;
+    width: 40px;
+    border: none;
+  }
+  .floating-btn i {
+    height: 40px;
+    width: 40px;
+  }
+</style>
+
+<style>
+  .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+  .form-input {
+    border: 1px solid #dfe1e7;
+    background-color: #f8fafb;
+    border-radius: 5px;
+    height: 48px;
+    padding: 8px 12px 8px 12px;
+  }
+  .form-dropdown {
+    /* Base styles for the select */
+    /* appearance: none; Remove browser default styling */
+    /* -webkit-appearance: none; For Safari */
+    /* -moz-appearance: none; For Firefox */
+    width: 100%;
+    height: 48px;
+    padding: 8px 12px 8px 12px;
+    border: 1px solid #dfe1e7;
+    background-color: #f8fafb;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 400;
+    color: black;
+    position: relative;
+  }
+  .form-dropdown::-ms-expand {
+    /* display: none; Hide the default arrow for IE11 */
+  }
+  .form-dropdown:focus {
+    outline: none;
+    border-color: black;
+    border-width: 2px;
+  }
+  .form-dropdown option {
+    padding: 8px 12px;
+    background-color: #fff;
+    font-size: 16px;
+  }
+
+  select {
+    appearance: none;
+    /*  safari  */
+    -webkit-appearance: none;
+    /*  other styles for aesthetics */
+  }
+  .form-dropdown::before,
+  .form-dropdown::after {
+    --size: 0.3rem;
+    content: "";
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+  }
+
+  .form-dropdown::before {
+    border-left: 0.3rem solid transparent;
+    border-right: 0.3rem solid transparent;
+    border-bottom: 0.3rem solid black;
+    top: 40%;
+  }
+
+  .form-dropdown::after {
+    border-left: 0.3rem solid transparent;
+    border-right: 0.3rem solid transparent;
+    border-top: 0.3rem solid black;
+    top: 55%;
+  }
+
+  ul.custom-bullet {
+    list-style: none; /* Remove default bullets */
+    padding: 0;
+  }
+
+  ul.custom-bullet li {
+    margin-left: 25px; /* Adjust as needed */
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  ul.custom-bullet li::before {
+    content: "";
+    position: absolute;
+    left: -25px; /* Adjust to position the image */
+    top: 4px;
+    width: 16px; /* Adjust image width */
+    height: 16px; /* Adjust image height */
+    background-image: url("{{cause_circle_cms_page.first().list_icon.getImage()}}"); /* Replace with your image path */
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+</style>
+
+{{include /components/global/Modals/login_modal.html}}
+
+<section
+  id="hero"
+  class="d-flex align-items-center justify-content-center my-4 mb-sm-7 mt-sm-5"
+>
+  <div class="row container">
+    <div
+      class="col-sm-12 col-md-5 d-flex flex-column align-items-center align-items-sm-start gap-3 pe-4 justify-content-center pb-4 pb-md-6"
+    >
+      <div
+        style="
+          max-width: 400px;
+          height: 48px;
+          border-radius: 24px;
+          background-color: #f4eeff;
+        "
+        class="d-flex mb-4"
+      >
+        <div
+          style="width: 84px; border-radius: 24px; margin: 2px"
+          class="bg-white d-flex align-items-center justify-content-center"
+        >
+          <p class="text-primary fw-semibold">New</p>
+        </div>
+        <div
+          class="d-flex align-items-center justify-content-center flex-grow-1 gap-2 px-3"
+        >
+          <p class="text-primary fw-semibold">Launching August 30th</p>
+          <i
+            class="bi bi-arrow-right text-primary fw-bold"
+            style="font-size: 24px"
+          ></i>
+        </div>
+      </div>
+      <div class="w-100 w-sm-100 text-start d-flex flex-column gap-4">
+        <div id="hero-title" class="text-primary">
+          {{ homepage.first().title }}
+        </div>
+        <div id="hero-description" class="d-flex flex-column gap-3">
+          {{ homepage.first().description }}
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-md-3">
+        <a data-target="#demo-section" class="btn btn-primary scroll-to-demo">
+          {{ homepage.first().primary_cta_label }}
+        </a>
+      </div>
+    </div>
+    <div
+      class="col-sm-12 col-md-7 d-flex flex-column align-items-center gap-4 pe-2 pe-sm-4 justify-content-center mt-6 mt-md-0"
+    >
+      <img
+        src="{{ homepage.first().hero_image.getImage() }}"
+        alt=""
+        style="width: auto; max-height: 820px; max-width: 100%"
+      />
+    </div>
+  </div>
+</section>
+
+<section
+  id="npo-search-container"
+  class="text-center d-flex flex-column gap-3 my-7 my-sm-9"
+>
+  <div class="container d-flex justify-content-center align-items-center">
+    <h1>{{this.npo_search_title}}</h1>
+  </div>
+
+  <div class="container d-flex align-items-center justify-content-center mb-3">
+    <div class="search-bar">
+      <button id="npo-search-btn" type="button" onclick="loadNPOdata()">
+        <i class="bi bi-search"></i>
+      </button>
+      <input id="npo-search" type="text" placeholder="Search" />
+    </div>
+  </div>
+
+  <div class="d-flex flex-column gap-3 overflow-x-auto invisible-scroll mx-2">
+    <div class="logo-container">
+      <div
+        class="logo-track d-flex gap-6 justify-content-start justify-content-xl-center"
+      >
+        <!--prettier-ignore-->
+        {{each {this.logos} as logo}}
+        <img
+          src="{{ logo.logo.getImage() }}"
+          alt="logo"
+          class="logo"
+          style="object-fit: contain; width: auto; max-height: 80px"
+        />
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container my-5" id="stories">
+  <h2 class="mb-5 text-center">{{this.featured_stories_title}}</h2>
+  <!-- prettier-ignore -->
+  <div class="row">
+    {{ each {this.featured_stories} as story limit 6 }}
+    <div class="col-sm-6 col-md-4 g-4">
+      <a href="{{ story.getUrl() }}" style="text-decoration: none">
+        <div class="card d-flex flex-column h-100">
+          <img
+            src="{{ story.story_image.getImage('w_400,h_300,c_fill') }}"
+            class="card-img-top"
+            style="max-height: 180px; object-fit: cover"
+            alt="{{ story.title }}"
+          />
+          <div class="p-3 d-flex flex-column gap-2 h-100">
+            <div class="d-flex align-items-center gap-2">
+              {{ $related_npo = {story.related_npos} }}
+              <!--prettier-ignore-->
+              {{each non_profits as npo where find_in_set(z.zuid, '{$related_npo}') limit 1}}
+              <img
+                style="
+                  width: 40px;
+                  height: 40px;
+                  border: 1px solid #aeaeae;
+                  border-radius: 50%;
+                "
+                src="{{ npo.logo.getImage('w_40,h_40,c_fill') }}"
+                class="img-fluid"
+                alt="{{ npo.name }}"
+              />
+              <p class="fw-medium" style="font-size: 18px">{{npo.name}}</p>
+              {{/each}}
+            </div>
+            <p class="card-title fw-semibold fs-5">{{ story.title }}</p>
+            <div class="d-flex gap-2 flex-grow-1 align-items-end flex-wrap">
+              {{ $related_causes = {story.related_causes} }}
+              <!--prettier-ignore-->
+              {{each causes as cause where find_in_set(z.zuid, '{$related_causes}') limit 3}}
+              <div
+                class="d-flex align-items-center"
+                style="
+                  padding: 0 10px;
+                  height: 28px;
+                  border-radius: 14px;
+                  background-color: #eceff3;
+                "
+              >
+                <p class="text-center fw-medium" style="font-size: 14px">
+                  {{ cause.title }}
+                </p>
+              </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+    {{/each}}
+  </div>
+
+  <div class="d-flex justify-content-center mt-5">
+    <a href="{{stories_landing_page.first().getUrl()}}" class="btn btn-primary"
+      >Load More</a
+    >
+  </div>
+</section>
+
+<section
+  id="causes"
+  class="w-100 bg-primary d-flex flex-column justify-content-center mt-5 py-5"
+>
+  <div
+    class="container d-flex flex-column gap-5 justify-content-center align-items-center"
+  >
+    <h2 class="text-center text-white w-100 w-md-75">
+      {{ this.causes_title }}
+    </h2>
+    <!-- prettier-ignore -->
+    <div class="row">
+      {{each {this.causes} as cause limit 12}}
+      <div class="col-12 col-md-4 col-lg-3">
+        <a style="text-decoration: none"> <!-- Add hrefs -->
+          <div
+            class="card mb-3 text-white position-relative category-card"
+            style="background-image: url({{ cause.image.getImage() }});"
+          >
+            <div
+              class="position-absolute start-0 end-0 top-0 bottom-0 gradient-overlay"
+            ></div>
+            <div class="card-body d-flex align-items-end position-relative">
+              <h4 class="card-title fw-bold">{{ cause.title }}</h4>
+            </div>
+          </div>
+        </a>
+      </div>
+      {{/each}}
+    </div>
+    <a
+      href="{{causes_landing_page.first().path_full}}"
+      class="btn btn-secondary text-decoration-none"
+      >Explore More</a
+    >
+  </div>
+</section>
+
+<section
+  id="first-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <div class="text-center">{{ homepage.first().first_use_cases_title }}</div>
+
+  <!-- prettier-ignore -->
+  {{ $first_use_cases = {homepage.first().first_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$first_use_cases}' )}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+  <a data-target="#demo-section" class="btn btn-primary scroll-to-demo mt-5">
+    {{ homepage.first().primary_use_case_cta_label }}
+  </a>
+</section>
+
+<section
+  id="second-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <div class="text-center">{{ homepage.first().second_use_cases_title }}</div>
+  <!-- prettier-ignore -->
+  {{ $second_use_cases = {homepage.first().second_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$second_use_cases}')}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+  <a data-target="#demo-section" class="btn btn-primary scroll-to-demo mt-5">
+    {{ homepage.first().primary_use_case_cta_label }}
+  </a>
+</section>
+
+<section
+  id="third-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <div class="text-center">{{ homepage.first().third_use_cases_title }}</div>
+  <!-- prettier-ignore -->
+  {{ $third_use_cases = {homepage.first().third_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$third_use_cases}' )}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+  <a data-target="#demo-section" class="btn btn-primary scroll-to-demo mt-5">
+    {{ homepage.first().primary_use_case_cta_label }}
+  </a>
+</section>
+
+<section
+  id="app-section"
+  style="background-color: #e6e0e9"
+  class="py-4 py-md-7"
+>
+  <div
+    class="d-flex flex-column gap-4 container pt-7 border border-bottom-0 rounded-5 rounded-bottom-0 bg-white"
+  >
+    <div>{{this.app_section}}</div>
+    <div class="d-flex justify-content-center">
+      <img
+        src="{{this.app_section_image.getImage()}}"
+        alt=""
+        style="
+          max-width: 100%;
+          width: auto;
+          max-height: 450px;
+          object-fit: cover;
+          object-position: top;
+        "
+      />
+    </div>
+  </div>
+
+  <div
+    style="background-color: #fcfbf3"
+    class="container border border-top-0 rounded-5 rounded-top-0 px-7 py-5 d-flex flex-column flex-md-row gap-4"
+  >
+    <div class="position-relative" style="height: 48px; width: 120px">
+      <img
+        src="https://consumersite-assets.trustpilot.net/consumersite-home/public/app-promo-banner/avatars/avatar-1.png"
+        alt=""
+        style="
+          width: 48px;
+          height: 48px;
+          position: absolute;
+          border: 3px solid #fff;
+          border-radius: 50%;
+          filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.24));
+        "
+      />
+      <img
+        src="https://consumersite-assets.trustpilot.net/consumersite-home/public/app-promo-banner/avatars/avatar-2.png"
+        alt=""
+        style="
+          left: 24px;
+          width: 48px;
+          height: 48px;
+          position: absolute;
+          border: 3px solid #fff;
+          border-radius: 50%;
+          filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.24));
+        "
+      />
+      <img
+        src="https://consumersite-assets.trustpilot.net/consumersite-home/public/app-promo-banner/avatars/avatar-3.png"
+        alt=""
+        style="
+          left: 48px;
+          width: 48px;
+          height: 48px;
+          position: absolute;
+          border: 3px solid #fff;
+          border-radius: 50%;
+          filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.24));
+        "
+      />
+      <img
+        src="https://consumersite-assets.trustpilot.net/consumersite-home/public/app-promo-banner/avatars/avatar-4.png"
+        alt=""
+        style="
+          left: 72px;
+          width: 48px;
+          height: 48px;
+          position: absolute;
+          border: 3px solid #fff;
+          border-radius: 50%;
+          filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.24));
+        "
+      />
+    </div>
+    <div>
+      <h3>Get the free CauseCircle Mobile App</h3>
+      <p>
+        Join the Beta
+        <a
+          data-target="#demo-section"
+          class="scroll-to-demo"
+          style="text-decoration: none"
+          href=""
+          >waitlist</a
+        >
+        and be the first ones to get the mobile app as soon as it launches.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section
+  class="position-relative bg-primary d-flex flex-column justify-content-center py-5"
+  style="height: 752px"
+  id="fundraising-banner"
+>
+  <div
+    class="container d-flex flex-column justify-content-center position-relative z-3"
+    style="background-color: #e6e0e9; border-radius: 30px; min-height: 512px"
+  >
+    <div class="row h-100">
+      <div
+        class="col-md-6 mb-4 mb-md-0 p-5 h-100 d-flex flex-column justify-content-center gap-5"
+      >
+        <div class="d-flex flex-column gap-4">
+          {{this.fundraising_title_description}}
+        </div>
+        <a
+          data-target="#demo-section"
+          class="btn btn-primary mt-4 scroll-to-demo"
+          style="align-self: start"
+        >
+          {{this.fundraising_cta_label}}
+        </a>
+      </div>
+      <div
+        class="col-md-6 p-0 d-none d-md-block"
+        style="height: 100%; border-radius: 0px 30px 30px 0px"
+      >
+        <img
+          src="{{this.fundraising_image.getImage()}}"
+          style="
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0px 30px 30px 0px;
+          "
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    style="
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 261px;
+      background-color: #f9f9f9;
+    "
+  ></div>
+</section>
+
+<div id="demo-section" class="container py-6 py-sm-7">
+  <div class="row">
+    <div class="col-md-6 d-flex align-items-start justify-content-center">
+      <div
+        class="d-flex flex-column align-items-start justify-content-center w-100 w-sm-75 gap-3"
+      >
+        <h2>{{ this.demo_title }}</h2>
+        <div id="hero-description" class="d-flex flex-column gap-2">
+          {{ this.demo_description }}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 d-flex align-items-start justify-content-start">
+      <!-- Change or deletion of the name attributes in the input tag will lead to empty values on record submission-->
+      <div
+        class="d-flex flex-column align-items-start justify-content-start h-100 w-100 w-lg-75"
+      >
+        <form
+          action="https://forms.zohopublic.com/zestyio/form/test/formperma/J6A2YBPtSZBBoKGtcRVtOCL6D6x0t905w43usoM_Bsw/htmlRecords/submit"
+          name="form"
+          id="form"
+          method="POST"
+          accept-charset="UTF-8"
+          enctype="multipart/form-data"
+          class="d-flex justify-content-center align-items-center flex-column"
+          onsubmit="return validateForm()"
+        >
+          <input
+            id="referrer-name"
+            type="hidden"
+            name="zf_referrer_name"
+            value=""
+          /><!-- To Track referrals , place the referrer name within the " " in the above hidden input field -->
+          <input
+            type="hidden"
+            name="zf_redirect_url"
+            value="https://causecircle.org/about/confirmation-page/"
+          /><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
+          <input
+            type="hidden"
+            name="zc_gad"
+            value=""
+          /><!-- If GCLID is enabled in Zoho CRM Integration, click details of AdWords Ads will be pushed to Zoho CRM -->
+          <!--Name-->
+          <div class="row gap-4 mt-5 mt-sm-0">
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label>First Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  maxlength="255"
+                  name="Name_First"
+                  fieldType="7"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="firstNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label>Last Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  maxlength="255"
+                  name="Name_Last"
+                  fieldType="7"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="lastNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label> Work Email </label>
+                <input
+                  class="form-input"
+                  type="email"
+                  maxlength="255"
+                  name="Email"
+                  value=""
+                  fieldType="9"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="emailError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label> Organization Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  name="SingleLine"
+                  value=""
+                  fieldType="1"
+                  maxlength="255"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="orgNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 mt-3">
+                <button
+                  type="submit"
+                  class="btn btn-primary w-100"
+                  style="height: 48px"
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--prettier-ignore-->
+{{include /components/global/Modals/login_modal.html}}
+
+<!--prettier-ignore-->
+{{include /components/global/Modals/Onboading/onboarding_modal.html}}
+
+<script>
+  $(document).ready(function () {
+    $("#hero-description ul").each(function () {
+      $(this).addClass("custom-bullet");
+    });
+    $(".usecase-description ul").each(function () {
+      $(this).addClass("custom-bullet");
+    });
+    $(".scroll-to-demo").click(function () {
+      var target = $(this).data("target");
+      $("html, body").animate(
+        {
+          scrollTop: $(target).offset().top - 200,
+        },
+        100
+      );
+    });
+
+    document
+      .getElementById("npo-search-btn")
+      .addEventListener("click", function () {
+        window.location.href =
+          "{{non_profits_landing_page.first().path_full}}/?limit=24&filter=" +
+          document.getElementById("npo-search").value;
+      });
+
+    document
+      .getElementById("npo-search")
+      .addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          window.location.href =
+            "{{non_profits_landing_page.first().path_full}}/?limit=24&filter=" +
+            e.target.value;
+        }
+      });
+
+    const $container = $(".logo-container");
+    const $track = $(".logo-track");
+    const $logos = $track.children();
+    const logoWidth = $logos.first().outerWidth();
+    const containerWidth = $container.outerWidth();
+    const scrollSpeed = 5; // Adjust this value to change the scroll speed
+    // Calculate the number of logos needed to fill the container plus some extra for smooth looping
+    const logosNeeded = Math.ceil(containerWidth / logoWidth) + 1;
+
+    // Duplicate logos
+    const totalLogos = $logos.length;
+    for (let i = 0; i < logosNeeded * totalLogos; i++) {
+      $track.append($logos.eq(i % totalLogos).clone());
+    }
+
+    // Adjust the track width to fit all logos
+    const trackWidth = $track[0].scrollWidth;
+    $track.css("width", `${trackWidth}px`);
+
+    // Set the animation duration based on the total width of the track for continuous effect
+    const animationDuration = (trackWidth / logoWidth) * scrollSpeed; // Adjust this multiplier as needed
+    $track.css("animation-duration", `${animationDuration}s`);
+  });
+
+  function triggerOnboarding() {
+    console.log("Triggering onboarding modal");
+    $("#onboardingModal").modal("show");
+  }
+</script>
+
+<script>
+  function validateForm() {
+    let isValid = true;
+    let firstNameError = document.getElementById("firstNameError");
+    let lastNameError = document.getElementById("lastNameError");
+    let emailError = document.getElementById("emailError");
+    let orgNameError = document.getElementById("orgNameError");
+
+    firstNameError.textContent = "";
+    lastNameError.textContent = "";
+    emailError.textContent = "";
+    orgNameError.textContent = "";
+
+    // Validate first name
+    if (document.forms["form"]["Name_First"].value === "") {
+      firstNameError.textContent = "Please enter your first name.";
+      isValid = false;
+    }
+
+    // Validate last name
+    if (document.forms["form"]["Name_Last"].value === "") {
+      lastNameError.textContent = "Please enter your last name.";
+      isValid = false;
+    }
+
+    // Validate email
+    let email = document.forms["form"]["Email"].value;
+    if (email === "" || !isValidEmail(email)) {
+      emailError.textContent = "Please enter a valid work email address.";
+      isValid = false;
+    }
+
+    // Validate organization name
+    if (document.forms["form"]["SingleLine"].value === "") {
+      orgNameError.textContent = "Please enter your organization name.";
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  function isValidEmail(email) {
+    // Define common free email domain patterns
+    const freeEmailDomains = [
+      "gmail.com",
+      "yahoo.com",
+      "hotmail.com",
+      "outlook.com",
+      "icloud.com",
+      "aol.com",
+      "zoho.com",
+      "gmx.com",
+      "mail.com",
+      "live.com",
+      "yandex.com",
+      "protonmail.com",
+      "tutanota.com",
+      "fastmail.com",
+      "mail.ru",
+      "inbox.com",
+      // Add more free email domains as needed
+    ];
+
+    // Check if the email is valid and doesn't end with a free domain
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(email)) {
+      return false; // Invalid email format
+    }
+
+    const domain = email.split("@")[1]; // Extract domain part
+    return !freeEmailDomains.includes(domain); // Check if it's a free domain
+  }
+  $(document).ready(function () {
+    $("#hero-description ul").each(function () {
+      $(this).addClass("custom-bullet");
+    });
+
+    const referrerField = $("#referrer-name");
+
+    if (referrerField.length) {
+      referrerField.val(window.location.href);
+    }
+  });
+</script>

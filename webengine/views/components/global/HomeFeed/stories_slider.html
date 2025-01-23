@@ -1,0 +1,227 @@
+<style>
+  .cause-card {
+    position: relative;
+    height: 200px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .cause-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cause-card .overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px;
+  }
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 5%;
+  }
+</style>
+
+<style>
+  .story-image {
+    height: 100%;
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .story-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #0e121b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .story-subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em; /* Adjust this value based on your line-height */
+    line-height: 1.4em; /* Adjust this value as needed */
+  }
+  .story-subtitle,
+  .npo-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: #0e121b;
+  }
+  .story-cause {
+    padding: 0 10px;
+    /* height: 28px; */
+    border-radius: 14px;
+    background-color: #eceff3;
+    text-transform: uppercase;
+    font-size: 12px;
+    /* font-weight: bold; */
+  }
+  .story-date {
+    font-size: 12px;
+  }
+  .story-npo-logo {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #aeaeae;
+    border-radius: 3px;
+    object-fit: cover;
+    object-position: center;
+  }
+  .story-btn {
+    font-size: 12px;
+    font-weight: 500;
+    color: #0e121b;
+  }
+  .story-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+  .story-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .story-btn {
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  .story-card:hover .story-btn {
+    background-color: #7b3fee;
+    color: white;
+  }
+  .card-btn {
+    height: 36px;
+  }
+  .npo-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+</style>
+
+<div class="my-4">
+  <h2 class="mb-4 fw-semibold fs-6">Stories You Might Like</h2>
+  <div id="storiesCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <!-- First set of stories -->
+      <div class="carousel-item active">
+        <div class="row">
+          {{each stories as story limit 3 }}
+          <div class="col-md-4 mb-3">
+            <div class="card d-flex flex-column h-100 p-3 gap-2 story-card">
+              <img
+                src="{{ story.story_image.getImage() }}"
+                class="story-image"
+              />
+              <div class="d-flex flex-column gap-2 h-100">
+                <div class="d-flex align-items-end gap-2">
+                  {{ $related_npo = {story.related_npos} }}
+                  <!--prettier-ignore-->
+                  {{each non_profits as npo where find_in_set(z.zuid, '{$related_npo}') limit 1}}
+                  <img
+                    src="{{ npo.logo.getImage('w_24,h_24,c_fill') }}"
+                    class="story-npo-logo"
+                  />
+                  <p class="npo-name my-auto">{{ npo.name }}</p>
+                  {{/each}}
+                </div>
+                <div class="flex-grow-1">
+                  <p class="story-title">{{ story.title }}</p>
+                  <div class="story-subtitle">{{ story.description }}</div>
+                </div>
+                <div class="d-flex align-items-center justify-content-start flex-wrap">
+                  <p class="story-date">{{ story.date_published }}</p>
+                  <!--prettier-ignore-->
+                  {{ each causes as cause where find_in_set(z.zuid, '{story.related_causes}') limit 1}}
+                  <div class="story-cause d-flex align-items-center">
+                    <p class="text-center">{{ cause.title }}</p>
+                  </div>
+                  {{/each}}
+                </div>
+                <a href="{{ story.getUrl() }}" class="btn btn-secondary story-btn card-btn">
+                  Read More
+                </a>
+              </div>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+
+      <!-- Second set of stories -->
+      <div class="carousel-item">
+        <div class="row">
+          {{each stories as story offset 3 limit 3 }}
+          <div class="col-md-4 mb-3">
+            <div class="card d-flex flex-column h-100 p-3 gap-2 story-card">
+              <img
+                src="{{ story.story_image.getImage() }}"
+                class="story-image"
+              />
+              <div class="d-flex flex-column gap-2 h-100">
+                <div class="d-flex align-items-end gap-2">
+                  {{ $related_npo = {story.related_npos} }}
+                  <!--prettier-ignore-->
+                  {{each non_profits as npo where find_in_set(z.zuid, '{$related_npo}') limit 1}}
+                  <img
+                    src="{{ npo.logo.getImage('w_24,h_24,c_fill') }}"
+                    class="story-npo-logo"
+                  />
+                  <p class="npo-name my-auto">{{ npo.name }}</p>
+                  {{/each}}
+                </div>
+                <div class="flex-grow-1">
+                  <p class="story-title">{{ story.title }}</p>
+                  <div class="story-subtitle">{{ story.description }}</div>
+                </div>
+                <div class="d-flex align-items-center justify-content-start flex-wrap">
+                  <p class="story-date">{{ story.date_published }}</p>
+                  <!--prettier-ignore-->
+                  {{ each causes as cause where find_in_set(z.zuid, '{story.related_causes}') limit 1}}
+                  <div class="story-cause d-flex align-items-center">
+                    <p class="text-center">{{ cause.title }}</p>
+                  </div>
+                  {{/each}}
+                </div>
+                <a href="{{ story.getUrl() }}" class="btn btn-secondary story-btn card-btn">
+                  Read More
+                </a>
+              </div>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+
+    <button
+      class="carousel-control-prev"
+      type="button"
+      data-bs-target="#storiesCarousel"
+      data-bs-slide="prev"
+    >
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button
+      class="carousel-control-next"
+      type="button"
+      data-bs-target="#storiesCarousel"
+      data-bs-slide="next"
+    >
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $("#storiesCarousel").carousel();
+  });
+</script>

@@ -1,0 +1,31 @@
+{{$total_npos = 0}}
+
+{
+  "data": [
+    {{each non_profits as npo}}
+    {{$total_npos = {npo._length} }}
+    {
+        "name": "{{npo.name}}",
+        "logo": "{{npo.logo.getImage()}}",
+        "hero_image": "{{npo.hero_image.getImage()}}",
+        "cause_description": "{{npo.cause_description.escapeForJS()}}",
+        "phone_number": "{{npo.phone_number.escapeForJS()}}",
+        "headquarters_address": "{{npo.headquarters_address.escapeForJS()}}",
+        "organization_type": "{{npo.organization_type.escapeForJS()}}",
+        "website": "{{npo.website.escapeForJS()}}",
+        "donate_link": "{{npo.donate_link.escapeForJS()}}",
+        "category": "{{ causes.filter(z.zuid = '{npo.category}').title }}",
+        "stories": "{{npo.stories}}",
+        "primary_cta_label": "{{npo.primary_cta_label}}",
+        "primary_cta_link": "{{npo.primary_cta_link}}",
+        "secondary_cta_label": "{{npo.secondary_cta_label}}",
+        "secondary_cta_link": "{{npo.secondary_cta_link}}",
+        "claimed": "{{npo.claimed}}",
+        "url": "https://causecircle.org{{npo.path_full}}",
+        "zuid": "{{z.zuid}}"
+    }{{npo._arraycomma}}{{/each}}
+  ],
+  "meta": {
+    "total": {{$total_npos}}
+  }
+}

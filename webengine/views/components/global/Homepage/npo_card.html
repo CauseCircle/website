@@ -1,0 +1,25 @@
+<div class="row">
+  {{each non_profits as npo limit 9}}
+  <div class="col-md-4">
+    <a href="{{ npo.getUrl() }}" class="text-decoration-none text-dark">
+      <div class="card mb-3 p-2">
+        <div class="card-body d-flex gap-4 align-items-center">
+          <img
+            src="{{ npo.logo.getImage('w_80,h_80,c_fill') }}"
+            alt="{{ npo.name }}"
+            style="
+              width: 80px;
+              height: 80px;
+              object-fit: cover;
+              border: 1px solid #000;
+              border-radius: 50%;
+            "
+          />
+          <h6 class="card-title">{{ npo.name }}</h6>
+          <p class="card-text">{{ npo.description }}</p>
+        </div>
+      </div>
+    </a>
+  </div>
+  {{/each}}
+</div>

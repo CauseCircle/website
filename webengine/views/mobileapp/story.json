@@ -1,0 +1,11 @@
+{
+    "data" :
+    [
+        {{each stories as story WHERE story.zuid='{get_var.zuid}' LIMIT 1}}
+        {{story.toJSON()}}
+        {{/each}}
+    ],
+    "meta" : {
+        "zuid" : "{{get_var.zuid}}"
+    }
+}

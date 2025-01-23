@@ -1,0 +1,27 @@
+<style>
+  h5,
+  h4,
+  h3 {
+    margin-top: 32px;
+  }
+
+  h1:first-child,
+  h2:first-child,
+  h3:first-child {
+    margin-top: 0;
+  }
+
+  p,
+  ul {
+    margin-top: 16px;
+  }
+
+  p,
+  ul li {
+    color: rgb(94, 94, 94);
+  }
+</style>
+
+<div class="container py-6 py-sm-7">
+  {{ this.terms_of_service }}
+</div>

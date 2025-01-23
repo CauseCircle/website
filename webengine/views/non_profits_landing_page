@@ -1,0 +1,935 @@
+<style>
+  /* General Styles */
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+
+  /* Custom Bullet List */
+  ul.custom-bullet {
+    list-style: none;
+    padding: 0;
+  }
+
+  ul.custom-bullet li {
+    margin-left: 25px;
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  ul.custom-bullet li::before {
+    content: "";
+    position: absolute;
+    left: -25px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    background-image: url("{{cause_circle_cms_page.first().list_icon.getImage()}}");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  /* Use Case Image */
+  .usecase-image {
+    border-radius: 20px;
+    max-height: 450px;
+    object-fit: cover;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    background-size: cover;
+    text-align: center;
+    padding: 100px 0;
+  }
+
+  /* Card Styles */
+  .card-img-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+  }
+
+  .featured-category-card,
+  .causes-card {
+    background-size: cover;
+    min-height: 223px;
+    border-radius: 20px;
+    border: none;
+  }
+
+  .featured-gradient-overlay {
+    background: linear-gradient(100deg, #613aaf 5%, #9a6ef3 95%);
+    border-radius: 20px;
+  }
+
+  .category-card {
+    background-size: cover;
+    min-height: 120px;
+    border-radius: 15px;
+    border: none;
+  }
+
+  .category-card:hover {
+    transform: scale(1.02);
+    transition: transform 0.5s ease;
+  }
+
+  .gradient-overlay {
+    background: linear-gradient(
+      179.63deg,
+      rgba(113, 61, 221, 0) 0.32%,
+      #3d2177 99.68%
+    );
+    border-radius: 15px;
+  }
+
+  /* Floating Button */
+  .featured-floating-btn,
+  .floating-btn {
+    font-size: 40px;
+    padding: 0;
+    height: 40px;
+    width: 40px;
+    border: none;
+  }
+
+  .featured-floating-btn {
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .floating-btn {
+    top: 20px;
+    right: 20px;
+  }
+
+  .floating-btn i {
+    height: 40px;
+    width: 40px;
+  }
+
+  /* Customer Images */
+  .customer-images {
+    display: flex;
+    position: relative;
+  }
+
+  .customer-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: -10px;
+    position: relative;
+    z-index: 1;
+    object-fit: cover;
+    filter: grayscale(100%);
+  }
+
+  .customer-img:nth-child(2) {
+    z-index: 2;
+  }
+  .customer-img:nth-child(3) {
+    z-index: 3;
+  }
+  .customer-img:nth-child(4) {
+    z-index: 4;
+  }
+
+  .customer-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .customer-info .card-title {
+    margin: 0;
+  }
+
+  /* Progress Bar */
+  .progress {
+    background-color: #e0e0e0;
+  }
+
+  .progress-bar {
+    background-color: #6c63ff;
+  }
+
+  /* Search Bar */
+  .search-bar {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    width: 100%;
+    max-width: 720px;
+  }
+
+  .search-bar input {
+    width: 100%;
+    max-width: 720px;
+    height: 66px;
+    padding: 20px 44px 20px 24px;
+    font-size: 16px;
+    border: 1px solid #dfe1e7;
+    border-radius: 10px;
+  }
+
+  .search-bar button {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #ccc;
+  }
+
+  .search-bar button:hover {
+    color: #333;
+  }
+
+  /* Logo Container */
+  .logo-container {
+    overflow: hidden;
+  }
+
+  .logo-track {
+    display: flex;
+    animation: scroll infinite linear;
+  }
+
+  .logo {
+    object-fit: contain;
+    width: auto;
+    max-height: 80px;
+    flex-shrink: 0;
+    animation: rotate 8s linear infinite;
+  }
+
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  /* Form Styles */
+  .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-input,
+  .form-dropdown {
+    border: 1px solid #dfe1e7;
+    background-color: #f8fafb;
+    border-radius: 5px;
+    height: 48px;
+    padding: 8px 12px;
+  }
+
+  .form-dropdown {
+    width: 100%;
+    font-size: 16px;
+    font-weight: 400;
+    color: black;
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .form-dropdown:focus {
+    outline: none;
+    border-color: black;
+    border-width: 2px;
+  }
+
+  .form-dropdown option {
+    padding: 8px 12px;
+    background-color: #fff;
+    font-size: 16px;
+  }
+
+  .form-dropdown::before,
+  .form-dropdown::after {
+    content: "";
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+  }
+
+  .form-dropdown::before {
+    border-left: 0.3rem solid transparent;
+    border-right: 0.3rem solid transparent;
+    border-bottom: 0.3rem solid black;
+    top: 40%;
+  }
+
+  .form-dropdown::after {
+    border-left: 0.3rem solid transparent;
+    border-right: 0.3rem solid transparent;
+    border-top: 0.3rem solid black;
+    top: 55%;
+  }
+
+  .hero-title p,
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  .section-title p,
+  .section-title {
+    font-size: 2rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  .hero-description p,
+  .hero-description {
+    font-size: 1.125rem;
+    font-weight: 400;
+    text-align: center;
+    color: var(--bs-gray-500);
+    max-width: 53.125rem;
+  }
+</style>
+
+<!--prettier-ignore-->
+<section
+  id="hero-background"
+  class="d-flex align-items-center justify-content-center"
+  style="background-image: url({{this.hero_image.getImage()}}); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 400px; width: 100%"
+>
+  <div
+    class="container flex flex-column justify-content-center align-items-center"
+    style="max-width: 800px"
+  >
+    <div
+      style="
+        max-width: 300px;
+        height: 48px;
+        border-radius: 24px;
+        background-color: #f4eeff;
+        margin: auto;
+      "
+      class="d-flex mb-4 d-none"
+    >
+      <div
+        class="d-flex align-items-center justify-content-center flex-grow-1 gap-2 px-3"
+      >
+        <a
+          href="#demo-section"
+          class="text-primary fw-semibold text-decoration-none d-flex align-items-center"
+        >
+          <span>Sign up for Beta Launch</span>
+          <i
+            class="bi bi-arrow-right text-primary fw-bold ms-2"
+            style="font-size: 24px"
+          ></i>
+        </a>
+      </div>
+    </div>
+    <div id="hero-title" class="text-primary text-center">
+      {{ this.hero_title }}
+    </div>
+    <div id="hero-description" class="d-flex flex-column gap-3 text-center mt-4">
+      {{ this.hero_description }}
+    </div>
+    <div class="d-flex gap-2 mt-md-3 justify-content-center d-none">
+      <a
+        href="{{ non_profits_search_page.first().path_full }}"
+        class="btn btn-primary"
+      >
+        {{ this.primary_cta_label }}
+      </a>
+    </div>
+
+    <div class="container d-flex align-items-center justify-content-center">
+      <div class="search-bar">
+        <button id="npo-search-btn" type="button">
+          <i class="bi bi-search"></i>
+        </button>
+        <input
+          id="npo-search"
+          type="text"
+          placeholder="Search for your Nonprofit and claim your free profile"
+          aria-label="Search"
+          class="form-control"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--NPO section-->
+<section id="npo-section" class="container py-5">
+  <div class="d-flex flex-column gap-3">
+    <p class="section-title">{{ this.npo_title }}</p>
+    <div class="hero-description mx-auto">
+      {{ this.npo_description }}
+    </div>
+    <div class="row pt-3 row-gap-3">
+      {{each {this.npos} as npo limit 4 }}
+      <div class="col-12 col-sm-6 col-md-3">
+        <!--prettier-ignore-->
+        {{ include /components/global/npo_card.html }}
+      </div>
+      {{/each}}
+    </div>
+    <div class="d-flex justify-content-center pt-3">
+      <a
+        href="{{ non_profits_search_page.first().path_full }}"
+        class="btn btn-secondary mx-auto"
+      >
+        {{ this.npo_cta_label }}
+      </a>
+    </div>
+  </div>
+</section>
+
+<section
+  id="first-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center py-5"
+>
+  <div class="text-center">{{ this.first_use_cases_title }}</div>
+
+  <!-- prettier-ignore -->
+  {{ $first_use_cases = {this.first_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$first_use_cases}' )}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+  <a
+    href="{{ how_it_works_page.first().path_full }}"
+    class="btn btn-primary scroll-to-demo mt-5"
+  >
+    {{ this.primary_use_case_cta_label }}
+  </a>
+</section>
+
+<section
+  id="second-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center py-5"
+>
+  <div class="text-center">{{ this.second_use_cases_title }}</div>
+  <!-- prettier-ignore -->
+  {{ $second_use_cases = {this.second_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$second_use_cases}')}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+  <a
+    href="{{ how_it_works_page.first().path_full }}"
+    class="btn btn-primary scroll-to-demo mt-5"
+  >
+    {{ this.primary_use_case_cta_label }}
+  </a>
+</section>
+
+<section
+  id="third-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center py-5"
+>
+  <div class="text-center">{{ this.third_use_cases_title }}</div>
+  <!-- prettier-ignore -->
+  {{ $third_use_cases = {this.third_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$third_use_cases}' )}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+  <a
+    href="{{ how_it_works_page.first().path_full }}"
+    class="btn btn-primary scroll-to-demo mt-5"
+  >
+    {{ this.primary_use_case_cta_label }}
+  </a>
+</section>
+
+<section
+  id="fundraising-banner"
+  class="position-relative bg-primary d-flex flex-column justify-content-center py-5"
+  style="height: 752px"
+>
+  <div
+    class="container d-flex flex-column justify-content-center position-relative z-3"
+    style="background-color: #e6e0e9; border-radius: 30px; min-height: 512px"
+  >
+    <div class="row h-100">
+      <div
+        class="col-md-6 mb-4 mb-md-0 p-5 h-100 d-flex flex-column justify-content-center gap-5"
+      >
+        <div class="d-flex flex-column gap-4">
+          {{ this.fundraising_title_description }}
+        </div>
+        <a
+          data-target="#demo-section"
+          class="btn btn-primary mt-4 scroll-to-demo"
+          style="align-self: start"
+        >
+          {{ this.fundraising_cta_label }}
+        </a>
+      </div>
+      <div
+        class="col-md-6 p-0 d-none d-md-block"
+        style="height: 100%; border-radius: 0px 30px 30px 0px"
+      >
+        <img
+          src="{{ this.fundraising_image.getImage() }}"
+          style="
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0px 30px 30px 0px;
+          "
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    style="
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 261px;
+      background-color: #f9f9f9;
+    "
+  ></div>
+</section>
+
+<section id="demo-section" class="container py-6 py-sm-7">
+  <div class="row">
+    <div class="col-md-6 d-flex align-items-start justify-content-center">
+      <div
+        class="d-flex flex-column align-items-start justify-content-center w-100 w-sm-75 gap-3"
+      >
+        <h2>{{ this.demo_title }}</h2>
+        <div id="hero-description" class="d-flex flex-column gap-2">
+          {{ this.demo_description }}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 d-flex align-items-start justify-content-start">
+      <!-- Change or deletion of the name attributes in the input tag will lead to empty values on record submission-->
+      <div
+        class="d-flex flex-column align-items-start justify-content-start h-100 w-100 w-lg-75"
+      >
+        <form
+          action="https://forms.zohopublic.com/zestyio/form/test/formperma/J6A2YBPtSZBBoKGtcRVtOCL6D6x0t905w43usoM_Bsw/htmlRecords/submit"
+          name="form"
+          id="form"
+          method="POST"
+          accept-charset="UTF-8"
+          enctype="multipart/form-data"
+          class="d-flex justify-content-center align-items-center flex-column"
+          onsubmit="return validateForm()"
+        >
+          <input
+            id="referrer-name"
+            type="hidden"
+            name="zf_referrer_name"
+            value=""
+          /><!-- To Track referrals , place the referrer name within the " " in the above hidden input field -->
+          <input
+            type="hidden"
+            name="zf_redirect_url"
+            value="https://causecircle.org/about/confirmation-page/"
+          /><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
+          <input
+            type="hidden"
+            name="zc_gad"
+            value=""
+          /><!-- If GCLID is enabled in Zoho CRM Integration, click details of AdWords Ads will be pushed to Zoho CRM -->
+          <!--Name-->
+          <div class="row gap-4 mt-5 mt-sm-0">
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label>First Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  maxlength="255"
+                  name="Name_First"
+                  fieldType="7"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="firstNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label>Last Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  maxlength="255"
+                  name="Name_Last"
+                  fieldType="7"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="lastNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label> Work Email </label>
+                <input
+                  class="form-input"
+                  type="email"
+                  maxlength="255"
+                  name="Email"
+                  value=""
+                  fieldType="9"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="emailError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label> Organization Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  name="SingleLine"
+                  value=""
+                  fieldType="1"
+                  maxlength="255"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="orgNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 mt-3">
+                <button
+                  type="submit"
+                  class="btn btn-primary w-100"
+                  style="height: 48px"
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  $(document).ready(function () {
+    // Add custom bullet class to specific elements
+    $("#hero-description ul, .usecase-description ul").addClass(
+      "custom-bullet"
+    );
+
+    // Scroll to demo section
+    $(".scroll-to-demo").click(function () {
+      var target = $(this).data("target");
+      $("html, body").animate(
+        {
+          scrollTop: $(target).offset().top - 200,
+        },
+        100
+      );
+    });
+
+    // NPO search functionality
+    $("#npo-search-btn").click(function () {
+      redirectToNPOSearch();
+    });
+
+    $("#npo-search").keypress(function (e) {
+      if (e.key === "Enter") {
+        redirectToNPOSearch();
+      }
+    });
+
+    // Logo animation setup
+    setupLogoAnimation();
+
+    // Set referrer field value
+    $("#referrer-name").val(window.location.href);
+  });
+
+  function redirectToNPOSearch() {
+    var searchValue = $("#npo-search").val();
+    window.location.href =
+      "{{non_profits_search_page.first().path_full}}/?filter=" + searchValue;
+  }
+
+  function setupLogoAnimation() {
+    const $container = $(".logo-container");
+    const $track = $(".logo-track");
+    const $logos = $track.children();
+    const logoWidth = $logos.first().outerWidth();
+    const containerWidth = $container.outerWidth();
+    const scrollSpeed = 5;
+    const logosNeeded = Math.ceil(containerWidth / logoWidth) + 1;
+
+    // Duplicate logos
+    const totalLogos = $logos.length;
+    for (let i = 0; i < logosNeeded * totalLogos; i++) {
+      $track.append($logos.eq(i % totalLogos).clone());
+    }
+
+    // Adjust track width and animation duration
+    const trackWidth = $track[0].scrollWidth;
+    $track.css({
+      width: `${trackWidth}px`,
+      "animation-duration": `${(trackWidth / logoWidth) * scrollSpeed}s`,
+    });
+  }
+
+  function triggerOnboarding() {
+    // console.log("Triggering onboarding modal");
+    $("#onboardingModal").modal("show");
+  }
+
+  function validateForm() {
+    let isValid = true;
+    const fields = [
+      {
+        name: "Name_First",
+        error: "firstNameError",
+        message: "Please enter your first name.",
+      },
+      {
+        name: "Name_Last",
+        error: "lastNameError",
+        message: "Please enter your last name.",
+      },
+      {
+        name: "Email",
+        error: "emailError",
+        message: "Please enter a valid work email address.",
+      },
+      {
+        name: "SingleLine",
+        error: "orgNameError",
+        message: "Please enter your organization name.",
+      },
+    ];
+
+    // Clear previous error messages
+    fields.forEach((field) => $(`#${field.error}`).text(""));
+
+    // Validate fields
+    fields.forEach((field) => {
+      const value = $(`[name="${field.name}"]`).val();
+      if (field.name === "Email" ? !isValidEmail(value) : value === "") {
+        $(`#${field.error}`).text(field.message);
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  }
+
+  function isValidEmail(email) {
+    const freeEmailDomains = [
+      "gmail.com",
+      "yahoo.com",
+      "hotmail.com",
+      "outlook.com",
+      "icloud.com",
+      "aol.com",
+      "zoho.com",
+      "gmx.com",
+      "mail.com",
+      "live.com",
+      "yandex.com",
+      "protonmail.com",
+      "tutanota.com",
+      "fastmail.com",
+      "mail.ru",
+      "inbox.com",
+    ];
+
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(email)) {
+      return false;
+    }
+
+    const domain = email.split("@")[1];
+    return !freeEmailDomains.includes(domain);
+  }
+</script>

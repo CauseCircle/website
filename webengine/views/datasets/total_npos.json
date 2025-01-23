@@ -1,0 +1,8 @@
+{{$total_npos = 0}}
+{{ each non_profits as npo }}
+{{$total_npos = {npo._length} }}
+{{/each}}
+
+{
+  "total_npos": {{$total_npos}}
+}

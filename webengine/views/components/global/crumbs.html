@@ -1,0 +1,39 @@
+    <style>
+        /* Custom breadcrumb styling */
+        .breadcrumb-custom-padding {
+            padding-top: 10px; /* Adjust the value as needed */
+              padding-left: 15px; /* Left padding */
+        }
+
+      .breadcrumb {
+            background: transparent; /* Clear background */
+            padding: 0.75rem 1rem; /* Adequate padding */
+            margin-bottom: 1rem; /* Space from content below */
+            list-style: none; /* Remove default list style */
+        }
+        .breadcrumb-item {
+            display: inline-block; /* Align items in a row */
+        }
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "/"; /* Separator */
+            padding: 0 0.5rem; /* Space around separator */
+            color: #6c757d; /* Bootstrap's default secondary color */
+        }
+        .breadcrumb a {
+            color: #007bff; /* Bootstrap's default link color */
+            text-decoration: none; /* No underline */
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline; /* Underline on hover for clarity */
+        }
+        .breadcrumb .active {
+            color: #6c757d; /* Bootstrap's default secondary color */
+            font-weight: 500; /* Slightly bolder */
+        }
+    </style>
+<nav aria-label="breadcrumb" class="breadcrumb-custom-padding">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Stories</li>
+  </ol>
+</nav>

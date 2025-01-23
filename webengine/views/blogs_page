@@ -1,0 +1,268 @@
+<style>
+  .article-category {
+    font-size: 12px;
+  }
+  .author-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+
+  .article-card:hover h2 {
+    color: #6936ca;
+  }
+
+  .article-img img {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .article-card:hover .article-img img {
+    transform: scale(1.01);
+  }
+
+  .article-card:hover .article-details .article-title {
+    color: #6936ca;
+  }
+
+  .search-bar {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding: 0 0;
+    width: 100%;
+  }
+  .search-bar input {
+    width: 100%;
+    max-width: 640px;
+    height: 32px;
+    padding: 20px 44px 20px 24px; /* Add padding for the icon */
+    font-size: 16px;
+    border: 1px solid #dfe1e7;
+    border-radius: 10px;
+  }
+  .search-bar button {
+    position: absolute;
+    right: 20px; /* Adjust position as needed */
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #ccc;
+  }
+  .search-bar button:hover {
+    color: #333;
+  }
+</style>
+
+<div class="container py-7">
+  <h1 class="pb-2">Blog</h1>
+  <div
+    class="container d-flex align-items-center justify-content-start mb-5 p-0"
+  >
+    <div class="search-bar w-50">
+      <button type="button" class="search-btn">
+        <i class="bi bi-search"></i>
+      </button>
+      <input id="search" type="text" placeholder="Search" />
+    </div>
+  </div>
+  <div id="search-result-container" class="row g-5"></div>
+  <nav aria-label="Page navigation">
+    <ul class="pagination" id="pagination"></ul>
+  </nav>
+</div>
+
+<script>
+  $(document).ready(function () {
+    const addLimit = (limit) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set("limit", limit);
+
+      window.history.pushState(
+        {},
+        "",
+        `${window.location.pathname}?${urlParams}`
+      );
+    };
+    const loadData = async (limitToAdd = 0) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      let limitParam = urlParams.get("limit");
+
+      if (!limitParam) {
+        limitParam = 0;
+      }
+
+      const newLimit = parseInt(limitParam) + limitToAdd;
+      addLimit(newLimit);
+
+      const searchResultContainer = document.getElementById(
+        "search-result-container"
+      );
+
+      const filter = document.getElementById("search").value;
+
+      searchResultContainer.innerHTML = `
+          <div class="d-flex justify-content-center">
+                  <div class="spinner-border" role="status">
+
+                  </div>
+          </div>
+          `;
+
+      const result = await fetchData(
+        window.location.origin +
+          "/datasets/articles.json?filter=" +
+          filter +
+          "&limit=" +
+          newLimit
+      );
+
+      if (!result || result?.data.length < 1) {
+        searchResultContainer.innerHTML = `
+              <div class="col-md-12">
+              <div class="alert alert-warning" role="alert">
+                  No result found
+              </div>
+              </div>
+          `;
+        return;
+      }
+
+      searchResultContainer.innerHTML = "";
+      result.data.forEach(async (item) => {
+        const authorData = await fetchData(
+          window.location.origin +
+            "/datasets/authors.json?filter=" +
+            item.author
+        );
+        if (item.index === "0") {
+          searchResultContainer.innerHTML += `
+            <a href="${item.href}" class="text-decoration-none" style="color: inherit">
+              <div class="col-12 pb-4 pb-xl-7 article-card">
+                <div class="row">
+                  <div class="col-12 d-block d-xl-none ">
+                    <div class="article-img">
+                      <img src="${item.hero_image}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
+                    </div>
+                  </div>
+                  <div class="col-12 col-xl-6 pt-4 pt-xl-0">
+                    <div class="d-flex flex-column gap-2 p-2 justify-content-center h-100">
+                      <p class="article-category">PRODUCT</p>
+                      <h2>${item.title}</h2>
+                      <p>${item.description}</p>
+                      <div class="d-flex gap-2">
+                        <div>
+                          <img class="author-img" src="${authorData.data[0].headshot}" alt=""></img>
+                        </div>
+                        <div>
+                          <p>${authorData.data[0].name}</p>
+                          <p>${item.date}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 d-none d-xl-block">
+                    <div class="article-img">
+                      <img src="${item.hero_image}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          `;
+        } else {
+          searchResultContainer.innerHTML += `
+          <div class="col-12 col-xl-4 pb-4 pb-xl-0">
+            <a href="${item.href}" class="text-decoration-none" style="color: inherit">
+              <div class="d-flex flex-column gap-4 h-100 article-card">
+                <div class="article-img">
+                  <img src="${item.hero_image}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
+                </div>
+                <div class="d-flex flex-column gap-2 p-2 justify-content-center h-100 article-details">
+                  <p class="article-category">PRODUCT</p>
+                  <h4 class="article-title">${item.title}</h4>
+                  <p>${item.description}</p>
+                  <div class="d-flex gap-2 mt-auto">
+                    <div>
+                      <img class="author-img" src="${authorData.data[0].headshot}" alt=""></img>
+                    </div>
+                    <div>
+                      <p>${authorData.data[0].name}</p>
+                      <p>${item.date}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+          `;
+        }
+      });
+
+      // updatePagination(result?.meta);
+    };
+
+    const updatePagination = (paginationData) => {
+      const { page, pages } = paginationData;
+      const paginationContainer = document.getElementById("pagination");
+
+      let paginationHTML = "";
+
+      // Previous link
+      if (page > 1) {
+        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="loadData(${
+          page - 1
+        })">Previous</a></li>`;
+      } else {
+        paginationHTML += `<li class="page-item disabled"><span class="page-link">Previous</span></li>`;
+      }
+
+      // Page links
+      for (let i = 1; i <= pages; i++) {
+        if (i === page) {
+          paginationHTML += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+        } else {
+          paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="loadData(${i})">${i}</a></li>`;
+        }
+      }
+
+      // Next link
+      if (page < pages) {
+        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="loadData(${
+          page + 1
+        })">Next</a></li>`;
+      } else {
+        paginationHTML += `<li class="page-item disabled"><span class="page-link">Next</span></li>`;
+      }
+
+      paginationContainer.innerHTML = paginationHTML;
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set("limit", 24);
+    urlParams.set("filter", "");
+
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}?${urlParams}`
+    );
+
+    loadData();
+
+    document
+      .getElementById("search")
+      .addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          loadData();
+        }
+      });
+
+    document
+      .getElementsByClassName("search-btn")[0]
+      .addEventListener("click", function () {
+        loadData();
+      });
+  });
+</script>

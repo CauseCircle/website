@@ -1,0 +1,180 @@
+<section id="shareSelection" class="section-container d-none">
+  <div class="py-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img class="section-icon" src="" style="max-width: 160px" />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="section-title fs-1 fw-normal mb-0"></p>
+        <p class="section-description fs-5 text-muted mb-0"></p>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="max-width: 480px; width: 100%">
+      <div class="d-flex flex-column gap-3">
+        <div class="d-flex flex-column gap-2">
+          <p class="text-muted">Share Link</p>
+          <div class="input-group mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="shareLink"
+              value="https://cc.org/stories/7Ue4fe87We"
+              readonly
+            />
+            <button class="btn btn-secondary" type="button" id="copyLinkBtn">
+              <i class="bi bi-clipboard"></i>
+            </button>
+          </div>
+        </div>
+        <div class="d-flex flex-column gap-2">
+          <p class="text-muted">Spread the word on your favorite platforms.</p>
+          <div class="d-flex justify-content-between">
+            <button
+              class="btn btn-secondary share-btn"
+              data-platform="facebook"
+            >
+              <i class="bi bi-facebook"></i>
+            </button>
+            <button class="btn btn-secondary share-btn" data-platform="twitter">
+              <i class="bi bi-twitter"></i>
+            </button>
+            <button
+              class="btn btn-secondary share-btn"
+              data-platform="linkedin"
+            >
+              <i class="bi bi-linkedin"></i>
+            </button>
+            <button class="btn btn-secondary share-btn" data-platform="reddit">
+              <i class="bi bi-reddit"></i>
+            </button>
+            <button
+              class="btn btn-secondary share-btn"
+              data-platform="whatsapp"
+            >
+              <i class="bi bi-whatsapp"></i>
+            </button>
+            <button class="btn btn-secondary share-btn" data-platform="email">
+              <i class="bi bi-envelope"></i>
+            </button>
+            <button class="btn btn-secondary share-btn" data-platform="more">
+              <i class="bi bi-three-dots"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <button id="viewStoryBtn" class="btn btn-secondary w-100 my-4">
+        View Story
+      </button>
+      <button
+        id="close-button"
+        class="btn btn-primary w-100"
+        data-bs-dismiss="modal"
+        aria-label="Close"
+      >
+        Back to Home
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  $(document).ready(function () {
+    // Copy link functionality
+    $("#copyLinkBtn").on("click", function () {
+      var shareLink = $("#shareLink");
+      shareLink.select();
+      document.execCommand("copy");
+      alert("Link copied to clipboard!");
+    });
+
+    $("#close-button").on("click", function () {
+      if (window.location.search.includes("create-story")) {
+        $("#downloadModal").modal("show");
+        // remove the create-story query param from the url
+        window.history.replaceState(
+          null,
+          "",
+          window.location.pathname +
+            window.location.search.replace("create-story", "")
+        );
+      }
+    });
+
+    // Share buttons functionality
+    $(".share-btn").on("click", function () {
+      var platform = $(this).data("platform");
+      var url = encodeURIComponent($("#shareLink").val());
+      var text = encodeURIComponent("Check out this story!");
+
+      switch (platform) {
+        case "facebook":
+          window.open(
+            `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+            "_blank"
+          );
+          break;
+        case "twitter":
+          window.open(
+            `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
+            "_blank"
+          );
+          break;
+        case "linkedin":
+          window.open(
+            `https://www.linkedin.com/shareArticle?mini=true&url=${url}`,
+            "_blank"
+          );
+          break;
+        case "reddit":
+          window.open(
+            `https://reddit.com/submit?url=${url}&title=${text}`,
+            "_blank"
+          );
+          break;
+        case "whatsapp":
+          window.open(
+            `https://api.whatsapp.com/send?text=${text} ${url}`,
+            "_blank"
+          );
+          break;
+        case "email":
+          window.location.href = `mailto:?subject=${text}&body=${url}`;
+          break;
+        case "more":
+          if (navigator.share) {
+            navigator
+              .share({
+                title: "Share Story",
+                text: text,
+                url: $("#shareLink").val(),
+              })
+              .catch(console.error);
+          } else {
+            alert("Native sharing not supported on this browser.");
+          }
+          break;
+      }
+    });
+
+    // View Story button functionality
+    $("#viewStoryBtn").on("click", function () {
+      window.open($("#shareLink").val(), "_blank");
+    });
+  });
+</script>
+
+<style>
+  .share-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .share-btn i {
+    font-size: 1.2rem;
+  }
+</style>

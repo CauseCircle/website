@@ -1,0 +1,574 @@
+<style>
+  .profile-image-container {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    border: 5px solid #9a6ef3;
+    overflow: hidden;
+    margin: 0 auto 2rem;
+    flex-shrink: 0;
+  }
+  .profile-image,
+  .profile-image-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  @media (max-width: 576px) {
+    .profile-image-container {
+      width: 200px;
+      height: 200px;
+    }
+  }
+  .about-me {
+    color: #333;
+    font-size: 1.2rem;
+    line-height: 1.6;
+  }
+  .about-me * {
+    width: 100%;
+    color: #666;
+  }
+
+  .card {
+    border: 1px solid #e1e4ea;
+    padding: 24px;
+    border-radius: 16px;
+    opacity: 1;
+  }
+  .npo-logo {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #e1e4ea;
+  }
+  .cause-subtitle,
+  .cause-subtitle * {
+    max-width: 50ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    /* color: #525866; */
+  }
+  .cause-description,
+  .cause-description * {
+    font-size: 18px;
+    color: #525866;
+  }
+  .nav-tabs {
+    border-bottom: 1px solid transparent;
+  }
+  .nav-tabs .nav-link {
+    color: #525866;
+    background-color: white;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 14px;
+    height: 48px;
+  }
+
+  .nav-tabs .nav-link.active {
+    color: black;
+    background-color: white;
+    border-bottom: 2px solid #7b3fee;
+  }
+  .card-btn {
+    height: 36px;
+  }
+</style>
+
+<style>
+  .cause-card {
+    position: relative;
+    height: 200px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .cause-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cause-card .overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px;
+  }
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 5%;
+  }
+</style>
+
+<style>
+  .category-card {
+    background-size: cover;
+    min-height: 160px;
+    border-radius: 15px;
+    border: none;
+    transition: transform 0.5s ease;
+  }
+
+  .category-card:hover {
+    transform: scale(1.02);
+  }
+
+  .gradient-overlay {
+    background: linear-gradient(
+      179.63deg,
+      rgba(113, 61, 221, 0) 0.32%,
+      #3d2177 99.68%
+    );
+    border-radius: 15px;
+  }
+</style>
+
+<style>
+  .story-image {
+    height: 100%;
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .story-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #0e121b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .story-subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em; /* Adjust this value based on your line-height */
+    line-height: 1.4em; /* Adjust this value as needed */
+  }
+  .story-subtitle,
+  .npo-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: #0e121b;
+  }
+  .story-cause {
+    padding: 0 10px;
+    /* height: 28px; */
+    border-radius: 14px;
+    background-color: #eceff3;
+    text-transform: uppercase;
+    font-size: 12px;
+    /* font-weight: bold; */
+  }
+  .story-date {
+    font-size: 12px;
+  }
+  .story-npo-logo {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #aeaeae;
+    border-radius: 3px;
+    object-fit: cover;
+    object-position: center;
+  }
+  .story-btn {
+    font-size: 12px;
+    font-weight: 500;
+    color: #0e121b;
+  }
+  .story-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+  .story-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .story-btn {
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  .story-card:hover .story-btn {
+    background-color: #7b3fee;
+    color: white;
+  }
+  .card-btn {
+    height: 36px;
+  }
+  .npo-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+</style>
+
+<section class="container my-4">
+  <div class="card pb-0">
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <div class="d-flex gap-3">
+          <div class="flex-shrink-0">
+            {{ if {this.profile_image} }}
+            <img
+              src="{{ this.profile_image.getImage() }}"
+              class="img-fluid npo-logo"
+              alt="{{ this.first_name }}"
+            />
+            {{ else }}
+            <img
+              src="https://via.placeholder.com/300x300?text=Profile+Image"
+              class="img-fluid npo-logo"
+              alt="{{ this.first_name }}"
+            />
+            {{ end-if }}
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex flex-column justify-content-around h-100">
+              <h3 class="card-title mb-0">
+                {{ this.first_name }} {{ this.last_name }}
+              </h3>
+              {{ if {this.about_me} }}
+              <div class="card-text cause-subtitle text-muted">
+                {{ this.about_me }}
+              </div>
+              {{ end-if }}
+              <div class="d-flex gap-2 d-none">
+                <p class="card-text text-muted">
+                  <strong>150</strong> Followers
+                </p>
+                <p class="card-text text-muted">
+                  <strong>80</strong> Following
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="d-flex align-items-end justify-content-end h-100 gap-2">
+          <button class="btn btn-secondary">
+            <i class="bi bi-share"></i> Share Profile
+          </button>
+          <button class="btn btn-outline-primary d-none">
+            <i class="bi bi-plus"></i> Follow
+          </button>
+          <button class="btn btn-primary">
+            <i class="bi bi-currency-dollar"></i> Donate Now
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="table-group-divider border-light-subtle mt-4"></div>
+    <div class="flex gap-2">
+      <ul class="nav nav-tabs" id="npoTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="about-tab"
+            type="button"
+            role="tab"
+            aria-selected="true"
+          >
+            About
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="stories-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#stories"
+            type="button"
+            role="tab"
+            aria-controls="stories"
+            aria-selected="false"
+          >
+            Stories
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="causes-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#causes"
+            type="button"
+            role="tab"
+            aria-controls="causes"
+            aria-selected="false"
+          >
+            Causes
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="container my-4">
+  <div class="row">
+    <!--Main Content-->
+    <div class="col-lg-9 col-md-8">
+      <div class="d-flex flex-column gap-4">
+        <div id="about-section" class="d-flex flex-column gap-2">
+          <h4 class="fs-5">About {{ this.first_name }}</h4>
+          <div class="cause-description">{{ this.about_me }}</div>
+        </div>
+        <div id="stories-section" class="d-flex flex-column gap-2">
+          <h4 class="fs-5">Stories</h4>
+          <div class="row" id="stories-row">
+            
+          </div>
+        </div>
+
+        <div class="my-4">
+          <h2 class="mb-4 fw-semibold fs-5">Featured Causes</h2>
+          <div
+            id="causesCarousel"
+            class="carousel slide"
+            data-bs-ride="carousel"
+          >
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <div class="row">
+                  {{each causes as cause where cause.featured = '1' limit 3 }}
+                  <div class="col-md-4 mb-3">
+                    <a
+                      href="{{ cause.getUrl() }}"
+                      style="text-decoration: none"
+                    >
+                      <!-- prettier-ignore -->
+                      {{ $imgURL = "" }}
+                      {{ if {cause.image} }}
+                      {{ $imgURL = {cause.image.getImage()} }}
+                      {{ else }}
+                      {{ $imgURL = 'https://fakeimg.pl/600x400?text=Placeholder' }}
+                      {{/if}}
+                      <div
+                        class="card mb-3 text-white position-relative category-card"
+                        style="background-image: url({{ $imgURL }});"
+                      >
+                        <div
+                          class="position-absolute start-0 end-0 top-0 bottom-0 gradient-overlay"
+                        ></div>
+                        <div
+                          class="card-body d-flex align-items-end position-relative"
+                        >
+                          <p class="fs-6 fw-semibold">{{ cause.title }}</p>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                  {{/each}}
+                </div>
+              </div>
+              <div class="carousel-item">
+                <div class="row">
+                  <!-- prettier-ignore -->
+                  {{each causes as cause where cause.featured = '1' limit 3 sort by cause.title desc }}
+                  <div class="col-md-4 mb-3">
+                    <a
+                      href="{{ cause.getUrl() }}"
+                      style="text-decoration: none"
+                    >
+                      <!-- prettier-ignore -->
+                      {{ $imgURL = "" }}
+                      {{ if {cause.image} }}
+                      {{ $imgURL = {cause.image.getImage()} }}
+                      {{ else }}
+                      {{ $imgURL = 'https://fakeimg.pl/600x400?text=Placeholder' }}
+                      {{/if}}
+                      <div
+                        class="card mb-3 text-white position-relative category-card"
+                        style="background-image: url({{ $imgURL }});"
+                      >
+                        <div
+                          class="position-absolute start-0 end-0 top-0 bottom-0 gradient-overlay"
+                        ></div>
+                        <div
+                          class="card-body d-flex align-items-end position-relative"
+                        >
+                          <p class="fs-6 fw-semibold">{{ cause.title }}</p>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                  {{/each}}
+                </div>
+              </div>
+            </div>
+            <button
+              class="carousel-control-prev"
+              type="button"
+              data-bs-target="#causesCarousel"
+              data-bs-slide="prev"
+            >
+              <span
+                class="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button
+              class="carousel-control-next"
+              type="button"
+              data-bs-target="#causesCarousel"
+              data-bs-slide="next"
+            >
+              <span
+                class="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--Sidebar-->
+    <div class="col-lg-3 col-md-4">
+      <div class="sidebar">
+        <!--prettier-ignore-->
+        {{ include /components/global/Users/sidebar.html }}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  $(document).ready(function () {
+    $(".back-btn").click(function () {
+      window.history.back();
+    });
+
+    // Handle About tab click
+    $("#about-tab").on("click", function (e) {
+      e.preventDefault();
+      $("html, body").animate(
+        {
+          scrollTop: $("#about-section").offset().top - 100, // Adjust the 100 value as needed for proper positioning
+        },
+        500
+      );
+    });
+
+    // Handle Projects tab click
+    $("#projects-tab").on("click", function (e) {
+      e.preventDefault();
+      $("html, body").animate(
+        {
+          scrollTop: $("#projects-section").offset().top - 100, // Adjust the 100 value as needed for proper positioning
+        },
+        500
+      );
+    });
+
+    // Handle Stories tab click
+    $("#stories-tab").on("click", function (e) {
+      e.preventDefault();
+      $("html, body").animate(
+        {
+          scrollTop: $("#stories-section").offset().top - 100, // Adjust the 100 value as needed for proper positioning
+        },
+        500
+      );
+    });
+
+    // Handle other tabs
+    $("#npoTabs button:not(#about-tab)").on("click", function (e) {
+      e.preventDefault();
+      $(this).tab("show");
+    });
+
+    // Initialize Bootstrap tabs
+    var triggerTabList = [].slice.call(
+      document.querySelectorAll("#npoTabs button")
+    );
+    triggerTabList.forEach(function (triggerEl) {
+      var tabTrigger = new bootstrap.Tab(triggerEl);
+      triggerEl.addEventListener("click", function (event) {
+        event.preventDefault();
+        tabTrigger.show();
+      });
+    });
+
+    const storiesRow = $("#stories-row");
+    if (storiesRow.children().length === 0) {
+      storiesRow.addClass("d-none");
+      $("#stories-section").addClass("d-none");
+      $("#stories-tab").addClass("d-none");
+    }
+  });
+</script>
+
+<script>
+  $(document).ready(async function () {
+    $(".back-btn").click(function () {
+      window.history.back();
+    });
+
+    // Fetch stories data from the API
+    try {
+      const authorZUID = "{{this.zuid}}";
+      const storiesApiUrl = `https://4xxglxlj-dev.webengine.zesty.io/mobileapp/stories.json?author=${authorZUID}&zpw=causecircle`;
+      const response = await fetch(storiesApiUrl);
+      const data = await response.json();
+
+      const storiesRow = $("#stories-row");
+      storiesRow.empty(); // Clear existing stories
+
+      if (data && data.data && data.data.length > 0) {
+        $("#no-stories-message").addClass("d-none");
+
+        data.data.forEach((story) => {
+          // Create a story card using the API data
+          const storyCard = `
+            <div class="col-12 col-sm-6 col-md-4" data-story-id="${story.meta.zuid}" data-story-date="${story.meta.createdAt}">
+              <div class="card d-flex flex-column h-100 p-3 gap-2 story-card">
+                <img src="${story.story_image.data[0].url}" class="story-image" alt="${story.title}">
+                <div class="d-flex flex-column gap-2 h-100">
+                  <div class="d-flex align-items-end gap-2">
+                    <img src="${story.author.data[0].profile_image}" class="story-npo-logo" alt="${story.author.data[0].first_name}">
+                    <p class="npo-name my-auto">${story.author.data[0].first_name} ${story.author.data[0].last_name}</p>
+                  </div>
+                  <div class="flex-grow-1">
+                    <p class="story-title">${story.title}</p>
+                    <div class="story-subtitle">${story.story_body}</div>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-start flex-wrap">
+                    <div class="story-cause d-flex align-items-center">
+                      <p class="text-center">${story.related_causes.data[0].title}</p>
+                    </div>
+                  </div>
+                  <a href="https://causecircle.org/${story.meta.web.uri}" class="btn btn-secondary story-btn card-btn">Read More</a>
+                </div>
+              </div>
+            </div>
+          `;
+          storiesRow.append(storyCard);
+        });
+
+        $("#stories-section").removeClass("d-none");
+        $("#stories-tab").removeClass("d-none");
+        storiesRow.removeClass("d-none");
+      } else {
+        $("#stories-tab").addClass("d-none");
+        $("#stories-section").addClass("d-none");
+        storiesRow.addClass("d-none");
+        $("#no-stories-message").removeClass("d-none");
+      }
+    } catch (error) {
+      console.error("Error fetching stories:", error);
+      $("#stories-tab").addClass("d-none");
+      $("#stories-section").addClass("d-none");
+      storiesRow.addClass("d-none");
+    }
+  });
+</script>

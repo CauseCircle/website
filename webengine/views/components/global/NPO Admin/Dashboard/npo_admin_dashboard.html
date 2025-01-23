@@ -1,0 +1,271 @@
+<style>
+  .posts-container {
+    max-height: 800px;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+
+  /* Custom scrollbar for posts container */
+  .posts-container::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .posts-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .posts-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+  }
+
+  .posts-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  .post-card {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .story-subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+  }
+
+  .post-card .story-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .post-card .profile-image {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+  }
+
+  .post-interaction {
+    display: flex;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .interaction-btn {
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+  }
+
+  .interaction-btn:hover {
+    color: #0d6efd;
+  }
+</style>
+
+<div class="tab-pane active" id="dashboard">
+  <!-- Today's Actions -->
+  <div class="card d-flex gap-3 mb-3">
+    <div>
+      <h5 class="mb-0">Today's actions</h5>
+      <p class="text-muted">
+        Complete these actions to grow your page 4x faster
+      </p>
+    </div>
+    <div
+      class="card d-flex flex-row justify-content-between align-items-center"
+      style="cursor: pointer;"
+      data-bs-toggle="modal"
+      data-bs-target="#reviewStoriesModal"
+    >
+      <div class="d-flex gap-4 align-items-center">
+        <div>
+          <i class="bi bi-list-check fs-4"></i>
+        </div>
+        <div id="review-stories-count">
+          <h6 class="mb-0">Review 0 New User Stories</h6>
+          <small class="text-muted"
+            >Approve or reject stories created by users for your non
+            profit</small
+          >
+        </div>
+      </div>
+      <div class="btn btn-link">
+        <i class="bi bi-arrow-right fs-4"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Track Performance -->
+  <div class="card d-flex gap-3 mb-3 d-none">
+    <div>
+      <h5 class="mb-0">Track Performance</h5>
+      <p class="text-muted">Leverage these insights to grow your page</p>
+    </div>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="card">
+          {{$followersCount = 0}}
+          <!--prettier-ignore-->
+          {{ each users as user where user.favorite_npos = '{get_var.zuid}'}}
+          {{$followersCount = {user._num} }}
+          {{/each}}
+          <div class="metric-value">0</div>
+          <div class="metric-label">Followers</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card">
+          {{$storiesCount = 0}}
+          <!--prettier-ignore-->
+          {{ each stories as story where story.related_npos = '{get_var.zuid}' }}
+          {{$storiesCount = {story._num} }}
+          {{/each}}
+          <div class="metric-value">{{$storiesCount}}</div>
+          <div class="metric-label">Stories</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card">
+          <div class="metric-value">0</div>
+          <div class="metric-label">Story Impressions</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card">
+          <div class="metric-value">0</div>
+          <div class="metric-label">Page Visitors</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join the Conversation -->
+  <div class="card d-flex gap-3 mb-3">
+    <div>
+      <h5 class="mb-0">Join the Conversation</h5>
+      <p class="text-muted">
+        Write comments and create awareness about your non profit
+      </p>
+    </div>
+
+    <!-- Posts Container -->
+    <div class="posts-container">
+      <div id="stories-scroll" class="row g-4 stories-grid"></div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  window.getStories = function (zuid, approved = 1, status = "") {
+    return $.getJSON(
+      `https://4xxglxlj-dev.webengine.zesty.io/mobileapp/stories.json?npo=${zuid}&approved=${approved}&status=${status}&zpw=causecircle`
+    ).then((data) => data?.data);
+  };
+
+  window.getNewStoriesCount = async function (zuid) {
+    const reviewStoriesCount = $("#review-stories-count");
+    const modalReviewStoriesCount = $("#modal-review-stories-count");
+
+    try {
+      const stories = await getStories(zuid, 0, "null");
+
+      // Update the review stories count on the dashboard
+      reviewStoriesCount.empty();
+      reviewStoriesCount.append(
+        `<h6 class="mb-0">Review ${stories?.length || 0} New User Stories</h6>`
+      );
+      reviewStoriesCount.append(`<small class="text-muted"
+        >Approve or reject stories created by users for your non
+        profit</small>`);
+
+      // Update the review stories count on the modal
+      modalReviewStoriesCount.text(
+        `You have ${stories?.length || 0} stories left to review`
+      );
+    } catch (error) {
+      console.error("Error updating review stories count:", error);
+      reviewStoriesCount.append("<p>Error updating review stories display</p>");
+    }
+  };
+
+  window.getApprovedStories = async function (zuid) {
+    const approvedStoriesContainer = $("#stories-scroll");
+    const stories = await getStories(zuid, 1, "approved");
+
+    approvedStoriesContainer.empty();
+    stories.forEach((story) => {
+      approvedStoriesContainer.append(`
+        <div class="col-12 col-md-6">
+          <div class="post-card h-100">
+            <div class="d-flex align-items-center mb-3">
+              <img
+                src="${story.author.data[0].profile_image || 'https://placehold.co/100x100?text=Profile'}"
+                alt="Profile"
+                class="rounded-circle profile-image"
+              />
+              <div class="ms-3">
+                <h6 class="mb-0">${story.author.data[0].first_name} ${story.author.data[0].last_name}</h6>
+                <small class="text-muted">${formatDate(story.date_published)}</small>
+              </div>
+            </div>
+            <h5 class="mb-2">${story.title}</h5>
+            <div class="text-muted mb-3 story-subtitle">
+              ${story.story_body}
+            </div>
+            <img
+              src="${typeof story.story_image == 'string' ? story.story_image : story.story_image.data[0]?.url}"
+              alt="${story.title}"
+              class="story-image mb-3"
+            />
+            <div class="post-interaction d-none">
+              <a href="#" class="interaction-btn">
+                <i class="bi bi-heart"></i> Like
+              </a>
+              <a href="#" class="interaction-btn">
+                <i class="bi bi-cash"></i> Donate
+              </a>
+              <a href="#" class="interaction-btn">
+                <i class="bi bi-chat"></i> Comment
+              </a>
+              <a href="#" class="interaction-btn">
+                <i class="bi bi-share"></i> Share
+              </a>
+            </div>
+          </div>
+        </div>
+      `);
+    });
+  };
+
+  // Helper function to format dates
+  function formatDate(dateString) {
+    if (!dateString) return '';
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  }
+
+  $(document).ready(async function () {
+    const reviewStoriesCount = $("#review-stories-count");
+
+    await getNewStoriesCount("{{get_var.zuid}}");
+    await getApprovedStories("{{get_var.zuid}}");
+  });
+</script>

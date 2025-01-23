@@ -1,0 +1,990 @@
+<!--prettier-ignore-->
+{{ $url = {home_feed.first().getUrl()} }}
+{{if {get_var.follow_npo} }}
+  {{$url = {non_profits.filter({get_var.follow_npo}).getUrl()} }}
+{{end-if}}
+
+<script type="module">
+  // ==================== CONFIG ====================
+  const BASE_URL = "https://api.causecircle.org";
+  // const BASE_URL = "http://localhost:8080";
+
+  window.CONFIG = {
+    CLOUD_FUNCTIONS_KEY: "c14c4fc76f791e76281a015c5feaf7f9",
+    CLOUD_FUNCTIONS_URL: {
+      "create-profile":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/create-profile",
+      "update-profile":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/update-profile",
+      "get-profile":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/get-profile",
+      "create-story":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/post-story",
+      "upload-media":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/upload-media",
+      "delete-story":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/delete-story",
+    },
+    ZESTY_MODEL_ZUID: "6-d6de86c395-416dtw",
+    ZESTY_BASE_URL: "https://8-d6c4f5cdd8-sg6188.api.zesty.io/v1/",
+    AUTHENTICATED_ROUTES: [
+      "{{home_feed.first().getUrl()}}",
+      "/dashboard",
+      "/settings",
+      "{{npo_admin_page.first().getUrl()}}",
+    ],
+    UNAUTHENTICATED_ROUTES: [
+      "{{login_page.first().getUrl()}}",
+      "/signup",
+      "/forgot-password",
+    ],
+    API_ROUTES: {
+      "create-story": `${BASE_URL}/stories`,
+      "approve-story": (zuid) => `${BASE_URL}/stories/${zuid}/approvals`,
+      "get-npo-admin-profile": `${BASE_URL}/npos`,
+      "update-npo-admin-profile": `${BASE_URL}/npos`,
+      "submit-feedback": `${BASE_URL}/feedback/submissions`,
+      "invite-users": (zuid) => `${BASE_URL}/npos/${zuid}/invites`,
+      "create-user-with-follow-npo": `${BASE_URL}/users`,
+      "update-user": (zuid) => `${BASE_URL}/users/${zuid}`,
+      "claim-listing": `${BASE_URL}/zoho`,
+    },
+  };
+
+  // ==================== ZOHO ====================
+  window.claimListing = async (data) => {
+    try {
+      const response = await fetch(CONFIG.API_ROUTES["claim-listing"], {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    } catch (error) {
+      console.error("Error claiming listing:", error);
+      throw error;
+    }
+  };
+
+  // ==================== USER MANAGEMENT ====================
+  const db = firebase.firestore();
+
+  async function createFirebaseUser(user, userZuid = null) {
+    // console.log("Creating Firebase user:", user);
+    try {
+      if (!user || !user.uid) {
+        throw new Error("Invalid user object");
+      }
+
+      const userData = {
+        name: user.displayName || "Unknown",
+        firstName: (user.displayName || "").split(" ")[0] || "Unknown",
+        lastName:
+          (user.displayName || "").split(" ").slice(1).join(" ") || "Unknown",
+        email: user?.providerData[0]?.email || "No email available",
+        phone:
+          user?.providerData[0]?.phoneNumber || "No phone number available",
+        profilePhoto: user.photoURL || "",
+        zuid: userZuid || null,
+      };
+
+      await db.collection("Users").doc(user.uid).set(userData);
+      // console.log("Firebase user created successfully");
+      return userData;
+    } catch (error) {
+      console.error("Error creating Firebase user:", error);
+      throw new Error("Failed to create user in Firebase: " + error.message);
+    }
+  }
+
+  async function checkUserExists(uid) {
+    const userDoc = await db.collection("Users").doc(uid).get();
+    return userDoc;
+  }
+
+  async function getUserData(searchTerm = "", searchType = "uid") {
+    try {
+      let userDoc;
+
+      if (searchType === "uid") {
+        // console.log("Searching for user by UID:", searchTerm);
+        userDoc = await db.collection("Users").doc(searchTerm).get();
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          // console.log("User Data:", userData);
+          if (Object.keys(userData).length === 0) {
+            console.warn("User document exists but is empty");
+            return null;
+          }
+          return userData;
+        } else {
+          console.warn("User document does not exist");
+        }
+      } else {
+        // console.log("Searching for user by email:", searchTerm);
+        const querySnapshot = await db
+          .collection("Users")
+          .where(searchType, "==", searchTerm)
+          .limit(1)
+          .get();
+
+        if (!querySnapshot.empty) {
+          userDoc = querySnapshot.docs[0];
+          const userData = userDoc.data();
+          // console.log("User Data:", userData);
+          if (Object.keys(userData).length === 0) {
+            console.warn("User document exists but is empty");
+            return null;
+          }
+          return userData;
+        } else {
+          console.warn("No user found with the given email");
+        }
+      }
+
+      // console.log("No valid user data found");
+      return null;
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
+  }
+
+  async function getAllUsers() {
+    try {
+      const usersSnapshot = await db.collection("Users").get();
+      const usersList = usersSnapshot.docs.map((doc) => doc.data());
+      // console.log("All Users:", usersList);
+      return usersList;
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      return [];
+    }
+  }
+
+  async function deleteUser(uid) {
+    try {
+      // Delete user data from Firestore
+      await db.collection("Users").doc(uid).delete();
+      // console.log("User data deleted from Firestore");
+      // Delete user from Firebase Authentication
+      const user = firebase.auth().currentUser;
+      if (user && user.uid === uid) {
+        await user.delete();
+        // console.log("User deleted from Firebase Authentication");
+      } else {
+        console.warn(
+          "Cannot delete user from Firebase Authentication: User not authenticated or UID mismatch"
+        );
+      }
+
+      // TODO: Add logic to delete user from Zesty.io if needed
+
+      // Clear local storage
+      localStorage.removeItem("user");
+
+      // console.log("User successfully deleted");
+      return true;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return false;
+    }
+  }
+
+  async function deleteUserByFirstName(firstName) {
+    try {
+      const querySnapshot = await db
+        .collection("Users")
+        .where("firstName", "==", firstName)
+        .limit(1)
+        .get();
+
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        const uid = userDoc.id;
+
+        // Delete user data from Firestore
+        await db.collection("Users").doc(uid).delete();
+        // console.log(
+        //   `User with firstName '${firstName}' deleted from Firestore`
+        // );
+
+        // Delete user from Firebase Authentication
+        const user = firebase.auth().currentUser;
+        if (user && user.uid === uid) {
+          await user.delete();
+          // console.log(
+          //   `User with firstName '${firstName}' deleted from Firebase Authentication`
+          // );
+        } else {
+          console.warn(
+            `Cannot delete user from Firebase Authentication: User not authenticated or UID mismatch`
+          );
+        }
+
+        // TODO: Add logic to delete user from Zesty.io if needed
+
+        // console.log(`User with firstName '${firstName}' successfully deleted`);
+        return true;
+      } else {
+        console.warn(`No user found with firstName '${firstName}'`);
+        return false;
+      }
+    } catch (error) {
+      console.error(
+        `Error deleting user with firstName '${firstName}':`,
+        error
+      );
+      return false;
+    }
+  }
+
+  async function deleteUserByEmail(email) {
+    const userDoc = await db
+      .collection("Users")
+      .where("email", "==", email)
+      .get();
+    if (!userDoc.empty) {
+      const uid = userDoc.docs[0].id;
+      await deleteUser(uid);
+    }
+  }
+
+  window.createZestyUser = async (data) => {
+    const {
+      email,
+      user_name,
+      profile_image = "",
+      user_type = "",
+      causes = [],
+      npos = [],
+      favorite_npos,
+    } = data;
+    // console.log("🚀 ~ window.createZestyUser= ~ favorite_npos:", favorite_npos);
+
+    const [first_name, ...lastNameParts] = user_name.split(" ");
+    const last_name = lastNameParts.join(" ");
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${CONFIG.CLOUD_FUNCTIONS_KEY}`,
+      },
+      body: JSON.stringify({
+        first_name,
+        last_name,
+        user_type,
+        image: profile_image,
+        email,
+        favorite_npos,
+      }),
+    };
+
+    try {
+      const response = await fetch(
+        CONFIG.CLOUD_FUNCTIONS_URL["create-profile"],
+        options
+      );
+      const data = await response.json();
+      // console.log(data);
+      return data;
+    } catch (error) {
+      console.error("Error creating Zesty user:", error);
+      throw error;
+    }
+  };
+
+  window.getZestyUser = async (zuid) => {
+    try {
+      const url = new URL(CONFIG.CLOUD_FUNCTIONS_URL["get-profile"]);
+      url.searchParams.append("zuid", zuid);
+
+      const options = {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${CONFIG.CLOUD_FUNCTIONS_KEY}`,
+        },
+      };
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error getting Zesty user:", error);
+      throw error;
+    }
+  };
+
+  // window.updateZestyUser = async (zuid, data) => {
+  //   try {
+  //     const options = {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${CONFIG.CLOUD_FUNCTIONS_KEY}`,
+  //       },
+  //       body: JSON.stringify({ zuid, data }),
+  //     };
+
+  //     const response = await fetch(
+  //       CONFIG.CLOUD_FUNCTIONS_URL["update-profile"],
+  //       options
+  //     );
+  //     const updatedUser = await response.json();
+  //     // console.log(updatedUser);
+  //     return updatedUser;
+  //   } catch (error) {
+  //     console.error("Error updating Zesty user:", error);
+  //     throw error;
+  //   }
+  // };
+
+  window.updateZestyUser = async (zuid, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify({
+        ...data,
+        uid: userId,
+        ...(data.favorite_npos
+          ? {
+              favorite_npos: Array.isArray(data.favorite_npos)
+                ? data.favorite_npos.join(",")
+                : data.favorite_npos.split(","),
+            }
+          : { favorite_npos: [] }),
+        ...(data.favorite_causes
+          ? {
+              favorite_causes: Array.isArray(data.favorite_causes)
+                ? data.favorite_causes.join(",")
+                : data.favorite_causes.split(","),
+            }
+          : { favorite_causes: [] }),
+        ...(data.profile_image ? { image: data.profile_image } : {}),
+      }),
+    };
+
+    try {
+      const response = await fetch(
+        `${CONFIG.API_ROUTES["update-user"](zuid)}`,
+        options
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw error;
+    }
+  };
+
+  // ==================== STORY MANAGEMENT ====================
+  window.createStory = async (data) => {
+    // const {
+    //   title,
+    //   story_body,
+    //   related_causes = [],
+    //   related_npos = [],
+    //   story_image = "",
+    // } = data;
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const idToken = await user.getIdToken();
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(CONFIG.API_ROUTES["create-story"], options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error creating story:", error);
+      throw error;
+    }
+  };
+
+  window.uploadImages = async (imageFiles) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    const uploadUrl = CONFIG.CLOUD_FUNCTIONS_URL["upload-media"];
+
+    const uploadPromises = imageFiles
+      .filter((file) => allowedTypes.includes(file.type))
+      .map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          // console.log("Uploading file:", file.name);
+          const response = await fetch(uploadUrl, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${CONFIG.CLOUD_FUNCTIONS_KEY}`,
+            },
+            body: formData,
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              errorData.message || `HTTP error! status: ${response.status}`
+            );
+          }
+
+          const data = await response.json();
+          // console.log("Upload response:", data);
+          return data.result;
+        } catch (error) {
+          console.error("Failed to upload image:", error);
+          throw error;
+        }
+      });
+
+    try {
+      const results = await Promise.all(uploadPromises);
+      return results;
+    } catch (error) {
+      console.error("One or more image uploads failed:", error);
+      alert("Failed to upload one or more images. Please try again.");
+      throw error;
+    }
+  };
+
+  window.deleteStory = async (zuid) => {
+    try {
+      const response = await fetch(
+        `${CONFIG.CLOUD_FUNCTIONS_URL["delete-story"]}?zuid=${zuid}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${CONFIG.CLOUD_FUNCTIONS_KEY}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      // console.log("Story deletion response:", data);
+      return data;
+    } catch (error) {
+      console.error("Error deleting story:", error);
+      throw error;
+    }
+  };
+
+  window.approveStory = async (zuid, status, changeRequest = null) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const idToken = await user.getIdToken();
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      let url = `${CONFIG.API_ROUTES["approve-story"](zuid)}?status=${status}`;
+      if (changeRequest) {
+        url += `&change_request=${encodeURIComponent(changeRequest)}`;
+      }
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error approving story:", error);
+      throw error;
+    }
+  };
+
+  // ==================== FEEDBACK ====================
+  window.submitFeedback = async (data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(
+        CONFIG.API_ROUTES["submit-feedback"],
+        options
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      throw error;
+    }
+  };
+
+  // ==================== INVITE USERS ====================
+  window.inviteUsers = async (zuid, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(
+        `${CONFIG.API_ROUTES["invite-users"](zuid)}`,
+        options
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error inviting users:", error);
+      throw error;
+    }
+  };
+
+  // ==================== NPO ADMIN ====================
+  window.updateNPOAdminProfile = async (zuid, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const idToken = await user.getIdToken();
+
+    try {
+      const response = await fetch(
+        `${CONFIG.API_ROUTES["update-npo-admin-profile"]}/${zuid}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userId}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error updating NPO profile:", error);
+      throw error;
+    }
+  };
+
+  // ==================== ROUTING ====================
+  function handleRouting(user) {
+    const currentPath = window.location.pathname;
+
+    if (user) {
+      if (CONFIG.UNAUTHENTICATED_ROUTES.includes(currentPath)) {
+        window.location.href = "{{home_feed.first().getUrl()}}";
+      }
+    } else {
+      if (CONFIG.AUTHENTICATED_ROUTES.includes(currentPath)) {
+        window.location.href = "/login";
+      }
+    }
+  }
+
+  // ==================== AUTH ====================
+  const auth = firebase.auth();
+  const googleProvider = new firebase.auth.GoogleAuthProvider();
+  const facebookProvider = new firebase.auth.FacebookAuthProvider();
+
+  facebookProvider.addScope("email");
+  facebookProvider.setCustomParameters({
+    display: "popup",
+  });
+
+  googleProvider.addScope("email");
+  googleProvider.setCustomParameters({
+    prompt: "consent",
+  });
+
+  async function signInWithGoogle() {
+    const users = await getAllUsers();
+    // console.log(users);
+    // await deleteUserByEmail("sethgofredo@gmail.com");
+    // return;
+    const npoZuid = localStorage.getItem("npoZuidToFollow");
+
+    try {
+      const result = await auth.signInWithPopup(googleProvider);
+      await handleAuthResult(result.user, npoZuid);
+    } catch (error) {
+      console.error("Error during Google sign-in:", error);
+    }
+  }
+
+  async function signInWithFacebook() {
+    const npoZuid = localStorage.getItem("npoZuidToFollow");
+
+    try {
+      console.log("Starting Facebook login with credential...");
+
+      // Create a new Promise to handle FB.login
+      const fbLoginResult = await new Promise((resolve, reject) => {
+        FB.login(
+          (response) => {
+            if (response.authResponse) {
+              resolve(response);
+            } else {
+              reject(
+                new Error("User cancelled login or did not fully authorize.")
+              );
+            }
+          },
+          {
+            scope: "email,public_profile",
+            auth_type: "rerequest",
+          }
+        );
+      });
+
+      if (fbLoginResult.authResponse) {
+        // Get the access token from Facebook
+        const accessToken = fbLoginResult.authResponse.accessToken;
+
+        // Create a Facebook credential with the token
+        const credential =
+          firebase.auth.FacebookAuthProvider.credential(accessToken);
+
+        // Sign in with the credential
+        const result = await auth.signInWithCredential(credential);
+
+        console.log("Successful Facebook sign-in:", {
+          user: result.user,
+          credential: credential,
+        });
+
+        // Handle the auth result
+        await handleAuthResult(result.user, npoZuid);
+      }
+    } catch (error) {
+      console.error("Error during Facebook sign-in:", {
+        code: error.code,
+        message: error.message,
+        email: error.email,
+        credential: error.credential,
+      });
+
+      // Handle specific Facebook auth errors
+      let errorMessage =
+        "An error occurred during authentication. Please try again.";
+
+      switch (error.code) {
+        case "auth/account-exists-with-different-credential":
+          errorMessage =
+            "An account already exists with the same email address but different sign-in credentials. Please sign in using the original method.";
+          break;
+        case "auth/cancelled-popup-request":
+        case "auth/popup-closed-by-user":
+          errorMessage = "Sign-in was cancelled. Please try again.";
+          break;
+        case "auth/popup-blocked":
+          errorMessage =
+            "Pop-up was blocked by your browser. Please enable pop-ups and try again.";
+          break;
+        default:
+          errorMessage = error.message;
+      }
+
+      alert(errorMessage);
+      await deauthenticateUser();
+    }
+  }
+
+  async function handleAuthResult(user, npoZuid = "") {
+    try {
+      let newUser = false;
+
+      const claimListingRedirectUrl = localStorage.getItem(
+        "claimListingRedirectUrl"
+      );
+
+      const followNpo = localStorage.getItem("followNpo");
+
+      const FBuserDoc = await checkUserExists(user.uid);
+      const FBuserExists = FBuserDoc.exists;
+      const FBuserData = FBuserExists ? FBuserDoc.data() : null;
+
+      // console.log("User exists in Firestore:", FBuserExists);
+
+      let zestyUser = null;
+      let zestyUserExists = false;
+
+      if (FBuserExists && FBuserData?.zuid && FBuserData.zuid !== "") {
+        zestyUser = await getZestyUser(FBuserData.zuid);
+        zestyUserExists = zestyUser.user ? true : false;
+      }
+
+      // console.log("Zesty user exists:", zestyUserExists);
+
+      if (!FBuserExists && !zestyUserExists) {
+        // console.log("npoZuid", npoZuid);
+        // Case 1: Neither Firebase nor Zesty user exists
+        newUser = npoZuid === "" ? false : true;
+        await createNewUser(user, npoZuid);
+      } else if (FBuserExists && !zestyUserExists) {
+        // Case 2: Firebase user exists, but Zesty user doesn't
+        await createZestyUserForExistingFirebase(user, FBuserData);
+      } else if (!FBuserExists && zestyUserExists) {
+        // Case 3: Zesty user exists, but Firebase user doesn't
+        await createFirebaseUserForExistingZesty(user, zestyUser);
+      } else if (FBuserExists && zestyUserExists && npoZuid !== "") {
+        // Case 4: Both Firebase and Zesty users exist
+        await updateExistingUser(user, FBuserData, zestyUser);
+        localStorage.removeItem("npoZuidToFollow");
+      }
+
+      await updateUserDataInLocalStorage(user.uid);
+
+      if (newUser) {
+        if (npoZuid === "") {
+          window.location.href = "{{onboarding.first().getUrl()}}";
+        } else {
+          localStorage.removeItem("npoZuidToFollow");
+          window.location.href = `{{home_feed.first().getUrl()}}${
+            npoZuid !== null && npoZuid !== "" ? `?create-story` : ""
+          }`;
+        }
+        // console.log("New user, redirecting to onboarding");
+      } else if (claimListingRedirectUrl) {
+        // console.log("Claim listing redirect, redirecting to claim listing");
+        localStorage.removeItem("claimListingRedirectUrl");
+
+        window.location.href = claimListingRedirectUrl
+          ? claimListingRedirectUrl + "?claim-listing-redirect=true"
+          : "{{home_feed.first().getUrl()}}";
+      } else if (followNpo) {
+        // console.log("Follow NPO redirect, redirecting to follow NPO");
+        localStorage.removeItem("followNpo");
+
+        window.location.href = "{{$url}}/?follow";
+        // console.log("{{$url}}/?follow");
+      } else {
+        localStorage.removeItem("npoZuidToFollow");
+        window.location.href = `{{home_feed.first().getUrl()}}${
+          npoZuid !== null && npoZuid !== "" ? `?create-story` : ""
+        }`;
+      }
+    } catch (error) {
+      console.error("Error in handleAuthResult:", error);
+      await deauthenticateUser(user);
+      alert(
+        error.message ||
+          "An error occurred during authentication. Please try again."
+      );
+    }
+  }
+
+  async function createNewUser(user, npoZuid = "") {
+    const [firstName, ...lastNameParts] = user.displayName.split(" ");
+    const lastName = lastNameParts.join(" ");
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        first_name: firstName,
+        last_name: lastName,
+        user_type: "volunteer",
+        image: user.photoURL,
+        email: user?.providerData[0]?.email || "",
+        favorite_npos: [npoZuid] || undefined,
+        uid: user.uid,
+      }),
+    };
+
+    try {
+      const response = await fetch(
+        CONFIG.API_ROUTES["create-user-with-follow-npo"],
+        options
+      );
+      const data = await response.json();
+      // console.log(data);
+
+      if (npoZuid === "") {
+        return data;
+      }
+
+      window.location.href = "{{onboarding.first().getUrl()}}";
+      return data;
+    } catch (error) {
+      console.error("Error creating Zesty user:", error);
+      throw error;
+    }
+  }
+
+  async function createZestyUserForExistingFirebase(user, FBuserData) {
+    // console.log("Creating Zesty user for existing Firebase user");
+    const zestyUserData = await createZestyUser({
+      email: user?.providerData[0]?.email || "",
+      user_name: user.displayName,
+      profile_image: user.photoURL,
+      user_type: FBuserData.userRole || "volunteer",
+      npos: FBuserData?.npos || [],
+      causes: FBuserData?.causes || [],
+    });
+
+    if (!zestyUserData || !zestyUserData.user_zuid) {
+      throw new Error(
+        "Zesty user creation failed or didn't return a user_zuid"
+      );
+    }
+
+    // Update Firebase user with new Zesty ID
+    await db
+      .collection("Users")
+      .doc(user.uid)
+      .update({ zuid: zestyUserData.user_zuid });
+  }
+
+  async function createFirebaseUserForExistingZesty(user, zestyUser) {
+    // console.log("Creating Firebase user for existing Zesty user");
+    await createFirebaseUser(user, zestyUser.user_zuid);
+  }
+
+  async function updateExistingUser(user, FBuserData, zestyUser) {
+    const npoZuid = localStorage.getItem("npoZuidToFollow");
+    const userData = zestyUser.user;
+
+    if (npoZuid) {
+      const favoriteNpos = userData.data.favorite_npos
+        ? `${userData.data.favorite_npos},${npoZuid}`
+        : npoZuid;
+
+      return await updateZestyUser(userData.meta.ZUID, {
+        ...userData.data,
+        favorite_npos: favoriteNpos
+          .split(",")
+          .filter((value, index, self) => self.indexOf(value) === index)
+          .join(","),
+        ...(userData.data.favorite_causes
+          ? {
+              favorite_causes: userData.data.favorite_causes
+                .split(",")
+                .filter((value, index, self) => self.indexOf(value) === index)
+                .join(","),
+            }
+          : {}),
+        uid: user.uid,
+      });
+    }
+  }
+
+  async function updateUserDataInLocalStorage(uid) {
+    const userData = await getUserData(uid);
+    if (userData) {
+      localStorage.setItem("user", JSON.stringify(userData));
+      document.cookie = `uid=${userData.uid}; path=/; domain=.causecircle.org; secure; samesite=strict`;
+      return userData;
+    } else {
+      console.warn("No user data found to update in local storage");
+      return null;
+    }
+  }
+
+  async function signOut() {
+    try {
+      await firebase.auth().signOut();
+      // console.log("User signed out");
+      localStorage.removeItem("user");
+      document.cookie = "uid=; path=/; domain=.causecircle.org; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; samesite=strict";
+      updateUIBasedOnAuthState(null);
+      window.location.href = "{{login_page.first().getUrl()}}";
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
+  }
+
+  function updateUIBasedOnAuthState(user) {
+    if (user) {
+      $("#contact-us-btn").addClass("d-none");
+      $(".signout-btn").each(function () {
+        $(this).on("click", signOut);
+      });
+      $("#profileDropdown").removeClass("d-none");
+      $("#home-btn").removeClass("d-none");
+      $(".signin-btn").each(function () {
+        $(this).addClass("d-none");
+      });
+    } else {
+      $("#contact-us-btn").removeClass("d-none");
+      $(".signout-btn").each(function () {
+        $(this).off("click");
+      });
+      $("#profileDropdown").addClass("d-none");
+      $("#home-btn").addClass("d-none");
+      $(".signin-btn").each(function () {
+        $(this).removeClass("d-none");
+      });
+    }
+  }
+
+  async function deauthenticateUser(user) {
+    try {
+      await firebase.auth().signOut();
+      // console.log("User deauthenticated due to error");
+    } catch (error) {
+      console.error("Error during deauthentication:", error);
+    }
+  }
+
+  // ==================== MAIN ====================
+  // Event listeners for sign-in buttons
+  document.getElementById("google-signin-btn").addEventListener("click", () => {
+    localStorage.setItem("npoZuidToFollow", "{{$zuid}}");
+    signInWithGoogle();
+  });
+  document
+    .getElementById("continue-with-fb-btn")
+    .addEventListener("click", () => {
+      localStorage.setItem("npoZuidToFollow", "{{$zuid}}");
+      signInWithFacebook();
+    });
+
+  // Initialize the app
+  function initializeApp() {
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        await updateUserDataInLocalStorage(user.uid);
+      } else {
+        localStorage.removeItem("user");
+      }
+      updateUIBasedOnAuthState(user);
+
+      if (window.location.pathname !== "{{login_page.first().getUrl()}}") {
+        // console.log("Handling routing");
+        handleRouting(user);
+      }
+    });
+  }
+
+  $(document).ready(initializeApp);
+</script>

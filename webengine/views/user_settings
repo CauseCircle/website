@@ -1,0 +1,331 @@
+<style>
+  .nav-tabs .nav-link {
+    color: #6c757d;
+    border: none;
+    border-bottom: 2px solid transparent;
+  }
+  .nav-tabs .nav-link.active {
+    color: #7749f8;
+    border-bottom: 2px solid #7749f8;
+  }
+  .sidebar .nav-link {
+    color: #6c757d;
+  }
+  .sidebar .nav-link.active {
+    color: #7749f8;
+    background-color: #f0e8ff;
+  }
+  .upload-image {
+    width: 100px;
+    height: 100px;
+    background-color: #e9ecef;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .btn-primary {
+    background-color: #7749f8;
+    border-color: #7749f8;
+  }
+  .btn-primary:hover {
+    background-color: #6234e3;
+    border-color: #6234e3;
+  }
+</style>
+
+<div class="container my-4">
+  <ul class="nav nav-tabs">
+    <li class="nav-item d-none">
+      <a class="nav-link" href="#">General Settings</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="#">Profile Settings</a>
+    </li>
+    <li class="nav-item d-none">
+      <a class="nav-link" href="#">Notification Settings</a>
+    </li>
+    <li class="nav-item d-none">
+      <a class="nav-link" href="#">Privacy & Security</a>
+    </li>
+    <li class="nav-item d-none">
+      <a class="nav-link" href="#">Integrations</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Your Stories</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Your NPOs</a>
+    </li>
+  </ul>
+
+  <!-- prettier-ignore -->
+  {{ include /components/global/UserSettings/General/general_settings.html }}
+
+  <!-- prettier-ignore -->
+  {{ include /components/global/UserSettings/Profile/profile_settings.html }}
+
+  <!-- prettier-ignore -->
+  {{ include /components/global/UserSettings/Stories/stories.html }}
+
+  <!-- prettier-ignore -->
+  {{ include /components/global/UserSettings/NPOs/npos.html }}
+
+  <div id="notificationSettings" class="row mt-4">
+    <div class="mx-auto" style="max-width: 500px; width: 100%">
+      <div class="p-4">
+        <h5>Notification Settings</h5>
+      </div>
+    </div>
+  </div>
+
+  <div id="privacySecurity" class="row mt-4">
+    <div class="mx-auto" style="max-width: 500px; width: 100%">
+      <div class="p-4">
+        <h5>Privacy & Security</h5>
+      </div>
+    </div>
+  </div>
+
+  <div id="integrations" class="row mt-4">
+    <div class="mx-auto" style="max-width: 500px; width: 100%">
+      <div class="p-4">
+        <h5>Integrations</h5>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--prettier-ignore-->
+{{ include /components/global/UserSettings/upload_profile_image.html }}
+
+<script>
+  const userTypes = {
+    volunteer: "volunteer",
+    donor: "donor",
+    staff: "staff",
+    individual: "individual",
+    beneficiary: "beneficiary",
+  };
+
+  window.originalFormData = {};  // Make it accessible globally
+  let originalContactFormData = {};
+
+  $(document).ready(async function () {
+    // Hide all content sections initially except profileSettings
+    $(
+      "#generalSettings, #notificationSettings, #privacySecurity, #integrations, #storiesSettings, #nposSettings, #contactInformation"
+    ).hide();
+
+    // Handle tab clicks
+    $(".nav-tabs .nav-link").on("click", function (e) {
+      e.preventDefault();
+
+      // Remove active class from all tabs
+      $(".nav-tabs .nav-link").removeClass("active");
+      // Add active class to clicked tab
+      $(this).addClass("active");
+
+      // Hide all content sections
+      $(
+        "#profileSettings, #generalSettings, #notificationSettings, #privacySecurity, #integrations, #storiesSettings, #nposSettings, #contactInformation"
+      ).hide();
+
+      // Show the corresponding content section based on the clicked tab
+      const tabText = $(this).text().trim().toLowerCase();
+      if (tabText.includes("general")) {
+        $("#generalSettings").show();
+      } else if (tabText.includes("profile")) {
+        $("#profileSettings").show();
+      } else if (tabText.includes("notification")) {
+        $("#notificationSettings").show();
+      } else if (tabText.includes("privacy")) {
+        $("#privacySecurity").show();
+      } else if (tabText.includes("integrations")) {
+        $("#integrations").show();
+      } else if (tabText.includes("stories")) {
+        $("#storiesSettings").show();
+      } else if (tabText.includes("npos")) {
+        $("#nposSettings").show();
+      } else if (tabText.includes("contact")) {
+        $("#contactInformation").show();
+      }
+    });
+
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    let zestyUser;
+    let zestyUserData;
+
+    if (localUser) {
+      zestyUser = await getZestyUser(localUser.zuid);
+      zestyUserData = zestyUser.user.data;
+
+      // Store original values
+      window.originalFormData = {
+        userType: userTypes[zestyUserData.user_type],
+        fullName: zestyUserData.first_name + " " + zestyUserData.last_name,
+        aboutMe: zestyUserData.about_me,
+        profileImage: zestyUserData.profile_image,
+      };
+
+      originalContactFormData = {
+        emailAddress: zestyUserData.email,
+        phoneNumber: zestyUserData.phone_number,
+        address: zestyUserData.address,
+      };
+
+      // Set initial values
+      $("#userType").val(window.originalFormData.userType);
+      $("#fullName").val(window.originalFormData.fullName);
+      $("#aboutme").val(window.originalFormData.aboutMe);
+      $("#profileImage").attr("src", window.originalFormData.profileImage);
+      $("#charCount").text(window.originalFormData.aboutMe?.length || 0);
+
+      $("#emailAddress").val(originalContactFormData.emailAddress);
+      $("#phoneNumber").val(originalContactFormData.phoneNumber);
+      $("#address").val(originalContactFormData.address);
+      $("#addressCharCount").text(originalContactFormData.address?.length || 0);
+    }
+
+    // Initially hide the action buttons
+    $(".form-actions, .contact-form-actions").addClass("d-none");
+
+    // Function to check if any form has changes
+    function hasAnyFormChanges() {
+      return hasFormChanges() || hasContactFormChanges();
+    }
+
+    // Function to check if profile form has changes
+    function hasFormChanges() {
+      const currentValues = {
+        userType: $("#userType").val(),
+        fullName: $("#fullName").val(),
+        aboutMe: $("#aboutme").val(),
+        profileImage: $("#profileImage").attr("src"),
+      };
+
+      return (
+        currentValues.userType !== window.originalFormData.userType ||
+        currentValues.fullName !== window.originalFormData.fullName ||
+        currentValues.aboutMe !== window.originalFormData.aboutMe ||
+        currentValues.profileImage !== window.originalFormData.profileImage
+      );
+    }
+
+    // Function to check if contact form has changes
+    function hasContactFormChanges() {
+      const currentContactValues = {
+        emailAddress: $("#emailAddress").val(),
+        phoneNumber: $("#phoneNumber").val(),
+        address: $("#address").val(),
+      };
+
+      return (
+        currentContactValues.emailAddress !==
+          originalContactFormData.emailAddress ||
+        currentContactValues.phoneNumber !==
+          originalContactFormData.phoneNumber ||
+        currentContactValues.address !== originalContactFormData.address
+      );
+    }
+
+    // Function to toggle action buttons visibility
+    function toggleActionButtons() {
+      if (hasAnyFormChanges()) {
+        $(".form-actions, .contact-form-actions").removeClass("d-none");
+      } else {
+        $(".form-actions, .contact-form-actions").addClass("d-none");
+      }
+    }
+
+    // Add change event listeners to all form fields
+    $(
+      "#userType, #fullName, #aboutme, #emailAddress, #phoneNumber, #address"
+    ).on("input change", toggleActionButtons);
+
+    // Add change event listener for profile image
+    const originalObserver = new MutationObserver(toggleActionButtons);
+    originalObserver.observe($("#profileImage")[0], {
+      attributes: true,
+      attributeFilter: ["src"],
+    });
+
+    // Update form submit handler
+    $("#profileForm, #contactForm").on("submit", async function (e) {
+      e.preventDefault();
+
+      const formData = {
+        user_type: $("#userType").val(),
+        full_name: $("#fullName").val(),
+        about_me: $("#aboutme").val(),
+        profile_image: $("#profileImage").attr("src"),
+        email: $("#emailAddress").val(),
+        phone_number: $("#phoneNumber").val(),
+        address: $("#address").val(),
+      };
+
+      try {
+        // Show loading state
+        const submitBtn = $(this).find("button[type='submit']");
+        submitBtn.prop("disabled", true);
+        submitBtn.html(
+          '<span class="spinner-border spinner-border-sm me-2"></span>Saving...'
+        );
+
+        // Make API call to update user
+        zestyUser.user.data.user_type = formData.user_type;
+        zestyUser.user.data.first_name = formData.full_name.split(" ")[0];
+        zestyUser.user.data.last_name = formData.full_name
+          .split(" ")
+          .slice(1)
+          .join(" ");
+        zestyUser.user.data.biography = formData.about_me;
+        zestyUser.user.data.email = formData.email;
+        zestyUser.user.data.phone_number = formData.phone_number;
+        zestyUser.user.data.address = formData.address;
+
+        await updateZestyUser(localUser.zuid, zestyUser.user.data);
+
+        // Update original data after successful save
+        window.originalFormData = {
+          userType: formData.user_type,
+          fullName: formData.full_name,
+          aboutMe: formData.about_me,
+          profileImage: formData.profile_image,
+        };
+
+        originalContactFormData = {
+          emailAddress: formData.email,
+          phoneNumber: formData.phone_number,
+          address: formData.address,
+        };
+
+        // Show success message
+        // toastr.success("Profile and contact information updated successfully");
+
+        // After successful save, hide the action buttons
+        // console.log("Hiding buttons after successful update");
+        $(".form-actions, .contact-form-actions").addClass("d-none");
+      } catch (error) {
+        console.error("Error updating profile and contact information:", error);
+        // toastr.error(
+        //   "Failed to update profile and contact information. Please try again."
+        // );
+      } finally {
+        // Reset button state
+        submitBtn.prop("disabled", false);
+        submitBtn.html("Apply Changes");
+      }
+    });
+
+    $("#aboutme").on("input", function () {
+      var charCount = $(this).val().length;
+      $("#charCount").text(charCount);
+    });
+
+    $("#address").on("input", function () {
+      var charCount = $(this).val().length;
+      $("#addressCharCount").text(charCount);
+    });
+  });
+</script>

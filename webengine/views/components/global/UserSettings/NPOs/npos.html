@@ -1,0 +1,136 @@
+<div id="nposSettings" class="container">
+  <section id="featured-npos" class="py-4 d-flex flex-column gap-4">
+    <div class="row">
+      {{ $author = {users.filter({get_var.zuid}).favorite_npos} }}
+      <!--prettier-ignore-->
+      {{each non_profits as npo where find_in_set(npo.zuid, '{$author}')}}
+      <div class="col-12 col-sm-6 col-md-3">
+        <!--prettier-ignore-->
+        {{ include /components/global/UserSettings/NPOs/npo_card.html }}
+      </div>
+      {{/each}}
+    </div>
+  </section>
+</div>
+
+<!-- Delete NPO Confirmation Modal -->
+<div class="modal fade" id="deleteNpoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content p-0">
+      <div class="modal-header w-100 border-0 pb-0">
+        <div class="d-flex justify-content-end w-100">
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+      <div class="modal-body px-4 pb-4">
+        <div
+          class="d-flex flex-column justify-content-center align-items-center"
+        >
+          <p class="text-center fs-5 fw-medium text-muted mb-4">
+            Are you sure you want to remove this NPO from your favorites? This
+            action cannot be undone.
+          </p>
+          <div class="d-flex gap-2 w-100">
+            <button
+              type="button"
+              class="btn btn-light flex-grow-1"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger flex-grow-1"
+              id="confirmDeleteNpo"
+            >
+              <span class="button-content">Remove</span>
+              <span
+                class="spinner-border spinner-border-sm d-none"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    const deleteModal = new bootstrap.Modal(
+      document.getElementById("deleteNpoModal")
+    );
+    let currentNpoCard = null;
+    let currentDeleteBtn = null;
+
+    // Handle delete button click
+    $(".delete-npo").on("click", function (e) {
+      e.preventDefault();
+      currentNpoCard = $(this).closest(".npo-card");
+      currentDeleteBtn = $(this);
+      deleteModal.show();
+    });
+
+    // Handle confirm delete
+    $("#confirmDeleteNpo").on("click", async function () {
+      const confirmBtn = $(this);
+      const buttonContent = confirmBtn.find(".button-content");
+      const spinner = confirmBtn.find(".spinner-border");
+
+      try {
+        // Show loading state
+        confirmBtn.prop("disabled", true);
+        buttonContent.addClass("d-none");
+        spinner.removeClass("d-none");
+
+        const localUser = JSON.parse(localStorage.getItem("user"));
+        if (!localUser?.zuid) {
+          throw new Error("User not found");
+        }
+
+        const userData = await window.getZestyUser(localUser.zuid);
+        if (!userData?.user?.data) {
+          throw new Error("Failed to fetch user data");
+        }
+
+        const currentFavorites =
+          userData.user.data.favorite_npos?.split(",").filter((zuid) => zuid) ||
+          [];
+        const updatedFavorites = currentFavorites.filter(
+          (zuid) => zuid !== currentNpoCard.data("npo-zuid")
+        );
+
+        userData.user.data.favorite_npos = updatedFavorites.join(",");
+        await window.updateZestyUser(localUser.zuid, userData.user);
+
+        // Hide modal first
+        deleteModal.hide();
+
+        // Wait for modal to finish hiding
+        setTimeout(() => {
+          // Remove the NPO card with animation
+          currentNpoCard.fadeOut(300, function () {
+            $(this).closest(".col-12").remove();
+          });
+
+          toastr.success("NPO removed from favorites");
+        }, 150);
+      } catch (error) {
+        console.error("Error removing NPO:", error);
+        toastr.error("Failed to remove NPO. Please try again.");
+      } finally {
+        // Reset button state
+        confirmBtn.prop("disabled", false);
+        buttonContent.removeClass("d-none");
+        spinner.addClass("d-none");
+      }
+    });
+  });
+</script>

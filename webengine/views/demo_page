@@ -1,0 +1,107 @@
+<style>
+  .hero-section {
+    /* background: url("{{this.hero_image.getImage()}}") no-repeat center center; */
+    background-size: cover;
+    /* color: #fff; */
+    text-align: center;
+    padding: 100px 0;
+  }
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+</style>
+
+<!-- <div class="hero-section">
+  <div class="container">
+    <h1>{{ this.hero_title }}</h1>
+    <p>{{ this.hero_description }}</p>
+  </div>
+</div> -->
+
+<!-- prettier-ignore -->
+{{include /components/global/demo.html}}
+
+<!-- prettier-ignore -->
+{{include /components/global/brand_logos.html}}
+
+<!-- prettier-ignore -->
+{{include /components/global/faqs_section.html}}
+
+<!-- <div class="container d-flex align-items-center my-4 my-sm-7">
+  <div class="row">
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-center align-items-sm-start gap-3 pe-4 justify-content-center"
+    >
+      <div class="w-100 text-start d-flex flex-column gap-4">
+        <h1>{{ this.hero_title }}</h1>
+        <div>{{ this.hero_description }}</div>
+      </div>
+      <div class="d-flex gap-2 mt-md-3">
+        <a
+          href="{{ this.hero_secondary_cta_link.truepath() }}"
+          class="btn btn-secondary"
+        >
+          {{ this.hero_secondary_cta_label }}
+        </a>
+        <a data-target="#demo-section" class="btn btn-primary scroll-to-demo">
+          {{ this.hero_primary_cta_label }}
+        </a>
+      </div>
+    </div>
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-start gap-4 pe-2 pe-sm-4 justify-content-center mt-6 mt-md-0"
+    >
+      <img
+        src="{{ this.hero_image.getImage() }}"
+        class="rounded-4"
+        alt=""
+        style="width: 100%; max-width: 100%; height: auto"
+      />
+    </div>
+  </div>
+</div> -->
+
+<script>
+  $(document).ready(function () {
+    $(".scroll-to-demo").click(function () {
+      var target = $(this).data("target");
+      $("html, body").animate(
+        {
+          scrollTop: $(target).offset().top - 200,
+        },
+        100
+      );
+    });
+
+    // Get the current URL hash
+    var hash = window.location.hash;
+
+    // Remove the # from the hash
+    var targetId = hash.substring(1); // Remove the first character '#'
+
+    // Check if there's a valid ID or class selector
+    if (targetId !== "") {
+      // Smooth scroll to the target element
+      $("html, body").animate(
+        {
+          scrollTop: $(targetId).offset().top,
+        },
+        500
+      );
+    }
+  });
+</script>

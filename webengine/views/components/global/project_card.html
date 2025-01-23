@@ -1,0 +1,103 @@
+<style>
+  .project-image {
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .project-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #0e121b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .project-subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em; /* Adjust this value based on your line-height */
+    line-height: 1.4em; /* Adjust this value as needed */
+  }
+  .project-subtitle,
+  .npo-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: #0e121b;
+  }
+  .project-cause {
+    padding: 0 10px;
+    /* height: 28px; */
+    border-radius: 14px;
+    background-color: #eceff3;
+    text-transform: uppercase;
+    font-size: 12px;
+    /* font-weight: bold; */
+  }
+  .project-date {
+    font-size: 12px;
+  }
+  .project-npo-logo {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #aeaeae;
+    border-radius: 3px;
+    object-fit: cover;
+    object-position: center;
+  }
+  .project-btn {
+    font-size: 12px;
+    font-weight: 500;
+    color: white;
+  }
+  .project-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+  .project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .project-btn {
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  .project-card:hover .project-btn {
+    background-color: whitesmoke;
+    color: #525866;
+  }
+</style>
+
+<div
+  class="card d-flex flex-column h-100 p-3 gap-2 project-card"
+  data-story-url="{{ story.getUrl() }}"
+>
+  <img
+    src="{{ story.story_image.getImage() }}"
+    class="project-image"
+    alt="{{ story.title }}"
+  />
+  <div class="d-flex flex-column gap-2 h-100">
+    <div class="d-flex justify-content-between">
+      <!--prettier-ignore-->
+      {{ each causes as cause where find_in_set(z.zuid, '{story.related_causes}') limit 1}}
+      <div class="project-cause d-flex align-items-center">
+        <p class="text-center">{{ cause.title }}</p>
+      </div>
+      {{/each}}
+    </div>
+    <p class="project-title">{{ story.title }}</p>
+    <div class="project-subtitle">{{ story.description }}</div>
+    <button class="btn btn-primary project-btn card-btn">Learn More</button>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $(".project-card").on("click", ".project-btn", function (e) {
+      e.preventDefault();
+      var storyUrl = $(this).closest(".project-card").data("story-url");
+      window.location.href = storyUrl;
+    });
+  });
+</script>

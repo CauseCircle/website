@@ -1,0 +1,703 @@
+<style>
+  .section-title p,
+  .section-title {
+    font-size: 2rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  .hero-description p,
+  .hero-description {
+    font-size: 1.125rem;
+    font-weight: 400;
+    text-align: center;
+    color: var(--bs-gray-500);
+    max-width: 53.125rem;
+  }
+  .role-card,
+  .cause-card,
+  .npo-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: pointer;
+  }
+  .role-card:hover,
+  .cause-card:hover,
+  .npo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .role-card.selected,
+  .cause-card.selected,
+  .npo-card.selected {
+    border: 2px solid #7b3fee;
+    background-color: #f8f4ff;
+  }
+  .search-input {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    padding-left: 35px;
+  }
+  #stepsIndicator {
+    font-size: 0.875rem;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    color: var(--bs-gray-600);
+  }
+  .step-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--bs-gray-300);
+    color: var(--bs-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+  }
+  .step-separator {
+    width: 16px;
+    height: 2px;
+    background-color: var(--bs-gray-300);
+    margin: 0 8px;
+  }
+  .step-item.active {
+    color: var(--bs-primary);
+  }
+  .step-item.active .step-icon {
+    background-color: var(--bs-primary);
+  }
+  .step-item.completed .step-icon {
+    background-color: var(--bs-success);
+  }
+  .cause-card .cause-title,
+  .cause-card .cause-description,
+  .cause-card .cause-description * *,
+  .npo-card .cause-title,
+  .npo-card .cause-description,
+  .npo-card .cause-description * * {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em;
+    line-height: 1.4em;
+  }
+</style>
+
+<header>
+  <div
+    class="d-flex justify-content-start align-items-center p-4 position-relative"
+  >
+    <div class="position-absolute" style="left: 1.5rem; top: 1.5rem">
+      <img
+        src="{{ globals.logo.getImage() }}"
+        style="max-width: 160px"
+        alt="cause circle brand logo"
+      />
+    </div>
+
+    <div
+      class="d-flex gap-2 align-items-center justify-content-center flex-grow-1"
+    >
+      <!-- steps indicator here -->
+      <div id="stepsIndicator" class="d-flex align-items-center">
+        <div class="step-item" data-step="1">
+          <span class="step-icon">1</span>
+          <span class="step-text">Role</span>
+        </div>
+        <div class="step-separator"></div>
+        <div class="step-item" data-step="2">
+          <span class="step-icon">2</span>
+          <span class="step-text">Select Cause</span>
+        </div>
+        <div class="step-separator"></div>
+        <div class="step-item" data-step="3">
+          <span class="step-icon">3</span>
+          <span class="step-text">Select NPO</span>
+        </div>
+        <div class="step-separator"></div>
+        <div class="step-item" data-step="4">
+          <span class="step-icon">4</span>
+          <span class="step-text">Summary</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<hr class="p-0 m-0" />
+
+<div class="container">
+  <div style="height: 38px" class="mt-4">
+    <button class="prevBtn btn btn-secondary">Back</button>
+  </div>
+</div>
+
+<section id="roleSelection" class="container">
+  <div class="pt-8 pb-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img
+        src="https://4xxglxlj.media.zestyio.com/role.png"
+        style="max-width: 160px"
+      />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="fs-1 fw-normal mb-0">Choose Your Role</p>
+        <p class="fs-5 text-muted mb-0">
+          Select the role that best describes you.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="width: 380px">
+      <div class="d-flex flex-column gap-3">
+        <div class="card role-card" data-role="volunteer">
+          <div class="d-flex gap-2 align-items-center p-3">
+            <div
+              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
+              style="background-color: #f8f4ff; width: 40px; height: 40px"
+            >
+              <i class="bi bi-people"></i>
+            </div>
+            <div>
+              <p class="fs-5 mb-0" style="font-size: 14px">Volunteer</p>
+              <p class="text-muted mb-0" style="font-size: 12px">
+                Contribute your time and skills to causes.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="card role-card" data-role="staff">
+          <div class="d-flex gap-2 align-items-center p-3">
+            <div
+              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
+              style="background-color: #f8f4ff; width: 40px; height: 40px"
+            >
+              <i class="bi bi-briefcase"></i>
+            </div>
+            <div>
+              <p class="fs-5 mb-0" style="font-size: 14px">Staff</p>
+
+              <p class="text-muted mb-0" style="font-size: 12px">
+                Work professionally for nonprofit organizations.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="card role-card" data-role="donor">
+          <div class="d-flex gap-2 align-items-center p-3">
+            <div
+              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
+              style="background-color: #f8f4ff; width: 40px; height: 40px"
+            >
+              <i class="bi bi-heart"></i>
+            </div>
+            <div>
+              <p class="fs-5 mb-0" style="font-size: 14px">Donor</p>
+              <p class="text-muted mb-0" style="font-size: 12px">
+                Support causes through financial contributions.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="card role-card" data-role="individual">
+          <div class="d-flex gap-2 align-items-center p-3">
+            <div
+              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
+              style="background-color: #f8f4ff; width: 40px; height: 40px"
+            >
+              <i class="bi bi-person-circle"></i>
+            </div>
+            <div>
+              <p class="fs-5 mb-0" style="font-size: 14px">Individual</p>
+              <p class="text-muted mb-0" style="font-size: 12px">
+                Support causes as an individual through various means.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="card role-card" data-role="beneficiary">
+          <div class="d-flex gap-2 align-items-center p-3">
+            <div
+              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
+              style="background-color: #f8f4ff; width: 40px; height: 40px"
+            >
+              <i class="bi bi-hand-thumbs-up"></i>
+            </div>
+            <div>
+              <p class="fs-5 mb-0" style="font-size: 14px">Beneficiary</p>
+              <p class="text-muted mb-0" style="font-size: 12px">
+                Connect with organizations and receive support for your needs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="nextBtn btn btn-primary w-100 mt-4">Next</button>
+    </div>
+  </div>
+</section>
+
+<section id="causeSelection" class="container d-none">
+  <div class="pt-8 pb-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img
+        src="https://4xxglxlj.media.zestyio.com/role.png"
+        style="max-width: 160px"
+      />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="fs-1 fw-normal mb-0">Select a Cause</p>
+        <p class="fs-5 text-muted mb-0">
+          Pick a cause that you are passionate about.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="width: 380px">
+      <input
+        id="causeSearchInput"
+        type="text"
+        class="form-control search-input mb-3"
+        placeholder="Search..."
+      />
+      <div id="cause-loading" class="text-center d-none">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div
+        id="cause-container"
+        class="d-flex flex-column gap-3 overflow-auto w-100"
+        style="max-height: 300px"
+      ></div>
+      <button class="nextBtn btn btn-primary w-100 mt-4">Next</button>
+    </div>
+  </div>
+</section>
+
+<section id="npoSelection" class="container d-none">
+  <div class="pt-8 pb-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img
+        src="https://4xxglxlj.media.zestyio.com/role.png"
+        style="max-width: 160px"
+      />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="fs-1 fw-normal mb-0">Follow Nonprofits</p>
+        <p class="fs-5 text-muted mb-0">
+          Choose Nonprofits to follow and engage with.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="width: 380px">
+      <input
+        id="npoSearchInput"
+        type="text"
+        class="form-control search-input mb-3"
+        placeholder="Search..."
+      />
+      <div id="npo-loading" class="text-center d-none">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div
+        id="npo-container"
+        class="d-flex flex-column gap-3 overflow-auto w-100"
+        style="max-height: 300px"
+      ></div>
+      <button class="nextBtn btn btn-primary w-100 mt-4">Next</button>
+    </div>
+  </div>
+</section>
+
+<section
+  id="summary"
+  class="container d-none h-100 d-flex align-items-center justify-content-center flex-column"
+>
+  <div class="pt-8 pb-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img
+        src="https://4xxglxlj.media.zestyio.com/check.png"
+        style="max-width: 160px"
+      />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="fs-1 fw-normal mb-0">Welcome to CauseCircle!</p>
+        <p class="fs-5 text-muted mb-0">
+          Your journey begins here. Explore and make a difference.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="width: 380px">
+      <a
+        id="createContentBtn"
+        href="{{ home_feed.first().getUrl() }}"
+        class="completeBtn btn btn-primary w-100 mt-4"
+      >
+        Create Content
+      </a>
+      <a
+        id="exploreCausesBtn"
+        href="{{ causes_landing_page.first().getUrl() }}"
+        class="btn btn-secondary w-100 mt-4"
+      >
+        Explore Causes
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  $(document).ready(function () {
+    async function updateUserProfile(zuid) {
+      let userData = await getZestyUser(zuid);
+      if (!userData?.user) return;
+
+      const userZuid = userData.user.meta.ZUID;
+
+      // Edit the user data
+      userData.user.data.user_type = selectedRole;
+      userData.user.data.favorite_causes = selectedCauses.join(",");
+      userData.user.data.favorite_npos = selectedNPOs.join(",");
+
+      // Update only the 'data' part of the user object
+      const updatedUser = await updateZestyUser(userZuid, userData.user.data);
+
+      // console.log("User profile updated:", updatedUser);
+    }
+
+    let currentStep = 1;
+    let selectedRole,
+      selectedCauses = [],
+      selectedNPOs = [];
+
+    function updateStepUI() {
+      $(".step").removeClass("active");
+      $(`#step${currentStep}`).addClass("active");
+
+      $("#roleSelection, #causeSelection, #npoSelection, #summary").addClass(
+        "d-none"
+      );
+      $(
+        `#${
+          ["roleSelection", "causeSelection", "npoSelection", "summary"][
+            currentStep - 1
+          ]
+        }`
+      ).removeClass("d-none");
+
+      $("#prevBtn").toggleClass("d-none", currentStep === 1);
+      $("#nextBtn").text(currentStep === 3 ? "Complete" : "Next");
+
+      // Update steps indicator
+      $("#stepsIndicator .step-item").each(function () {
+        const stepNumber = $(this).data("step");
+        $(this).removeClass("active completed");
+        if (stepNumber < currentStep) {
+          $(this).addClass("completed");
+          $(this).find(".step-icon").text("✓");
+        } else if (stepNumber === currentStep) {
+          $(this).addClass("active");
+          $(this).find(".step-icon").text(stepNumber);
+        } else {
+          $(this).find(".step-icon").text(stepNumber);
+        }
+      });
+      if (currentStep === 1) {
+        $(".prevBtn").addClass("d-none");
+      } else {
+        $(".prevBtn").removeClass("d-none");
+      }
+      if (currentStep === 2) loadCauses();
+      if (currentStep === 3) loadNPOs();
+      if (currentStep === 4) {
+        const localUser = localStorage.getItem("user");
+
+        if (localUser) {
+          updateUserProfile(JSON.parse(localUser).zuid);
+        }
+      }
+    }
+
+    $(".role-card").click(function () {
+      $(".role-card").removeClass("selected");
+      $(this).addClass("selected");
+      selectedRole = $(this).data("role");
+    });
+
+    $(".nextBtn").click(function () {
+      if (currentStep === 1 && !selectedRole) {
+        alert("Please select a role");
+        return;
+      }
+      if (currentStep < 4) {
+        currentStep++;
+        updateStepUI();
+      }
+    });
+
+    $(".prevBtn").click(function () {
+      currentStep--;
+      updateStepUI();
+    });
+
+    function searchNPOs(searchTerm) {
+      const limit = searchTerm ? 5 : 100;
+
+      $.ajax({
+        url: "https://causecircle.org/mobileapp/npos.json",
+        method: "GET",
+        data: {
+          limit: limit,
+          search: searchTerm,
+          page: 1,
+        },
+        success: function (data) {
+          //logic here
+        },
+        error: function (error) {
+          //logic here
+        },
+      });
+    }
+
+    function loadCauses(searchTerm) {
+      const limit = searchTerm ? 5 : 100;
+
+      // Show loading indicator
+      $("#cause-loading").removeClass("d-none");
+      $("#cause-container").addClass("d-none");
+
+      $.ajax({
+        url: "https://causecircle.org/mobileapp/causes.json",
+        method: "GET",
+        data: {
+          limit: limit,
+          search: searchTerm,
+          page: 1,
+        },
+        success: function (response) {
+          const causes = response.data;
+          const causeContainer = $("#cause-container");
+          causeContainer.empty();
+
+          causes.forEach((cause) => {
+            const imageUrl =
+              cause.image && cause.image.data && cause.image.data[0]
+                ? cause.image.data[0].url
+                : "https://placehold.co/100x100";
+            const description = cause.description
+              ? cause.description.substring(0, 100) + "..."
+              : "No description available";
+
+            const causeCard = `
+              <div class="card cause-card" data-cause-id="${cause.meta.zuid}">
+                <div class="d-flex gap-2 align-items-center p-3">
+                  <img src="${imageUrl}" alt="${cause.title}" style="width: 60px; height: 60px; object-fit: cover;">
+                  <div class="flex-grow-1">
+                    <p class="fs-5 mb-0 cause-title" style="font-size: 14px">${cause.title}</p>
+                    <div class="text-muted mb-0 cause-description" style="font-size: 12px">${description}</div>
+                  </div>
+                </div>
+              </div>
+            `;
+            causeContainer.append(causeCard);
+          });
+
+          // Add click event for cause selection
+          $(".cause-card").click(function () {
+            const causeId = $(this).data("cause-id");
+            $(this).toggleClass("selected"); // Toggle selection on click
+            if ($(this).hasClass("selected")) {
+              selectedCauses.push(causeId); // Add to selected causes
+              // console.log("Selected causes:", selectedCauses);
+            } else {
+              selectedCauses = selectedCauses.filter((id) => id !== causeId); // Remove from selected causes
+            }
+          });
+
+          // Hide loading indicator and show results
+          $("#cause-loading").addClass("d-none");
+          $("#cause-container").removeClass("d-none");
+        },
+        error: function (error) {
+          console.error("Error fetching causes:", error);
+          // Hide loading indicator on error
+          $("#cause-loading").addClass("d-none");
+          $("#cause-container").removeClass("d-none");
+        },
+      });
+    }
+
+    // Debounce function for search input
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    function loadNPOs(searchTerm) {
+      const limit = searchTerm ? 5 : 100;
+
+      // Show loading indicator
+      $("#npo-loading").removeClass("d-none");
+      $("#npo-container").addClass("d-none");
+
+      $.ajax({
+        url: "https://causecircle.org/mobileapp/npos.json",
+        method: "GET",
+        data: {
+          limit: limit,
+          search: searchTerm,
+          page: 1,
+        },
+        success: function (response) {
+          const npos = response.data;
+          const npoContainer = $("#npo-container");
+          npoContainer.empty();
+
+          npos.forEach((npo) => {
+            const imageUrl =
+              npo.logo && npo.logo.data && npo.logo.data[0]
+                ? npo.logo.data[0].url
+                : "https://placehold.co/100x100";
+            const description = npo.cause_description
+              ? npo.cause_description.substring(0, 100) + "..."
+              : "No description available";
+
+            const npoCard = `
+              <div class="card npo-card" data-npo-id="${npo.meta.zuid}">
+                <div class="d-flex gap-2 align-items-center p-3">
+                  <img src="${imageUrl}" alt="${npo.name}" style="width: 60px; height: 60px; object-fit: cover;">
+                  <div class="card-content">
+                    <p class="fs-5 mb-0 cause-title" style="font-size: 14px">${npo.name}</p>
+                    <div class="text-muted mb-0 cause-description" style="font-size: 12px">${description}</div>
+                  </div>
+                </div>
+              </div>
+            `;
+            npoContainer.append(npoCard);
+          });
+
+          // Add click event for NPO selection
+          $(".npo-card").click(function () {
+            const npoId = $(this).data("npo-id");
+            $(this).toggleClass("selected");
+            if ($(this).hasClass("selected")) {
+              selectedNPOs.push(npoId);
+            } else {
+              selectedNPOs = selectedNPOs.filter((id) => id !== npoId);
+            }
+            // console.log("Selected NPOs:", selectedNPOs);
+          });
+
+          // Hide loading indicator and show results
+          $("#npo-loading").addClass("d-none");
+          $("#npo-container").removeClass("d-none");
+        },
+        error: function (error) {
+          console.error("Error fetching NPOs:", error);
+          // Hide loading indicator on error
+          $("#npo-loading").addClass("d-none");
+          $("#npo-container").removeClass("d-none");
+        },
+      });
+    }
+
+    $("#causeSearchInput").on(
+      "input",
+      debounce(function () {
+        const searchTerm = $(this).val().trim();
+        loadCauses(searchTerm);
+      }, 300)
+    );
+
+    $("#npoSearchInput").on(
+      "input",
+      debounce(function () {
+        const searchTerm = $(this).val().trim();
+        loadNPOs(searchTerm);
+      }, 300)
+    );
+
+    function showSummary() {
+      const summaryContent = $("#summaryContent");
+      summaryContent.empty();
+
+      // Add role summary
+      summaryContent.append(`<h3>Selected Role</h3><p>${selectedRole}</p>`);
+
+      // Add causes summary
+      summaryContent.append(`<h3>Selected Causes</h3>`);
+      if (selectedCauses.length > 0) {
+        const causesList = selectedCauses
+          .map((causeId) => {
+            const causeElement = $(`.cause-card[data-cause-id="${causeId}"]`);
+            return causeElement.find(".fs-5").text();
+          })
+          .join(", ");
+        summaryContent.append(`<p>${causesList}</p>`);
+      } else {
+        summaryContent.append(`<p>No causes selected</p>`);
+      }
+
+      // Add NPOs summary
+      summaryContent.append(`<h3>Selected NPOs</h3>`);
+      if (selectedNPOs.length > 0) {
+        const nposList = selectedNPOs
+          .map((npoId) => {
+            const npoElement = $(`.npo-card[data-npo-id="${npoId}"]`);
+            return npoElement.find(".fs-5").text();
+          })
+          .join(", ");
+        summaryContent.append(`<p>${nposList}</p>`);
+      } else {
+        summaryContent.append(`<p>No NPOs selected</p>`);
+      }
+    }
+
+    // Add a click handler for the complete button
+    $(".completeBtn").click(function () {
+      // Handle completion
+      // console.log("Onboarding completed:", {
+      //   selectedRole,
+      //   selectedCauses,
+      //   selectedNPOs,
+      // });
+      // Redirect or show completion message
+    });
+
+    // Initial UI update
+    updateStepUI();
+
+    const claimListingRedirectUrl = localStorage.getItem(
+      "claimListingRedirectUrl"
+    );
+
+    if (claimListingRedirectUrl) {
+      $("#createContentBtn")
+        .attr("href", claimListingRedirectUrl + "?claim-listing-redirect=true")
+        .text("Return to Claim Listing");
+    }
+
+    localStorage.removeItem("claimListingRedirectUrl");
+  });
+</script>

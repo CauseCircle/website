@@ -1,0 +1,486 @@
+<style>
+  .title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+  }
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    max-width: 480px;
+    width: 100%;
+  }
+  .search-input,
+  .filter-dropdown {
+    /* background-color: #f0f0f0; */
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  .search-input {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    padding-left: 35px;
+    max-width: 640px;
+    height: 48px;
+  }
+  .filter-dropdown {
+    appearance: none;
+    padding-right: 30px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+  .filter-dropdown::-ms-expand {
+    display: none;
+  }
+
+  .section-title p,
+  .section-title {
+    font-size: 2rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  .hero-description p,
+  .hero-description {
+    font-size: 1.125rem;
+    font-weight: 400;
+    text-align: center;
+    color: var(--bs-gray-500);
+    max-width: 53.125rem;
+  }
+
+  #cause-filter {
+    width: 120px;
+  }
+
+  /* Styles for Webkit browsers (Chrome, Safari, etc.) */
+  #cause-filter::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  #cause-filter::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  #cause-filter::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  #cause-filter::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  /* Styles for Firefox */
+  #cause-filter {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+  }
+
+  /* Ensure the dropdown is scrollable */
+  #cause-filter option {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+</style>
+
+<style>
+  .npo-image {
+    height: 100%;
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .npo-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #0e121b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .npo-subtitle p,
+  .npo-subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em; /* Adjust this value based on your line-height */
+    line-height: 1.4em; /* Adjust this value as needed */
+  }
+  .npo-subtitle,
+  .npo-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: #0e121b;
+  }
+  .npo-cause {
+    padding: 0 10px;
+    /* height: 28px; */
+    border-radius: 14px;
+    background-color: #eceff3;
+    text-transform: uppercase;
+    font-size: 12px;
+    /* font-weight: bold; */
+  }
+  .npo-date {
+    font-size: 12px;
+  }
+  .npo-npo-logo {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #aeaeae;
+    border-radius: 3px;
+    object-fit: cover;
+    object-position: center;
+  }
+  .npo-btn {
+    font-size: 12px;
+    font-weight: 500;
+    color: #0e121b;
+  }
+  .npo-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+  .npo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .npo-btn {
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  .npo-card:hover .npo-btn {
+    background-color: #7b3fee;
+    color: white;
+  }
+  .card-btn {
+    height: 36px;
+  }
+</style>
+
+<section class="container py-4 py-md-8">
+  <div
+    class="d-flex flex-column gap-2 justify-content-center align-items-center"
+  >
+    <p class="fs-1 fw-normal text-center">{{ this.hero_title }}</p>
+    <p class="fs-5 text-muted text-center" style="max-width: 45rem">
+      {{ this.hero_description }}
+    </p>
+    <div class="search-bar">
+      <input
+        type="text"
+        id="npo-search"
+        class="search-input form-control w-100 mb-2 mb-md-0 py-2 my-4 w-100"
+        placeholder="Search Nonprofits by name..."
+        aria-label="Search"
+      />
+      <div class="d-flex align-items-end d-none">
+        <select
+          id="cause-filter"
+          class="filter-dropdown form-control"
+          style="height: 48px"
+        >
+          <option value="all">All Causes</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-2">
+  <hr class="my-0" style="border-top: 1px solid #bdbdbd" />
+</section>
+
+<section id="search-results" class="container py-4 flex-column gap-4">
+  <div class="d-flex justify-content-between">
+    <p class="fs-5 fw-bold py-4">Explore Nonprofits</p>
+  </div>
+  <div id="search-npos-container" class="row row-gap-4">
+    <!-- Search results will be dynamically inserted here -->
+  </div>
+</section>
+
+<section class="py-2">
+  <hr class="my-0" style="border-top: 1px solid #bdbdbd" />
+</section>
+
+<!--Get started section-->
+<section id="get-started-section" class="container-fluid pt-5">
+  <div class="container">
+    <div
+      class="d-flex flex-column gap-3 align-items-center justify-content-center"
+    >
+      <p class="section-title text-center">Got questions? We'd love to chat.</p>
+      <div class="hero-description mx-auto">
+        Discover how you can claim your profile, access Beta benefits, onboard
+        your community of volunteers and staff, and more.
+      </div>
+      <div class="py-3">
+        <a href="{{ demo_page.first().path_full }}" class="btn btn-primary">
+          Contact Us
+        </a>
+      </div>
+      <img
+        src="https://4xxglxlj.media.zestyio.com/layer-2-1.png"
+        alt=""
+        style="height: 12.375rem; object-fit: contain"
+      />
+    </div>
+  </div>
+</section>
+
+<script>
+  $(document).ready(function () {
+    const $npoSearch = $(".search-input");
+    const $causeFilter = $("#cause-filter");
+    const $searchNposContainer = $("#search-npos-container");
+    const $loadingIndicator = $(
+      '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+    );
+    const $noResultsMessage = $(`
+      <div class="text-center py-6">
+        <img src="https://4xxglxlj.media.zestyio.com/Empty-States--Finance---Banking---1.0-.png" alt="NPO Not Found" style="height: 12.375rem; object-fit: contain" class="mb-4"/>
+        <h2 class="mb-3">NPO Not Found</h2>
+        <p class="text-muted">We couldn't find any NPO matching your search criteria.</p>
+        <p class="text-muted py-4">Is your NPO missing from our directory?</p>
+        <a href="https://causecircle.org/claim-listing/" class="btn btn-primary">Register Your NPO</a>
+      </div>
+    `);
+    const $exploreNPOsText = $(".fs-5.fw-bold.py-4");
+    let currentPage = 1;
+    let isSearching = false;
+    let npoData = [];
+    let hasLoadMoreBeenClicked = false; // Add this new variable
+
+    // Fetch cause categories
+    $.ajax({
+      url: "https://causecircle.org/mobileapp/causes.json",
+      method: "GET",
+      data: { limit: 999 },
+      success: function (data) {
+        if (data.data && data.data.length > 0) {
+          // Sort causes alphabetically
+          data.data.sort((a, b) => a.title.localeCompare(b.title));
+          data.data.forEach((cause) => {
+            $causeFilter.append(
+              `<option value="${cause.title}">${cause.title}</option>`
+            );
+          });
+        }
+      },
+      error: function (error) {
+        console.error("Error fetching cause categories:", error);
+      },
+    });
+
+    // Get the filter parameter from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParam = urlParams.get("filter");
+
+    // Set the initial value of the search input if filter parameter exists
+    if (searchParam) {
+      $npoSearch.val(searchParam);
+    }
+
+    // Perform initial search with the filter or display featured NPOs
+    searchNpos();
+
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    $npoSearch.on(
+      "input",
+      debounce(() => {
+        currentPage = 1;
+        hasLoadMoreBeenClicked = false;
+        searchNpos();
+        updateUrlParam();
+      }, 300)
+    );
+
+    $causeFilter.on("change", () => {
+      currentPage = 1;
+      filterNpos();
+    });
+
+    // Update URL parameter function
+    function updateUrlParam() {
+      const searchValue = $npoSearch.val();
+      const newUrl = searchValue
+        ? `${window.location.pathname}?filter=${encodeURIComponent(
+            searchValue
+          )}`
+        : window.location.pathname;
+      history.pushState(null, "", newUrl);
+    }
+
+    function searchNpos() {
+      const searchInput = $npoSearch.val();
+      const limit = !searchInput && !hasLoadMoreBeenClicked ? 8 : 20;
+      const isFeatured = !searchInput && !hasLoadMoreBeenClicked ? 1 : 0;
+
+      if (currentPage === 1) {
+        $searchNposContainer.empty().append($loadingIndicator);
+      }
+
+      $.ajax({
+        url: `https://causecircle.org/mobileapp/npos.json`,
+        method: "GET",
+        data: {
+          limit: limit,
+          search: searchInput,
+          page: currentPage,
+          featured: isFeatured,
+        },
+        success: function (data) {
+          if (currentPage === 1) {
+            $searchNposContainer.empty();
+            npoData = []; // Reset data only when starting a new search
+          }
+
+          if (data.data && data.data.length > 0) {
+            // Merge new data with existing data, avoiding duplicates
+            const newNpos = data.data.filter(
+              (newNpo) =>
+                !npoData.some(
+                  (existingNpo) => existingNpo.meta.zuid === newNpo.meta.zuid
+                )
+            );
+            npoData = [...npoData, ...newNpos];
+            filterNpos();
+
+            if (
+              (data.data.length > 0 && data.data.length >= limit) ||
+              !hasLoadMoreBeenClicked
+            ) {
+              addLoadMoreButton();
+            } else {
+              removeLoadMoreButton();
+            }
+          } else if (currentPage === 1) {
+            $exploreNPOsText.hide();
+            removeLoadMoreButton();
+            $searchNposContainer.append($noResultsMessage);
+          }
+          isSearching = false;
+        },
+        error: function (error) {
+          console.error("Error fetching search results:", error);
+          if (currentPage === 1) {
+            $exploreNPOsText.hide();
+            removeLoadMoreButton();
+            $searchNposContainer
+              .empty()
+              .append(
+                $(
+                  '<div class="text-center py-4">An error occurred. Please try again.</div>'
+                )
+              );
+          }
+          isSearching = false;
+        },
+      });
+    }
+
+    function filterNpos() {
+      const selectedCause = $causeFilter.val();
+      const filteredNpos = npoData.filter((npo) => {
+        return (
+          selectedCause === "all" ||
+          (npo.category &&
+            npo.category.data.some((cause) => cause.title === selectedCause))
+        );
+      });
+
+      $searchNposContainer.empty();
+      if (filteredNpos.length > 0) {
+        $exploreNPOsText.show();
+        $searchNposContainer.empty();
+        filteredNpos.forEach((npo) => {
+          const $npoCard = createNpoCard(npo);
+          $searchNposContainer.append($npoCard);
+        });
+        if (filteredNpos.length === 20) {
+          addLoadMoreButton();
+        } else {
+          removeLoadMoreButton();
+        }
+      } else {
+        $exploreNPOsText.hide();
+        removeLoadMoreButton();
+        $searchNposContainer.append($noResultsMessage);
+      }
+    }
+
+    function createNpoCard(npo) {
+      let npoImage =
+        typeof npo.hero_image === "string"
+          ? npo.hero_image
+          : npo.hero_image?.data[0]?.url || "";
+
+      if (npoImage.includes("https://placehold.co/")) {
+        npoImage = "{{globals.npo_placeholder_image.getImage()}}";
+      }
+
+      return `
+      <div class="col-12 col-sm-6 col-md-3">
+        <div class="card d-flex flex-column h-100 p-3 gap-2 npo-card" data-story-url="${
+          npo.meta?.web?.uri || "#"
+        }">
+          <img src="${npoImage}" class="npo-image" />
+          <div class="d-flex flex-column gap-2 h-100">
+            <div class="d-flex flex-grow-1 align-items-center gap-2 d-none">
+              <img src="${
+                typeof npo.logo === "string"
+                  ? npo.logo
+                  : npo.logo?.data[0]?.url || ""
+              }" class="npo-npo-logo" />
+              <p class="npo-name my-auto">${npo.name || "Unknown NPO"}</p>
+            </div>
+            <p class="npo-title">${npo.name || "Unknown NPO"}</p>
+            <div class="npo-subtitle">${
+              npo.cause_description || "No description available"
+            }</div>
+            <a href="${
+              npo.meta?.web?.uri || "#"
+            }" class="btn btn-secondary npo-btn card-btn">View Profile</a>
+          </div>
+        </div>
+      </div>
+    `;
+    }
+
+    function addLoadMoreButton() {
+      removeLoadMoreButton();
+      const $loadMoreButton = $(
+        '<button class="btn btn-primary mt-4 d-block mx-auto">Load More</button>'
+      );
+      $loadMoreButton.on("click", loadMore);
+      $searchNposContainer.after($loadMoreButton);
+    }
+
+    function removeLoadMoreButton() {
+      $searchNposContainer.next(".btn-primary").remove();
+    }
+
+    function loadMore() {
+      hasLoadMoreBeenClicked = true;
+      currentPage++;
+      searchNpos();
+    }
+  });
+</script>

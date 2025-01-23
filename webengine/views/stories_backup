@@ -1,0 +1,107 @@
+<style>
+  .hero {
+    background-image: url("{{this.story_image.getImage()}}");
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    position: relative;
+    z-index: 1;
+  }
+  .hero::after {
+    content: "";
+    background: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+  }
+  .article-content {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 5px;
+    padding: 20px;
+  }
+</style>
+
+<!--prettier-ignore-->
+{{ include /components/global/crumbs.html }}
+
+<div class="hero py-5">
+  <div class="container">
+    <div class="py-5 text-center">
+      <h1>{{ this.title }}</h1>
+      <p class="lead">
+        By
+        <a href="#author"
+          >{{users.filter({this.author}).first_name}}
+          {{users.filter({this.author}).last_name}}</a
+        >
+        | {{ this.date_published }}
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="article-content">
+        <article>
+          <h2 class="mb-3">{{ this.title }}</h2>
+          <p class="text-muted">Published on {{ this.date_published }}</p>
+          {{ this.story_body }}
+        </article>
+
+        <!-- Related Causes -->
+        <div class="mb-4">
+          <h2>Related Causes</h2>
+          <ul class="list-group">
+            {{ if {this.related_causes} }}
+            {{each {this.related_causes} as cause }}
+            <li class="list-group-item">
+              <a href="{{ cause.getUrl() }}">{{ cause.name }}</a>
+            </li>
+            {{/each}}
+            {{end-if}}
+          </ul>
+        </div>
+
+        <!-- Author Snippet -->
+        {{ if {this.author} }}
+        {{each {this.author} as author}}
+        <div class="card mb-4">
+          <div class="card-body" id="author">
+            <div class="row">
+              <div class="col-auto">
+                <a href="{{ author.getUrl() }}">
+                  <img
+                    src="{{ author.profile_image.getImage() }}"
+                    alt="{{ author.first_name }} {{ author.last_name }}"
+                    class="rounded-circle"
+                    style="width: 100px; height: 100px"
+                  />
+                </a>
+              </div>
+              <div class="col d-flex align-items-center">
+                <div>
+                  <h5 class="card-title">
+                    <a href="{{ author.getUrl() }}"
+                      >{{ author.first_name }} {{ author.last_name }}</a
+                    >
+                  </h5>
+                  <p class="card-text">
+                    {{ author.about_me.substr(0, 100) }}...
+                    <a href="{{ author.getUrl() }}">read more</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+        {{ end-if}}
+      </div>
+    </div>
+  </div>
+</div>

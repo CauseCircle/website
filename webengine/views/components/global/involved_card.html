@@ -1,0 +1,92 @@
+<style>
+  .involved-card {
+    border: 1px solid #e1e4ea;
+    padding: 16px;
+    border-radius: 16px;
+    opacity: 1;
+    text-align: center;
+  }
+  .involved-card .icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  .involved-card .card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .involved-card .card-text {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  .involved-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+  .involved-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .involved-btn {
+    font-size: 12px;
+    font-weight: 500;
+  }
+</style>
+
+<div class="row">
+  <div class="col-12 col-sm-6 col-md-4">
+    <div
+      class="card involved-card"
+      style="border-color: #ff8447; background-color: rgba(255, 132, 71, 0.1)"
+    >
+      <div class="d-flex flex-column gap-2 align-items-start">
+        <div class="icon">
+          <i class="bi bi-person-heart" style="color: #ff8447"></i>
+        </div>
+        <h5 class="card-title">Volunteer with Us</h5>
+        <p class="card-text flex-grow-1 text-start">
+          Join hands in our community efforts and make a difference.
+        </p>
+        <button href="#" class="btn btn-secondary card-btn involved-btn">
+          Sign Up
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-md-4">
+    <div
+      class="card involved-card"
+      style="border-color: #335cff; background-color: rgba(51, 92, 255, 0.1)"
+    >
+      <div class="d-flex flex-column gap-2 align-items-start">
+        <div class="icon">
+          <i class="bi bi-calendar-event" style="color: #335cff"></i>
+        </div>
+        <h5 class="card-title">Participate in Fundraising</h5>
+        <p class="card-text flex-grow-1 text-start">
+          Support our cause by attending and contributing to our events.
+        </p>
+        <button href="#" class="btn btn-secondary card-btn involved-btn">
+          View Events
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-md-4">
+    <div
+      class="card involved-card"
+      style="border-color: #22d3bb; background-color: rgba(34, 211, 187, 0.1)"
+    >
+      <div class="d-flex flex-column gap-2 align-items-start">
+        <div class="icon">
+          <i class="bi bi-currency-dollar" style="color: #22d3bb"></i>
+        </div>
+        <h5 class="card-title">Make a Donation</h5>
+        <p class="card-text flex-grow-1 text-start">
+          Your generous contribution can help us reach more people in need.
+        </p>
+        <button href="#" class="btn btn-secondary card-btn involved-btn">
+          Donate Now
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

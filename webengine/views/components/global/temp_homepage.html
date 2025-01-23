@@ -1,0 +1,618 @@
+<style>
+  .usecase-image {
+    border-radius: 20px;
+    max-height: 450px;
+    object-fit: cover;
+  }
+  ul.custom-bullet {
+    list-style: none; /* Remove default bullets */
+    padding: 0;
+  }
+
+  ul.custom-bullet li {
+    margin-left: 25px; /* Adjust as needed */
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  ul.custom-bullet li::before {
+    content: "";
+    position: absolute;
+    left: -25px; /* Adjust to position the image */
+    top: 4px;
+    width: 16px; /* Adjust image width */
+    height: 16px; /* Adjust image height */
+    background-image: url("{{cause_circle_cms_page.first().list_icon.getImage()}}"); /* Replace with your image path */
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+</style>
+
+<style>
+  .hero-section {
+    /* background: url("{{this.hero_image.getImage()}}") no-repeat center center; */
+    background-size: cover;
+    /* color: #fff; */
+    text-align: center;
+    padding: 100px 0;
+  }
+  .card-img-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+  }
+  .featurette-divider {
+    margin: 5rem 0;
+  }
+  .featured-category-card {
+    background-size: cover;
+    min-height: 223px;
+    border-radius: 20px;
+    border: none;
+  }
+  .featured-gradient-overlay {
+    background: linear-gradient(100deg, #613aaf 5%, #9a6ef3 95%);
+    border-radius: 20px;
+  }
+  .featured-floating-btn {
+    bottom: 20px;
+    right: 20px;
+    font-size: 40px;
+    padding: 0;
+    height: 40px;
+    width: 40px;
+    border: none;
+  }
+  .customer-images {
+    display: flex;
+    position: relative;
+  }
+  .customer-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: -10px;
+    position: relative;
+    z-index: 1;
+    object-fit: cover;
+    filter: grayscale(100%);
+  }
+  .customer-img:nth-child(2) {
+    z-index: 2;
+  }
+  .customer-img:nth-child(3) {
+    z-index: 3;
+  }
+  .customer-img:nth-child(4) {
+    z-index: 4;
+  }
+  .customer-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .customer-info .card-title {
+    margin: 0;
+  }
+
+  .progress {
+    background-color: #e0e0e0;
+  }
+
+  .progress-bar {
+    background-color: #6c63ff;
+  }
+  .causes-card {
+    background-size: cover;
+    min-height: 223px;
+    border-radius: 20px;
+    border: none;
+  }
+
+  .search-bar {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    width: 100%;
+    max-width: 640px;
+  }
+  .search-bar input {
+    width: 100%;
+    max-width: 640px;
+    height: 66px;
+    padding: 20px 44px 20px 24px; /* Add padding for the icon */
+    font-size: 16px;
+    border: 1px solid #dfe1e7;
+    border-radius: 10px;
+  }
+  .search-bar button {
+    position: absolute;
+    right: 20px; /* Adjust position as needed */
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #ccc;
+  }
+  .search-bar button:hover {
+    color: #333;
+  }
+
+  .logo-container {
+    overflow: hidden;
+    /* width: 300px;
+    height: 100px; */
+    /* position: relative; */
+  }
+
+  .logo-track {
+    display: flex;
+    animation: scroll infinite linear;
+  }
+
+  .logo {
+    object-fit: contain;
+    width: auto;
+    max-height: 80px;
+    flex-shrink: 0;
+    animation: rotate 8s linear infinite;
+  }
+
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+</style>
+
+<div class="container d-flex align-items-center my-4 my-sm-7">
+  <div class="row">
+    <div
+      class="col-sm-12 col-md-5 d-flex flex-column align-items-center align-items-sm-start gap-3 pe-4 justify-content-center"
+    >
+      <div class="w-100 w-sm-100 text-start d-flex flex-column gap-4">
+        <div id="hero-title">{{ homepage.first().title }}</div>
+        <div id="hero-description" class="d-flex flex-column gap-3">
+          {{ homepage.first().description }}
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-md-3">
+        <a data-target="#demo-section" class="btn btn-secondary scroll-to-demo">
+          {{ homepage.first().secondary_cta_label }}
+        </a>
+        <a data-target="#demo-section" class="btn btn-primary scroll-to-demo">
+          {{ homepage.first().primary_cta_label }}
+        </a>
+      </div>
+    </div>
+    <div
+      class="col-sm-12 col-md-7 d-flex flex-column align-items-start gap-4 pe-2 pe-sm-4 justify-content-center mt-6 mt-md-0"
+    >
+      <img
+        src="{{ homepage.first().hero_image.getImage() }}"
+        alt=""
+        style="width: 100%; max-width: 100%; height: auto"
+      />
+    </div>
+  </div>
+</div>
+
+<div
+  id="npo-search-container"
+  class="text-center d-flex flex-column gap-3 my-7 my-sm-9"
+>
+  <div class="container d-flex justify-content-center align-items-center">
+    <h1>{{this.npo_search_title}}</h1>
+  </div>
+
+  <div class="container d-flex align-items-center justify-content-center mb-3">
+    <div class="search-bar">
+      <button id="npo-search-btn" type="button" onclick="loadNPOdata()">
+        <i class="bi bi-search"></i>
+      </button>
+      <input id="npo-search" type="text" placeholder="Search" />
+    </div>
+  </div>
+
+  <div class="d-flex flex-column gap-3 overflow-x-auto invisible-scroll mx-2">
+    <div class="logo-container">
+      <div
+        class="logo-track d-flex gap-6 justify-content-start justify-content-xl-center"
+      >
+        <!--prettier-ignore-->
+        {{each {this.logos} as logo}}
+        <img
+          src="{{ logo.logo.getImage() }}"
+          alt="logo"
+          class="logo"
+          style="object-fit: contain; width: auto; max-height: 80px"
+        />
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  id="first-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px; display: none !important"
+>
+  <h1 class="text-center mb-5">{{ about.first().first_use_cases_title }}</h1>
+  {{ $first_usercase_var = {about.first().first_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$first_usercase_var}' )}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row my-5 d-none d-sm-block">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75">
+        <h2>{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-block d-sm-none">
+    <div class="col-12 col-md 6 d-flex flex-column justify-content-center">
+      <div class="w-75">
+        <h2>{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row">
+    <div class="col-12 col-md 6 d-flex flex-column justify-content-center">
+      <div class="w-75">
+        <h2>{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+
+  <div class="d-flex gap-2 mt-5">
+    <a data-target="#demo-section" class="btn btn-secondary scroll-to-demo">
+      {{ about.first().use_cases_secondary_cta_label }}
+    </a>
+    <a
+      href="{{ about.first().use_cases_primary_cta_link.truepath() }}"
+      class="btn btn-primary"
+    >
+      {{ about.first().use_cases_primary_cta_label }}
+    </a>
+  </div>
+</div>
+
+<div
+  id="first-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <h1 class="text-center">{{ about.first().first_use_cases_title }}</h1>
+  {{ $first_usercase_var = {about.first().first_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$first_usercase_var}' ) sort by sort_order }}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2>{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div class="col-12 col-md 6 d-flex flex-column justify-content-center">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 class="">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div class="col-12 col-md 6 d-flex flex-column justify-content-center">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2>{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+
+  <div class="d-flex gap-2 mt-5">
+    <a data-target="#demo-section" class="btn btn-secondary scroll-to-demo">
+      {{ about.first().use_cases_secondary_cta_label }}
+    </a>
+    <a
+      href="{{ about.first().use_cases_primary_cta_link.truepath() }}"
+      class="btn btn-primary"
+    >
+      {{ about.first().use_cases_primary_cta_label }}
+    </a>
+  </div>
+</div>
+
+<div
+  id="second-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <h1 class="text-center">{{ about.first().second_use_cases_title }}</h1>
+  {{ $second_usercase_var = {about.first().second_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$second_usercase_var}' )}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2>{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div class="col-12 col-md 6 d-flex flex-column justify-content-center">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 class="">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div class="col-12 col-md 6 d-flex flex-column justify-content-center">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2>{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+
+  <div class="d-flex gap-2 mt-5">
+    <a data-target="#demo-section" class="btn btn-secondary scroll-to-demo">
+      {{ about.first().use_cases_secondary_cta_label }}
+    </a>
+    <a
+      href="{{ about.first().use_cases_primary_cta_link.truepath() }}"
+      class="btn btn-primary"
+    >
+      {{ about.first().use_cases_primary_cta_label }}
+    </a>
+  </div>
+</div>
+
+<div
+  id="third-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <h1 class="text-center">{{ about.first().third_use_cases_title }}</h1>
+  {{ $third_usercase_var = {about.first().third_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$third_usercase_var}' )}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2>{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div class="col-12 col-md 6 d-flex flex-column justify-content-center">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 class="">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div class="col-12 col-md 6 d-flex flex-column justify-content-center">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2>{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+
+  <div class="d-flex gap-2 mt-5">
+    <a data-target="#demo-section" class="btn btn-secondary scroll-to-demo">
+      {{ about.first().use_cases_secondary_cta_label }}
+    </a>
+    <a
+      href="{{ about.first().use_cases_primary_cta_link.truepath() }}"
+      class="btn btn-primary"
+    >
+      {{ about.first().use_cases_primary_cta_label }}
+    </a>
+  </div>
+</div>
+
+<!-- prettier-ignore -->
+{{ include /components/global/fundraising_banner.html }}
+
+<!-- prettier-ignore -->
+{{ include /components/global/cause_banner.html }}
+
+<!-- prettier-ignore -->
+{{ include /components/global/demo.html}}
+
+<script>
+  $(document).ready(function () {
+    $("#hero-description ul").each(function () {
+      $(this).addClass("custom-bullet");
+    });
+    $(".usecase-description ul").each(function () {
+      $(this).addClass("custom-bullet");
+    });
+    $(".scroll-to-demo").click(function () {
+      var target = $(this).data("target");
+      $("html, body").animate(
+        {
+          scrollTop: $(target).offset().top - 200,
+        },
+        100
+      );
+    });
+
+    document
+      .getElementById("npo-search-btn")
+      .addEventListener("click", function () {
+        window.location.href =
+          "{{non_profits_landing_page.first().path_full}}/?limit=24&filter=" +
+          document.getElementById("npo-search").value;
+      });
+
+    document
+      .getElementById("npo-search")
+      .addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          window.location.href =
+            "{{non_profits_landing_page.first().path_full}}/?limit=24&filter=" +
+            e.target.value;
+        }
+      });
+
+    const $container = $(".logo-container");
+    const $track = $(".logo-track");
+    const $logos = $track.children();
+    const logoWidth = $logos.first().outerWidth();
+    const containerWidth = $container.outerWidth();
+    const scrollSpeed = 5; // Adjust this value to change the scroll speed
+    // Calculate the number of logos needed to fill the container plus some extra for smooth looping
+    const logosNeeded = Math.ceil(containerWidth / logoWidth) + 1;
+
+    // Duplicate logos
+    const totalLogos = $logos.length;
+    for (let i = 0; i < logosNeeded * totalLogos; i++) {
+      $track.append($logos.eq(i % totalLogos).clone());
+    }
+
+    // Adjust the track width to fit all logos
+    const trackWidth = $track[0].scrollWidth;
+    $track.css("width", `${trackWidth}px`);
+
+    // Set the animation duration based on the total width of the track for continuous effect
+    const animationDuration = (trackWidth / logoWidth) * scrollSpeed; // Adjust this multiplier as needed
+    $track.css("animation-duration", `${animationDuration}s`);
+  });
+</script>

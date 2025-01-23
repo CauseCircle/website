@@ -1,0 +1,320 @@
+<style>
+  ul.custom-bullet {
+    list-style: none; /* Remove default bullets */
+    padding: 0;
+  }
+
+  ul.custom-bullet li {
+    margin-left: 25px; /* Adjust as needed */
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  ul.custom-bullet li::before {
+    content: "";
+    position: absolute;
+    left: -25px; /* Adjust to position the image */
+    top: 4px;
+    width: 16px; /* Adjust image width */
+    height: 16px; /* Adjust image height */
+    background-image: url("{{cause_circle_cms_page.first().list_icon.getImage()}}"); /* Replace with your image path */
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  .usecase-image {
+    border-radius: 20px;
+    max-height: 450px;
+    object-fit: cover;
+  }
+
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+</style>
+
+<div class="container my-4 my-sm-7">
+  <div class="row">
+    <div
+      class="col-md-5 d-flex flex-column gap-4 justify-content-center pr-sm-7"
+    >
+      <div id="hero-title">{{ cause_circle_cms_page.first().hero_title }}</div>
+      <div id="hero-description" class="d-flex flex-column gap-3">
+        {{ cause_circle_cms_page.first().hero_description }}
+      </div>
+      <div
+        id="hero-button"
+        class="d-flex justify-content-center justify-content-sm-start"
+      >
+        <a
+          href="{{ cause_circle_cms_page.first().hero_primary_cta_link.truepath() }}"
+          class="btn btn-primary"
+          >{{ cause_circle_cms_page.first().hero_primary_cta_label }}</a
+        >
+      </div>
+    </div>
+    <div
+      class="col-md-7 d-flex align-items-start justify-content-center mt-5 mt-sm-0"
+    >
+      <img
+        src="{{ cause_circle_cms_page.first().first_hero_image.getImage() }}"
+        alt="first hero image"
+        class="img-fluid"
+      />
+    </div>
+  </div>
+</div>
+
+<!-- prettier-ignore -->
+{{include /components/global/brand_logos.html}}
+
+<div
+  id="first-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <div class="text-center">
+    {{ cause_circle_cms_page.first().first_use_cases_title }}
+  </div>
+
+  <!-- prettier-ignore -->
+  {{ $first_use_cases = {cause_circle_cms_page.first().first_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$first_use_cases}' )}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+  <a data-target="#demo-section" class="btn btn-primary scroll-to-demo mt-5">
+    {{ cause_circle_cms_page.first().primary_use_case_cta_label }}
+  </a>
+</div>
+
+<div
+  id="second-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <div class="text-center">
+    {{ cause_circle_cms_page.first().second_use_cases_title }}
+  </div>
+  <!-- prettier-ignore -->
+  {{ $second_use_cases = {cause_circle_cms_page.first().second_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$second_use_cases}')}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+  <a data-target="#demo-section" class="btn btn-primary scroll-to-demo mt-5">
+    {{ cause_circle_cms_page.first().primary_use_case_cta_label }}
+  </a>
+</div>
+
+<div
+  id="third-use-cases"
+  class="container d-flex flex-column align-items-center justify-content-center"
+  style="margin-top: 160px; margin-bottom: 80px"
+>
+  <div class="text-center">
+    {{ cause_circle_cms_page.first().third_use_cases_title }}
+  </div>
+  <!-- prettier-ignore -->
+  {{ $third_use_cases = {cause_circle_cms_page.first().third_use_cases} }}
+
+  <!-- prettier-ignore -->
+  {{each use_cases as usecase where find_in_set(usecase.zuid, '{$third_use_cases}' )}}
+  <!-- prettier-ignore -->
+  {{if {usecase._index} % 2 === 0}}
+  <div class="row d-none d-sm-flex mt-5">
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
+      <div class="w-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row d-flex d-sm-none mt-5 mt-sm-0 gap-3 gap-sm-0">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{else}}
+  <div class="row mt-5 gap-3 gap-sm-0 d-flex">
+    <div
+      class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+    >
+      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+        <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
+        <div class="usecase-description">{{ usecase.description }}</div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <img
+        src="{{ usecase.image.getImage() }}"
+        alt=""
+        class="img-fluid w-100 usecase-image"
+      />
+    </div>
+  </div>
+  {{end-if}} {{/each}}
+  <a data-target="#demo-section" class="btn btn-primary scroll-to-demo mt-5">
+    {{ cause_circle_cms_page.first().primary_use_case_cta_label }}
+  </a>
+</div>
+
+<!-- prettier-ignore -->
+{{include /components/global/demo.html}}
+
+<script>
+  $(document).ready(function () {
+    $("#hero-description ul").each(function () {
+      $(this).addClass("custom-bullet");
+    });
+    $(".usecase-description ul").each(function () {
+      $(this).addClass("custom-bullet");
+    });
+    $(".scroll-to-demo").click(function () {
+      var target = $(this).data("target");
+      $("html, body").animate(
+        {
+          scrollTop: $(target).offset().top - 200,
+        },
+        100
+      );
+    });
+  });
+</script>

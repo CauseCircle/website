@@ -1,0 +1,193 @@
+<style>
+  ul.custom-bullet {
+    list-style: none; /* Remove default bullets */
+    padding: 0;
+  }
+
+  ul.custom-bullet li {
+    margin-left: 25px; /* Adjust as needed */
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  ul.custom-bullet li::before {
+    content: "";
+    position: absolute;
+    left: -25px; /* Adjust to position the image */
+    top: 4px;
+    width: 16px; /* Adjust image width */
+    height: 16px; /* Adjust image height */
+    background-image: url("{{cause_circle_cms_page.first().list_icon.getImage()}}"); /* Replace with your image path */
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .mission-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    box-shadow: 0 0 0px rgba(0, 0, 0, 0);
+  }
+
+  .mission-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  .mission-description h5 {
+    color: white;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+</style>
+
+<div class="container d-flex align-items-center my-4 my-sm-7">
+  <div class="row">
+    <div
+      class="col-sm-12 col-md-5 d-flex flex-column align-items-center align-items-sm-start gap-3 pe-2 pe-sm-4 justify-content-center"
+    >
+      <div class="w-100 w-sm-100 text-start d-flex flex-column gap-4">
+        <h1 id="hero-title">{{ about.first().hero_title }}</h1>
+        <div id="hero-description" class="d-flex flex-column gap-3">
+          {{ about.first().hero_description }}
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-md-3">
+        <a
+          href="{{ about.first().hero_secondary_cta_link.truepath() }}"
+          class="btn btn-secondary"
+        >
+          {{ about.first().hero_secondary_cta_label }}
+        </a>
+        <a
+          href="{{ about.first().hero_primary_cta_link.truepath() }}"
+          class="btn btn-primary"
+        >
+          {{ about.first().hero_primary_cta_label }}
+        </a>
+      </div>
+    </div>
+    <div
+      class="col-sm-12 col-md-7 d-flex flex-column align-items-start gap-4 pe-2 pe-sm-4 justify-content-center mt-6 mt-md-0"
+    >
+      <img
+        src="{{ about.first().hero_image.getImage() }}"
+        alt=""
+        style="width: 100%; max-width: 100%; height: auto"
+      />
+    </div>
+  </div>
+</div>
+
+<!-- prettier-ignore -->
+{{ include /components/global/brand_logos.html }}
+
+<div class="container my-5 my-sm-7 d-flex flex-column align-items-center gap-5">
+  <h1>{{ about.first().missions_title }}</h1>
+
+  {{ $missions = {about.first().missions} }}
+
+  <div class="row g-3 g-sm-5 w-100">
+    <!-- prettier-ignore -->
+    {{ each missions as mission where find_in_set(mission.zuid, '{$missions}') sort by sort_order}}
+    <div class="text-white col-sm-12 col-md-6 col-lg-4">
+      <div
+        class="d-flex flex-column gap-2 rounded-4 h-100 mission-card"
+        style="background: {{mission.bg_color}}; border: 1px solid {{mission.bg_color}};"
+      >
+        <h2 class="p-4 p-sm-4 mb-0 text-center">{{ mission.title }}</h2>
+        <div
+          style="height: 200px"
+          class="d-flex align-items-center justify-content-center bg-white w-100"
+        >
+          <img
+            src="{{mission.image.getImage()}}"
+            class="img-fluid"
+            alt=""
+            style="max-height: 150px; width: auto"
+          />
+        </div>
+        <div class="mission-description p-4 p-sm-4">
+          {{ mission.description }}
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>
+
+<!-- prettier-ignore -->
+{{ include /components/global/integrations.html }}
+
+<!-- prettier-ignore -->
+{{ include /components/global/cause_banner.html }}
+
+<div class="container d-flex align-items-center my-4 my-sm-7">
+  <div class="row">
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-center align-items-sm-start gap-3 pe-4 justify-content-center"
+    >
+      <div class="w-100 text-start d-flex flex-column gap-4">
+        <h1>{{ demo_page.first().hero_title }}</h1>
+        <div>{{ demo_page.first().hero_description }}</div>
+      </div>
+      <div class="d-flex gap-2 mt-md-3">
+        <a
+          href="{{ demo_page.first().hero_secondary_cta_link.truepath() }}"
+          class="btn btn-secondary"
+        >
+          {{ demo_page.first().hero_secondary_cta_label }}
+        </a>
+        <a data-target="#demo-section" class="btn btn-primary scroll-to-demo">
+          {{ demo_page.first().hero_primary_cta_label }}
+        </a>
+      </div>
+    </div>
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-start gap-4 pe-2 pe-sm-4 justify-content-center mt-6 mt-md-0"
+    >
+      <img
+        src="{{ demo_page.first().hero_image.getImage() }}"
+        class="rounded-4"
+        alt=""
+        style="width: 100%; max-width: 100%; height: auto"
+      />
+    </div>
+  </div>
+</div>
+
+<!-- prettier-ignore -->
+{{ include /components/global/demo.html}}
+
+<script>
+  $(document).ready(function () {
+    $("#hero-description ul").each(function () {
+      $(this).addClass("custom-bullet");
+    });
+    $(".usecase-description ul").each(function () {
+      $(this).addClass("custom-bullet");
+    });
+    $(".scroll-to-demo").click(function () {
+      var target = $(this).data("target");
+      $("html, body").animate(
+        {
+          scrollTop: $(target).offset().top - 200,
+        },
+        100
+      );
+    });
+  });
+</script>

@@ -1,0 +1,862 @@
+<style>
+  #npoDropdown,
+  #categoryDropdown {
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+  }
+  #npoDropdown .dropdown-item,
+  #categoryDropdown .dropdown-item {
+    white-space: normal;
+  }
+  #useCurrentLocation {
+    min-width: 140px;
+  }
+  .image-upload-container {
+    width: 100%;
+  }
+  .image-preview {
+    width: 100%;
+    height: 270px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #f8f9fa;
+  }
+  .preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .custom-file-input {
+    display: none;
+  }
+  #removeImageBtn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  #removeImageBtn i {
+    font-size: 14px;
+  }
+  .upload-message {
+    text-align: center;
+    padding: 20px;
+  }
+  .upload-area {
+    border: 2px dashed #ced4da;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .upload-area:hover {
+    background-color: #f8f9fa;
+  }
+  .preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .preview-item {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  .remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .add-more {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #ced4da;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  .extra-images-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+  }
+</style>
+
+<section id="storyInformationSelection" class="section-container d-none">
+  <div class="py-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img class="section-icon" src="" style="max-width: 160px" />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="section-title fs-1 fw-normal mb-0"></p>
+        <p class="section-description fs-5 text-muted mb-0 text-center"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="max-width: 480px; width: 100%">
+      <form id="storyDetailsForm" novalidate>
+        <div class="mb-4">
+          <label for="storyImages" class="form-label">
+            Story Image <span class="text-danger">*</span>
+          </label>
+          <div id="uploadArea" class="upload-area mt-3">
+            <p class="mb-1">Choose an image or drag & drop it here.</p>
+            <p class="text-muted small">
+              JPEG, PNG, and other image formats, up to 50 MB.
+            </p>
+            <button
+              id="browseButton"
+              class="btn btn-secondary mt-2"
+              type="button"
+            >
+              Browse File
+            </button>
+          </div>
+          <input
+            type="file"
+            id="fileInput"
+            style="display: none"
+            multiple
+            accept="image/jpeg,image/png,image/jpg,image/webp"
+          />
+          <div id="previewContainer" class="preview-container"></div>
+        </div>
+
+        <div class="mb-4">
+          <label for="storyDescription" class="form-label">
+            Description <span class="text-danger">*</span>
+          </label>
+          <textarea
+            class="form-control"
+            id="storyDescription"
+            rows="3"
+            required
+          ></textarea>
+          <div class="invalid-feedback">Please enter a story description.</div>
+        </div>
+
+        <div class="mb-4">
+          <label for="selectNPO" class="form-label">
+            Select Nonprofit Organization <span class="text-danger">*</span>
+          </label>
+          <div class="dropdown">
+            <input
+              type="text"
+              class="form-control"
+              id="npoSearchInput"
+              placeholder="Search NPOs..."
+              autocomplete="off"
+            />
+            <ul
+              class="dropdown-menu w-100"
+              id="npoDropdown"
+              style="max-height: 300px; overflow-y: auto"
+            >
+              <!-- NPO options will be dynamically added here -->
+            </ul>
+          </div>
+          <input type="hidden" id="selectedNPO" name="selectedNPO" required />
+          <div class="invalid-feedback">Please select an NPO.</div>
+        </div>
+
+        <div class="mb-4">
+          <label for="selectCategory" class="form-label">
+            Select Cause
+          </label>
+          <div class="dropdown">
+            <input
+              type="text"
+              class="form-control"
+              id="categorySearchInput"
+              placeholder="Search Categories..."
+              autocomplete="off"
+              disabled
+            />
+            <ul
+              class="dropdown-menu w-100"
+              id="categoryDropdown"
+              style="max-height: 300px; overflow-y: auto"
+            >
+              <!-- Category options will be dynamically added here -->
+            </ul>
+          </div>
+          <input
+            type="hidden"
+            id="selectedCategory"
+            name="selectedCategory"
+          />
+          <div class="invalid-feedback">Please select a category.</div>
+        </div>
+
+        <div class="mb-4">
+          <label for="location" class="form-label">
+            Location <span class="text-danger">*</span>
+          </label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="location" required />
+            <button
+              class="btn btn-secondary"
+              type="button"
+              id="useCurrentLocation"
+            >
+              <span
+                class="spinner-border spinner-border-sm d-none"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              <span class="button-text"
+                ><i class="bi bi-geo-alt"></i> Use Current</span
+              >
+            </button>
+          </div>
+          <div id="locationFeedback" class="invalid-feedback">
+            Please enter a location.
+          </div>
+        </div>
+      </form>
+      <button id="nextBtn" class="btn btn-primary w-100 mt-4" disabled>
+        <span
+          class="spinner-border spinner-border-sm me-2 d-none"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        Next
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  function updateNextButtonState(enable) {
+    $("#createStoryModal #nextBtn").prop("disabled", enable);
+  }
+
+  $(document).ready(async function () {
+    const localUser = localStorage.getItem("user");
+    const userData = await getZestyUser(JSON.parse(localUser).zuid);
+
+    const heroImageInput = $("#heroImageInput");
+    const imagePreview = $("#imagePreview");
+    const previewImage = $("#previewImage");
+    const removeImageBtn = $("#removeImageBtn");
+    const uploadMessage = $("#uploadMessage");
+    const npoSearchInput = $("#npoSearchInput");
+    const npoDropdown = $("#npoDropdown");
+    const selectedNPO = $("#selectedNPO");
+    const categorySearchInput = $("#categorySearchInput");
+    const categoryDropdown = $("#categoryDropdown");
+    const selectedCategory = $("#selectedCategory");
+    const locationInput = $("#location");
+    const locationFeedback = $("#locationFeedback");
+    const useCurrentLocationBtn = $("#useCurrentLocation");
+    const locationSpinner = useCurrentLocationBtn.find(".spinner-border");
+    const locationButtonText = useCurrentLocationBtn.find(".button-text");
+    const nextBtn = $("#nextBtn");
+    const storyDescription = $("#storyDescription");
+
+    // Add image to validation state
+    window.validationState = {
+      storyImage: false,
+      storyDescription: false,
+      selectedNPO: false,
+      location: false,
+    };
+
+    heroImageInput.on("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewImage.attr("src", e.target.result).removeClass("d-none");
+          uploadMessage.addClass("d-none");
+          removeImageBtn.removeClass("d-none");
+          // uploadHeroImage();
+          validationState.storyImage = true;
+          checkAllValid();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        resetImagePreview();
+      }
+    });
+
+    function resetImagePreview() {
+      previewImage.attr("src", "").addClass("d-none");
+      uploadMessage.removeClass("d-none");
+      removeImageBtn.addClass("d-none");
+      validationState.storyImage = false;
+      checkAllValid();
+    }
+
+    function validateStoryDescription() {
+      const value = storyDescription.val().trim();
+      if (value === "") {
+        storyDescription.addClass("is-invalid");
+        validationState.storyDescription = false;
+      } else {
+        storyDescription.removeClass("is-invalid").addClass("is-valid");
+        validationState.storyDescription = true;
+      }
+      checkAllValid();
+    }
+
+    function validateSelectedNPO() {
+      const value = selectedNPO.val().trim();
+      if (value === "") {
+        npoSearchInput.addClass("is-invalid");
+        validationState.selectedNPO = false;
+      } else {
+        npoSearchInput.removeClass("is-invalid").addClass("is-valid");
+        validationState.selectedNPO = true;
+      }
+      checkAllValid();
+    }
+
+    function validateLocation() {
+      const value = locationInput.val().trim();
+      if (value === "") {
+        locationInput.addClass("is-invalid");
+        locationFeedback.text("Please enter a location.");
+        validationState.location = false;
+      } else {
+        locationInput.removeClass("is-invalid").addClass("is-valid");
+        validationState.location = true;
+      }
+      checkAllValid();
+    }
+
+    function checkAllValid() {
+      const allValid = Object.values(validationState).every(Boolean);
+      updateNextButtonState(!allValid);
+    }
+
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    window.searchNPOs = function (searchTerm) {
+      const limit = searchTerm ? 20 : 100;
+
+      const userNpoIds =
+        userData.user && userData.user.data.favorite_npos != ""
+          ? userData.user.data.favorite_npos.split(",")
+          : [];
+
+      // Function to fetch a single NPO by its ID
+      const fetchSingleNPO = (npoId) => {
+        return $.ajax({
+          url: "https://causecircle.org/mobileapp/npos.json",
+          method: "GET",
+          data: {
+            limit: 1,
+            zuid: npoId,
+          },
+        }).then((response) =>
+          response.data && response.data.length > 0 ? response.data[0] : null
+        );
+      };
+
+      // Fetch user's favorite NPOs
+      const fetchUserNPOs = Promise.all(userNpoIds.map(fetchSingleNPO));
+
+      // Fetch search results or all NPOs
+      const fetchSearchNPOs = $.ajax({
+        url: "https://causecircle.org/mobileapp/npos.json",
+        method: "GET",
+        data: {
+          limit: limit,
+          search: searchTerm,
+          page: 1,
+        },
+      });
+
+      // Use Promise.all to wait for all requests to complete
+      Promise.all([fetchUserNPOs, fetchSearchNPOs])
+        .then(([userNpoData, searchNposResponse]) => {
+          // Filter out null values (NPOs that couldn't be fetched)
+          userNpoData = userNpoData.filter((npo) => npo !== null);
+          const searchNpoData = searchNposResponse.data || [];
+
+          // Sort user NPOs alphabetically
+          userNpoData.sort((a, b) => a.name.localeCompare(b.name));
+          // Sort search NPOs alphabetically
+          searchNpoData.sort((a, b) => a.name.localeCompare(b.name));
+
+          npoDropdown.empty();
+
+          if (userNpoData.length > 0 || searchNpoData.length > 0) {
+            window.npo_data = [...userNpoData, ...searchNpoData];
+
+            if (searchTerm === "") {
+              // Add "Your Nonprofits" section if user has favorite NPOs
+              if (userNpoData.length > 0) {
+                npoDropdown.append(
+                  '<li><h5 class="dropdown-header text-primary fst-italic">Your Nonprofits</h5></li>'
+                );
+                userNpoData.forEach((npo) => {
+                  npoDropdown.append(
+                    `<li><a class="dropdown-item" href="#" data-npo-id="${npo.meta.zuid}">${npo.name}</a></li>`
+                  );
+                });
+                // Add a divider if there are other NPOs to display
+                if (searchNpoData.length > 0) {
+                  npoDropdown.append('<li><hr class="dropdown-divider"></li>');
+                }
+              }
+
+              // Add "Other Nonprofits" section
+              if (searchNpoData.length > 0) {
+                npoDropdown.append(
+                  '<li><h5 class="dropdown-header text-primary fst-italic">Other Nonprofits</h5></li>'
+                );
+                searchNpoData.forEach((npo) => {
+                  if (!userNpoIds.includes(npo.meta.zuid)) {
+                    npoDropdown.append(
+                      `<li><a class="dropdown-item" href="#" data-npo-id="${npo.meta.zuid}">${npo.name}</a></li>`
+                    );
+                  }
+                });
+              }
+            } else {
+              // If there's a search term, show all matching NPOs without headers
+              searchNpoData.forEach((npo) => {
+                npoDropdown.append(
+                  `<li><a class="dropdown-item" href="#" data-npo-id="${npo.meta.zuid}">${npo.name}</a></li>`
+                );
+              });
+            }
+          } else {
+            npoDropdown.append(
+              '<li><span class="dropdown-item">No NPOs found</span></li>'
+            );
+          }
+          npoDropdown.show();
+        })
+        .catch((error) => {
+          console.error("Error fetching NPOs:", error);
+          npoDropdown
+            .empty()
+            .append(
+              '<li><span class="dropdown-item">Error fetching NPOs</span></li>'
+            );
+          npoDropdown.show();
+        });
+    };
+
+    function searchCategories(searchTerm = "", npo, shouldShowDropdown = true) {
+      categoryDropdown.empty();
+      if (!npo || !npo.category || !npo.category.data) {
+        categoryDropdown.append(
+          '<li><span class="dropdown-item">No categories available</span></li>'
+        );
+        categoryDropdown.show();
+        return;
+      }
+
+      let categories = npo.category.data;
+
+      if (searchTerm) {
+        const searchTermLower = searchTerm.toLowerCase();
+        categories = categories.filter((category) =>
+          category.title.toLowerCase().includes(searchTermLower)
+        );
+      }
+
+      if (categories.length > 0) {
+        // Sort categories alphabetically by title
+        categories.sort((a, b) => a.title.localeCompare(b.title));
+        window.category_data = categories;
+        categories.forEach((category) => {
+          categoryDropdown.append(
+            `<li><a class="dropdown-item" href="#" data-category-id="${category.meta.zuid}">${category.title}</a></li>`
+          );
+        });
+      } else {
+        categoryDropdown.append(
+          '<li><span class="dropdown-item">No categories found</span></li>'
+        );
+      }
+      if (shouldShowDropdown) {
+        categoryDropdown.show();
+      }
+    }
+
+    const debouncedSearchNPO = debounce(function () {
+      const searchTerm = npoSearchInput.val().trim();
+      searchNPOs(searchTerm);
+    }, 300);
+
+    const debouncedSearchCategory = debounce(function () {
+      const searchTerm = categorySearchInput.val().trim();
+      const selectedNPOId = selectedNPO.val();
+      const selectedNPOData = window.npo_data?.find(npo => npo.meta.zuid === selectedNPOId);
+      searchCategories(searchTerm, selectedNPOData);
+    }, 300);
+
+    removeImageBtn.on("click", function () {
+      heroImageInput.val("");
+      resetImagePreview();
+    });
+
+    npoSearchInput.on("input", debouncedSearchNPO);
+    categorySearchInput.on("input", debouncedSearchCategory);
+
+    // Validation Events
+    storyDescription.on("input focus", validateStoryDescription);
+    npoSearchInput.on("input focus", validateSelectedNPO);
+    locationInput.on("input focus", validateLocation);
+
+    // Trigger search on focus
+    npoSearchInput.on("focus", function () {
+      if (npoDropdown.children().length === 0) {
+        searchNPOs("");
+      } else {
+        npoDropdown.show();
+      }
+    });
+
+    categorySearchInput.on("focus", function () {
+      if (categoryDropdown.children().length === 0) {
+        const selectedNPOId = selectedNPO.val();
+        if (!selectedNPOId) {
+          categoryDropdown.empty();
+          categoryDropdown.append(
+            '<li><span class="dropdown-item">Please select an NPO first</span></li>'
+          );
+          categoryDropdown.show();
+          return;
+        }
+
+        const selectedNPOData = window.npo_data?.find(npo => npo.meta.zuid === selectedNPOId);
+        searchCategories("", selectedNPOData, true);
+      } else {
+        categoryDropdown.show();
+      }
+    });
+
+    npoDropdown.on("click", "a.dropdown-item", function (e) {
+      e.preventDefault();
+      const npoId = $(this).data("npo-id");
+      const npoName = $(this).text();
+      selectedNPO.val(npoId);
+      npoSearchInput.val(npoName);
+      npoDropdown.hide();
+      validateSelectedNPO();
+
+      // Deselect any selected category
+      selectedCategory.val("");
+      categorySearchInput.val("");
+      
+      // Enable category input and refresh categories
+      categorySearchInput.prop("disabled", false);
+      const selectedNPOData = window.npo_data?.find(npo => npo.meta.zuid === npoId);
+      searchCategories("", selectedNPOData, false);
+    });
+
+    categoryDropdown.on("click", "a.dropdown-item", function (e) {
+      e.preventDefault();
+      const categoryId = $(this).data("category-id");
+      const categoryName = $(this).text();
+      selectedCategory.val(categoryId);
+      categorySearchInput.val(categoryName);
+      categoryDropdown.hide();
+      // Remove category validation
+      // validateSelectedCategory();
+    });
+
+    $(document).on("click", function (e) {
+      if (!$(e.target).closest(".dropdown").length) {
+        npoDropdown.hide();
+        categoryDropdown.hide();
+      }
+    });
+
+    // Initial NPO and Category load
+    // searchNPOs("");
+    // searchCategories("");
+
+    useCurrentLocationBtn.on("click", function () {
+      if ("geolocation" in navigator) {
+        // Show loading spinner and disable button
+        locationSpinner.removeClass("d-none");
+        locationButtonText.addClass("d-none");
+        useCurrentLocationBtn.prop("disabled", true);
+
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            $.ajax({
+              url: `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
+              type: "GET",
+              dataType: "json",
+              success: function (data) {
+                if (data.address) {
+                  const city =
+                    data.address.city ||
+                    data.address.town ||
+                    data.address.village ||
+                    "";
+                  const state = data.address.state || "";
+                  const country = data.address.country || "";
+
+                  let locationString = [city, state, country]
+                    .filter(Boolean)
+                    .join(", ");
+                  locationInput.val(locationString);
+                  locationInput.removeClass("is-invalid is-valid");
+                  locationInput.addClass("is-valid");
+                  locationFeedback.text("");
+                  validationState.location = true;
+                } else {
+                  locationInput.addClass("is-invalid");
+                  locationFeedback.text(
+                    "Unable to determine location. Please enter manually."
+                  );
+                  validationState.location = false;
+                }
+              },
+              error: function () {
+                locationInput.addClass("is-invalid");
+                locationFeedback.text(
+                  "Error fetching location. Please enter manually."
+                );
+                validationState.location = false;
+              },
+              complete: function () {
+                // Hide loading spinner and enable button
+                locationSpinner.addClass("d-none");
+                locationButtonText.removeClass("d-none");
+                useCurrentLocationBtn.prop("disabled", false);
+                checkAllValid();
+              },
+            });
+          },
+          function (error) {
+            locationInput.addClass("is-invalid");
+            locationFeedback.text(
+              "Error: " + error.message + ". Please enter location manually."
+            );
+            // Hide loading spinner and enable button
+            locationSpinner.addClass("d-none");
+            locationButtonText.removeClass("d-none");
+            useCurrentLocationBtn.prop("disabled", false);
+            validationState.location = false;
+            checkAllValid();
+          }
+        );
+      } else {
+        locationInput.addClass("is-invalid");
+        locationFeedback.text(
+          "Geolocation is not supported by your browser. Please enter location manually."
+        );
+        validationState.location = false;
+        checkAllValid();
+      }
+    });
+
+    // Initial validation check
+    updateNextButtonState(true);
+
+    const uploadArea = document.getElementById("uploadArea");
+    const fileInput = document.getElementById("fileInput");
+    const browseButton = document.getElementById("browseButton");
+    const previewContainer = document.getElementById("previewContainer");
+    let uploadedFiles = [];
+
+    uploadArea.addEventListener("click", () => fileInput.click());
+
+    browseButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    uploadArea.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadArea.style.backgroundColor = "#f8f9fa";
+    });
+
+    uploadArea.addEventListener("dragleave", () => {
+      uploadArea.style.backgroundColor = "";
+    });
+
+    uploadArea.addEventListener("drop", (e) => {
+      e.preventDefault();
+      uploadArea.style.backgroundColor = "";
+      handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener("change", () => {
+      handleFiles(fileInput.files);
+    });
+
+    function handleFiles(files) {
+      // Only take the first file
+      const file = files[0];
+
+      if (file && file.type.startsWith("image/")) {
+        // Replace the existing files array with just the new file
+        uploadedFiles = [file];
+        window.hero_image = uploadedFiles;
+        updatePreviews();
+      }
+    }
+
+    function updatePreviews() {
+      previewContainer.innerHTML = "";
+
+      if (uploadedFiles.length === 1) {
+        const previewItem = document.createElement("div");
+        previewItem.classList.add("preview-item");
+
+        const preview = document.createElement("img");
+        preview.classList.add("preview-image");
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          preview.src = e.target.result;
+        };
+        reader.readAsDataURL(uploadedFiles[0]);
+
+        const removeBtn = document.createElement("button");
+        removeBtn.classList.add("remove-btn");
+        removeBtn.innerHTML = "&times;";
+        removeBtn.addEventListener("click", () => removeFile(0));
+
+        previewItem.appendChild(preview);
+        previewItem.appendChild(removeBtn);
+
+        previewContainer.appendChild(previewItem);
+      }
+
+      updateUploadArea();
+      validationState.storyImage = uploadedFiles.length > 0;
+      checkAllValid();
+    }
+
+    function removeFile() {
+      uploadedFiles = [];
+      window.hero_image = [];
+      updatePreviews();
+    }
+
+    function updateUploadArea() {
+      if (uploadedFiles.length > 0) {
+        uploadArea.style.display = "none";
+        // Keep the add more button for replacing the image
+        if (!document.querySelector(".add-more")) {
+          const addMore = document.createElement("div");
+          addMore.classList.add("add-more");
+          addMore.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-image" viewBox="0 0 16 16"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/><path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/></svg>';
+          addMore.addEventListener("click", () => fileInput.click());
+          previewContainer.insertBefore(addMore, previewContainer.firstChild);
+        }
+      } else {
+        uploadArea.style.display = "block";
+        const addMore = document.querySelector(".add-more");
+        if (addMore) {
+          addMore.remove();
+        }
+      }
+    }
+
+    window.resetAllStates = function () {
+      // Reset validation state
+      validationState = {
+        storyImage: false,
+        storyDescription: false,
+        selectedNPO: false,
+        location: false,
+      };
+
+      // Reset uploaded files
+      uploadedFiles = [];
+      window.hero_image = [];
+      updatePreviews();
+
+      // Reset form fields
+      $("#storyDetailsForm")[0].reset();
+
+      // Remove validation classes
+      $("#storyDetailsForm .form-control").removeClass("is-valid is-invalid");
+
+      // Reset dropdown selections
+      $("#selectedNPO").val("");
+      $("#selectedCategory").val("");
+      $("#npoSearchInput").val("").removeClass("is-valid is-invalid");
+      $("#categorySearchInput").val("").removeClass("is-valid is-invalid").prop("disabled", true);
+
+      // Reset location field
+      $("#location").val("").removeClass("is-valid is-invalid");
+      $("#locationFeedback").text("Please enter a location.");
+
+      // Hide dropdown menus
+      $("#npoDropdown").hide();
+      $("#categoryDropdown").hide();
+
+      // Hide image preview and reset upload area
+      $("#imagePreview").attr("src", "").addClass("d-none");
+      $("#uploadMessage").removeClass("d-none");
+      $("#removeImageBtn").addClass("d-none");
+
+      // Clear preview container
+      $("#previewContainer").empty();
+
+      // Optionally, reset any global variables or additional states
+      window.npo_data = [];
+      window.category_data = [];
+
+      // Reset Next button state
+      updateNextButtonState(true);
+    };
+  });
+</script>

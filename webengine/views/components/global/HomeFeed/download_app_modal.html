@@ -1,0 +1,85 @@
+<style>
+  .logo-img {
+    height: 28px;
+    width: auto;
+  }
+
+  .hero-img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+  }
+
+  .store-button {
+    height: 40px;
+    width: auto;
+    transition: transform 0.2s;
+  }
+
+  .store-button:hover {
+    transform: scale(1.05);
+  }
+</style>
+
+<div
+  class="modal fade"
+  id="downloadModal"
+  tabindex="-1"
+  aria-labelledby="downloadModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <img
+          src="https://4xxglxlj.media.zestyio.com/Asset-2--1-.png"
+          alt="CauseCircle Logo"
+          class="logo-img"
+        />
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body text-center px-4">
+        <img
+          src="https://4xxglxlj.media.zestyio.com/download_hero.png"
+          alt="CauseCircle App Screenshots"
+          class="hero-img my-3"
+        />
+        <h2 class="fs-3 fw-bold mb-2">
+          Download the CauseCircle app to share even more stories.
+        </h2>
+        <p class="text-muted mb-4">
+          Your journey begins here. Come make a difference.
+        </p>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+          <a
+            href="https://play.google.com/store/apps/details?id=causecircle.org&pcampaignid=web_share"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="https://4xxglxlj.media.zestyio.com/google_download.png"
+              alt="Get it on Google Play"
+              class="store-button"
+            />
+          </a>
+          <a
+            href="https://apps.apple.com/us/app/causecircle/id6593386907"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="https://4xxglxlj.media.zestyio.com/apple_download.png"
+              alt="Download on the App Store"
+              class="store-button"
+            />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

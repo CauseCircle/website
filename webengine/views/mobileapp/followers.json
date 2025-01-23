@@ -1,0 +1,14 @@
+{{ $count = 0 }}
+{
+  "data" : [
+    {{each users as userData }}
+    {{ $count = {userData._length} }}
+    "test": {{ {userData.followed_users} }}
+    {{ userData._arraycomma }}
+    {{/each}}
+  ],
+  "meta" : {
+    "zuid" : "{{get_var.zuid}}",
+    "count" : {{ $count }}
+  }
+}

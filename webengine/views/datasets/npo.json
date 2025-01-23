@@ -1,0 +1,75 @@
+{{$skip = 0 }}
+{{$limit = 0 }}
+{{$totalNpo = 0}}
+{{$sort = desc}}
+{{$filter = "" }}
+
+
+{{if {request.queryParam(skip)} }}
+{{$skip = {request.queryParam(skip)} }}
+{{else}}
+{{$skip = 0}}
+{{end-if}}
+
+
+{{if {request.queryParam(limit)} }}
+{{$limit = {request.queryParam(limit)} }}
+{{else}}
+{{$limit = 10}}
+{{end-if}}
+
+{{if {request.queryParam(sort)} &&  {request.queryParam(sort)} === 'asc'}}
+{{$sort = asc }}
+{{else}}
+{{$sort = desc }}
+{{end-if}}
+
+
+{{if {request.queryParam(filter)} }}
+{{$filter = "%{request.queryParam(filter)}%" }}
+{{else}}
+{{$filter = "%%" }}
+{{end-if}}
+
+{{if {request.queryParam(cause)} }}
+{{$cause = "{request.queryParam(cause)}" }}
+{{else}}
+{{$cause = "" }}
+{{end-if}}
+
+{{each non_profits as npo}}
+{{$totalNpo = {npo._num} }}
+{{/each}}
+
+{
+    "data": [
+        {{each non_profits as npo where npo.name like {$filter} limit {$skip}, {$limit} }}
+        {
+            "name": "{{npo.name}}",
+            "phone_number": "{{npo.phone_number}}",
+            "headquarters_address": "{{npo.headquarters_address}}",
+            "organization_type": "{{npo.organization_type}}",
+            "logo": "{{npo.logo.getImage()}}",
+            "hero_image": "{{npo.hero_image.getImage()}}",
+            "cause_description": "{{npo.cause_description.escapeForJS()}}",
+            "website": "{{npo.website}}",
+            "donate_link": "{{npo.donate_link}}",
+            "donate_embed": "{{npo.donate_embed}}",
+            "causes": "{{npo.category}}",
+            "zuid": "{{z.zuid}}",
+            "href": "{{npo.path_full}}"
+
+        }{{npo._arraycomma}}
+        {{/each}}
+    ],
+    "meta": {
+        "skip": {{$skip}},
+        "limit": {{$limit}},
+        "page": {{math({$skip} / {$limit} + 1)}},
+        "pages": {{ math(round({$totalNpo} / {$limit})) }},
+        "totalItems": {{$totalNpo}},
+        "sort": "{{$sort}}",
+        "filter": {{$filter}},
+        "cause": {{$cause}}
+    }
+}

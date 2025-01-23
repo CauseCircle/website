@@ -1,0 +1,64 @@
+{{ $skip = 0 }}
+{{ $limit = 0 }}
+{{ $page = 1 }}
+{{ $totalStories = 0 }}
+{{ $sort = desc }}
+
+{{ $title = "" }}
+
+{{ if {request.queryParam(limit)} }}
+    {{ $limit = {request.queryParam(limit)} }}
+    {{ if {$limit} > 5000 }}
+        {{ $limit = 5000 }}
+    {{ end-if }}
+{{ else }}
+    {{ $limit = 100 }}
+{{ end-if }}
+
+{{ if {request.queryParam(page)} }}
+    {{ $page = {request.queryParam(page)} }}
+    {{ if {$page} < 1 }}
+      {{ $page = 1 }}
+    {{ end-if }}
+{{ else }}
+    {{ $page = 1 }}
+{{ end-if }}
+
+{{ if {request.queryParam(sort)} && {request.queryParam(sort)} === 'asc' }}
+    {{ $sort = asc }}
+{{ else }}
+    {{ $sort = desc }}
+{{ end-if }}
+
+{{ if {request.queryParam(title)} }}
+    {{ $title = "%{request.queryParam(title)}%" }}
+{{ else }}
+    {{ $title = "%%" }}
+{{ end-if }}
+
+{{ $skip = {math( ( {$page} - 1) * {$limit} ) }  }}
+
+
+{
+    "data": [
+        {{ each stories as story where story.title like {$title} sort by title {$sort} limit {$skip}, {$limit} }}
+        {{ $totalStories = {story._num} }}
+        {
+        "meta": {
+            "ZUID": "{{story.zuid}}",
+            "masterZUID": "{{story.zuid}}",
+            "contentModelZUID": "{{story.set_zuid}}",
+        },
+        "data": {/{ story.toJSON(2, false) }/}
+        }
+        {{ story._arraycomma }}
+        {{/each}}
+    ],
+    "_meta": {
+        "timestamp": "{{ instance.date('Y-m-d\TH:i:s.u\Z') }}",
+        "totalResults": {{ $totalStories }},
+        "start": {{ $skip }},
+        "offset": {{ $skip }},
+        "limit": {{ $limit }}
+    }
+}

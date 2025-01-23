@@ -1,0 +1,35 @@
+<div
+  id="faqs-section"
+  class="container"
+  style="margin-top: 100px; margin-bottom: 100px"
+>
+  <div class="d-flex flex-column gap-2">
+    <h1>Frequently Asked Questions</h1>
+    <div class="accordion" id="faqs">
+      {{each faqs as faq sort by sort_order}}
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{faq._index}}">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse{{faq._index}}"
+            aria-expanded="false"
+            aria-controls="collapse{{faq._index}}"
+          >
+            {{faq.question}}
+          </button>
+        </h2>
+        <div
+          id="collapse{{faq._index}}"
+          class="accordion-collapse collapse"
+          aria-labelledby="heading{{faq._index}}"
+          data-bs-parent="#faqs"
+        >
+          <div class="accordion-body">{{faq.answer}}</div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>

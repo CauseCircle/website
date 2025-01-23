@@ -1,0 +1,354 @@
+<style>
+  .hero-title p,
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  .section-title p,
+  .section-title {
+    font-size: 2rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  .hero-description p,
+  .hero-description {
+    font-size: 1.125rem;
+    font-weight: 400;
+    text-align: center;
+    color: var(--bs-gray-500);
+    max-width: 53.125rem;
+  }
+
+  @media (max-width: 767.98px) {
+    .hero-description-text p,
+    .hero-description-text {
+      text-shadow: 1px 1px 3px white;
+      color: var(--bs-gray-600);
+    }
+  }
+  .hero-container {
+    max-width: 750px;
+  }
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    max-height: 25.625rem;
+    object-fit: contain;
+  }
+
+  /* Logo Container */
+  .logo-container {
+    overflow: hidden;
+  }
+
+  .logo-track {
+    display: flex;
+    animation: scroll infinite linear;
+  }
+
+  .logo {
+    object-fit: contain;
+    width: auto;
+    max-height: 80px;
+    flex-shrink: 0;
+    animation: rotate 8s linear infinite;
+  }
+
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  .card {
+    border-radius: 16px;
+  }
+  .btn {
+    border-radius: 8px;
+  }
+  #causes-section {
+    background-color: var(--bs-purple);
+  }
+  .causes-description p,
+  .causes-description {
+    color: var(--bs-white);
+  }
+
+  #get-started-section {
+    background-color: #f5f7fa;
+  }
+
+  .text-start p,
+  .text-start * {
+    text-align: start;
+  }
+
+  #hero-section {
+    min-height: 680px;
+    background-image: url("https://4xxglxlj.media.zestyio.com/homepage_bg.png");
+    background-size: cover;
+    background-position: center;
+  }
+</style>
+
+<!--Hero section-->
+<section id="hero-section" class="container-fluid">
+  <div class="container py-5">
+    <div
+      class="d-flex flex-column align-items-center gap-4 hero-container mx-auto"
+    >
+      <div class="hero-title">
+        {{ this.title }}
+      </div>
+      <div class="hero-description hero-description-text">
+        {{ this.description }}
+      </div>
+      <div class="d-flex gap-2">
+        <a
+          href="{{ login_page.first().getUrl() }}"
+          class="btn btn-primary signin-btn d-none"
+        >
+          {{ this.primary_cta_label }}
+        </a>
+        <a href="" class="btn btn-secondary">
+          {{ this.secondary_cta_label }}
+        </a>
+      </div>
+    </div>
+  </div>
+  <div>
+    <img
+      src="{{ this.hero_image.getImage() }}"
+      alt=""
+      class="hero-image d-none"
+    />
+  </div>
+</section>
+
+<!--Logo section-->
+<section
+  id="logo-section"
+  class="container-fluid py-5 d-flex flex-column gap-3"
+>
+  <p class="text-center mx-auto hero-description">
+    {{ this.logos_title }}
+  </p>
+  <div class="d-flex flex-column gap-3 overflow-x-auto invisible-scroll mx-2">
+    <div class="logo-container">
+      <div
+        class="logo-track d-flex gap-6 justify-content-start justify-content-xl-center"
+      >
+        <!--prettier-ignore-->
+        {{each {this.logos} as logo}}
+        <img
+          src="{{ logo.logo.getImage() }}"
+          alt="logo"
+          class="logo"
+          style="object-fit: contain; width: auto; max-height: 80px"
+        />
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--Feature stories section-->
+<section id="feature-stories-section" class="container py-5">
+  <div class="d-flex flex-column gap-3">
+    <p class="section-title">{{ this.stories_title }}</p>
+    <div class="hero-description mx-auto">
+      {{ this.stories_description }}
+    </div>
+    <div class="row pt-3 row-gap-3">
+      {{each {this.stories} as story limit 4}}
+      <div class="col-12 col-sm-6 col-md-3">
+        <!--prettier-ignore-->
+        {{ include /components/global/story_card.html }}
+      </div>
+      {{/each}}
+    </div>
+    <div class="d-flex justify-content-center pt-3">
+      <a
+        href="{{ stories_landing_page.first().path_full }}"
+        class="btn btn-secondary mx-auto"
+      >
+        {{ this.stories_cta_label }}
+      </a>
+    </div>
+  </div>
+</section>
+
+<!--Causes section-->
+<section id="causes-section" class="py-5">
+  <div class="container">
+    <div class="d-flex flex-column gap-3">
+      <p class="section-title text-white">{{ this.causes_title }}</p>
+      <div class="hero-description causes-description mx-auto">
+        {{ this.causes_description }}
+      </div>
+      <div class="row pt-3">
+        {{each {this.causes} as cause limit 6 }}
+        <div class="col-12 col-sm-6 col-md-2">
+          <!--prettier-ignore-->
+          {{ include /components/global/causes_card.html }}
+        </div>
+        {{/each}}
+      </div>
+      <div class="d-flex justify-content-center pt-3">
+        <a
+          href="{{ causes_landing_page.first().path_full }}"
+          class="btn btn-secondary mx-auto"
+        >
+          {{ this.causes_cta_label }}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--NPO section-->
+<section id="npo-section" class="container py-5">
+  <div class="d-flex flex-column gap-3">
+    <p class="section-title">{{ this.npo_title }}</p>
+    <div class="hero-description mx-auto">
+      {{ this.npo_description }}
+    </div>
+    <div class="row pt-3 row-gap-3">
+      {{each {this.npos} as npo limit 4 }}
+      <div class="col-12 col-sm-6 col-md-3">
+        <!--prettier-ignore-->
+        {{ include /components/global/npo_card.html }}
+      </div>
+      {{/each}}
+    </div>
+    <div class="d-flex justify-content-center pt-3">
+      <a
+        href="{{ non_profits_landing_page.first().path_full }}"
+        class="btn btn-secondary mx-auto"
+      >
+        {{ this.npo_cta_label }}
+      </a>
+    </div>
+  </div>
+</section>
+
+<!--Use Cases section-->
+<section id="use-cases-section" class="container py-5">
+  <div class="d-flex flex-column gap-3">
+    <p class="section-title">{{ this.use_cases_title }}</p>
+    <div class="hero-description mx-auto">
+      {{ this.use_cases_description }}
+    </div>
+    <div class="row pt-3 row-gap-5">
+      {{each {this.use_cases} as use_case limit 3}}
+      <div class="col-12 col-sm-6 col-md-4">
+        <!--prettier-ignore-->
+        {{ include /components/global/usecases_card.html }}
+      </div>
+      {{/each}}
+    </div>
+    <div class="d-flex justify-content-center pt-3">
+      <a
+        href="{{ demo_page.first().path_full }}"
+        class="btn btn-primary mx-auto"
+      >
+        {{ this.use_cases_cta_label }}
+      </a>
+    </div>
+  </div>
+</section>
+
+<!--Download section-->
+<section id="download-section" class="container-fluid container-md py-5">
+  <div
+    class="row position-relative flex-column flex-md-row"
+    style="
+      background-color: var(--bs-purple);
+      border-radius: 0;
+      border-radius: 1rem;
+    "
+  >
+    <div class="col-12 col-md-6 p-4 p-md-5">
+      <div
+        class="d-flex flex-column gap-3 align-items-start justify-content-center h-100"
+      >
+        <p class="section-title text-white text-start">
+          {{ this.app_section_title }}
+        </p>
+        <div class="hero-description causes-description text-start">
+          {{ this.app_section_description }}
+        </div>
+        <div>
+          <a href="" class="btn btn-secondary">
+            {{ this.app_section_cta_label }}
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6 overflow-hidden">
+      <img
+        src="{{ this.app_section_image.getImage() }}"
+        alt=""
+        class="img-fluid w-100"
+        style="object-fit: contain; max-height: 29.25rem"
+      />
+    </div>
+  </div>
+</section>
+
+<!--Get started section-->
+<section id="get-started-section" class="container-fluid pt-5">
+  <div class="container">
+    <div
+      class="d-flex flex-column gap-3 align-items-center justify-content-center"
+    >
+      <p class="section-title text-center">Ready to Make a Difference?</p>
+      <div class="hero-description mx-auto">
+        Start exploring causes and nonprofits to today.
+      </div>
+      <div class="py-3">
+        <a href="{{ demo_page.first().path_full }}" class="btn btn-primary">
+          Get Started
+        </a>
+      </div>
+      <img
+        src="https://4xxglxlj.media.zestyio.com/layer-2-1.png"
+        alt=""
+        style="height: 12.375rem; object-fit: contain"
+      />
+    </div>
+  </div>
+</section>
+
+<!--scripts-->
+<script>
+  function setupLogoAnimation() {
+    const $container = $(".logo-container");
+    const $track = $(".logo-track");
+    const $logos = $track.children();
+    const logoWidth = $logos.first().outerWidth();
+    const containerWidth = $container.outerWidth();
+    const scrollSpeed = 5;
+    const logosNeeded = Math.ceil(containerWidth / logoWidth) + 1;
+
+    // Duplicate logos
+    const totalLogos = $logos.length;
+    for (let i = 0; i < logosNeeded * totalLogos; i++) {
+      $track.append($logos.eq(i % totalLogos).clone());
+    }
+
+    // Adjust track width and animation duration
+    const trackWidth = $track[0].scrollWidth;
+    $track.css({
+      width: `${trackWidth}px`,
+      "animation-duration": `${(trackWidth / logoWidth) * scrollSpeed}s`,
+    });
+  }
+
+  $(document).ready(function () {
+    setupLogoAnimation();
+  });
+</script>

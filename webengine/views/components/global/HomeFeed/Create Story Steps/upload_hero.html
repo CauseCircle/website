@@ -1,0 +1,179 @@
+<style>
+  .image-upload-container {
+    width: 100%;
+  }
+  .image-preview {
+    width: 100%;
+    height: 270px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #f8f9fa;
+  }
+  .preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .custom-file-input {
+    display: none;
+  }
+  #removeImageBtn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  #removeImageBtn i {
+    font-size: 14px;
+  }
+  .upload-message {
+    text-align: center;
+    padding: 20px;
+  }
+</style>
+
+<section id="uploadHeroImageSelection" class="section-container">
+  <div class="py-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img class="section-icon" src="" style="max-width: 160px" />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="section-title fs-1 fw-normal mb-0"></p>
+        <p class="section-description fs-5 text-muted mb-0"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="max-width: 480px; width: 100%">
+      <div class="image-upload-container">
+        <div id="imagePreview" class="image-preview mb-3">
+          <div
+            id="uploadMessage"
+            class="d-flex flex-column gap-2 align-items-center upload-message"
+          >
+            <p>Choose a file or drag & drop it here.</p>
+            <p>JPEG, PNG, GIF, BMP, TIFF, and WEBP formats.</p>
+            <label class="btn btn-secondary mt-2" for="heroImageInput"
+              >Choose Image</label
+            >
+          </div>
+          <img
+            id="previewImage"
+            class="preview-image d-none"
+            src=""
+            alt="Preview"
+          />
+          <button
+            id="removeImageBtn"
+            class="btn position-absolute top-0 end-0 m-2 d-none rounded-circle bg-white"
+          >
+            <i class="bi bi-x text-black"></i>
+          </button>
+        </div>
+        <input
+          type="file"
+          class="custom-file-input btn btn-outline-secondary w-100"
+          id="heroImageInput"
+          accept="image/*"
+        />
+        <button id="nextBtn" class="btn btn-primary w-100 mt-4">Next</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function updateNextButtonState(enable) {
+    $("#createStoryModal #nextBtn").prop("disabled", enable);
+  }
+
+  function uploadHeroImage() {
+    const heroImageInput = $("#heroImageInput");
+    const file = heroImageInput[0].files[0];
+
+    if (!file) {
+      alert("Please select an image to upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("bin_id", "1-114d3b24-8tkmzd");
+    formData.append("group_id", "1-114d3b24-8tkmzd");
+
+    const authToken = "PTK-7s2jvqh3tq5q9421m6hh34zwlkt3dbfrg0vszfp69lhzl";
+
+    $.ajax({
+      url: "https://media-storage.api.zesty.io/upload/gcp/zesty-8497a10216721e22d9db331448fbfb8b46ebee3c",
+      type: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        // console.log("Image uploaded successfully:", response);
+        updateNextButtonState(false);
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.error("Image upload failed:", textStatus, errorThrown);
+        alert("Failed to upload image. Please try again.");
+      },
+    });
+  }
+
+  $(document).ready(function () {
+    // $("#createStoryModal #nextBtn").on("click", function () {
+    //   window.hero_image = $("#previewImage").attr("src");
+    //   printStates();
+    // });
+    const heroImageInput = $("#heroImageInput");
+    const imagePreview = $("#imagePreview");
+    const previewImage = $("#previewImage");
+    const removeImageBtn = $("#removeImageBtn");
+    const uploadMessage = $("#uploadMessage");
+
+    heroImageInput.on("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewImage.attr("src", e.target.result).removeClass("d-none");
+          uploadMessage.addClass("d-none");
+          removeImageBtn.removeClass("d-none");
+          // uploadHeroImage();
+          updateNextButtonState(false);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        resetImagePreview();
+      }
+    });
+
+    removeImageBtn.on("click", function () {
+      heroImageInput.val("");
+      resetImagePreview();
+    });
+
+    function resetImagePreview() {
+      previewImage.attr("src", "").addClass("d-none");
+      uploadMessage.removeClass("d-none");
+      removeImageBtn.addClass("d-none");
+      updateNextButtonState(true);
+    }
+
+    updateNextButtonState(true);
+  });
+</script>

@@ -1,0 +1,247 @@
+{{ $profileZuid = 7-f8f2fe8ee5-2wc7td }}
+
+<style>
+  .carousel-control-prev-icon {
+    background-color: #575757;
+    border-radius: 5px;
+  }
+  .carousel-control-next-icon {
+    background-color: #575757;
+    border-radius: 5px;
+  }
+</style>
+<!-- prettier-ignore -->
+{{include /components/global/HomeFeed/create_story_modal.html}}
+<!-- prettier-ignore -->
+{{include /components/global/HomeFeed/create_event_modal.html}}
+<!-- prettier-ignore -->
+{{include /components/global/HomeFeed/download_app_modal.html}}
+<div class="container py-3">
+  <div class="row">
+    <section id="left-column" class="col-3 d-none d-md-flex">
+      <div>
+        <!-- prettier-ignore -->
+        {{ include /components/global/HomeFeed/profile_card.html }}
+        <!-- prettier-ignore -->
+        {{ include /components/global/HomeFeed/stats_card.html }}
+      </div>
+    </section>
+    <section id="middle-column" class="col-12 col-md-6">
+      <!-- prettier-ignore -->
+      {{ include /components/global/HomeFeed/media_creation_card.html }}
+      <!-- prettier-ignore -->
+      {{ include /components/global/HomeFeed/causes_slider.html }}
+      <!-- prettier-ignore -->
+      {{ include /components/global/HomeFeed/npos_slider.html }}
+      <!-- prettier-ignore -->
+      {{ include /components/global/HomeFeed/big_story_card.html }}
+      <!-- prettier-ignore -->
+      {{ include /components/global/HomeFeed/stories_slider.html }}
+    </section>
+    <section id="right-column" class="col-3 d-none d-md-flex">
+      <!-- prettier-ignore -->
+      {{ include /components/global/HomeFeed/recommended_npos_card.html }}
+    </section>
+  </div>
+</div>
+
+<script>
+  const authUser = JSON.parse(localStorage.getItem("user"));
+  let userUrl = "";
+  let favoriteNPOs = [];
+  let favoriteCauses = [];
+
+  $.ajax({
+    url: "https://4xxglxlj-dev.webengine.zesty.io/mobileapp/user_profile.json?zpw=causecircle",
+    method: "GET",
+    data: {
+      user_zuid: authUser.zuid,
+    },
+    success: function (data) {
+      // console.log("User profile:", data);
+      userUrl = `https://causecircle.org/${data.meta.web.uri}`;
+      favoriteNPOs = data.favorite_npos?.data || [];
+      favoriteCauses = data.favorite_causes?.data;
+
+      // Populate NPO slider
+      populateNPOSlider(favoriteNPOs);
+
+      // Get stories for favorite NPOs
+      if (favoriteNPOs.length > 0) {
+        const npoZuids = favoriteNPOs.map((npo) => npo.meta.zuid);
+        getStoriesForNPOs(npoZuids);
+      }
+    },
+  });
+
+  function populateNPOSlider(npos) {
+    const npoCardsContainer = $("#npoCards");
+    npoCardsContainer.empty(); // Clear existing content
+
+    // Determine the number of NPOs per slide based on screen size
+    const nposPerSlide = window.innerWidth < 768 ? 1 : 3;
+
+    // Create carousel items
+    let carouselItem;
+    npos.forEach((npo, index) => {
+      if (index % nposPerSlide === 0) {
+        // Start a new carousel item for every nposPerSlide NPOs
+        if (carouselItem) {
+          npoCardsContainer.append(carouselItem); // Append the previous carousel item
+        }
+        carouselItem = $(`<div class="carousel-item"><div class="row"></div></div>`);
+        if (index === 0) {
+          carouselItem.addClass("active"); // Make the first item active
+        }
+      }
+
+      const npoCard = `
+        <div class="col-md-4 mb-3">
+          <div
+            class="card d-flex flex-column h-100 p-3 gap-2 npo-card"
+            data-story-url="${npo.meta.web.url}"
+          >
+            <img src="${
+              typeof npo.hero_image === "string"
+                ? npo.hero_image
+                : npo.hero_image.data[0].url
+            }" class="npo-image" />
+            <div class="d-flex flex-column gap-2 h-100">
+              <div class="d-flex flex-grow-1 align-items-center gap-2">
+                <img
+                  src="${
+                    typeof npo.logo === "string"
+                      ? npo.logo
+                      : npo.logo.data[0].url
+                  }"
+                  class="npo-npo-logo"
+                />
+                <p class="npo-name my-auto">${npo.name}</p>
+              </div>
+              <div class="npo-subtitle">${npo.cause_description}</div>
+              <a
+                href="https://causecircle.org/${npo.meta.web.uri}"
+                class="btn btn-secondary npo-btn card-btn"
+                >View Profile</a
+              >
+            </div>
+          </div>
+        </div>
+      `;
+      carouselItem.find(".row").append(npoCard);
+
+      // In mobile view, remove the col-md-4 class to take full width
+      if (window.innerWidth < 768) {
+        carouselItem.find(".col-md-4").removeClass("col-md-4");
+      }
+    });
+
+    // Append the last carousel item if it has any content
+    if (carouselItem) {
+      npoCardsContainer.append(carouselItem);
+    }
+  }
+
+  function getStoriesForNPOs(npoZuids) {
+    const promises = npoZuids.map((npoZuid) => {
+      return $.ajax({
+        url: "https://4xxglxlj-dev.webengine.zesty.io/mobileapp/stories.json?zpw=causecircle",
+        method: "GET",
+        data: {
+          npo: npoZuid,
+          approved: 1, // Only get approved stories
+        },
+      });
+    });
+
+    Promise.all(promises)
+      .then((responses) => {
+        // Combine all stories from different NPOs
+        const allStories = responses.flatMap((response) => response.data || []);
+
+        // Sort stories by date (newest first)
+        allStories
+          .sort((a, b) => {
+            return new Date(b.date_published) - new Date(a.date_published);
+          })
+          .reverse();
+
+        // Populate big story cards
+        populateStoryCards(allStories);
+      })
+      .catch((err) => {
+        console.error("Error fetching stories:", err);
+      });
+  }
+
+  function populateStoryCards(stories) {
+    const bigStoryCardContainer = $("#big-stories-container");
+
+    // Take first 2 stories as per the original template
+    stories.forEach((story) => {
+      const relatedNPO = story.related_npos?.data?.[0] || {};
+
+      const storyCard = `
+        <div class="post-card my-3" onclick="window.location.href='${
+          story.meta.web.url
+        }'" style="cursor: pointer">
+          <div class="post-header">
+            <img
+              src="${
+                typeof relatedNPO.logo === "string"
+                  ? relatedNPO.logo
+                  : relatedNPO.logo.data[0].url
+              }"
+              alt=""
+              class="profile-img"
+            />
+            <div class="post-meta">
+              <h5 class="mb-0">${relatedNPO.name || "Organization"}</h5>
+            </div>
+            <button class="btn btn-light ms-auto">+</button>
+          </div>
+          <div class="post-content p-3">
+            <h4>${story.title}</h4>
+            <div class="story-subtitle">${
+              story.description ?? story.story_body
+            }</div>
+          </div>
+          <img
+            src="${
+              typeof story.story_image === "string"
+                ? story.story_image
+                : story.story_image.data[0].url
+            }"
+            class="post-image"
+          />
+        </div>
+      `;
+
+      bigStoryCardContainer.append(storyCard);
+    });
+  }
+
+  $(document).ready(function () {
+    // Add click handler for create story button
+    $(".create-story").on("click", function (e) {
+      e.preventDefault();
+      $("#createStoryModal").modal("show");
+    });
+
+    $("#my-stories").click(function () {
+      window.location.href = userUrl;
+    });
+    $("#my-npos").click(function () {
+      window.location.href = userUrl;
+    });
+
+    if (window.location.search.includes("create-story")) {
+      $("#createStoryModal").modal("show");
+    }
+
+    // Recalculate NPO slider on window resize
+    $(window).resize(function () {
+      populateNPOSlider(favoriteNPOs);
+    });
+  });
+</script>

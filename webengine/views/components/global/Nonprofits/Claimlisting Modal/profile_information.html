@@ -1,0 +1,528 @@
+<style>
+  #npoDropdown,
+  #categoryDropdown {
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+  }
+  #npoDropdown .dropdown-item,
+  #categoryDropdown .dropdown-item {
+    white-space: normal;
+  }
+  #useCurrentLocation {
+    min-width: 140px;
+  }
+</style>
+
+<section id="profileInformationSelection" class="section-container d-none">
+  <div class="py-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img class="section-icon" src="" style="max-width: 160px" />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="section-title fs-1 fw-normal mb-0"></p>
+        <p class="section-description fs-5 text-muted mb-0"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="width: 600px">
+      <form id="profileInformationForm" novalidate>
+        <div class="mb-4 row">
+          <div class="col-md-6">
+            <label for="organizationName" class="form-label">
+              Organization Name <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="organizationName"
+              required
+            />
+            <div class="invalid-feedback">
+              Please enter an organization name.
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="organizationType" class="form-label">
+              Organization Type <span class="text-danger">*</span>
+            </label>
+            <select class="form-control" id="organizationType" required>
+              <option value="">Select Organization Type</option>
+              <option value="National HQ">National HQ</option>
+              <option value="Affiliate/local chapter">
+                Affiliate/local chapter
+              </option>
+            </select>
+            <div class="invalid-feedback">
+              Please select an organization type.
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4 row">
+          <div class="col-md-6">
+            <label for="roleInOrganization" class="form-label">
+              Title/Role in Organization <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              id="roleInOrganization"
+              required
+            />
+            <div class="invalid-feedback">
+              Please enter your title/role in organization.
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label for="relationshipToNpo" class="form-label">
+              Relationship to NPO <span class="text-danger">*</span>
+            </label>
+            <select class="form-control" id="relationshipToNpo" required>
+              <option value="">Select Relationship to NPO</option>
+              <option value="NPO Admin">NPO Admin</option>
+              <option value="NPO Staff">NPO Staff</option>
+              <option value="NPO Representative">
+                NPO Agency Representative
+              </option>
+            </select>
+            <div class="invalid-feedback">
+              Please select a relationship to NPO.
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4 row">
+          <div class="col-md-6">
+            <label for="workEmail" class="form-label">
+              Work Email <span class="text-danger">*</span>
+            </label>
+            <input type="text" class="form-control" id="workEmail" required />
+            <div class="invalid-feedback">Please enter your work email.</div>
+          </div>
+          <div class="col-md-6">
+            <label for="causeCategory" class="form-label">
+              Cause Category <span class="text-danger">*</span>
+            </label>
+            <div class="dropdown">
+              <input
+                type="text"
+                class="form-control"
+                id="categorySearchInput"
+                placeholder="Search Categories..."
+                autocomplete="off"
+              />
+              <ul
+                class="dropdown-menu w-100"
+                id="categoryDropdown"
+                style="max-height: 300px; overflow-y: auto"
+              >
+                <!-- Category options will be dynamically added here -->
+              </ul>
+            </div>
+            <input
+              type="hidden"
+              id="selectedCategory"
+              name="selectedCategory"
+              required
+            />
+            <div class="invalid-feedback">Please select a category.</div>
+          </div>
+        </div>
+
+        <div id="termsAndConditions" class="">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value=""
+              id="termsCheck"
+              required
+            />
+            <label class="form-check-label" for="termsCheck">
+              <a href="/terms-of-service"
+                >I agree to the <u><b>Terms</b></u></a
+              >
+              and
+              <a href="/privacy-policy"
+                ><u><b>Privacy Policy</b></u></a
+              >
+            </label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value=""
+              id="updatesCheck"
+            />
+            <label class="form-check-label" for="updatesCheck">
+              I would like to receive periodic news and product updates
+            </label>
+          </div>
+        </div>
+      </form>
+      <button id="nextBtn" class="btn btn-primary w-100 mt-4" disabled>
+        Submit and Claim Listing
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  function updateNextButtonState(enable) {
+    $("#createStoryModal #nextBtn").prop("disabled", enable);
+  }
+  $(document).ready(function () {
+    // $("#createStoryModal #nextBtn").on("click", function () {
+    //   window.story_title = $("#storyTitle").val();
+    //   window.story_description = $("#storyDescription").val();
+
+    //   // Find the NPO object and get its zuid
+    //   const npoName = $("#npoSearchInput").val();
+    //   const npoObject = npo_data.find((npo) => npo.name === npoName);
+    //   window.story_npo = npoObject ? npoObject.meta.zuid : null;
+
+    //   // Find the Category object and get its zuid
+    //   const categoryName = $("#categorySearchInput").val();
+    //   const categoryObject = category_data.find(
+    //     (category) => category.title === categoryName
+    //   );
+    //   window.story_category = categoryObject ? categoryObject.meta.zuid : null;
+
+    //   window.story_location = $("#location").val();
+    //   printStates();
+    // });
+
+    const npoSearchInput = $("#npoSearchInput");
+    const npoDropdown = $("#npoDropdown");
+    const selectedNPO = $("#selectedNPO");
+    const categorySearchInput = $("#categorySearchInput");
+    const categoryDropdown = $("#categoryDropdown");
+    const selectedCategory = $("#selectedCategory");
+    const locationInput = $("#location");
+    const locationFeedback = $("#locationFeedback");
+    const useCurrentLocationBtn = $("#useCurrentLocation");
+    const locationSpinner = useCurrentLocationBtn.find(".spinner-border");
+    const locationButtonText = useCurrentLocationBtn.find(".button-text");
+    const nextBtn = $("#nextBtn");
+    const storyTitle = $("#storyTitle");
+    const storyDescription = $("#storyDescription");
+
+    // Validation state
+    let validationState = {
+      storyTitle: false,
+      storyDescription: false,
+      selectedNPO: false,
+      selectedCategory: false,
+      location: false,
+    };
+
+    function validateStoryTitle() {
+      const value = storyTitle.val().trim();
+      if (value === "") {
+        storyTitle.addClass("is-invalid");
+        validationState.storyTitle = false;
+      } else {
+        storyTitle.removeClass("is-invalid").addClass("is-valid");
+        validationState.storyTitle = true;
+      }
+      checkAllValid();
+    }
+
+    function validateStoryDescription() {
+      const value = storyDescription.val().trim();
+      if (value === "") {
+        storyDescription.addClass("is-invalid");
+        validationState.storyDescription = false;
+      } else {
+        storyDescription.removeClass("is-invalid").addClass("is-valid");
+        validationState.storyDescription = true;
+      }
+      checkAllValid();
+    }
+
+    function validateSelectedNPO() {
+      const value = selectedNPO.val().trim();
+      if (value === "") {
+        npoSearchInput.addClass("is-invalid");
+        validationState.selectedNPO = false;
+      } else {
+        npoSearchInput.removeClass("is-invalid").addClass("is-valid");
+        validationState.selectedNPO = true;
+      }
+      checkAllValid();
+    }
+
+    function validateSelectedCategory() {
+      const value = selectedCategory.val().trim();
+      if (value === "") {
+        categorySearchInput.addClass("is-invalid");
+        validationState.selectedCategory = false;
+      } else {
+        categorySearchInput.removeClass("is-invalid").addClass("is-valid");
+        validationState.selectedCategory = true;
+      }
+      checkAllValid();
+    }
+
+    function validateLocation() {
+      const value = locationInput.val().trim();
+      if (value === "") {
+        locationInput.addClass("is-invalid");
+        locationFeedback.text("Please enter a location.");
+        validationState.location = false;
+      } else {
+        locationInput.removeClass("is-invalid").addClass("is-valid");
+        validationState.location = true;
+      }
+      checkAllValid();
+    }
+
+    function checkAllValid() {
+      const allValid = Object.values(validationState).every(Boolean);
+      updateNextButtonState(!allValid);
+    }
+
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    function searchNPOs(searchTerm) {
+      const limit = searchTerm ? 20 : 100;
+
+      $.ajax({
+        url: "https://causecircle.org/mobileapp/npos.json",
+        method: "GET",
+        data: {
+          limit: limit,
+          search: searchTerm,
+          page: 1,
+        },
+        success: function (data) {
+          npoDropdown.empty();
+          if (data.data && data.data.length > 0) {
+            window.npo_data = data.data; // Store the NPO data
+            data.data.forEach((npo) => {
+              npoDropdown.append(
+                `<li><a class="dropdown-item" href="#" data-npo-id="${npo.id}">${npo.name}</a></li>`
+              );
+            });
+          } else {
+            npoDropdown.append(
+              '<li><span class="dropdown-item">No NPOs found</span></li>'
+            );
+          }
+          npoDropdown.show();
+        },
+        error: function (error) {
+          console.error("Error fetching NPOs:", error);
+          npoDropdown
+            .empty()
+            .append(
+              '<li><span class="dropdown-item">Error fetching NPOs</span></li>'
+            );
+          npoDropdown.show();
+        },
+      });
+    }
+
+    function searchCategories(searchTerm) {
+      const limit = searchTerm ? 20 : 100;
+
+      $.ajax({
+        url: "https://causecircle.org/mobileapp/causes.json",
+        method: "GET",
+        data: {
+          limit: limit,
+          search: searchTerm,
+          page: 1,
+        },
+        success: function (data) {
+          categoryDropdown.empty();
+          if (data.data && data.data.length > 0) {
+            window.category_data = data.data;
+            data.data.forEach((category) => {
+              categoryDropdown.append(
+                `<li><a class="dropdown-item" href="#" data-category-id="${category.id}">${category.title}</a></li>`
+              );
+            });
+          } else {
+            categoryDropdown.append(
+              '<li><span class="dropdown-item">No categories found</span></li>'
+            );
+          }
+          categoryDropdown.show();
+        },
+        error: function (error) {
+          console.error("Error fetching categories:", error);
+          categoryDropdown
+            .empty()
+            .append(
+              '<li><span class="dropdown-item">Error fetching categories</span></li>'
+            );
+          categoryDropdown.show();
+        },
+      });
+    }
+
+    const debouncedSearchNPO = debounce(function () {
+      const searchTerm = npoSearchInput.val().trim();
+      searchNPOs(searchTerm);
+    }, 300);
+
+    const debouncedSearchCategory = debounce(function () {
+      const searchTerm = categorySearchInput.val().trim();
+      searchCategories(searchTerm);
+    }, 300);
+
+    npoSearchInput.on("input", debouncedSearchNPO);
+    categorySearchInput.on("input", debouncedSearchCategory);
+
+    // Validation Events
+    storyTitle.on("input focus", validateStoryTitle);
+    storyDescription.on("input focus", validateStoryDescription);
+    npoSearchInput.on("input focus", validateSelectedNPO);
+    categorySearchInput.on("input focus", validateSelectedCategory);
+    locationInput.on("input focus", validateLocation);
+
+    // Trigger search on focus
+    npoSearchInput.on("focus", function () {
+      if (npoDropdown.children().length === 0) {
+        searchNPOs("");
+      } else {
+        npoDropdown.show();
+      }
+    });
+
+    categorySearchInput.on("focus", function () {
+      if (categoryDropdown.children().length === 0) {
+        searchCategories("");
+      } else {
+        categoryDropdown.show();
+      }
+    });
+
+    npoDropdown.on("click", "a.dropdown-item", function (e) {
+      e.preventDefault();
+      const npoId = $(this).data("npo-id");
+      const npoName = $(this).text();
+      selectedNPO.val(npoId);
+      npoSearchInput.val(npoName);
+      npoDropdown.hide();
+      validateSelectedNPO();
+    });
+
+    categoryDropdown.on("click", "a.dropdown-item", function (e) {
+      e.preventDefault();
+      const categoryId = $(this).data("category-id");
+      const categoryName = $(this).text();
+      selectedCategory.val(categoryId);
+      categorySearchInput.val(categoryName);
+      categoryDropdown.hide();
+      validateSelectedCategory();
+    });
+
+    $(document).on("click", function (e) {
+      if (!$(e.target).closest(".dropdown").length) {
+        npoDropdown.hide();
+        categoryDropdown.hide();
+      }
+    });
+
+    // Initial NPO and Category load
+    searchNPOs("");
+    searchCategories("");
+
+    useCurrentLocationBtn.on("click", function () {
+      if ("geolocation" in navigator) {
+        // Show loading spinner and disable button
+        locationSpinner.removeClass("d-none");
+        locationButtonText.addClass("d-none");
+        useCurrentLocationBtn.prop("disabled", true);
+
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            $.ajax({
+              url: `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
+              type: "GET",
+              dataType: "json",
+              success: function (data) {
+                if (data.address) {
+                  const city =
+                    data.address.city ||
+                    data.address.town ||
+                    data.address.village ||
+                    "";
+                  const state = data.address.state || "";
+                  const country = data.address.country || "";
+
+                  let locationString = [city, state, country]
+                    .filter(Boolean)
+                    .join(", ");
+                  locationInput.val(locationString);
+                  locationInput.removeClass("is-invalid is-valid");
+                  locationInput.addClass("is-valid");
+                  locationFeedback.text("");
+                  validationState.location = true;
+                } else {
+                  locationInput.addClass("is-invalid");
+                  locationFeedback.text(
+                    "Unable to determine location. Please enter manually."
+                  );
+                  validationState.location = false;
+                }
+              },
+              error: function () {
+                locationInput.addClass("is-invalid");
+                locationFeedback.text(
+                  "Error fetching location. Please enter manually."
+                );
+                validationState.location = false;
+              },
+              complete: function () {
+                // Hide loading spinner and enable button
+                locationSpinner.addClass("d-none");
+                locationButtonText.removeClass("d-none");
+                useCurrentLocationBtn.prop("disabled", false);
+                checkAllValid();
+              },
+            });
+          },
+          function (error) {
+            locationInput.addClass("is-invalid");
+            locationFeedback.text(
+              "Error: " + error.message + ". Please enter location manually."
+            );
+            // Hide loading spinner and enable button
+            locationSpinner.addClass("d-none");
+            locationButtonText.removeClass("d-none");
+            useCurrentLocationBtn.prop("disabled", false);
+            validationState.location = false;
+            checkAllValid();
+          }
+        );
+      } else {
+        locationInput.addClass("is-invalid");
+        locationFeedback.text(
+          "Geolocation is not supported by your browser. Please enter location manually."
+        );
+        validationState.location = false;
+        checkAllValid();
+      }
+    });
+
+    // Initial validation check
+    updateNextButtonState(false);
+  });
+</script>

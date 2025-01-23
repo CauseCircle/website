@@ -1,0 +1,412 @@
+<style>
+  .sidebar {
+    height: auto;
+    margin: 20px 0px 0px 0px;
+  }
+
+  /* Mobile sidebar transformation */
+  @media (max-width: 768px) {
+    .sidebar .card {
+      margin-bottom: 20px;
+    }
+
+    .sidebar .nav {
+      display: flex;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding: 10px 0;
+      margin: 0 -10px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .sidebar .nav-link {
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      margin: 0 5px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+
+    .sidebar .nav-link i {
+      margin-right: 6px;
+    }
+
+    .sidebar .d-flex {
+      justify-content: center;
+      padding: 10px;
+    }
+  }
+
+  .tab-content {
+    margin: 20px 0px;
+  }
+
+  .nav-link {
+    color: #666;
+    padding: 10px 15px;
+  }
+
+  .nav-link.active {
+    background-color: #7b3fee;
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+
+  .nav-link:hover:not(.active) {
+    background-color: #f8f9fa;
+    color: #7b3fee;
+  }
+
+  .metrics-card {
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .metrics-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .metric-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 5px;
+  }
+
+  .metric-label {
+    color: #718096;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .action-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #dee2e6;
+  }
+
+  .post-interaction {
+    border-top: 1px solid #dee2e6;
+    padding-top: 15px;
+    margin-top: 15px;
+  }
+
+  .interaction-btn {
+    color: #666;
+    text-decoration: none;
+    margin-right: 20px;
+  }
+
+  .card {
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  .posts-container {
+    width: 100%;
+    overflow: hidden;
+    padding: 10px 0;
+  }
+
+  .posts-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #7b3fee #f0f0f0;
+  }
+
+  .posts-scroll::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .posts-scroll::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
+  }
+
+  .posts-scroll::-webkit-scrollbar-thumb {
+    background: #7b3fee;
+    border-radius: 10px;
+  }
+
+  .post-card {
+    width: 100%;
+    height: 100%;
+    max-width: 560px;
+    background: white;
+    border: none;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .post-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .post-card img.img-fluid {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+
+  .story-subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em;
+    line-height: 1.4em;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 576px) {
+    .metric-value {
+      font-size: 24px;
+    }
+
+    .post-card {
+      padding: 15px;
+    }
+
+    .posts-scroll {
+      padding: 5px;
+      gap: 15px;
+    }
+  }
+
+  /* Add this media query for mobile responsiveness */
+  @media (max-width: 768px) {
+    .sidebar .card.min-vh-100 {
+      min-height: auto !important;  /* Override the min-vh-100 class */
+      height: auto;
+    }
+  }
+</style>
+
+<style>
+  .hero {
+    background-image: url("{{this.story_image.getImage()}}");
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    position: relative;
+    z-index: 1;
+  }
+  .hero::after {
+    content: "";
+    background: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+  }
+  .article-content {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 5px;
+    padding: 20px;
+  }
+  .back-btn {
+    background: #eceff3;
+    /* border: none; */
+    color: black;
+    font-size: 1.5rem;
+    cursor: pointer;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .back-btn:hover {
+    color: #7b3fee;
+  }
+  .back-btn i {
+    font-size: 1.6rem;
+  }
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .story-container img {
+    max-width: 100%;
+    max-height: auto;
+    padding: 20px 0;
+  }
+  .story-container p {
+    padding-bottom: 12px;
+  }
+  .author-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  .story-description p,
+  .npo-description p,
+  .npo-description,
+  .story-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .one-line-text,
+  .one-line-text p {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  .npo-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 3px;
+    object-fit: cover;
+  }
+
+  .badge {
+    background-color: #7c3fee2d;
+  }
+
+  .story-card {
+    transition: all 0.3s ease;
+  }
+  .story-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  #qr-code-container {
+    width: 100%;
+    height: 288px;
+    background: #4C25A7;
+
+  }
+</style>
+
+<section id="npo-admin-page" class="container">
+  <div class="row mb-3">
+    <!-- Sidebar -->
+    <div class="col-12 col-md-3 col-lg-3 sidebar">
+      <div class="card mb-0 min-vh-100 p-0 d-flex flex-column justify-content-between">
+        <div class="p-3">
+          <a href="{{ non_profits.filter({get_var.zuid}).getUrl() }}" class="d-flex align-items-center mb-3 text-decoration-none text-dark">
+            <img
+              src="{{ non_profits.filter({get_var.zuid}).logo.getImage() }}"
+              alt="Organization Logo"
+              height="40"
+              class="rounded"
+            />
+            <h5 class="mb-0 ms-3">
+              {{ non_profits.filter({get_var.zuid}).name }}
+            </h5>
+          </a >
+          <div class="nav flex-md-column">
+            <a class="nav-link active" href="#" data-tab="dashboard">
+              <i class="bi bi-grid"></i> <span>Dashboard</span>
+            </a>
+            <a class="nav-link" href="#" data-tab="followers">
+              <i class="bi bi-people"></i> Followers
+            </a>
+            <a class="nav-link" href="#" data-tab="story-stream">
+              <i class="bi bi-collection"></i> Story Stream
+            </a>
+            <a class="nav-link" href="#" data-tab="profile">
+              <i class="bi bi-person"></i> Profile Details
+            </a>
+            <a class="nav-link d-none" href="#" data-tab="settings">
+              <i class="bi bi-gear"></i> Settings
+            </a>
+          </div>
+        </div>
+        <div id="qr-code-container" class="d-none d-md-flex flex-column justify-content-center align-items-center gap-3 rounded-bottom-3">
+          <div id="qr-code-image">
+            <img src="https://api.causecircle.org/npos/{{get_var.zuid}}/qrcode?type=svg&mode=serve&color=fff" alt="QR Code" style="width: 128px; height: 128px;" />
+          </div>
+          <div id="qr-code-text" class="text-center text-white">
+            <h6>Use QR Code to Gain Followers and Stories</h6>
+          </div>
+          <div id="qr-code-download" class="text-center d-flex gap-3">
+            <a href="https://api.causecircle.org/npos/{{get_var.zuid}}/qrcode?type=png&mode=download" target="_blank" class="btn btn-primary bg-white text-primary"><i class="bi bi-download"></i> PNG</a>
+            <a href="https://api.causecircle.org/npos/{{get_var.zuid}}/qrcode?type=svg&mode=download" target="_blank" class="btn btn-primary bg-white text-primary"><i class="bi bi-download"></i> SVG</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-12 col-md-9 col-lg-9">
+      <div class="tab-content">
+        <!-- Dashboard Tab -->
+        {{include /components/global/NPO Admin/Dashboard/npo_admin_dashboard.html}}
+        <!--Followers Tab-->
+        {{include /components/global/NPO Admin/Followers/npo_admin_followers.html}}
+        <!--Story Stream Tab-->
+        {{include /components/global/NPO Admin/Story Stream/npo_admin_story_stream.html}}
+        <!--Profile Details Tab-->
+        {{include /components/global/NPO Admin/Profile/npo_admin_profile.html}}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--prettier-ignore-->
+{{include /components/global/NPO Admin/Dashboard/Review Story Modal/review_story_modal.html}}
+
+<script>
+  $(document).ready(function () {
+    // Tab functionality
+    $("#npo-admin-page .nav-link").click(function (e) {
+      e.preventDefault();
+      $("#npo-admin-page .nav-link").removeClass("active");
+      $(this).addClass("active");
+
+      const tabId = $(this).data("tab");
+      $("#npo-admin-page .tab-pane").removeClass("active");
+      $(`#${tabId}`).addClass("active");
+    });
+
+    $("#approve-story").click(async function (e) {
+      e.preventDefault();
+      const zuid = $("#active-story").data("zuid");
+      const status = "approved";
+      const changeRequest = null;
+      const data = await window.approveStory(zuid, status, changeRequest);
+
+      if (data) {
+        $("#reviewStoriesModal").modal("hide");
+      }
+    });
+  });
+</script>

@@ -1,0 +1,58 @@
+<style>
+  .profile-widget {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px;
+  }
+  .stats-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+  .stats-value {
+    color: #8e44ad;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    color: #333;
+    text-decoration: none;
+  }
+  .menu-item:hover {
+    background-color: #f8f9fa;
+  }
+  .menu-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+  }
+</style>
+
+<div class="profile-widget my-3">
+  <div class="mb-3 d-none">
+    <div class="stats-item">
+      <span>Profile viewers</span>
+      <span class="stats-value">4</span>
+    </div>
+    <div class="stats-item">
+      <span>Following</span>
+      <span class="stats-value">36</span>
+    </div>
+    <div class="stats-item">
+      <span>Followers</span>
+      <span class="stats-value">36</span>
+    </div>
+  </div>
+  <hr class="d-none" />
+  <div>
+    <a id="my-stories" href="#" class="menu-item px-2">
+      <i class="bi bi-journal-text fs-6 text-muted me-2"></i>
+      My Stories
+    </a>
+    <a id="my-npos" href="#" class="menu-item px-2">
+      <i class="bi bi-building fs-6 text-muted me-2"></i>
+      My NPOs
+    </a>
+  </div>
+</div>

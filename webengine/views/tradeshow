@@ -1,0 +1,934 @@
+<style>
+  .hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+      url("{{this.hero_image.getImage()}}");
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    padding: 4rem 0;
+    color: white;
+  }
+
+  .form-card {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<style>
+  /* General Styles */
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+
+  /* Custom Bullet List */
+  ul.custom-bullet {
+    list-style: none;
+    padding: 0;
+  }
+
+  ul.custom-bullet li {
+    margin-left: 25px;
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  ul.custom-bullet li::before {
+    content: "";
+    position: absolute;
+    left: -25px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    background-image: url("{{cause_circle_cms_page.first().list_icon.getImage()}}");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  /* Use Case Image */
+  .usecase-image {
+    border-radius: 20px;
+    max-height: 450px;
+    object-fit: cover;
+  }
+
+  /* Hero Section */
+  /* .hero-section {
+    background-size: cover;
+    text-align: center;
+    padding: 100px 0;
+  } */
+
+  /* Card Styles */
+  .card-img-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+  }
+
+  .featured-category-card,
+  .causes-card {
+    background-size: cover;
+    min-height: 223px;
+    border-radius: 20px;
+    border: none;
+  }
+
+  .featured-gradient-overlay {
+    background: linear-gradient(100deg, #613aaf 5%, #9a6ef3 95%);
+    border-radius: 20px;
+  }
+
+  .category-card {
+    background-size: cover;
+    min-height: 120px;
+    border-radius: 15px;
+    border: none;
+  }
+
+  .category-card:hover {
+    transform: scale(1.02);
+    transition: transform 0.5s ease;
+  }
+
+  .gradient-overlay {
+    background: linear-gradient(
+      179.63deg,
+      rgba(113, 61, 221, 0) 0.32%,
+      #3d2177 99.68%
+    );
+    border-radius: 15px;
+  }
+
+  /* Floating Button */
+  .featured-floating-btn,
+  .floating-btn {
+    font-size: 40px;
+    padding: 0;
+    height: 40px;
+    width: 40px;
+    border: none;
+  }
+
+  .featured-floating-btn {
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .floating-btn {
+    top: 20px;
+    right: 20px;
+  }
+
+  .floating-btn i {
+    height: 40px;
+    width: 40px;
+  }
+
+  /* Customer Images */
+  .customer-images {
+    display: flex;
+    position: relative;
+  }
+
+  .customer-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: -10px;
+    position: relative;
+    z-index: 1;
+    object-fit: cover;
+    filter: grayscale(100%);
+  }
+
+  .customer-img:nth-child(2) {
+    z-index: 2;
+  }
+  .customer-img:nth-child(3) {
+    z-index: 3;
+  }
+  .customer-img:nth-child(4) {
+    z-index: 4;
+  }
+
+  .customer-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .customer-info .card-title {
+    margin: 0;
+  }
+
+  /* Progress Bar */
+  .progress {
+    background-color: #e0e0e0;
+  }
+
+  .progress-bar {
+    background-color: #6c63ff;
+  }
+
+  /* Search Bar */
+  .search-bar {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    width: 100%;
+    max-width: 640px;
+  }
+
+  .search-bar input {
+    width: 100%;
+    max-width: 640px;
+    height: 66px;
+    padding: 20px 44px 20px 24px;
+    font-size: 16px;
+    border: 1px solid #dfe1e7;
+    border-radius: 10px;
+  }
+
+  .search-bar button {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #ccc;
+  }
+
+  .search-bar button:hover {
+    color: #333;
+  }
+
+  /* Logo Container */
+  .logo-container {
+    overflow: hidden;
+  }
+
+  .logo-track {
+    display: flex;
+    animation: scroll infinite linear;
+  }
+
+  .logo {
+    object-fit: contain;
+    width: auto;
+    max-height: 80px;
+    flex-shrink: 0;
+    animation: rotate 8s linear infinite;
+  }
+
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  /* Form Styles */
+  .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-input,
+  .form-dropdown {
+    border: 1px solid #dfe1e7;
+    background-color: #f8fafb;
+    border-radius: 5px;
+    height: 48px;
+    padding: 8px 12px;
+  }
+
+  .form-dropdown {
+    width: 100%;
+    font-size: 16px;
+    font-weight: 400;
+    color: black;
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .form-dropdown:focus {
+    outline: none;
+    border-color: black;
+    border-width: 2px;
+  }
+
+  .form-dropdown option {
+    padding: 8px 12px;
+    background-color: #fff;
+    font-size: 16px;
+  }
+
+  .form-dropdown::before,
+  .form-dropdown::after {
+    content: "";
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+  }
+
+  .form-dropdown::before {
+    border-left: 0.3rem solid transparent;
+    border-right: 0.3rem solid transparent;
+    border-bottom: 0.3rem solid black;
+    top: 40%;
+  }
+
+  .form-dropdown::after {
+    border-left: 0.3rem solid transparent;
+    border-right: 0.3rem solid transparent;
+    border-top: 0.3rem solid black;
+    top: 55%;
+  }
+
+  .hero-title p,
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  .section-title p,
+  .section-title {
+    font-size: 2rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  .hero-description p,
+  .hero-description {
+    font-size: 1.125rem;
+    font-weight: 400;
+    text-align: center;
+    color: var(--bs-gray-500);
+    max-width: 53.125rem;
+  }
+</style>
+
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-xl-8 col-md-6 mb-4 mb-lg-0 pe-lg-6">
+        <h1 class="display-4 fw-bold mb-4">
+          {{ this.hero_title }}
+        </h1>
+        <div class="d-flex flex-column gap-3">
+          {{ this.hero_description }}
+        </div>
+      </div>
+      <div class="col-xl-4 col-md-6">
+        <div id="tradeshow-form" class="form-card">
+          <form
+            action="https://forms.zohopublic.com/zestyio/form/CauseCircleNPOStoryTellingConfMixerSignup1/formperma/JGJiLxKGYQKIOtxWBFMIFyb4C1kmUa8Unu0BkSPixgs/htmlRecords/submit"
+            name="form"
+            id="form"
+            method="POST"
+            accept-charset="UTF-8"
+            enctype="multipart/form-data"
+          >
+            <input type="hidden" name="zf_referrer_name" value="" />
+            <!-- prettier-ignore -->
+            <input
+              type="hidden"
+              name="zf_redirect_url"
+              value="https://causecircle.org{{ non_profits_landing_page.first().getUrl() }}"
+            />
+            <input type="hidden" name="zc_gad" value="" />
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="firstName" class="form-label text-muted">
+                  First name <em class="text-danger">*</em>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  name="Name_First"
+                  fieldType="7"
+                  maxlength="255"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="lastName" class="form-label text-muted">
+                  Last name <em class="text-danger">*</em>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lastName"
+                  name="Name_Last"
+                  fieldType="7"
+                  maxlength="255"
+                  required
+                />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="organization" class="form-label text-muted">
+                Organization Name
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="organization"
+                name="SingleLine"
+                fieldType="1"
+                maxlength="255"
+              />
+              <small class="text-muted"
+                >This is the official name of your Nonprofit or
+                Foundation</small
+              >
+            </div>
+            <div class="mb-3">
+              <label for="organizationType" class="form-label text-muted">
+                What is your organization type?
+              </label>
+              <select
+                id="organizationType"
+                name="Dropdown5"
+                class="form-control"
+              >
+                <!-- <option selected="true" value="-Select-">-Select-</option> -->
+                <option value="Nonprofit">Nonprofit</option>
+                <option value="Nonprofit&#x20;Vendor">Nonprofit Vendor</option>
+                <option value="Agency">Agency</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label text-muted">
+                Work Email <em class="text-danger">*</em>
+              </label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="Email"
+                fieldType="9"
+                maxlength="255"
+                required
+              />
+            </div>
+            <div class="mb-3 form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="DecisionBox1"
+                name="DecisionBox1"
+              />
+              <label class="form-check-label text-dark" for="DecisionBox1">
+                Does your Nonprofit have multiple locations?
+              </label>
+            </div>
+            <p class="text-muted small mb-4">
+              By clicking submit below, you consent to allow CauseCircle to
+              store and process the personal information submitted above to
+              provide you the content requested.
+            </p>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section
+  id="fundraising-banner"
+  class="position-relative bg-primary d-flex flex-column justify-content-center py-5"
+  style="height: 752px"
+>
+  <div
+    class="container d-flex flex-column justify-content-center position-relative z-3"
+    style="background-color: #e6e0e9; border-radius: 30px; min-height: 512px"
+  >
+    <div class="row h-100">
+      <div
+        class="col-md-6 mb-4 mb-md-0 p-5 h-100 d-flex flex-column justify-content-center gap-5"
+      >
+        <div class="d-flex flex-column gap-4">
+          {{ this.fundraising_title_description }}
+        </div>
+        <a
+          data-target="#demo-section"
+          class="btn btn-primary mt-4 scroll-to-demo"
+          style="align-self: start"
+        >
+          {{ this.fundraising_cta_label }}
+        </a>
+      </div>
+      <div
+        class="col-md-6 p-0 d-none d-md-block"
+        style="height: 100%; border-radius: 0px 30px 30px 0px"
+      >
+        <img
+          src="{{ this.fundraising_image.getImage() }}"
+          style="
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0px 30px 30px 0px;
+          "
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    style="
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 261px;
+      background-color: #f9f9f9;
+    "
+  ></div>
+</section>
+
+<section
+  id="npo-search-container"
+  class="text-center d-flex flex-column gap-3 my-5"
+>
+  <div class="container d-flex justify-content-center align-items-center">
+    <h1>{{ this.npo_search_title }}</h1>
+  </div>
+
+  <div class="container d-flex align-items-center justify-content-center mb-3">
+    <div class="search-bar">
+      <button id="npo-search-btn" type="button">
+        <i class="bi bi-search"></i>
+      </button>
+      <input
+        id="npo-search"
+        type="text"
+        placeholder="Enter Nonprofit Name"
+        aria-label="Search"
+        class="form-control"
+      />
+    </div>
+  </div>
+
+  <div class="d-flex flex-column gap-3 overflow-x-auto invisible-scroll mx-2">
+    <div class="logo-container">
+      <div
+        class="logo-track d-flex gap-6 justify-content-start justify-content-xl-center"
+      >
+        <!--prettier-ignore-->
+        {{each {this.logos} as logo}}
+        <img
+          src="{{ logo.logo.getImage() }}"
+          alt="logo"
+          class="logo"
+          style="object-fit: contain; width: auto; max-height: 80px"
+        />
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="demo-section" class="container py-6 py-sm-7 d-none">
+  <div class="row">
+    <div class="col-md-6 d-flex align-items-start justify-content-center">
+      <div
+        class="d-flex flex-column align-items-start justify-content-center w-100 w-sm-75 gap-3"
+      >
+        <h2>{{ this.demo_title }}</h2>
+        <div id="hero-description" class="d-flex flex-column gap-2">
+          {{ this.demo_description }}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 d-flex align-items-start justify-content-start">
+      <!-- Change or deletion of the name attributes in the input tag will lead to empty values on record submission-->
+      <div
+        class="d-flex flex-column align-items-start justify-content-start h-100 w-100 w-lg-75"
+      >
+        <form
+          action="https://forms.zohopublic.com/zestyio/form/test/formperma/J6A2YBPtSZBBoKGtcRVtOCL6D6x0t905w43usoM_Bsw/htmlRecords/submit"
+          name="form"
+          id="form"
+          method="POST"
+          accept-charset="UTF-8"
+          enctype="multipart/form-data"
+          class="d-flex justify-content-center align-items-center flex-column"
+          onsubmit="return validateForm()"
+        >
+          <input
+            id="referrer-name"
+            type="hidden"
+            name="zf_referrer_name"
+            value=""
+          /><!-- To Track referrals , place the referrer name within the " " in the above hidden input field -->
+          <input
+            type="hidden"
+            name="zf_redirect_url"
+            value="https://causecircle.org/about/confirmation-page/"
+          /><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
+          <input
+            type="hidden"
+            name="zc_gad"
+            value=""
+          /><!-- If GCLID is enabled in Zoho CRM Integration, click details of AdWords Ads will be pushed to Zoho CRM -->
+          <!--Name-->
+          <div class="row gap-4 mt-5 mt-sm-0">
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label>First Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  maxlength="255"
+                  name="Name_First"
+                  fieldType="7"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="firstNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label>Last Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  maxlength="255"
+                  name="Name_Last"
+                  fieldType="7"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="lastNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label> Work Email </label>
+                <input
+                  class="form-input"
+                  type="email"
+                  maxlength="255"
+                  name="Email"
+                  value=""
+                  fieldType="9"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="emailError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-2">
+                <label> Organization Name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  name="SingleLine"
+                  value=""
+                  fieldType="1"
+                  maxlength="255"
+                  placeholder=""
+                  required
+                />
+                <small class="text-danger" id="orgNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 mt-3">
+                <button
+                  type="submit"
+                  class="btn btn-primary w-100"
+                  style="height: 48px"
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="feature-stories-section" class="container py-5">
+  <div class="d-flex flex-column gap-3">
+    <p class="section-title">{{ this.stories_title }}</p>
+    <div class="hero-description mx-auto">
+      {{ this.stories_description }}
+    </div>
+    <div class="row pt-3 row-gap-3">
+      {{each {this.stories} as story limit 4}}
+      <div class="col-12 col-sm-6 col-md-3">
+        <!--prettier-ignore-->
+        {{ include /components/global/story_card.html }}
+      </div>
+      {{/each}}
+    </div>
+    <div class="d-flex justify-content-center pt-3">
+      <a
+        href="{{ stories_landing_page.first().path_full }}"
+        class="btn btn-secondary mx-auto"
+      >
+        {{ this.stories_cta_label }}
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="modal fade" id="thankYouModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 20px; border: none">
+      <div class="modal-header border-0 position-absolute end-0 top-0 z-3">
+        <button
+          type="button"
+          class="btn-close shadow-none"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="text-center mb-4">
+          <i
+            class="bi bi-check-circle-fill text-success"
+            style="font-size: 4rem"
+          ></i>
+        </div>
+        <h4 class="text-center mb-4">Thank You!</h4>
+        <p class="text-muted fs-5 text-center mb-4" style="line-height: 1.6">
+          Thank you for signing up to attend the Happy Hour Network Reception
+          sponsored by CauseCircle. You will receive an email with more
+          information on how to attend the Reception shortly. Looking forward to
+          see you there.
+        </p>
+        <div class="text-center">
+          <button
+            type="button"
+            id="countdownButton"
+            class="btn btn-primary px-4 py-2"
+            style="min-width: 120px"
+            disabled
+          >
+            Redirecting in 5s
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $("#tradeshow-form #form").on("submit", function (e) {
+      e.preventDefault();
+
+      // Store form data for potential beacon send
+      const formData = new FormData(this);
+      const formUrl = this.action;
+
+      // Setup beforeunload handler
+      $(window).on("beforeunload", function () {
+        // Send the form data using beacon if tab is closed
+        navigator.sendBeacon(formUrl, formData);
+      });
+
+      // Show the thank you modal
+      const thankYouModal = new bootstrap.Modal(
+        document.getElementById("thankYouModal")
+      );
+      thankYouModal.show();
+
+      // Start countdown
+      let countdown = 5;
+      const countdownButton = $("#countdownButton");
+
+      const timer = setInterval(() => {
+        countdown--;
+        countdownButton.text(`Redirecting in ${countdown}s`);
+
+        if (countdown <= 0) {
+          clearInterval(timer);
+          // Remove beforeunload handler since we're submitting normally
+          $(window).off("beforeunload");
+          $("#tradeshow-form #form")[0].submit();
+        }
+      }, 1000);
+
+      // If modal is manually closed, submit immediately
+      $("#thankYouModal").on("hidden.bs.modal", function () {
+        clearInterval(timer);
+        // Remove beforeunload handler since we're submitting normally
+        $(window).off("beforeunload");
+        $("#tradeshow-form #form")[0].submit();
+      });
+    });
+
+    // Add custom bullet class to specific elements
+    $("#hero-description ul, .usecase-description ul").addClass(
+      "custom-bullet"
+    );
+
+    // Scroll to demo section
+    $(".scroll-to-demo").click(function () {
+      var target = $(this).data("target");
+      $("html, body").animate(
+        {
+          scrollTop: $(target).offset().top - 200,
+        },
+        100
+      );
+    });
+
+    // NPO search functionality
+    $("#npo-search-btn").click(function () {
+      redirectToNPOSearch();
+    });
+
+    $("#npo-search").keypress(function (e) {
+      if (e.key === "Enter") {
+        redirectToNPOSearch();
+      }
+    });
+
+    // Logo animation setup
+    setupLogoAnimation();
+
+    // Set referrer field value
+    $("#referrer-name").val(window.location.href);
+  });
+
+  function redirectToNPOSearch() {
+    var searchValue = $("#npo-search").val();
+    window.location.href =
+      "{{non_profits_search_page.first().path_full}}/?filter=" + searchValue;
+  }
+
+  function setupLogoAnimation() {
+    const $container = $(".logo-container");
+    const $track = $(".logo-track");
+    const $logos = $track.children();
+    const logoWidth = $logos.first().outerWidth();
+    const containerWidth = $container.outerWidth();
+    const scrollSpeed = 5;
+    const logosNeeded = Math.ceil(containerWidth / logoWidth) + 1;
+
+    // Duplicate logos
+    const totalLogos = $logos.length;
+    for (let i = 0; i < logosNeeded * totalLogos; i++) {
+      $track.append($logos.eq(i % totalLogos).clone());
+    }
+
+    // Adjust track width and animation duration
+    const trackWidth = $track[0].scrollWidth;
+    $track.css({
+      width: `${trackWidth}px`,
+      "animation-duration": `${(trackWidth / logoWidth) * scrollSpeed}s`,
+    });
+  }
+
+  function triggerOnboarding() {
+    // console.log("Triggering onboarding modal");
+    $("#onboardingModal").modal("show");
+  }
+
+  function validateForm() {
+    let isValid = true;
+    const fields = [
+      {
+        name: "Name_First",
+        error: "firstNameError",
+        message: "Please enter your first name.",
+      },
+      {
+        name: "Name_Last",
+        error: "lastNameError",
+        message: "Please enter your last name.",
+      },
+      {
+        name: "Email",
+        error: "emailError",
+        message: "Please enter a valid work email address.",
+      },
+      {
+        name: "SingleLine",
+        error: "orgNameError",
+        message: "Please enter your organization name.",
+      },
+    ];
+
+    // Clear previous error messages
+    fields.forEach((field) => $(`#${field.error}`).text(""));
+
+    // Validate fields
+    fields.forEach((field) => {
+      const value = $(`[name="${field.name}"]`).val();
+      if (field.name === "Email" ? !isValidEmail(value) : value === "") {
+        $(`#${field.error}`).text(field.message);
+        isValid = false;
+      }
+    });
+
+    return isValid;
+  }
+
+  function isValidEmail(email) {
+    const freeEmailDomains = [
+      "gmail.com",
+      "yahoo.com",
+      "hotmail.com",
+      "outlook.com",
+      "icloud.com",
+      "aol.com",
+      "zoho.com",
+      "gmx.com",
+      "mail.com",
+      "live.com",
+      "yandex.com",
+      "protonmail.com",
+      "tutanota.com",
+      "fastmail.com",
+      "mail.ru",
+      "inbox.com",
+    ];
+
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(email)) {
+      return false;
+    }
+
+    const domain = email.split("@")[1];
+    return !freeEmailDomains.includes(domain);
+  }
+
+  // reset all forms
+  $("form").each(function () {
+    this.reset();
+  });
+</script>

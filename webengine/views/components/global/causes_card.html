@@ -1,0 +1,43 @@
+<style>
+  .category-card {
+    background-size: cover;
+    min-height: 160px;
+    border-radius: 15px;
+    border: none;
+    transition: transform 0.5s ease;
+  }
+
+  .category-card:hover {
+    transform: scale(1.02);
+  }
+
+  .gradient-overlay {
+    background: linear-gradient(
+      179.63deg,
+      rgba(113, 61, 221, 0) 0.32%,
+      #3d2177 99.68%
+    );
+    border-radius: 15px;
+  }
+</style>
+
+<a href="{{ cause.getUrl() }}" style="text-decoration: none">
+  <!-- prettier-ignore -->
+  {{ $imgURL = "" }}
+  {{ if {cause.image} }}
+  {{ $imgURL = {cause.image.getImage()} }}
+  {{ else }}
+  {{ $imgURL = 'https://fakeimg.pl/600x400?text=Placeholder' }}
+  {{/if}}
+  <div
+    class="card mb-3 text-white position-relative category-card"
+    style="background-image: url({{ $imgURL }});"
+  >
+    <div
+      class="position-absolute start-0 end-0 top-0 bottom-0 gradient-overlay"
+    ></div>
+    <div class="card-body d-flex align-items-end position-relative">
+      <p class="fs-6 fw-semibold">{{ cause.title }}</p>
+    </div>
+  </div>
+</a>

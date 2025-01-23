@@ -1,0 +1,91 @@
+<style>
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+</style>
+
+<div class="container d-flex flex-column justify-content-center my-4 gap-3">
+  <div class="d-flex justify-content-center">
+    <img
+      src="{{ this.logo.getImage() }}"
+      alt="Claim Listing Confirmation"
+      class="img-fluid rounded-circle"
+      style="width: 250px; height: 250px; object-fit: cover"
+    />
+  </div>
+  <div class="d-flex flex-column gap-4 align-items-center text-center">
+    <h1 style="max-width: 800px">{{ this.title }}</h1>
+    <a
+      href="{{ this.primary_cta_link.truepath() }}"
+      class="btn btn-primary d-none"
+    >
+      <!-- prettier-ignore -->
+      {{ this.primary_cta_label }}
+    </a>
+  </div>
+
+  <div class="d-flex flex-column gap-4 align-items-center">
+    <div class="text-muted d-flex flex-column gap-1" style="max-width: 600px">
+      {{ this.description }}
+    </div>
+  </div>
+  <div id="cta-btns" class="d-flex flex-column gap-1 align-items-center">
+    <a href="{{ this.primary_cta_link.truepath() }}" class="btn btn-primary">
+      <!-- prettier-ignore -->
+      {{ this.primary_cta_label }}
+    </a>
+  </div>
+  <div
+    id="beta-launch-notification"
+    class="d-none d-flex flex-column gap-2 align-items-center w-100 mt-4"
+  >
+    <i>
+      <p class="text-muted text-center" style="max-width: 600px">
+        We will notify you when we launch Beta. If you'd like to find out more
+        details about your free benefits now, please schedule a meeting using
+        the links below
+      </p>
+    </i>
+  </div>
+</div>
+
+<div
+  id="multipleLocations"
+  class="container d-flex flex-column justify-content-center text-center my-4 my-sm-7 gap-7 d-none"
+>
+  <iframe
+    width="100%"
+    height="585px"
+    src="https://zesty.zohobookings.com/portal-embed#/causecircle"
+    frameborder="0"
+    allowfullscreen=""
+  >
+  </iframe>
+</div>
+
+<script>
+  //get url param multipleLocations
+  const urlParams = new URLSearchParams(window.location.search);
+  const multipleLocations = urlParams.get("multiplelocations");
+  // console.log(multipleLocations);
+
+  if (multipleLocations === "true") {
+    $("#multipleLocations").removeClass("d-none");
+    $("#cta-btns").removeClass("d-none");
+    $("#beta-launch-notification").removeClass("d-none");
+  }
+</script>

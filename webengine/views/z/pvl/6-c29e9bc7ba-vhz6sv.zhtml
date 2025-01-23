@@ -1,0 +1,43 @@
+<div className={styles.pvlRoot}>
+	<div style="display:flex" className={styles.pvlRow}>
+		<div style="flex:1" className={styles.pvlColumn}>
+			<h1 class="andres randy">{{this.title}}</h1>
+			<div class="pvlRichtext">{{this.story_body}}</div>
+		</div>
+		<div style="flex:1" className={styles.pvlColumn}>
+			<img src="{{this.story_image.getImage()}}" alt="@" width="100%" />
+			<div class="pvlRichtext">{{this.description}}</div>
+			<div style="display:flex" className={styles.pvlRow}>
+				<div style="flex:1" className={styles.pvlColumn}>
+					<div class="pvlRichtext" style="background-color:#933434;">
+<div class="post-content">
+<p><strong>12 Annual Zebra Dash – June 4, 2022</strong></p>
+<p>5K &amp; 1 MILE FUN RUN BENEFITING NOAH’S ARK ANIMAL SANCTUARY</p>
+<p>Join Noah’s Ark &amp; Revolution Running for an exciting day running through the trails and animal habitats at Noah’s Ark Animal Sanctuary, partnered with a premier <a href="https://www.outlookindia.com/outlook-spotlight/best-offshore-sportsbooks-news-282789">overseas gambling guide</a> for a sponsorship. This exciting event is perfect for the entire family! The 5k run begins on trails alongside fields of horses, goats, pigs, and peacocks. The finish line takes runners on paths through the animal habitats past bears, lions, tigers, monkeys, and more! The one-mile Fun Run follows a paved course winding through the entire park overlooking these amazing animals, making it ideal for families with strollers and smaller children. Kick-off summer with a race like no other and then stay and visit with all the animals at Noah’s Ark! To register go to <a href="http://www.revolutionrunning.net">www.revolutionrunning.net </a>Noah’s Ark Animal Sanctuary is a nonprofit dedicated to bringing children and animals together to provide unconditional love, nurturing care, and a future full of hope.</p>
+<p>Check-in opens at 7:30AM, and the race starts at 9:00AM. Early race packet pick-up will be available June 3rd between 10:00AM – 4:00PM.</p>
+<p><strong>Race Date</strong></p>
+<p>June 4, 2022</p>
+<p>712 LG Griffin Road</p>
+<p>Locust Grove, GA 30248</p>
+</div>
+</div>
+				</div>
+				<div style="flex:1" className={styles.pvlColumn}>
+					<img src="{{this.story_image.getImage()}}" alt="@" width="100%" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div style="display:flex" classname="{styles.pvlRow}" class="row andres">
+		<div style="flex:2" className={styles.pvlColumn}>
+			<h1 class="pvlHeader">{{categories.first().description}}</h1>
+		</div>
+		<div style="flex:2" className={styles.pvlColumn}>
+			<h1 class="pvlHeader">{{this.title}}</h1>
+			<span class="pvlDate">{{this.date_published}}</span>
+		</div>
+		<div style="flex:2" className={styles.pvlColumn}>
+			<img src="{{this.story_image.getImage()}}" alt="@" width="100%" />
+		</div>
+	</div>
+</div>

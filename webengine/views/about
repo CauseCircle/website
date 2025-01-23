@@ -1,0 +1,202 @@
+<style>
+  ul.custom-bullet {
+    list-style: none; /* Remove default bullets */
+    padding: 0;
+  }
+
+  ul.custom-bullet li {
+    margin-left: 25px; /* Adjust as needed */
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  ul.custom-bullet li::before {
+    content: "";
+    position: absolute;
+    left: -25px; /* Adjust to position the image */
+    top: 4px;
+    width: 16px; /* Adjust image width */
+    height: 16px; /* Adjust image height */
+    background-image: url("{{cause_circle_cms_page.first().list_icon.getImage()}}"); /* Replace with your image path */
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .mission-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    box-shadow: 0 0 0px rgba(0, 0, 0, 0);
+  }
+
+  .mission-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  .mission-description h5 {
+    color: white;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+</style>
+
+<div class="container d-flex align-items-center my-4 my-sm-7">
+  <div class="row">
+    <div
+      class="col-sm-12 col-md-5 d-flex flex-column align-items-center align-items-sm-start gap-3 pe-2 pe-sm-4 justify-content-center"
+    >
+      <div class="w-100 w-sm-100 text-start d-flex flex-column gap-4">
+        <h1 id="hero-title">{{ about.first().hero_title }}</h1>
+        <div id="hero-description" class="d-flex flex-column gap-3">
+          {{ about.first().hero_description }}
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-md-3">
+        <a
+          href="{{ about.first().hero_secondary_cta_link.truepath() }}"
+          class="btn btn-secondary"
+        >
+          {{ about.first().hero_secondary_cta_label }}
+        </a>
+        <a
+          href="{{ about.first().hero_primary_cta_link.truepath() }}"
+          class="btn btn-primary"
+        >
+          {{ about.first().hero_primary_cta_label }}
+        </a>
+      </div>
+    </div>
+    <div
+      class="col-sm-12 col-md-7 d-flex flex-column align-items-start gap-4 pe-2 pe-sm-4 justify-content-center mt-6 mt-md-0"
+    >
+      <img
+        src="{{ about.first().hero_image.getImage() }}"
+        alt=""
+        style="width: 100%; max-width: 100%; height: auto"
+      />
+    </div>
+  </div>
+</div>
+
+<!-- prettier-ignore -->
+{{ include /components/global/brand_logos.html }}
+
+<section class="" style="background: #f5f7fa">
+  <div class="container py-5">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <p class="fs-2 fw-normal">{{ this.missions_title }}</p>
+      <div class="fs-5 text-muted">
+        {{ this.missions_description }}
+      </div>
+    </div>
+    <div class="row mt-5">
+      {{ $missions = {this.missions} }}
+      {{ each missions as mission where find_in_set(mission.zuid, '{$missions}') sort by sort_order}}
+      <div class="col-md-3 mb-4">
+        <div
+          style="
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+          "
+        >
+          <img
+            src="{{ mission.image.getImage() }}"
+            class="mb-3"
+            style="width: 70px; height: 70px; max-width: 100%; max-height: 100%"
+          />
+        </div>
+        <p class="fs-3 fw-normal">{{ mission.title }}</p>
+        <div class="fs-6 text-muted">
+          {{ mission.description }}
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</section>
+
+<!-- prettier-ignore -->
+{{ include /components/global/integrations.html }}
+
+<!-- prettier-ignore -->
+{{ include /components/global/cause_banner.html }}
+
+<div class="container d-flex align-items-center my-4 my-sm-7">
+  <div class="row">
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-center align-items-sm-start gap-3 pe-4 justify-content-center"
+    >
+      <div class="w-100 text-start d-flex flex-column gap-4">
+        <h1>{{ demo_page.first().hero_title }}</h1>
+        <div>{{ demo_page.first().hero_description }}</div>
+      </div>
+      <div class="d-flex gap-2 mt-md-3">
+        <a
+          href="{{ demo_page.first().hero_secondary_cta_link.truepath() }}"
+          class="btn btn-secondary"
+        >
+          {{ demo_page.first().hero_secondary_cta_label }}
+        </a>
+        <a data-target="#demo-section" class="btn btn-primary scroll-to-demo">
+          {{ demo_page.first().hero_primary_cta_label }}
+        </a>
+      </div>
+    </div>
+    <div
+      class="col-sm-12 col-md-6 d-flex flex-column align-items-start gap-4 pe-2 pe-sm-4 justify-content-center mt-6 mt-md-0"
+    >
+      <img
+        src="{{ demo_page.first().hero_image.getImage() }}"
+        class="rounded-4"
+        alt=""
+        style="width: 100%; max-width: 100%; height: auto"
+      />
+    </div>
+  </div>
+</div>
+
+<!-- prettier-ignore -->
+{{ include /components/global/demo.html}}
+
+<script>
+  $(document).ready(function () {
+    // Add custom bullet class to specific elements
+    $("#hero-description ul, .usecase-description ul").addClass(
+      "custom-bullet"
+    );
+
+    // Smooth scroll to demo section
+    $(".scroll-to-demo").click(function () {
+      var target = $(this).data("target");
+      $("html, body").animate(
+        {
+          scrollTop: $(target).offset().top - 200,
+        },
+        100
+      );
+    });
+  });
+</script>

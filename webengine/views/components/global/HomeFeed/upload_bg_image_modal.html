@@ -1,0 +1,198 @@
+<style>
+  .image-upload-container {
+    width: 100%;
+  }
+  .image-preview {
+    width: 100%;
+    height: 270px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #f8f9fa;
+  }
+  .preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .custom-file-input {
+    display: none;
+  }
+  #removeImageBtn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  #removeImageBtn i {
+    font-size: 14px;
+  }
+  .upload-message {
+    text-align: center;
+    padding: 20px;
+  }
+</style>
+
+<div
+  class="modal fade"
+  id="uploadBgImageModal"
+  tabindex="-1"
+  aria-labelledby="uploadBgImageModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header" style="border-bottom: none">
+        <button
+          type="button"
+          class="btn-close btn"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div
+          class="d-flex justify-content-center align-items-center flex-column"
+        >
+          <div style="max-width: 480px; width: 100%">
+            <div class="image-upload-container">
+              <div id="imagePreview" class="image-preview">
+                <div
+                  id="uploadMessage"
+                  class="d-flex flex-column gap-2 align-items-center upload-message"
+                >
+                  <p>Choose a file or drag & drop it here.</p>
+                  <p>JPEG, PNG, GIF, BMP, TIFF, and WEBP formats.</p>
+                  <label class="btn btn-secondary mt-2" for="heroImageInput"
+                    >Choose Image</label
+                  >
+                </div>
+                <img
+                  id="previewImage"
+                  class="preview-image d-none"
+                  src=""
+                  alt="Preview"
+                />
+                <button
+                  id="removeImageBtn"
+                  class="btn position-absolute top-0 end-0 m-2 d-none rounded-circle bg-white"
+                >
+                  <i class="bi bi-x text-black"></i>
+                </button>
+              </div>
+              <input
+                type="file"
+                class="custom-file-input btn btn-outline-secondary w-100"
+                id="heroImageInput"
+                accept="image/*"
+              />
+            </div>
+          </div>
+          <button id="uploadBgImageBtn" class="btn btn-primary w-100 mt-4">
+            Upload
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    const heroImageInput = $("#heroImageInput");
+    const imagePreview = $("#imagePreview");
+    const previewImage = $("#previewImage");
+    const removeImageBtn = $("#removeImageBtn");
+    const uploadMessage = $("#uploadMessage");
+    const uploadBgImageBtn = $("#uploadBgImageBtn");
+
+    heroImageInput.on("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewImage.attr("src", e.target.result).removeClass("d-none");
+          uploadMessage.addClass("d-none");
+          removeImageBtn.removeClass("d-none");
+          // uploadHeroImage();
+          updateUploadButtonState(true);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        resetImagePreview();
+      }
+    });
+
+    removeImageBtn.on("click", function () {
+      heroImageInput.val("");
+      resetImagePreview();
+    });
+
+    uploadBgImageBtn.on("click", async function () {
+      try {
+        uploadBgImageBtn
+          .prop("disabled", true)
+          .html(
+            '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...'
+          );
+
+        const file = heroImageInput.prop("files")[0];
+        if (!file) {
+          throw new Error("No file selected");
+        }
+
+        const image = await uploadImages([file]);
+
+        if (image && image.length > 0) {
+          const localUser = await window.localStorage.getItem("user");
+          const user = JSON.parse(localUser);
+          const userZuid = user.zuid;
+
+          let userData = await getZestyUser(userZuid);
+          if (!userData?.user) return;
+
+          // Edit the user data
+          userData.user.data.background_image = image[0].data[0].id;
+
+          const updatedUser = await updateZestyUser(userZuid, userData.user.data);
+
+          // console.log("User profile updated:", updatedUser);
+
+          $("#uploadBgImageModal").modal("hide");
+
+          $("#profile-card")
+            .find(".background-img")
+            .attr("src", image[0].data[0].url);
+        } else {
+          throw new Error("Upload failed");
+        }
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        alert("An error occurred while uploading the image. Please try again.");
+      } finally {
+        uploadBgImageBtn.prop("disabled", false).html("Upload");
+      }
+    });
+
+    function resetImagePreview() {
+      previewImage.attr("src", "").addClass("d-none");
+      uploadMessage.removeClass("d-none");
+      removeImageBtn.addClass("d-none");
+      updateUploadButtonState(false);
+    }
+
+    function updateUploadButtonState(enabled) {
+      uploadBgImageBtn.prop("disabled", !enabled);
+    }
+
+    updateUploadButtonState(false);
+  });
+</script>

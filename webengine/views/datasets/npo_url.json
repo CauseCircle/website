@@ -1,0 +1,8 @@
+[
+  {{ each non_profits as npo where npo.name = '{get_var.npo_name}' }}
+  {
+    "url": "https://causecircle.org{{npo.getUrl()}}"
+  }
+  {{ npo._arraycomma }}
+  {{/each}}
+]

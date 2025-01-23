@@ -1,0 +1,27 @@
+{{$page = 1}}
+{{$limit = 25}}
+{{$filter = }}
+{{if {get_var.page} }}
+{{$page = {get_var.page} }}
+{{/if}}
+{{if {get_var.limit} }}
+{{$limit = {get_var.limit} }}
+{{/if}}
+{{if {get_var.search} }}
+{{$filter = AND story.title LIKE '%{get_var.search}%'  }}
+{{/if}}
+{{$start = {math(({$page} - 1) * {$limit})} }}
+{
+    "data" :
+    [
+        {{each stories as story WHERE FIND_IN_SET('{get_var.cause}', story.related_causes) {$filter} limit {$start}, {$limit} }}
+        {{story.toJSON(2)}}
+        {{story._arraycomma}}
+        {{/each}}
+    ],
+    "meta" : {
+        "page" : {{$page}},
+        "start" : {{$start}},
+        "limit" : {{$limit}}
+    }
+}

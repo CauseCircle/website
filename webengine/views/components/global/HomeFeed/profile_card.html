@@ -1,0 +1,178 @@
+<style>
+  .card-header {
+    background-color: #8a2be2;
+    height: 80px;
+    border-top-left-radius: 0.5rem !important;
+    border-top-right-radius: 0.5rem !important;
+  }
+  .profile-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+    /* border: 4px solid white; */
+    object-fit: cover;
+  }
+
+  .profile-image-container {
+    position: absolute;
+    top: 40px;
+    left: 20px;
+    width: 80px;
+    height: 80px;
+    border-radius: 0.5rem;
+    border: 4px solid white;
+  }
+  .camera-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: white;
+    font-size: 1.5rem;
+  }
+  .background-img {
+    width: 100%;
+    height: 80px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    object-fit: cover;
+  }
+</style>
+
+<!--prettier-ignore-->
+{{ include /components/global/HomeFeed/upload_bg_image_modal.html }}
+<!--prettier-ignore-->
+{{ include /components/global/HomeFeed/upload_profile_image_modal.html }}
+
+<div class="card" id="profile-card">
+  <div class="">
+    <img src="" class="background-img" id="background-image" />
+    <button
+      class="btn bg-transparent camera-icon"
+      data-bs-toggle="modal"
+      data-bs-target="#uploadBgImageModal"
+    >
+      <i class="bi bi-camera"></i>
+    </button>
+  </div>
+  <div class="profile-image-container">
+    <img src="" class="profile-image" id="profile-image" />
+    <button
+      class="btn btn-sm btn-light rounded-circle position-absolute bottom-0 end-0 m-1"
+      id="change-profile-image-btn"
+      data-bs-toggle="modal"
+      data-bs-target="#uploadProfileImageModal"
+    >
+      <i class="bi bi-camera"></i>
+    </button>
+  </div>
+  <div class="card-body pt-5 mt-3">
+    <h5 class="card-title mb-0" id="user-name"></h5>
+    <p class="card-text text-muted mb-3" id="user-type"></p>
+    <p class="card-text text-muted small mb-3" id="user-email"></p>
+    <p class="card-text d-flex align-items-center" id="favorite-cause">
+      <img
+        src=""
+        class="me-2"
+        style="width: 20px; height: 20px"
+        id="cause-logo"
+      />
+      <span id="cause-name"></span>
+    </p>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    const authUser = JSON.parse(localStorage.getItem("user"));
+
+    // const profileImageContainer = $("#profile-image-container");
+    // const changeProfileImageBtn = $("#change-profile-image-btn");
+
+    // profileImageContainer.hover(
+    //   function () {
+    //     changeProfileImageBtn.removeClass("d-none");
+    //   },
+    //   function () {
+    //     changeProfileImageBtn.addClass("d-none");
+    //   }
+    // );
+
+    $.ajax({
+      url: "https://4xxglxlj-dev.webengine.zesty.io/mobileapp/user_profile.json?zpw=causecircle",
+      method: "GET",
+      data: {
+        user_zuid: authUser.zuid,
+      },
+      success: function (data) {
+        // Update profile image
+        if (typeof data.profile_image === "string") {
+          $("#profile-image").attr("src", data.profile_image);
+        } else if (
+          data.profile_image &&
+          data.profile_image.data &&
+          data.profile_image.data.length > 0 &&
+          data.profile_image.data[0].url
+        ) {
+          $("#profile-image").attr("src", data.profile_image.data[0].url);
+        } else {
+          $("#profile-image").attr("src", "");
+        }
+
+        // Update background image
+        if (typeof data.background_image === "string") {
+          $("#background-image").attr("src", data.background_image);
+        } else if (
+          data.background_image &&
+          data.background_image.data &&
+          data.background_image.data.length > 0 &&
+          data.background_image.data[0].url
+        ) {
+          $("#background-image").attr("src", data.background_image.data[0].url);
+        } else {
+          $("#background-image").attr(
+            "src",
+            "https://4xxglxlj.media.zestyio.com/minimalistic-blur-gradient-banner-web-app-backdrop-design_1017-44315-1-.jpg"
+          );
+        }
+
+        // Update user name
+        $("#user-name").text(data.first_name + " " + data.last_name);
+
+        // Update user type (if available)
+        if (data.user_type) {
+          $("#user-type").text(
+            data.user_type.charAt(0).toUpperCase() + data.user_type.slice(1)
+          );
+        } else {
+          $("#user-type").hide();
+        }
+
+        // Update user email (if available)
+        if (data.email) {
+          $("#user-email").text(data.email);
+        } else {
+          $("#user-email").hide();
+        }
+
+        // Update favorite NPO (if available)
+        if (data?.favorite_causes && data?.favorite_causes?.data?.length > 0) {
+          const cause = data?.favorite_causes?.data[0];
+          $("#cause-name").text(cause?.title || "Favorite Cause");
+          if (cause?.image) {
+            $("#cause-logo").attr("src", cause?.image?.data[0]?.url);
+          } else {
+            $("#cause-logo").hide();
+          }
+        } else {
+          // console.log("no cause");
+          $("#favorite-cause").hide();
+          $("#cause-name").hide();
+          $("#cause-logo").hide();
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("Error fetching user profile:", error);
+      },
+    });
+  });
+</script>

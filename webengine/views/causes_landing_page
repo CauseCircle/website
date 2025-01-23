@@ -1,0 +1,313 @@
+<style>
+  .title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+  }
+  .search-bar {
+    display: flex;
+    gap: 10px;
+  }
+  .search-input,
+  .filter-dropdown {
+    /* background-color: #f0f0f0; */
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  .search-input {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    padding-left: 35px;
+    max-width: 548px;
+  }
+  .filter-dropdown {
+    appearance: none;
+    padding-right: 30px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+  .filter-dropdown::-ms-expand {
+    display: none;
+  }
+
+  .section-title p,
+  .section-title {
+    font-size: 2rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  .hero-description p,
+  .hero-description {
+    font-size: 1.125rem;
+    font-weight: 400;
+    text-align: center;
+    color: var(--bs-gray-500);
+    max-width: 53.125rem;
+  }
+
+  .category-card {
+    background-size: cover;
+    background-position: center;
+    min-height: 160px;
+    border-radius: 15px;
+    border: none;
+    transition: transform 0.5s ease;
+  }
+
+  .category-card:hover {
+    transform: scale(1.02);
+  }
+
+  .gradient-overlay {
+    background: linear-gradient(
+      179.63deg,
+      rgba(113, 61, 221, 0) 0.32%,
+      #3d2177 99.68%
+    );
+    border-radius: 15px;
+  }
+</style>
+
+<section class="container py-4 py-md-8">
+  <div
+    class="d-flex flex-column gap-2 justify-content-center align-items-center"
+  >
+    <p class="fs-1 fw-normal text-center">Explore Impactful Causes</p>
+    <p class="fs-5 text-muted text-center">
+      Discover and support causes that matter to you.
+    </p>
+    <input
+      type="text"
+      id="cause-search"
+      class="search-input form-control w-100 mb-2 mb-md-0 py-2 my-4"
+      placeholder="Search Causes by name..."
+      aria-label="Search"
+    />
+  </div>
+</section>
+
+<section class="py-2">
+  <hr class="my-0" style="border-top: 1px solid #bdbdbd" />
+</section>
+
+<section id="search-results" class="container py-4 flex-column gap-4">
+  <div class="d-flex justify-content-between">
+    <p class="fs-5 fw-bold py-4">Explore Causes</p>
+  </div>
+  <div id="search-causes-container" class="row row-gap-4">
+    <!-- Search results will be dynamically inserted here -->
+  </div>
+</section>
+
+<section class="py-2">
+  <hr class="my-0" style="border-top: 1px solid #bdbdbd" />
+</section>
+
+<!--Get started section-->
+<section id="get-started-section" class="container-fluid pt-5">
+  <div class="container">
+    <div
+      class="d-flex flex-column gap-3 align-items-center justify-content-center"
+    >
+      <p class="section-title text-center">Ready to Make a Difference?</p>
+      <div class="hero-description mx-auto">
+        Start exploring causes and nonprofits to today.
+      </div>
+      <div class="py-3">
+        <a href="{{ demo_page.first().path_full }}" class="btn btn-primary">
+          Get Started
+        </a>
+      </div>
+      <img
+        src="https://4xxglxlj.media.zestyio.com/layer-2-1.png"
+        alt=""
+        style="height: 12.375rem; object-fit: contain"
+      />
+    </div>
+  </div>
+</section>
+
+<script>
+  $(document).ready(function () {
+    const $causeSearch = $(".search-input");
+    const $searchCausesContainer = $("#search-causes-container");
+    const $loadingIndicator = $(
+      '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>'
+    );
+    const $noResultsMessage = $(`
+      <div class="text-center py-12">
+        <h2 class="mb-3">Cause Not Found</h2>
+        <p class="text-muted">We couldn't find any cause matching your search criteria.</p>
+      </div>
+    `);
+    const $exploreCausesText = $(".fs-5.fw-bold.py-4");
+    let currentPage = 1;
+    let isSearching = false;
+
+    // Get the filter parameter from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParam = urlParams.get("search");
+
+    // Set the initial value of the search input if filter parameter exists
+    if (searchParam) {
+      $causeSearch.val(searchParam);
+    }
+
+    // Perform initial search with the filter or display featured NPOs
+    searchCauses();
+
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    $causeSearch.on(
+      "input",
+      debounce(() => {
+        currentPage = 1;
+        searchCauses();
+        updateUrlParam();
+      }, 300)
+    );
+
+    // Update URL parameter function
+    function updateUrlParam() {
+      const searchValue = $causeSearch.val();
+      const newUrl = searchValue
+        ? `${window.location.pathname}?filter=${encodeURIComponent(
+            searchValue
+          )}`
+        : window.location.pathname;
+      history.pushState(null, "", newUrl);
+    }
+
+    function searchCauses() {
+      const searchInput = $causeSearch.val();
+      const limit = searchInput ? 20 : 8;
+      const isFeatured = searchInput ? 0 : 1;
+
+      if (currentPage === 1) {
+        $searchCausesContainer.empty().append($loadingIndicator);
+      }
+
+      $.ajax({
+        url: `https://causecircle.org/mobileapp/causes.json`,
+        method: "GET",
+        data: {
+          limit: limit,
+          search: searchInput,
+          page: currentPage,
+          featured: isFeatured,
+        },
+        success: function (data) {
+          if (currentPage === 1) {
+            $searchCausesContainer.empty();
+          }
+          if (data.data && data.data.length > 0) {
+            $exploreCausesText.show();
+            $.each(data.data, function (index, cause) {
+              const $causeCard = createCauseCard(cause);
+              $searchCausesContainer.append($causeCard);
+            });
+            if (data.data.length === limit) {
+              addLoadMoreButton();
+            } else {
+              removeLoadMoreButton();
+            }
+          } else if (currentPage === 1) {
+            $exploreCausesText.hide();
+            removeLoadMoreButton();
+            $searchCausesContainer.append($noResultsMessage);
+          }
+          isSearching = false;
+        },
+        error: function (error) {
+          console.error("Error fetching search results:", error);
+          if (currentPage === 1) {
+            $exploreCausesText.hide();
+            removeLoadMoreButton();
+            $searchCausesContainer
+              .empty()
+              .append(
+                $(
+                  '<div class="text-center py-4">An error occurred. Please try again.</div>'
+                )
+              );
+          }
+          isSearching = false;
+        },
+      });
+    }
+
+    function createCauseCard(cause) {
+      let causeImage =
+        typeof cause.image === "string"
+          ? cause.image
+          : cause.image?.data[0]?.url ||
+            "https://placehold.co/600x400/png?text=Cause+Image";
+
+      if (causeImage.includes("https://placehold.co/")) {
+        causeImage = "https://placehold.co/600x400/png?text=Cause+Image";
+      }
+
+      return `
+        <div class="col-12 col-sm-6 col-md-3 mb-3">
+          <a href="${
+            cause.meta?.web?.uri || "#"
+          }" style="text-decoration: none">
+            <div class="card text-white position-relative category-card" style="background-image: url(${causeImage});">
+              <div class="position-absolute start-0 end-0 top-0 bottom-0 gradient-overlay"></div>
+              <div class="card-body d-flex align-items-end position-relative">
+                <p class="fs-6 fw-semibold">${
+                  cause.title || "Unknown Cause"
+                }</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      `;
+    }
+
+    function addLoadMoreButton() {
+      removeLoadMoreButton();
+      const $loadMoreButton = $(
+        '<button class="btn btn-secondary mt-4 d-block mx-auto">Load More</button>'
+      );
+      $loadMoreButton.on("click", loadMore);
+      $searchCausesContainer.after($loadMoreButton);
+    }
+
+    function removeLoadMoreButton() {
+      $searchCausesContainer.next(".btn-secondary").remove();
+    }
+
+    function loadMore() {
+      if (!isSearching) {
+        isSearching = true;
+        currentPage++;
+        searchCauses();
+      }
+    }
+
+    $("img").each(function () {
+      if ($(this).attr("src").includes("https://placehold.co/")) {
+        $(this).attr(
+          "src",
+          "https://placehold.co/600x400/png?text=Cause+Image"
+        );
+      }
+    });
+  });
+</script>

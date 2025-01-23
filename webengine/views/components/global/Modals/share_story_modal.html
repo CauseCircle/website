@@ -1,0 +1,341 @@
+<style>
+  .modal-content {
+    padding: 1.5rem;
+  }
+  .modal-header {
+    padding-bottom: 1.5rem;
+  }
+  .modal-title {
+    font-weight: 600;
+    color: #373d46;
+    opacity: 0.88;
+  }
+  .icon_holder {
+    width: 4.5em;
+    height: 4.5em;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .social__logo {
+    width: 2em;
+    height: 2em;
+  }
+  .list__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    gap: 0.5rem; /* Added gap between elements */
+  }
+  [data-icon="twitter"] {
+    background-color: #e8f6fe;
+  }
+  [data-icon="twitter"] img {
+    filter: invert(47%) sepia(95%) saturate(1887%) hue-rotate(177deg)
+      brightness(98%) contrast(93%);
+  }
+  [data-icon="facebook"] {
+    background-color: #e8f1fe;
+  }
+  [data-icon="facebook"] img {
+    filter: invert(23%) sepia(92%) saturate(1645%) hue-rotate(204deg)
+      brightness(97%) contrast(95%);
+  }
+  [data-icon="linkedin"] {
+    background-color: #e1eaf7;
+  }
+  [data-icon="linkedin"] img {
+    filter: invert(29%) sepia(98%) saturate(1161%) hue-rotate(178deg)
+      brightness(95%) contrast(96%);
+  }
+  [data-icon="whatsapp"] {
+    background-color: #e9fbf0;
+  }
+  [data-icon="whatsapp"] img {
+    filter: invert(55%) sepia(64%) saturate(489%) hue-rotate(93deg)
+      brightness(97%) contrast(94%);
+  }
+  [data-icon="reddit"] {
+    background-color: #ffece6;
+  }
+  [data-icon="reddit"] img {
+    filter: invert(37%) sepia(93%) saturate(1372%) hue-rotate(356deg)
+      brightness(95%) contrast(105%);
+  }
+  [data-icon="telegram"] {
+    background-color: #e6f3fa;
+  }
+  [data-icon="telegram"] img {
+    filter: invert(40%) sepia(52%) saturate(845%) hue-rotate(165deg)
+      brightness(100%) contrast(93%);
+  }
+  [data-icon="pinterest"] {
+    background-color: #ffeaeb;
+  }
+  [data-icon="pinterest"] img {
+    filter: invert(13%) sepia(89%) saturate(5618%) hue-rotate(343deg)
+      brightness(78%) contrast(96%);
+  }
+  [data-icon="email"] {
+    background-color: #f1f3f4;
+  }
+  [data-icon="email"] img {
+    filter: invert(20%) sepia(10%) saturate(2076%) hue-rotate(176deg)
+      brightness(92%) contrast(86%);
+  }
+  .share__modal_input input {
+    background-color: #f8f9fa;
+    border: none;
+  }
+  .share__modal_input input:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  .share__modal_input .btn {
+    border: none;
+    background-color: #f8f9fa;
+    color: #373d46;
+    transition: background-color 0.3s ease;
+  }
+  .share__modal_input .btn:hover {
+    background-color: #e9ecef;
+  }
+  .share__modal_input .btn:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  .copied-message {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .btn.copied .copied-message {
+    opacity: 1;
+    animation: fadeInOut 1.5s ease;
+  }
+  @keyframes fadeInOut {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    20%,
+    80% {
+      opacity: 1;
+    }
+  }
+</style>
+
+<div
+  class="modal fade"
+  id="shareModal"
+  tabindex="-1"
+  aria-labelledby="shareModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="shareModalLabel">Share this story</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body px-4 pb-4">
+        <div class="share__modal__options">
+          <div class="row row-cols-3 row-cols-md-4 g-3">
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="twitter">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/twitter.svg"
+                    class="social__logo"
+                    alt="twitter-logo"
+                  />
+                </div>
+                <span>Twitter</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="facebook">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/facebook.svg"
+                    class="social__logo"
+                    alt="facebook-logo"
+                  />
+                </div>
+                <span>Facebook</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="linkedin">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/linkedin.svg"
+                    class="social__logo"
+                    alt="linkedin-logo"
+                  />
+                </div>
+                <span>LinkedIn</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="whatsapp">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/whatsapp.svg"
+                    class="social__logo"
+                    alt="whatsapp-logo"
+                  />
+                </div>
+                <span>WhatsApp</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="reddit">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/reddit.svg"
+                    class="social__logo"
+                    alt="reddit-logo"
+                  />
+                </div>
+                <span>Reddit</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="telegram">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/telegram.svg"
+                    class="social__logo"
+                    alt="telegram-logo"
+                  />
+                </div>
+                <span>Telegram</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="pinterest">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/pinterest.svg"
+                    class="social__logo"
+                    alt="pinterest-logo"
+                  />
+                </div>
+                <span>Pinterest</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="email">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@3.13.0/icons/mail-dot-ru.svg"
+                    class="social__logo"
+                    alt="email-logo"
+                  />
+                </div>
+                <span>Email</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="share__modal_link mt-4">
+          <span class="d-block mb-2">Page link</span>
+          <div class="share__modal_input input-group">
+            <input type="text" class="form-control" id="pageUrl" readonly />
+            <button
+              class="btn btn-outline-secondary position-relative"
+              type="button"
+              id="copyButton"
+            >
+              <i class="bi bi-clipboard"></i>
+              <span class="copied-message">Copied!</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    var pageUrl = window.location.href;
+    $("#pageUrl").val(pageUrl);
+
+    $(".list__item").click(function () {
+      var platform = $(this).find(".icon_holder").data("icon");
+      var shareUrl = "";
+
+      switch (platform) {
+        case "twitter":
+          shareUrl =
+            "https://twitter.com/intent/tweet?url=" +
+            encodeURIComponent(pageUrl);
+          break;
+        case "facebook":
+          shareUrl =
+            "https://www.facebook.com/sharer/sharer.php?u=" +
+            encodeURIComponent(pageUrl);
+          break;
+        case "linkedin":
+          shareUrl =
+            "https://www.linkedin.com/shareArticle?url=" +
+            encodeURIComponent(pageUrl);
+          break;
+        case "whatsapp":
+          shareUrl = "https://wa.me/?text=" + encodeURIComponent(pageUrl);
+          break;
+        case "reddit":
+          shareUrl =
+            "https://reddit.com/submit?url=" + encodeURIComponent(pageUrl);
+          break;
+        case "telegram":
+          shareUrl =
+            "https://t.me/share/url?url=" + encodeURIComponent(pageUrl);
+          break;
+        case "pinterest":
+          shareUrl =
+            "https://pinterest.com/pin/create/button/?url=" +
+            encodeURIComponent(pageUrl);
+          break;
+        case "email":
+          shareUrl = "mailto:?body=" + encodeURIComponent(pageUrl);
+          break;
+      }
+
+      if (shareUrl) {
+        window.open(shareUrl, "_blank");
+      }
+    });
+
+    $("#copyButton").click(function () {
+      $("#pageUrl").select();
+      document.execCommand("copy");
+
+      // Show the "Copied!" message
+      $(this).addClass("copied");
+
+      // Remove the "Copied!" message after animation completes
+      setTimeout(() => {
+        $(this).removeClass("copied");
+      }, 1500);
+    });
+  });
+</script>

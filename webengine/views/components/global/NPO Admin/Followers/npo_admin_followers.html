@@ -1,0 +1,305 @@
+<style>
+  .followers-list {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+
+  .follower-item {
+    transition: background-color 0.2s ease;
+  }
+
+  .follower-item:hover {
+    background-color: #f8f9fa;
+  }
+
+  .btn-link {
+    color: #666;
+  }
+
+  .btn-link:hover {
+    color: #000;
+  }
+
+  /* Custom modal styles */
+  .modal-content {
+    border-radius: 16px;
+    padding: 8px;
+  }
+
+  .invite-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+  }
+
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 24px auto;
+  }
+
+  .success-icon .checkmark {
+    color: #22c55e;
+    font-size: 24px;
+  }
+
+  .btn-primary {
+    background-color: #7c3aed;
+    border-color: #7c3aed;
+  }
+
+  .btn-primary:hover {
+    background-color: #6d28d9;
+    border-color: #6d28d9;
+  }
+
+  .modal-subtitle {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+
+  .spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.2em;
+    margin-right: 0.5rem;
+  }
+
+  .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+</style>
+
+<div class="tab-pane" id="followers">
+  <div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="mb-0 text-center">Followers</h3>
+      <button
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#inviteModal"
+      >
+        <i class="bi bi-person-plus"></i> Invite Followers
+      </button>
+    </div>
+
+    <!-- Followers List -->
+    <div class="followers-list d-flex flex-column gap-3">
+      <!--prettier-ignore-->
+      {{each users as member where find_in_set('{get_var.zuid}', member.favorite_npos)}}
+      <div
+        class="follower-item d-flex flex-row justify-content-between align-items-center card"
+      >
+        <div class="d-flex align-items-center">
+          <img
+            src="{{ member.profile_image.getImage() }}"
+            alt="Profile"
+            class="rounded-circle"
+            width="48"
+            height="48"
+          />
+          <div class="ms-3">
+            <h6 class="mb-0">{{ member.first_name }} {{ member.last_name }}</h6>
+            <small class="text-muted"
+              >{{member.email}} • Joined {{member.created_at}}</small
+            >
+          </div>
+        </div>
+        <a href="{{member.getUrl()}}" class="btn btn-link text-decoration-none"
+          >View Profile</a
+        >
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
+
+<!-- Invite Modal -->
+<div class="modal fade" id="inviteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <div class="modal-title d-flex flex-row align-items-center gap-2">
+          <span class="invite-icon">
+            <i class="bi bi-person-plus fs-4"></i>
+          </span>
+          <div class="d-flex flex-column">
+            <h5 class="mb-0">Invite Followers</h5>
+            <p class="modal-subtitle mb-0">
+              Input emails as comma-separated values. These invites will be sent
+              as emails on your behalf.
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="inviteEmails" class="form-label">Invite</label>
+          <textarea
+            class="form-control"
+            id="inviteEmails"
+            rows="3"
+            placeholder="e.g. zoshua@zesty.io, stuart@zesty.io"
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-0 d-flex justify-content-between">
+        <div>
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            id="downloadQRCode"
+          >
+            Download Invitation QR Code
+          </button>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" id="sendInvites">
+            <span class="d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="invite-text">Invite</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <div class="modal-title d-flex flex-row align-items-center gap-2">
+          <span class="invite-icon">
+            <i class="bi bi-person-plus fs-4"></i>
+          </span>
+          <div class="d-flex flex-column">
+            <h5 class="mb-0">Followers Invited</h5>
+            <p class="modal-subtitle mb-0">
+              These invites will be sent as emails
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="success-icon">
+          <i class="bi bi-check-lg checkmark"></i>
+        </div>
+        <h4>You've invited <span id="inviteCount">0</span> new followers</h4>
+        <p class="modal-subtitle">
+          Please ask them to check their inbox for an email from<br />
+          invite@causecircle.com
+        </p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light" id="inviteMore">
+          Invite More
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    const inviteModal = new bootstrap.Modal(
+      document.getElementById("inviteModal")
+    );
+    const successModal = new bootstrap.Modal(
+      document.getElementById("successModal")
+    );
+
+    // Handle invite submission
+    $("#sendInvites").click(async function () {
+      const $button = $(this);
+      const $spinner = $button.find('.spinner-border');
+      const $text = $button.find('.invite-text');
+      
+      // Disable button and show loading
+      $button.prop('disabled', true);
+      $spinner.removeClass('d-none');
+
+      const emailsText = $("#inviteEmails").val();
+      const emails = emailsText
+        .split(",")
+        .map((email) => email.trim())
+        .filter((email) => email);
+
+      if (emails.length === 0) {
+        alert("Please enter at least one email address");
+        // Reset button state
+        $button.prop('disabled', false);
+        $spinner.addClass('d-none');
+        $text.text('Invite');
+        return;
+      }
+
+      try {
+        const response = await window.inviteUsers("{{get_var.zuid}}", {
+          emails: emails.join(','),
+          type: "follower",
+        });
+
+        // console.log("response", response);
+
+        // Update success message and show success modal
+        $("#inviteCount").text(emails.length);
+        inviteModal.hide();
+        successModal.show();
+      } catch (error) {
+        console.error("Error sending invites:", error);
+        alert("Failed to send invites. Please try again.");
+      } finally {
+        // Reset button state
+        $button.prop('disabled', false);
+        $spinner.addClass('d-none');
+        $text.text('Invite');
+      }
+    });
+
+    // Handle "Invite More" button
+    $("#inviteMore").click(function () {
+      successModal.hide();
+      $("#inviteEmails").val(""); // Clear previous inputs
+      inviteModal.show();
+    });
+
+    // Reset form when modal is hidden
+    $("#inviteModal").on("hidden.bs.modal", function () {
+      $("#inviteEmails").val("");
+    });
+
+    // Add QR Code download handler
+    $("#downloadQRCode").click(function () {
+      const npoId = "{{get_var.zuid}}";
+      const url = `https://api.causecircle.org/npos/${npoId}/qrcode?type=png&mode=download`;
+      window.open(url, "_blank");
+    });
+  });
+</script>

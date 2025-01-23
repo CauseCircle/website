@@ -1,0 +1,28 @@
+{{$page = 1}}
+{{$limit = 25}}
+{{$search =  }}
+{{if {get_var.page} }}
+{{$page = {get_var.page} }}
+{{/if}}
+{{if {get_var.limit} }}
+{{$limit = {get_var.limit} }}
+{{/if}}
+{{if {get_var.search} }}
+{{$search = AND npo.name LIKE '%{get_var.search}%'  }}
+{{/if}}
+{{$start = {math(({$page} - 1) * {$limit})} }}
+{
+    "data" :
+    [
+        {{each non_profits as npo WHERE npo.category LIKE '%{get_var.cause}%' {$search} limit {$start}, {$limit} }}
+        {{npo.toJSON(2)}}
+        {{npo._arraycomma}}
+        {{/each}}
+    ],
+    "meta" : {
+        "page" : {{$page}},
+        "cause": "{{get_var.cause}}",
+        "start" : {{$start}},
+        "limit" : {{$limit}}
+    }
+}
