@@ -1,0 +1,98 @@
+name: Bug Report
+description: Report a bug in the website
+title: "[Bug]: "
+labels: [bug]
+type: Bug
+projects: ["CauseCircle/7"]
+body:
+  - type: input
+    attributes:
+      label: Reporter
+      description: Your name or GitHub username so we know who submitted this bug.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: product
+    attributes:
+      label: Product / Feature
+      description: Select the feature or product area where the bug occurs.
+      options:
+        - Sign up / Onboarding
+        - Log In / Authentication
+        - User Profile
+        - Add Story
+        - Comments / Engagement
+        - NPO Admin
+        - Search
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How severe is the issue? Select the priority that best reflects its impact.
+      options:
+        - Critical (System Crash, Data Loss)
+        - High (Major Feature Broken, Significant User Impact)
+        - Medium (Minor feature issue, workaround available)
+        - Low (Cosmetic issue, nice-to-have)
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Detailed Explanation of the problem
+      description: Provide a clear and detailed description of what went wrong, including symptoms and error messages if available.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: What is the expected behavior?
+      description: Describe what you expected to happen instead of the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to reproduce the issue
+      description: List step-by-step instructions so we can reliably reproduce the bug (e.g., "1. Go to homepage, 2. Click login, 3. Enter credentials, 4. Page freezes").
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Browser & Version
+      description: Provide the browser and version where the bug occurred (e.g., Chrome 117, Firefox 115).
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Operating System
+      description: Specify the operating system you are using (e.g., Windows 11, macOS Sonoma, Ubuntu 22.04).
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Screen Resolution
+      description: Provide your screen resolution (e.g., 1920x1080, 1440x900) if relevant.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Additional Information
+      description: Any other relevant details that could help (e.g., network conditions, console errors, logs, extensions in use).
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Screenshots / Video Recording
+      description: Attach screenshots or a screen recording showing the problem, if available. This greatly helps in debugging.
+    validations:
+      required: false
