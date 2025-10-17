@@ -1,0 +1,69 @@
+<script type="module">
+  // ==================== BASE URL ====================
+  const BASE_URL = "https://api.causecircle.org";
+  // const BASE_URL = "http://localhost:8080";
+
+  // ==================== NPO STATS ====================
+  window.npoTotalStats = async (zuid) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/admin/stats/npos/total?npo_zuid=${zuid}`, options);
+      return await response.json();
+    } catch (error) {
+      console.error("Error getting NPO total stats:", error);
+      throw error;
+    }
+  }
+
+  window.npoEngagementStats = async (zuid, startDate, endDate) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/admin/stats/npos?npo_zuid=${zuid}&start=${startDate}&end=${endDate}`, options);
+      return await response.json();
+    } catch (error) {
+      console.error("Error getting NPO engagement stats:", error);
+      throw error;
+    }
+  }
+
+  window.npoStoriesStats = async (zuid, startDate, endDate) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/admin/stats/stories?npo_zuid=${zuid}&start=${startDate}&end=${endDate}`, options);
+      return await response.json();
+    } catch (error) {
+      console.error("Error getting NPO story stats:", error);
+      throw error;
+    }
+  }
+</script>

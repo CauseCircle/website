@@ -1,0 +1,657 @@
+<style>
+  #hero-section {
+    background: linear-gradient(to bottom, white, #f7d7fe);
+  }
+
+  .hero-container {
+    /* Removing max-width restriction */
+  }
+
+  .hero-image {
+    width: 100%;
+    height: auto;
+    max-height: 32rem;
+    object-fit: contain;
+  }
+
+  @media (min-width: 992px) {
+    .hero-image {
+      max-height: 35rem;
+      transform: scale(1.1);
+    }
+    
+    .hero-image-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: visible;
+    }
+  }
+
+  .hero-title p,
+  .hero-title {
+    /* font-size: 2.5rem;
+    font-weight: 500; */
+    text-align: left; /* Changed from center to left */
+  }
+
+  .hero-description p,
+  .hero-description {
+    /* font-size: 1.125rem;
+    font-weight: 400; */
+    /* text-align: center; */
+    color: var(--bs-gray-500);
+    max-width: 35.125rem;
+  }
+
+  /* Homepage Search Styles */
+  .search-bar {
+    position: relative;
+    display: flex;
+    justify-content: flex-start; /* Changed from center to flex-start */
+    padding: 20px 0;
+    width: 100%;
+    max-width: 720px;
+    margin: 0; /* Changed from 0 auto to 0 */
+  }
+
+  .search-bar input {
+    width: 100%;
+    max-width: 720px;
+    height: 66px;
+    padding: 20px 24px 20px 54px;
+    font-size: 16px;
+    border: 1px solid #dfe1e7;
+    border-radius: 10px;
+    transition: border-color 0.2s ease-in-out;
+  }
+  
+  /* Add placeholder color styling */
+  .search-bar input::placeholder {
+    color: rgba(91, 44, 201, 1);
+    font-style: italic;
+  }
+
+  /* For older browsers */
+  .search-bar input::-webkit-input-placeholder {
+    color: rgba(91, 44, 201, 1);
+    font-style: italic;
+  }
+  .search-bar input::-moz-placeholder {
+    color: rgba(91, 44, 201, 1);
+    font-style: italic;
+  }
+  .search-bar input:-ms-input-placeholder {
+    color: rgba(91, 44, 201, 1);
+    font-style: italic;
+  }
+  .search-bar input::-ms-input-placeholder {
+    color: rgba(91, 44, 201, 1);
+    font-style: italic;
+  }
+
+  .search-bar input:focus {
+    border-color: var(--bs-primary);
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+  }
+
+  .search-bar button {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: rgba(91, 44, 201, 1);
+  }
+
+  .search-bar button:hover {
+    color: rgba(91, 44, 201, 0.8);
+  }
+
+  #homepage-search-results {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% - 5px);
+    z-index: 1000;
+    min-height: 50px;
+    max-height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.5rem 0;
+    font-size: 1rem;
+    color: #212529;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  
+  #homepage-search-results .dropdown-header {
+    display: block;
+    padding: 0.5rem 1.5rem;
+    margin-bottom: 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+    white-space: nowrap;
+    font-weight: bold;
+    font-style: italic;
+  }
+  
+  #homepage-search-results .dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.25rem 1.5rem;
+    clear: both;
+    font-weight: 400;
+    color: #212529;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+  }
+  
+  #homepage-search-results .loading-state {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+  }
+  
+  #homepage-search-results .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+  }
+  
+  #homepage-search-results .dropdown-item.scroll-text:hover {
+    animation: scrollText 7s linear infinite;
+    white-space: nowrap;
+    background-color: #f8f9fa;
+  }
+  
+  #homepage-search-results .dropdown-item:hover {
+    color: #16181b;
+    text-decoration: none;
+    background-color: #f8f9fa;
+    overflow: visible;
+    white-space: nowrap;
+  }
+  
+  #homepage-search-results .dropdown-divider {
+    height: 1px;
+    margin: 0.5rem 0;
+    overflow: hidden;
+    background-color: #e9ecef;
+  }
+
+  #download-buttons {
+    justify-content: flex-start !important; /* Override center alignment */
+  }
+
+  @media (max-width: 767.98px) {
+    .hero-description-text p,
+    .hero-description-text {
+      text-shadow: 1px 1px 3px white;
+      color: var(--bs-gray-600);
+    }
+    
+    /* Align text center on mobile */
+    .hero-title {
+      text-align: center;
+    }
+    
+    #download-buttons {
+      justify-content: center !important;
+    }
+    
+    .search-bar {
+      margin: 0 auto;
+    }
+  }
+
+  .how_it_works_section {
+    /* color: rgb(94, 94, 94); */
+  }
+
+  /* Add styles for the CTA links */
+  .cta-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: var(--bs-primary);
+    color: white;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .cta-link:hover {
+    background-color: var(--bs-primary-darken-5, #5b2cc9);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  /* Add smooth scrolling to the page */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  #search-container {
+    scroll-margin-top: 100px; /* Adjust this value to control how high the element appears */
+  }
+</style>
+
+<section id="hero-section" class="container-fluid">
+  <div class="container py-5">
+    <div class="row align-items-center">
+      <div class="col-12 col-md-6 order-md-1 order-2">
+        <div class="d-flex flex-column gap-4">
+          <div class="hero-title">
+            {{ this.hero_title }}
+          </div>
+          <div class="hero-description hero-description-text">
+            {{ this.hero_description }}
+          </div>
+          <div id="search-container" class="search-bar">
+            <button id="homepage-search-btn" type="button">
+              <i class="bi bi-search"></i>
+            </button>
+            <input
+              id="homepage-search"
+              type="text"
+              placeholder="Search, Claim your Nonprofit Profile to Login and Submit your Story"
+              aria-label="Search"
+            />
+            <ul id="homepage-search-results" class="dropdown-menu"></ul>
+          </div>
+          <div id="download-buttons" class="d-flex gap-3">
+            <a
+              href="https://play.google.com/store/apps/details?id=causecircle.org&pcampaignid=web_share"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/google_download.png"
+                alt="Get it on Google Play"
+                class="store-button"
+              />
+            </a>
+            <a
+              href="https://apps.apple.com/us/app/causecircle/id6593386907"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/apple_download.png"
+                alt="Download on the App Store"
+                class="store-button"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 mt-md-0 mb-4 mb-md-0 hero-image-container order-md-2 order-1">
+        <img
+          src="{{ this.hero_image.getImage() }}"
+          alt="CauseCircle StoryFest"
+          class="img-fluid hero-image"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="what-it-is-section" class="my-3 my-sm-7">
+  <div class="container">
+    <div class="hero-title">{{ this.what_it_is_section }}</div>
+  </div>
+
+  <div class="container">
+    <div class="row d-none d-sm-flex mt-4">
+      <div class="col-12 col-md-6">
+        <img
+          src="{{ this.how_it_works_image.getImage() }}?width=600"
+          alt=""
+          class="img-fluid w-100 usecase-image"
+        />
+      </div>
+      <div
+        class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5"
+      >
+        <div class="w-75 d-flex flex-column gap-2">
+          <div class="how_it_works_section">
+            {{ this.how_it_works_section }}
+          </div>
+          <div>
+            <a href="#search-container" class="cta-link">
+              {{ this.how_it_works_cta }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row d-flex d-sm-none mt-4 mt-sm-0 gap-3 gap-sm-0">
+      <div class="col-12 col-md-6">
+        <img
+          src="{{ this.how_it_works_image.getImage() }}?width=600"
+          alt=""
+          class="img-fluid w-100 usecase-image"
+        />
+      </div>
+      <div
+        class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+      >
+        <div class="w-100 w-sm-75 d-flex flex-column gap-2">
+          <div class="how_it_works_section">
+            {{ this.how_it_works_section }}
+          </div>
+          <div>
+            <a href="#search-container" class="cta-link">
+              {{ this.how_it_works_cta }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row mt-1 gap-3 gap-sm-0 d-flex">
+      <div
+        class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
+      >
+        <div class="w-100 w-sm-75 d-flex flex-column gap-2">
+          <div class="how_it_works_section">
+            {{ this.rewards_section }}
+          </div>
+          <div>
+            <a href="#search-container" class="cta-link">
+              {{ this.rewards_cta }}
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <img
+          src="{{ this.rewards_image.getImage() }}?width=600"
+          alt=""
+          class="img-fluid w-100 usecase-image"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<section
+  id="faqs-section"
+  class="container"
+  style="margin-top: 100px; margin-bottom: 100px"
+>
+  <div class="d-flex flex-column gap-2">
+    <h1>StoryFest FAQs</h1>
+    <div class="accordion" id="faqs">
+      {{each storyfest_faqs as faq sort by sort_order}}
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{faq._index}}">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse{{faq._index}}"
+            aria-expanded="false"
+            aria-controls="collapse{{faq._index}}"
+          >
+            {{faq.question}}
+          </button>
+        </h2>
+        <div
+          id="collapse{{faq._index}}"
+          class="accordion-collapse collapse"
+          aria-labelledby="heading{{faq._index}}"
+          data-bs-parent="#faqs"
+        >
+          <div class="accordion-body">{{faq.answer}}</div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</section>
+
+<script type="module">
+  // Homepage Search functionality
+  $(document).ready(function() {
+    const $homepageSearch = $("#homepage-search");
+    const $searchResultsDropdown = $("#homepage-search-results");
+    const $searchBar = $(".search-bar");
+    const $searchButton = $("#homepage-search-btn");
+
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    function showDropdown() {
+      $searchResultsDropdown.show();
+      $(document).on('click.dropdown', function(event) {
+        // Close dropdown when clicking outside
+        if (!$searchBar.is(event.target) && $searchBar.has(event.target).length === 0) {
+          hideDropdown();
+        }
+      });
+    }
+
+    function hideDropdown() {
+      $searchResultsDropdown.hide();
+      $(document).off('click.dropdown');
+    }
+    
+    // Search button click handler - also focus the input
+    $searchButton.click(function() {
+      $homepageSearch.focus();
+      const searchInput = $homepageSearch.val();
+      if (searchInput) {
+        // Show loading state immediately
+        $searchResultsDropdown.empty()
+          .append('<div class="dropdown-item loading-state text-center"><div class="spinner-border spinner-border-sm text-secondary me-2" role="status"><span class="visually-hidden">Loading...</span></div>Searching...</div>');
+        showDropdown();
+        searchAll(searchInput);
+      }
+    });
+
+    // Set focus to the search input when clicking anywhere in the search bar container
+    $searchBar.on('click', function(e) {
+      if (e.target !== $homepageSearch[0]) {
+        $homepageSearch.focus();
+      }
+    });
+
+    $homepageSearch.on("input", debounce(() => {
+      const searchInput = $homepageSearch.val();
+      if (searchInput) {
+        // Show loading state immediately
+        $searchResultsDropdown.empty()
+          .append('<div class="dropdown-item loading-state text-center"><div class="spinner-border spinner-border-sm text-secondary me-2" role="status"><span class="visually-hidden">Loading...</span></div>Searching...</div>');
+        showDropdown();
+        searchAll(searchInput);
+      } else {
+        hideDropdown();
+      }
+    }, 300));
+
+    $homepageSearch.on("focus", function() {
+      const searchInput = $homepageSearch.val();
+      if (searchInput) {
+        // Show loading state immediately
+        $searchResultsDropdown.empty()
+          .append('<div class="dropdown-item loading-state text-center"><div class="spinner-border spinner-border-sm text-secondary me-2" role="status"><span class="visually-hidden">Loading...</span></div>Searching...</div>');
+        showDropdown();
+        searchAll(searchInput);
+      }
+    });
+    
+    // Handle Enter key press
+    $homepageSearch.keypress(function(e) {
+      if (e.key === "Enter") {
+        const searchInput = $homepageSearch.val();
+        if (searchInput) {
+          // Show loading state immediately
+          $searchResultsDropdown.empty()
+            .append('<div class="dropdown-item loading-state text-center"><div class="spinner-border spinner-border-sm text-secondary me-2" role="status"><span class="visually-hidden">Loading...</span></div>Searching...</div>');
+          showDropdown();
+          searchAll(searchInput);
+        }
+      }
+    });
+
+    function searchAll(query) {
+      const npoUrl = `{{ $base_url }}mobileapp/npos.json?zpw=causecircle&search=${encodeURIComponent(query)}`;
+      const causesUrl = `{{ $base_url }}mobileapp/causes.json?zpw=causecircle&search=${encodeURIComponent(query)}`;
+      const storiesUrl = `{{ $base_url }}mobileapp/stories.json?zpw=causecircle&search=${encodeURIComponent(query)}`;
+
+      // Already showing loading state from the input handler
+      
+      // Minimum loading time for better UX
+      const minLoadingTime = 500; // milliseconds
+      const startTime = Date.now();
+      
+      Promise.all([
+        $.getJSON(npoUrl),
+        $.getJSON(causesUrl),
+        $.getJSON(storiesUrl)
+      ])
+        .then(([nposData, causesData, storiesData]) => {
+          // Ensure loading indicator shows for at least minLoadingTime
+          const elapsedTime = Date.now() - startTime;
+          if (elapsedTime < minLoadingTime) {
+            setTimeout(() => {
+              displayResults(nposData.data, causesData.data, storiesData.data);
+            }, minLoadingTime - elapsedTime);
+          } else {
+            displayResults(nposData.data, causesData.data, storiesData.data);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching search results:", error);
+          const elapsedTime = Date.now() - startTime;
+          if (elapsedTime < minLoadingTime) {
+            setTimeout(() => {
+              $searchResultsDropdown.empty()
+                .append('<div class="dropdown-item no-results text-center text-danger">Error loading results</div>');
+            }, minLoadingTime - elapsedTime);
+          } else {
+            $searchResultsDropdown.empty()
+              .append('<div class="dropdown-item no-results text-center text-danger">Error loading results</div>');
+          }
+        });
+    }
+
+    function displayResults(npos, causes, stories) {
+      $searchResultsDropdown.empty();
+
+      function appendResults(sectionTitle, data, isLastSection, searchType) {
+        if (data.length > 0) {
+          $searchResultsDropdown.append(
+            `<h6 class="dropdown-header">${sectionTitle}</h6>`
+          );
+          data.slice(0, 5).forEach((item) => {
+            const $item = $(
+              `<a class="dropdown-item" href="{{ $base_url }}${item.meta?.web?.uri || "#"}">
+                ${item.name || item.title}
+              </a>`
+            );
+            $searchResultsDropdown.append($item);
+            if ($item[0].scrollWidth > $item[0].clientWidth) {
+              $item.addClass("scroll-text");
+            }
+          });
+          if (data.length > 5) {
+            let moreResultsUrl;
+            switch (searchType) {
+              case "npos":
+                moreResultsUrl = `{{ non_profits_search_page.first().path_full }}?search=${encodeURIComponent($homepageSearch.val())}`;
+                break;
+              case "causes":
+                moreResultsUrl = `{{ causes_landing_page.first().path_full }}?search=${encodeURIComponent($homepageSearch.val())}`;
+                break;
+              case "stories":
+                moreResultsUrl = `{{ stories_landing_page.first().path_full }}?search=${encodeURIComponent($homepageSearch.val())}`;
+                break;
+            }
+            $searchResultsDropdown.append(
+              `<a class="dropdown-item text-muted" href="${moreResultsUrl}">+${data.length - 5} more results</a>`
+            );
+          }
+          if (!isLastSection) {
+            $searchResultsDropdown.append('<div class="dropdown-divider"></div>');
+          }
+        }
+      }
+
+      const sections = [
+        { title: "Nonprofits", data: npos, type: "npos" },
+        { title: "Causes", data: causes, type: "causes" },
+        { title: "Stories", data: stories, type: "stories" }
+      ];
+
+      let hasResults = false;
+      sections.forEach((section, index) => {
+        if (section.data.length > 0) {
+          hasResults = true;
+        }
+        appendResults(
+          section.title,
+          section.data,
+          index === sections.length - 1,
+          section.type
+        );
+      });
+
+      if (!hasResults) {
+        $searchResultsDropdown.append(
+          '<div class="dropdown-item no-results"><p class="text-center">No results found</p></div>'
+        );
+      }
+    }
+
+    // Handle clicking on links within the dropdown
+    $searchResultsDropdown.on('click', '.dropdown-item', function(e) {
+      // Don't close dropdown when clicking on non-link elements
+      if ($(this).attr('href') === undefined) {
+        e.preventDefault();
+        return;
+      }
+      
+      // For actual links, allow the default action and hide the dropdown
+      hideDropdown();
+    });
+  });
+</script>
+
+<script type="module">
+  // Focus search input when anchor links are clicked using jQuery
+  $(document).ready(function() {
+    // Add click event listener to all CTA links
+    $('a.cta-link[href="#search-container"]').on('click', function(e) {
+      setTimeout(function() {
+        $('#homepage-search').focus();
+      }, 800);
+    });
+  });
+</script>

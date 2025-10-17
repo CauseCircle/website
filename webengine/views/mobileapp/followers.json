@@ -1,14 +1,12 @@
-{{ $count = 0 }}
 {
-  "data" : [
-    {{each users as userData }}
-    {{ $count = {userData._length} }}
-    "test": {{ {userData.followed_users} }}
-    {{ userData._arraycomma }}
-    {{/each}}
+  "data" :
+  [
+      {{each users as member where member.followed_users LIKE '%{get_var.zuid}%'  }}
+      {{member.toJSON(2)}}
+      {{member._arraycomma}}
+      {{/each}}
   ],
   "meta" : {
-    "zuid" : "{{get_var.zuid}}",
-    "count" : {{ $count }}
+    "zuid" : "{{get_var.zuid}}"
   }
 }

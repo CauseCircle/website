@@ -12,6 +12,60 @@
     background-color: white;
   }
 
+  /* New styles for the secondary navigation */
+  .secondary-nav {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    padding: 0.5rem 0;
+  }
+
+  .secondary-nav .nav-link {
+    color: #495057;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+    margin: 0 0.25rem;
+  }
+
+  .secondary-nav .nav-link:hover {
+    color: #7b3fee;
+  }
+
+  .secondary-nav .nav-link.active {
+    background-color: #7b3fee;
+    color: white;
+  }
+
+  .secondary-nav .dropdown-toggle::after {
+    margin-left: 0.5rem;
+  }
+
+  .secondary-nav .dropdown-menu {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .secondary-nav .dropdown-item {
+    padding: 0.75rem 1.5rem;
+    font-weight: 400;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .secondary-nav .dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #7b3fee;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 991.98px) {
+    .secondary-nav {
+      display: none !important;
+    }
+  }
+
   @media (max-width: 767.98px) {
     .nav-item .dropdown-menu-end {
       right: auto;
@@ -23,7 +77,8 @@
     display: none;
     position: absolute;
     top: calc(100% + 5px); /* Add a little distance */
-    right: 0; /* Align to the right */
+    left: 0; /* Align to the left for centered search */
+    right: 0; /* Ensure it spans the full width */
     z-index: 1000;
     min-width: 100%; /* Set min width to 100% of the parent */
     min-height: 50px; /* Set min height */
@@ -120,6 +175,21 @@
     text-align: center;
     color: #6c757d;
   }
+
+  #search-results-dropdown .loading-state {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+  }
+  
+  #search-results-dropdown .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+  }
+
   #global-search {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
     background-repeat: no-repeat;
@@ -141,7 +211,7 @@
     height: 24px;
     border-radius: 50%;
     margin-right: 10px;
-    object-fit: cover;
+    object-fit: contain;
   }
   .profile-dropdown .dropdown-profile-image {
     width: 40px;
@@ -175,296 +245,95 @@
   .donation-progress {
     height: 6px;
   }
-  #profileDropdown {
+  #profileDropdown, #manageDropdown {
     background-color: white;
     border: var(--bs-border-width) solid var(--bs-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  #profileDropdown:hover {
+  #profileDropdown:hover, #manageDropdown:hover {
     background-color: #f8f9fa;
   }
   .offcanvas-profile-button-image {
     width: 40px;
     height: 40px;
   }
+  .profile-name {
+    max-width: 240px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+  }
+  
+  /* Header layout for desktop */
+  @media (min-width: 992px) {
+    .container-lg {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    /* Center search container */
+    .d-none.d-lg-flex.justify-content-center.flex-grow-1 {
+      flex: 1;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  }
 </style>
 
 <nav
   id="header-container"
-  class="navbar navbar-expand-lg border-bottom border-light-subtle"
+  class="navbar navbar-expand-lg border-bottom-0"
 >
   <div class="container-lg my-2">
-    <!-- Profile dropdown button for mobile -->
-    <button
-      class="btn  d-lg-none"
-      type="button"
-      data-bs-toggle="offcanvas"
-      data-bs-target="#offcanvasProfile"
-      aria-controls="offcanvasProfile"
-    >
-      <img
-        id="offcanvas-profile-image"
-        src="https://i.pravatar.cc/100?img=5"
-        alt="Profile"
-        class="dropdown-profile-image m-0 offcanvas-profile-button-image"
-      />
-    </button>
-    <a class="navbar-brand" href="/">
-      <img
-        src="{{globals.logo.getImage()}}"
-        style="max-width: 160px"
-        alt="cause circle brand logo"
-      />
-    </a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="offcanvas"
-      data-bs-target="#offcanvasNavbar"
-      aria-controls="offcanvasNavbar"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <!-- offcanvas for profile -->
-    <div class="offcanvas offcanvas-start d-block d-md-none" tabindex="-1" id="offcanvasProfile" aria-labelledby="offcanvasProfileLabel">
-      <div class="offcanvas-header">
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body pt-0">
-        <div
-          class="dropdown-menu profile-dropdown show d-block position-static border-0 w-100"
-          aria-labelledby="profileDropdown"
-        >
-          <a id="profile-header-link-offcanvas" href="#" class="text-decoration-none btn-outline-secondary">
-            <div class="profile-header">
-              <img
-                src="https://i.pravatar.cc/100?img=5"
-                alt="Profile"
-                class="dropdown-profile-image"
-              />
-              <div>
-                <strong class="profile-name">User Name</strong>
-                <div class="text-muted profile-role">Role</div>
-              </div>
-            </div>
-          </a>
-          <div class="menu-section d-none">
-            <div class="menu-header">CONTENT</div>
-            <a href="#" class="menu-item"
-              ><i class="bi bi-file-text"></i> Content</a
-            >
-            <a href="#" class="menu-item"
-              ><i class="bi bi-calendar-event"></i> Events</a
-            >
-          </div>
-          <div class="menu-section">
-            <div class="menu-header">SETTINGS</div>
-            <a
-              id="edit-profile-btn"
-              href="{{user_settings.first().getUrl()}}"
-              class="menu-item"
-              ><i class="bi bi-person"></i> Edit Profile</a
-            >
-            <a href="#" class="menu-item d-none"
-              ><i class="bi bi-shield-lock"></i> Privacy & Security</a
-            >
-            <a href="#" class="menu-item d-none"
-              ><i class="bi bi-bell"></i> Notification Settings</a
-            >
-            <a href="#" class="menu-item d-none"
-              ><i class="bi bi-link-45deg"></i> Connected Accounts</a
-            >
-          </div>
-          <div class="menu-section">
-            <div class="menu-header">MANAGE</div>
-            <div id="manage-menu-items-offcanvas"></div>
-          </div>
-          <div class="menu-section d-none">
-            <div class="menu-header">SUPPORT</div>
-            <a href="#" class="menu-item"><i class="bi bi-book"></i> Guide</a>
-            <a href="#" class="menu-item"
-              ><i class="bi bi-question-circle"></i> Help Center</a
-            >
-          </div>
-          <div class="donation-section d-none">
-            <div
-              class="d-flex justify-content-between align-items-center mb-1"
-            >
-              <small>Donation collected</small>
-              <small>11 Donations</small>
-            </div>
-            <div class="progress donation-progress mb-1">
-              <div
-                class="progress-bar bg-primary"
-                role="progressbar"
-                style="width: 75%"
-                aria-valuenow="75"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              ></div>
-            </div>
-            <small class="text-primary">US$5,366,460 Collected</small>
-          </div>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="menu-item logout-btn signout-btn cursor-pointer"
-            ><i class="bi bi-box-arrow-right"></i> Logout</a
-          >
-        </div>
-      </div>
+    <!-- Mobile layout: Profile button, centered logo -->
+    <div class="d-flex d-lg-none align-items-center justify-content-between">
+      <!-- Profile dropdown button for mobile -->
+      <button
+        class="btn"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#offcanvasProfile"
+        aria-controls="offcanvasProfile"
+      >
+        <img
+          id="offcanvas-profile-image"
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23808080'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E"
+          alt="Profile"
+          class="dropdown-profile-image m-0 offcanvas-profile-button-image"
+        />
+      </button>
+      
+      <!-- Centered logo for mobile -->
+      <a id="navbar-brand" class="navbar-brand position-absolute start-50 translate-middle-x" href="/">
+        <img
+          src="{{globals.logo.getImage()}}?width=160"
+          style="max-width: 160px"
+          alt="cause circle brand logo"
+        />
+      </a>
+      
+      <!-- Invisible spacer to maintain layout -->
+      <div style="width: 40px;"></div>
     </div>
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-      <div class="offcanvas-header">
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body">
-        <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
-          <li class="nav-item">
-            <a
-              id="home-btn"
-              href="{{home_feed.first().getUrl()}}"
-              aria-current="page"
-              class="nav-link"
-              >Home</a
-            >
-          </li>
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              aria-current="page"
-              href="{{stories_landing_page.first().getUrl()}}"
-              >Stories
-            </a>
-          </li>
-          <li class="nav-item d-none">
-            <a
-              class="nav-link"
-              aria-current="page"
-              href="{{non_profits_landing_page.first().getUrl()}}"
-              >Nonprofits
-            </a>
-          </li>
-          <li class="nav-item dropdown d-none d-md-flex">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              About
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <a
-                  class="dropdown-item text-end"
-                  href="{{about.first().getUrl()}}"
-                >
-                  About CauseCircle
-                </a>
-              </li>
-              <li>
-                <a
-                  class="dropdown-item text-end"
-                  href="{{blogs_page.first().getUrl()}}"
-                >
-                  Blog
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item d-flex d-md-none">
-            <a
-              class="nav-link"
-              href="{{about.first().getUrl()}}"
-            >
-              About CauseCircle
-            </a>
-          </li>
-          <li class="nav-item d-flex d-md-none">
-            <a
-              class="nav-link"
-              href="{{blogs_page.first().getUrl()}}"
-            >
-              Blog
-            </a>
-          </li>
-          <li class="nav-item d-flex d-md-none">
-            <a
-              class="nav-link"
-              aria-current="page"
-              href="{{how_it_works_page.first().getUrl()}}"
-              >How It Works
-            </a>
-          </li>
-          <li class="nav-item d-flex d-md-none ">
-            <a
-              class="nav-link"
-              aria-current="page"
-              href="{{non_profits_search_page.first().getUrl()}}"
-              >Nonprofit Directory
-            </a>
-          </li>
-          <li class="nav-item d-flex d-md-none">
-            <a
-              class="nav-link"
-              aria-current="page"
-              href="{{claim_listing_page.first().getUrl()}}"
-              >Claim Listing
-            </a>
-          </li>
-          <li class="nav-item d-none">
-            <a class="nav-link" href="{{partner_page.first().getUrl()}}"
-              >Partners</a
-            >
-          </li>
-          <li class="nav-item d-none">
-            <a
-              class="nav-link"
-              aria-current="page"
-              href="{{blogs_page.first().getUrl()}}"
-            >
-              Blog
-            </a>
-          </li>
-        </ul>
-      </div>
+    
+    <!-- Desktop layout: Logo on the left -->
+    <div class="d-none d-lg-flex align-items-center">
+      <a id="navbar-brand-desktop" class="navbar-brand" href="/">
+        <img
+          src="{{globals.logo.getImage()}}?width=160"
+          style="max-width: 160px"
+          alt="cause circle brand logo"
+        />
+      </a>
     </div>
-    <div class="d-none d-lg-flex gap-2 align-items-center">
-      <div id="non-profits-dropdown" class="dropdown">
-        <a
-          href="{{non_profits_landing_page.first().getUrl()}}"
-          class="btn btn-secondary border-0 dropdown-toggle"
-          id="navbarDropdown"
-          role="button"
-        >
-          For Nonprofits
-        </a>
-        <ul
-          class="dropdown-menu dropdown-menu-end"
-          aria-labelledby="navbarDropdown"
-        >
-          <li>
-            <a
-              class="dropdown-item text-end"
-              aria-current="page"
-              href="{{how_it_works_page.first().getUrl()}}"
-              >How It Works
-            </a>
-          </li>
-          <li>
-            <a
-              class="dropdown-item text-end"
-              aria-current="page"
-              href="{{non_profits_search_page.first().getUrl()}}"
-              >Nonprofit Directory
-            </a>
-          </li>
-
-          <li>
-            <a
-              class="dropdown-item text-end"
-              aria-current="page"
-              href="{{claim_listing_page.first().getUrl()}}"
-              >Claim Listing
-            </a>
-          </li>
-        </ul>
-      </div>
-      <div class="dropdown">
+    
+    <!-- Center section: Global search (desktop only) -->
+    <div class="d-none d-lg-flex justify-content-center flex-grow-1">
+      <div class="dropdown" style="max-width: 400px; width: 100%;">
         <input
           type="text"
           id="global-search"
@@ -473,26 +342,46 @@
           aria-label="Search"
           data-bs-toggle="dropdown"
           aria-expanded="false"
+          role="combobox"
+          aria-haspopup="listbox"
+          aria-controls="search-results-dropdown"
         />
         <ul
           id="search-results-dropdown"
           class="dropdown-menu dropdown-menu-end"
+          role="listbox"
         ></ul>
       </div>
-      <button
-        class="btn btn-secondary border-0"
-        id="feedback-btn"
-        title="Feedback"
-      >
-        <i class="bi bi-chat-right-text fs-5"></i>
+    </div>
+    
+    <!-- Right section: Profile and admin buttons (desktop only) -->
+    <div class="d-none d-lg-flex gap-2 align-items-center">
+      <button id="create-post-btn" class="btn btn-primary d-none">
+        <i class="bi bi-pencil-square"></i> Post
       </button>
-      <a
-        id="contact-us-btn"
-        href="{{demo_page.first().getUrl()}}"
-        class="btn btn-secondary text-nowrap d-none"
-      >
-        Contact Us
-      </a>
+      
+      <div class="dropdown">
+        <button
+          class="btn dropdown-toggle d-none"
+          type="button"
+          id="manageDropdown"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          Admin
+        </button>
+        <div
+          class="dropdown-menu profile-dropdown dropdown-menu-end"
+          aria-labelledby="manageDropdown"
+        >
+          <div id="manage-menu-items-section" class="menu-section">
+            <div class="menu-header">
+              MANAGE
+            </div>
+            <div id="manage-menu-items"></div>
+          </div>
+        </div>
+      </div>
       <!-- Profile dropdown -->
       <div class="dropdown">
         <button
@@ -503,7 +392,7 @@
           aria-expanded="false"
         >
           <img
-            src="https://i.pravatar.cc/100?img=5"
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23808080'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E"
             alt="Profile"
             class="dropdown-profile-image"
           />
@@ -513,26 +402,27 @@
           class="dropdown-menu profile-dropdown dropdown-menu-end"
           aria-labelledby="profileDropdown"
         >
-          <a id="profile-header-link" href="#" class="text-decoration-none btn-outline-secondary">
+          <a
+            id="profile-header-link"
+            href="#"
+            class="text-decoration-none btn-outline-secondary"
+          >
             <div class="profile-header">
               <img
-                src="https://i.pravatar.cc/100?img=5"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23808080'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E"
                 alt="Profile"
                 class="dropdown-profile-image"
               />
               <div>
                 <strong class="profile-name">User Name</strong>
-                <div class="text-muted profile-role">Role</div>
+                <div class="text-muted profile-role d-none">Role</div>
               </div>
             </div>
           </a>
-          <div class="menu-section d-none">
-            <div class="menu-header">CONTENT</div>
-            <a href="#" class="menu-item"
-              ><i class="bi bi-file-text"></i> Content</a
-            >
-            <a href="#" class="menu-item"
-              ><i class="bi bi-calendar-event"></i> Events</a
+          <div class="menu-section">
+            <div class="menu-header">PROFILE</div>
+            <a href="#" class="menu-item view-profile-link"
+              ><i class="bi bi-person-badge"></i> View Profile</a
             >
           </div>
           <div class="menu-section">
@@ -543,45 +433,10 @@
               class="menu-item"
               ><i class="bi bi-person"></i> Edit Profile</a
             >
-            <a href="#" class="menu-item d-none"
-              ><i class="bi bi-shield-lock"></i> Privacy & Security</a
-            >
-            <a href="#" class="menu-item d-none"
-              ><i class="bi bi-bell"></i> Notification Settings</a
-            >
-            <a href="#" class="menu-item d-none"
-              ><i class="bi bi-link-45deg"></i> Connected Accounts</a
-            >
-          </div>
-          <div class="menu-section">
-            <div class="menu-header">MANAGE</div>
-            <div id="manage-menu-items"></div>
           </div>
           <div class="menu-section d-none">
-            <div class="menu-header">SUPPORT</div>
-            <a href="#" class="menu-item"><i class="bi bi-book"></i> Guide</a>
-            <a href="#" class="menu-item"
-              ><i class="bi bi-question-circle"></i> Help Center</a
-            >
-          </div>
-          <div class="donation-section d-none">
-            <div
-              class="d-flex justify-content-between align-items-center mb-1"
-            >
-              <small>Donation collected</small>
-              <small>11 Donations</small>
-            </div>
-            <div class="progress donation-progress mb-1">
-              <div
-                class="progress-bar bg-primary"
-                role="progressbar"
-                style="width: 75%"
-                aria-valuenow="75"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              ></div>
-            </div>
-            <small class="text-primary">US$5,366,460 Collected</small>
+            <div class="menu-header">MANAGE</div>
+            <div id="manage-menu-items"></div>
           </div>
           <div class="dropdown-divider"></div>
           <a href="#" class="menu-item logout-btn signout-btn cursor-pointer"
@@ -596,75 +451,705 @@
         Sign In
       </a>
     </div>
+    
+    <!-- Mobile hamburger button -->
+    <button
+      class="navbar-toggler d-lg-none"
+      type="button"
+      data-bs-toggle="offcanvas"
+      data-bs-target="#offcanvasNavbar"
+      aria-controls="offcanvasNavbar"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- offcanvas for profile -->
+    <div
+      class="offcanvas offcanvas-start d-block d-md-none"
+      tabindex="-1"
+      id="offcanvasProfile"
+      aria-labelledby="offcanvasProfileLabel"
+    >
+      <div class="offcanvas-header">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body pt-0">
+        <div
+          class="dropdown-menu profile-dropdown show d-block position-static border-0 w-100"
+          aria-labelledby="profileDropdown"
+        >
+          <a
+            id="profile-header-link-offcanvas"
+            href="#"
+            class="text-decoration-none btn-outline-secondary"
+          >
+            <div class="profile-header">
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23808080'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E"
+                alt="Profile"
+                class="dropdown-profile-image"
+              />
+              <div>
+                <strong class="profile-name">User Name</strong>
+                <div class="text-muted profile-role d-none">Role</div>
+              </div>
+            </div>
+          </a>
+          <div class="menu-section">
+            <div class="menu-header">PROFILE</div>
+            <a href="#" class="menu-item view-profile-link-offcanvas"
+              ><i class="bi bi-person-badge"></i> View Profile</a
+            >
+          </div>
+          <div class="menu-section d-none">
+            <div class="menu-header">CONTENT</div>
+            <a href="#" class="menu-item"
+              ><i class="bi bi-file-text"></i> Content</a
+            >
+            <a href="#" class="menu-item"
+              ><i class="bi bi-calendar-event"></i> Events</a
+            >
+          </div>
+          <div class="menu-section">
+            <div class="menu-header">SETTINGS</div>
+            <a
+              id="edit-profile-btn"
+              href="{{user_settings.first().getUrl()}}"
+              class="menu-item"
+              ><i class="bi bi-person"></i> Edit Profile</a
+            >
+            <a href="#" class="menu-item d-none"
+              ><i class="bi bi-shield-lock"></i> Privacy & Security</a
+            >
+            <a href="#" class="menu-item d-none"
+              ><i class="bi bi-bell"></i> Notification Settings</a
+            >
+            <a href="#" class="menu-item d-none"
+              ><i class="bi bi-link-45deg"></i> Connected Accounts</a
+            >
+          </div>
+          <div id="manage-menu-items-offcanvas-section" class="menu-section">
+            <div class="menu-header">MANAGE</div>
+            <div id="manage-menu-items-offcanvas" style="overflow-y: auto; max-height: 300px;"></div>
+          </div>
+          <div class="menu-section d-none">
+            <div class="menu-header">SUPPORT</div>
+            <a href="#" class="menu-item"><i class="bi bi-book"></i> Guide</a>
+            <a href="#" class="menu-item"
+              ><i class="bi bi-question-circle"></i> Help Center</a
+            >
+          </div>
+          <div class="donation-section d-none">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <small>Donation collected</small>
+              <small>11 Donations</small>
+            </div>
+            <div class="progress donation-progress mb-1">
+              <div
+                class="progress-bar bg-primary"
+                role="progressbar"
+                style="width: 75%"
+                aria-valuenow="75"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+            <small class="text-primary">US$5,366,460 Collected</small>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="menu-item logout-btn signout-btn cursor-pointer"
+            ><i class="bi bi-box-arrow-right"></i> Logout</a
+          >
+        </div>
+      </div>
+    </div>
+    <div
+      class="offcanvas offcanvas-end d-lg-none"
+      tabindex="-1"
+      id="offcanvasNavbar"
+      aria-labelledby="offcanvasNavbarLabel"
+    >
+      <div class="offcanvas-header">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
+          <li class="nav-item">
+            <a
+              id="home-btn-mobile"
+              href="{{home_feed.first().getUrl()}}"
+              aria-current="page"
+              class="nav-link"
+              >Home</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              aria-current="page"
+              href="{{stories_landing_page.first().getUrl()}}"
+              >Stories</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{about.first().getUrl()}}">
+              About CauseCircle
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{blogs_page.first().getUrl()}}">
+              Blog
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              aria-current="page"
+              href="{{how_it_works_page.first().getUrl()}}"
+              >How It Works
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              aria-current="page"
+              href="{{non_profits_search_page.first().getUrl()}}"
+              >Nonprofit Directory
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              aria-current="page"
+              href="{{claim_listing_page.first().getUrl()}}"
+              >Claim Listing
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              aria-current="page"
+              href="{{non_profits_landing_page.first().getUrl()}}"
+              >Why CauseCircle?
+            </a>
+          </li>
+          <li class="nav-item d-none">
+            <a
+              class="nav-link"
+              href="#"
+              >For Corporations
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              href="#"
+              class="nav-link"
+              id="feedback-btn-mobile"
+            >
+              Feedback
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              id="contact-us-btn-mobile"
+              href="{{demo_page.first().getUrl()}}"
+              class="nav-link"
+            >
+              Contact Us
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+<!-- New Secondary Navigation Row -->
+<nav class="secondary-nav d-none d-lg-block py-0">
+  <div class="container-lg">
+    <div class="d-flex justify-content-between align-items-center w-100">
+      <!-- First group: Home, Stories, About, For Nonprofits, Corporations -->
+      <ul class="nav">
+        <li class="nav-item">
+          <a
+            id="home-btn-secondary"
+            href="{{home_feed.first().getUrl()}}"
+            class="nav-link"
+          >
+            Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            href="{{stories_landing_page.first().getUrl()}}"
+          >
+            Stories
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            About
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a
+                class="dropdown-item"
+                href="{{about.first().getUrl()}}"
+              >
+                <i class="bi bi-heart me-2"></i>About CauseCircle
+              </a>
+            </li>
+            <li>
+              <a
+                class="dropdown-item"
+                href="{{blogs_page.first().getUrl()}}"
+              >
+                <i class="bi bi-newspaper me-2"></i>Blog
+              </a>
+            </li>
+          </ul>
+        </li>       
+        <li class="nav-item dropdown">
+          <a
+            href="#"
+            class="nav-link dropdown-toggle"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Nonprofits
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a
+                class="dropdown-item"
+                href="{{how_it_works_page.first().getUrl()}}"
+              >
+                <i class="bi bi-gear me-2"></i>How It Works
+              </a>
+            </li>
+            <li>
+              <a
+                class="dropdown-item"
+                href="{{non_profits_search_page.first().getUrl()}}"
+              >
+                <i class="bi bi-search me-2"></i>Nonprofit Directory
+              </a>
+            </li>
+            <li>
+              <a
+                class="dropdown-item"
+                href="{{claim_listing_page.first().getUrl()}}"
+              >
+                <i class="bi bi-check-circle me-2"></i>Claim Listing
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            href="{{non_profits_landing_page.first().getUrl()}}"
+          >
+            Why CauseCircle?
+          </a>
+        </li>
+        <li class="nav-item d-none">
+          <a
+            class="nav-link"
+            href="#"
+          >
+            For Corporations
+          </a>
+        </li>
+      </ul>
+      
+      <!-- Second group: Feedback, Contact Us -->
+      <ul class="nav">
+        <li class="nav-item">
+          <a
+            href="#"
+            class="nav-link"
+            id="feedback-btn-secondary"
+          >
+            Feedback
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            id="contact-us-btn-secondary"
+            href="{{demo_page.first().getUrl()}}"
+            class="nav-link"
+          >
+            Contact Us
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 </nav>
 
 <!-- prettier-ignore -->
 {{include /components/global/feedback_modal.html}}
 
-<script>
+<!-- prettier-ignore -->
+{{include /components/global/HomeFeed/create_story_modal.html}}
+
+<script type="module">
   const localUser = JSON.parse(localStorage.getItem("user"));
 
-  const getUserManagedNpos = async (zuid) => {
-    $.getJSON(
-      `https://causecircle.org/mobileapp/npos.json?admin_zuid=${zuid}`,
-      (data) => {
-        // console.log("data", data);
-        $("#manage-menu-items").empty();
-        $("#manage-menu-items-offcanvas").empty(); // Ensure offcanvas is targeted too
-        data.data.forEach((npo) => {
-          const logoUrl = typeof npo.logo === 'string' ? npo.logo : (npo.logo?.data[0]?.url || 'https://placehold.co/24x24');
-          $("#manage-menu-items").append(
-            `<a href="{{npo_admin_page.first().getUrl()}}?zuid=${npo?.meta?.zuid}" class="menu-item">
-              <img src="${logoUrl}" alt="${npo.name} logo" class="dropdown-profile-image me-2">
-              ${npo.name}
-            </a>`
-          );
-          $("#manage-menu-items-offcanvas").append(
-            `<a href="{{npo_admin_page.first().getUrl()}}?zuid=${npo?.meta?.zuid}" class="menu-item">
-              <img src="${logoUrl}" alt="${npo.name} logo" class="dropdown-profile-image me-2">
-              ${npo.name}
-            </a>`
-          );
-        });
-      }
-    );
-  };
+  // Create query observers
+  const userProfileQuery = window.createUserProfileQuery(localUser?.zuid);
+  const managedNposQuery = window.createUserManagedNposQuery(localUser?.zuid);
 
-  $(document).ready(async function () {
-    if (localUser) {
-      const data = await getZestyUser(localUser.zuid);
-      const zestyUser = data.user.data;
-      await getUserManagedNpos(localUser.zuid);
+  // Search query variables
+  let nposSearchQuery, causesSearchQuery, storiesSearchQuery;
+  let currentSearchQuery = '';
 
+  // Helper function to update user profile UI
+  function updateUserProfileUI(zestyUser) {
+        // Set the navbar brand
+        $("#navbar-brand").attr("href", "{{home_feed.first().getUrl()}}");
+        $("#navbar-brand-desktop").attr("href", "{{home_feed.first().getUrl()}}");
+
+        // Set the profile image
+        const profileImageUrl = typeof zestyUser.profile_image === "string" && zestyUser.profile_image !== "" 
+          ? zestyUser.profile_image 
+          : zestyUser.profile_image?.data[0]?.url || "https://www.gravatar.com/avatar/?d=mp";
+        
+        $("#profileDropdown img").attr("src", `${profileImageUrl}?width=90`);
+        $(".profile-header img").attr("src", `${profileImageUrl}?width=90`);
+        $("#offcanvas-profile-image").attr("src", `${profileImageUrl}?width=90`);
+
+        // Determine what to display as the user name
+        let displayName = '';
+        if (zestyUser.first_name) {
+          displayName = zestyUser.first_name;
+          const fullName = `${zestyUser.first_name} ${zestyUser.last_name || ''}`.trim();
+          $(".profile-header .profile-name").text(fullName);
+        } else if (zestyUser.email) {
+          displayName = zestyUser.email;
+          $(".profile-header .profile-name").text(zestyUser.email);
+        } else {
+          displayName = "User";
+          $(".profile-header .profile-name").text("User");
+        }
+        
+        // Update all display name instances
+        $("#profileDropdown .profile-name").text(displayName);
+        
+        // Set the role/type
+        $(".profile-header .profile-role").text(zestyUser.user_type.charAt(0).toUpperCase() + zestyUser.user_type.slice(1));
+        
+        // Set profile link URLs
+        $("#profile-header-link-offcanvas").attr("href", zestyUser.meta.web.uri);
+        $("#profile-header-link").attr("href", zestyUser.meta.web.uri);
+        $(".view-profile-link").attr("href", zestyUser.meta.web.uri);
+        $(".view-profile-link-offcanvas").attr("href", zestyUser.meta.web.uri);
+        
+    $("#edit-profile-btn").attr("href", `{{user_settings.first().getUrl()}}`);
+    $("#create-post-btn").removeClass("d-none");
+  }
+
+  // Helper function to update managed NPOs UI
+  function updateManagedNposUI(managedNpos) {
+    $("#manage-menu-items").empty();
+    $("#manage-menu-items-offcanvas").empty();
+
+    if (managedNpos.length === 0) {
+      $("#manage-menu-items-offcanvas").addClass("d-none");
+      $("#manage-menu-items").addClass("d-none");
+      $("#manage-menu-items-offcanvas-section").addClass("d-none");
+      $("#manage-menu-items-section").addClass("d-none");
+      $("#manageDropdown").addClass("d-none");
+    } else {
+      $("#manage-menu-items-offcanvas-section").removeClass("d-none");
+      $("#manage-menu-items-section").removeClass("d-none");
+      $("#manageDropdown").removeClass("d-none");
+
+      managedNpos.sort((a, b) => a.name.localeCompare(b.name)).forEach((npo) => {
+        const logoUrl = typeof npo.logo === "string"
+          ? npo.logo
+          : npo.logo?.data[0]?.url || "https://placehold.co/24x24";
+        
+        $("#manage-menu-items").append(
+          `<a href="${npo.meta?.web?.url}/admin" class="menu-item">
+            <img src="${logoUrl}?width=40" alt="${npo.name} logo" class="dropdown-profile-image me-2">
+            ${npo.name}
+          </a>`
+        );
+        $("#manage-menu-items-offcanvas").append(
+          `<a href="${npo.meta?.web?.url}/admin" class="menu-item">
+            <img src="${logoUrl}?width=40" alt="${npo.name} logo" class="dropdown-profile-image me-2">
+            ${npo.name}
+          </a>`
+        );
+      });
+    }
+  }
+
+  // Subscribe to user profile changes
+  userProfileQuery.subscribe((result) => {
+    if (result.isLoading) {
+      // Show loading state for profile elements
+      $("#profileDropdown .profile-name").text("Loading...");
+    } else if (result.isSuccess) {
+      const zestyUser = result.data?.data[0];
       if (zestyUser) {
-        $("#profileDropdown img").attr("src", zestyUser.profile_image);
-        $("#profileDropdown .profile-name").text(zestyUser.first_name);
-        $("#profileDropdown .profile-role").text(zestyUser.user_type);
-        $(".profile-header img").attr("src", zestyUser.profile_image);
-        $(".profile-header .profile-name").text(
-          zestyUser.first_name + " " + zestyUser.last_name
-        );
-        $(".profile-header .profile-role").text(zestyUser.user_type);
-        $("#profile-header-link-offcanvas").attr("href", data.user.web.path);
-        $("#profile-header-link").attr("href", data.user.web.path);
-        $(".offcanvasProfile .profile-header img").attr("src", zestyUser.profile_image);
-        $(".offcanvasProfile .profile-header .profile-name").text(
-          zestyUser.first_name + " " + zestyUser.last_name
-        );
-        $(".offcanvasProfile .profile-header .profile-role").text(zestyUser.user_type);
-        $("#offcanvas-profile-image").attr("src", zestyUser.profile_image);
-        getUserManagedNpos(localUser.zuid);
+        updateUserProfileUI(zestyUser);
+      }
+    } else if (result.isError) {
+      console.error("Error loading user profile:", result.error);
+      // Show fallback UI
+      $("#profileDropdown .profile-name").text("User");
+    }
+  });
 
-        $("#edit-profile-btn").attr(
-          "href",
-          `{{user_settings.first().getUrl()}}?zuid=${localUser.zuid}`
+  // Subscribe to managed NPOs changes
+  managedNposQuery.subscribe((result) => {
+    if (result.isLoading) {
+          // Show loading state
+      $("#manage-menu-items").html('<div class="menu-item text-muted">Loading...</div>');
+      $("#manage-menu-items-offcanvas").html('<div class="menu-item text-muted">Loading...</div>');
+    } else if (result.isSuccess) {
+      updateManagedNposUI(result.data?.data || []);
+    } else if (result.isError) {
+      console.error("Error loading managed NPOs:", result.error);
+      // Show error state
+      $("#manage-menu-items").html('<div class="menu-item text-danger">Error loading</div>');
+      $("#manage-menu-items-offcanvas").html('<div class="menu-item text-danger">Error loading</div>');
+    }
+  });
+
+  // Initialize search functionality
+  function initializeSearch(query) {
+    // Only create new queries if the search term has changed
+    if (currentSearchQuery !== query) {
+      currentSearchQuery = query;
+
+      // Create new queries for each search
+      nposSearchQuery = window.createSearchNposQuery(query);
+      causesSearchQuery = window.createSearchCausesQuery(query);
+      storiesSearchQuery = window.createSearchStoriesQuery(query);
+
+      // Initialize UI with loading states for all sections
+      initializeSearchUI();
+
+      // Subscribe to each search result independently
+      nposSearchQuery.subscribe((result) => {
+        updateNposSection(result);
+      });
+
+      causesSearchQuery.subscribe((result) => {
+        updateCausesSection(result);
+      });
+
+      storiesSearchQuery.subscribe((result) => {
+        updateStoriesSection(result);
+      });
+        } else {
+      // If same query, manually trigger updates for cached results
+      setTimeout(() => {
+        const nposResult = nposSearchQuery?.getCurrentResult();
+        const causesResult = causesSearchQuery?.getCurrentResult();
+        const storiesResult = storiesSearchQuery?.getCurrentResult();
+
+        if (nposResult) updateNposSection(nposResult);
+        if (causesResult) updateCausesSection(causesResult);
+        if (storiesResult) updateStoriesSection(storiesResult);
+      }, 100);
+    }
+  }
+
+  // Initialize search UI with loading states for all sections
+  function initializeSearchUI() {
+    const $globalSearch = $("#global-search");
+    const $searchResultsDropdown = $("#search-results-dropdown");
+
+    $searchResultsDropdown.empty().show();
+    $searchResultsDropdown.css("min-width", $globalSearch.outerWidth());
+
+    // Create sections with loading states
+    const sections = [
+      { id: 'npos-section', title: 'Nonprofits', type: 'npos' },
+      { id: 'causes-section', title: 'Causes', type: 'causes' },
+      { id: 'stories-section', title: 'Stories', type: 'stories' }
+    ];
+
+    sections.forEach((section, index) => {
+      const $sectionDiv = $(`<div id="${section.id}" class="search-section"></div>`);
+      $sectionDiv.append(`<h6 class="dropdown-header">${section.title}</h6>`);
+      $sectionDiv.append(`
+        <div class="dropdown-item loading-state text-center">
+          <div class="spinner-border spinner-border-sm text-secondary me-2" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          Searching ${section.title.toLowerCase()}...
+        </div>
+      `);
+
+      $searchResultsDropdown.append($sectionDiv);
+
+      // Add divider between sections (except last)
+      if (index < sections.length - 1) {
+        $searchResultsDropdown.append('<div class="dropdown-divider"></div>');
+      }
+    });
+  }
+
+  // Update individual sections
+  function updateNposSection(result) {
+    updateSearchSection('npos-section', 'Nonprofits', result, 'npos');
+  }
+
+  function updateCausesSection(result) {
+    updateSearchSection('causes-section', 'Causes', result, 'causes');
+  }
+
+  function updateStoriesSection(result) {
+    updateSearchSection('stories-section', 'Stories', result, 'stories');
+  }
+
+  function updateSearchSection(sectionId, sectionTitle, result, searchType) {
+    const $section = $(`#${sectionId}`);
+    $section.empty();
+
+    if (result.isLoading) {
+      $section.append(`<h6 class="dropdown-header">${sectionTitle}</h6>`);
+      $section.append(`
+        <div class="dropdown-item loading-state text-center">
+          <div class="spinner-border spinner-border-sm text-secondary me-2" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          Searching ${sectionTitle.toLowerCase()}...
+        </div>
+      `);
+    } else if (result.isError) {
+      $section.append(`<h6 class="dropdown-header">${sectionTitle}</h6>`);
+      $section.append(`
+        <div class="dropdown-item text-danger text-center">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Error loading ${sectionTitle.toLowerCase()}
+        </div>
+      `);
+    } else if (result.data) {
+      const data = result.data?.data || [];
+      if (data.length > 0) {
+        $section.append(`<h6 class="dropdown-header">${sectionTitle}</h6>`);
+        data.slice(0, 5).forEach((item) => {
+          const $item = $(
+            `<a class="dropdown-item" href="{{ $base_url }}${item.meta?.web?.uri || "#"}">
+              ${item.name || item.title}
+            </a>`
+          );
+          $section.append($item);
+          if ($item[0].scrollWidth > $item[0].clientWidth) {
+            $item.addClass("scroll-text");
+          }
+        });
+
+        if (data.length > 5) {
+          let moreResultsUrl;
+          switch (searchType) {
+            case "npos":
+              moreResultsUrl = `{{ non_profits_search_page.first().path_full }}?filter=${encodeURIComponent($("#global-search").val())}`;
+              break;
+            case "causes":
+              moreResultsUrl = `{{ causes_landing_page.first().path_full }}?search=${encodeURIComponent($("#global-search").val())}`;
+              break;
+            case "stories":
+              moreResultsUrl = `{{ stories_landing_page.first().path_full }}?search=${encodeURIComponent($("#global-search").val())}`;
+              break;
+          }
+          $section.append(
+            `<a class="dropdown-item text-muted" href="${moreResultsUrl}">+${
+              data.length - 5
+            } more results</a>`
+          );
+        }
+      } else {
+        $section.append(`<h6 class="dropdown-header">${sectionTitle}</h6>`);
+        $section.append(
+          `<div class="dropdown-item text-muted text-center">No ${sectionTitle.toLowerCase()} found</div>`
         );
       }
     }
+  }
+
+
+  // Initialize event handlers
+  $(document).ready(function () {
+    if (!localUser) {
+      // When no user is logged in on mobile, replace the profile button with a Sign In button.
+      $('button[data-bs-target="#offcanvasProfile"]').replaceWith(
+        '<a href="{{login_page.first().getUrl()}}" class="btn d-lg-none btn-primary">Sign In</a>'
+      );
+      // Remove the offcanvas profile element since it is not needed.
+      $('#offcanvasProfile').remove();
+
+      $("#create-post-btn").addClass("d-none");
+      $("#manageDropdown").addClass("d-none");
+
+      // Hide Home and Feedback buttons in secondary navigation when not logged in
+      $("#home-btn-secondary").parent().hide();
+      $("#feedback-btn-secondary").parent().hide();
+      
+      // Hide Home and Feedback buttons in mobile navigation when not logged in
+      $("#home-btn-mobile").parent().hide();
+      $("#feedback-btn-mobile").parent().hide();
+    }
+
+    // Handle feedback button clicks for all feedback buttons
+    $("#feedback-btn, #feedback-btn-secondary, #feedback-btn-mobile").on("click", function(e) {
+      e.preventDefault();
+      $("#feedbackModal").modal("show");
+    });
+
+    // Handle create post button click
+    $("#create-post-btn").on("click", async function(e) {
+      e.preventDefault();
+      
+      const $btn = $(this);
+      const originalText = $btn.html();
+      
+      // Show loading state
+      $btn.prop("disabled", true).html(`
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        Checking...
+      `);
+      
+      try {
+        await window.showCreateStoryModal();
+      } catch (error) {
+        console.error("Error showing create story modal:", error);
+        // Fallback - just show the modal
+        $("#createStoryModal").modal("show");
+      } finally {
+        // Restore button state
+        $btn.prop("disabled", false).html(originalText);
+      }
+    });
 
     const $globalSearch = $("#global-search");
-    const $searchResultsDropdown = $("#search-results-dropdown");
+    const $searchResultsDropdown = $("#search-results-dropdown"); 
 
     function debounce(func, wait) {
       let timeout;
@@ -674,22 +1159,24 @@
       };
     }
 
-    $globalSearch.on(
-      "input",
-      debounce(() => {
-        const searchInput = $globalSearch.val();
-        if (searchInput) {
-          searchAll(searchInput);
-        } else {
-          $searchResultsDropdown.empty().hide();
-        }
-      }, 300)
-    );
+    $globalSearch.on("input", debounce(() => {
+      const searchInput = $globalSearch.val();
+      if (searchInput) {
+        initializeSearch(searchInput);
+      } else {
+        $searchResultsDropdown.empty().hide();
+        // Clean up previous queries
+        nposSearchQuery = null;
+        causesSearchQuery = null;
+        storiesSearchQuery = null;
+        currentSearchQuery = '';
+      }
+    }, 500));
 
     $globalSearch.on("focus", function () {
       const searchInput = $globalSearch.val();
       if (searchInput) {
-        searchAll(searchInput);
+        initializeSearch(searchInput);
       }
     });
 
@@ -698,124 +1185,5 @@
         $searchResultsDropdown.hide();
       }, 200); // Delay to allow click events to register
     });
-
-    $("#non-profits-dropdown")
-      .on("mouseenter", function () {
-        $("#non-profits-dropdown").dropdown("show");
-      })
-      .on("mouseleave", function () {
-        $("#non-profits-dropdown").dropdown("hide");
-      });
-
-    function searchAll(query) {
-      const npoUrl = `https://causecircle.org/mobileapp/npos.json?search=${encodeURIComponent(
-        query
-      )}`;
-      const causesUrl = `https://causecircle.org/mobileapp/causes.json?search=${encodeURIComponent(
-        query
-      )}`;
-      const storiesUrl = `https://causecircle.org/mobileapp/stories.json?search=${encodeURIComponent(
-        query
-      )}`;
-
-      Promise.all([
-        $.getJSON(npoUrl),
-        $.getJSON(causesUrl),
-        $.getJSON(storiesUrl),
-      ])
-        .then(([nposData, causesData, storiesData]) => {
-          displayResults(nposData.data, causesData.data, storiesData.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching search results:", error);
-          $searchResultsDropdown.empty().hide();
-        });
-    }
-
-    function displayResults(npos, causes, stories) {
-      $searchResultsDropdown.empty().show();
-      $searchResultsDropdown.css("min-width", $globalSearch.outerWidth());
-
-      function appendResults(sectionTitle, data, isLastSection, searchType) {
-        if (data.length > 0) {
-          $searchResultsDropdown.append(
-            `<h6 class="dropdown-header">${sectionTitle}</h6>`
-          );
-          data.slice(0, 5).forEach((item) => {
-            const $item = $(
-              `<a class="dropdown-item" href="${item.meta?.web?.uri || "#"}">
-                ${item.name || item.title}
-              </a>`
-            );
-            $searchResultsDropdown.append($item);
-            if ($item[0].scrollWidth > $item[0].clientWidth) {
-              $item.addClass("scroll-text");
-            }
-          });
-          if (data.length > 5) {
-            let moreResultsUrl;
-            switch (searchType) {
-              case "npos":
-                moreResultsUrl = `{{ non_profits_search_page.first().path_full }}?search=${encodeURIComponent(
-                  $globalSearch.val()
-                )}`;
-                break;
-              case "causes":
-                moreResultsUrl = `{{ causes_landing_page.first().path_full }}?search=${encodeURIComponent(
-                  $globalSearch.val()
-                )}`;
-                break;
-              case "stories":
-                moreResultsUrl = `{{ stories_landing_page.first().path_full }}?search=${encodeURIComponent(
-                  $globalSearch.val()
-                )}`;
-                break;
-            }
-            $searchResultsDropdown.append(
-              `<a class="dropdown-item text-muted" href="${moreResultsUrl}">+${
-                data.length - 5
-              } more results</a>`
-            );
-          }
-          if (!isLastSection) {
-            $searchResultsDropdown.append(
-              '<div class="dropdown-divider"></div>'
-            );
-          }
-        }
-      }
-
-      const sections = [
-        { title: "Nonprofits", data: npos, type: "npos" },
-        { title: "Causes", data: causes, type: "causes" },
-        { title: "Stories", data: stories, type: "stories" },
-      ];
-
-      let hasResults = false;
-      sections.forEach((section, index) => {
-        if (section.data.length > 0) {
-          hasResults = true;
-        }
-        appendResults(
-          section.title,
-          section.data,
-          index === sections.length - 1,
-          section.type
-        );
-      });
-
-      if (!hasResults) {
-        $searchResultsDropdown.append(
-          '<div class="dropdown-item no-results"><p class="text-center">No results found</p></div>'
-        );
-      }
-    }
   });
-      console.log("🚀 ~ zestyUser:", zestyUser)
-      console.log("🚀 ~ zestyUser:", zestyUser)
-      console.log("🚀 ~ zestyUser:", zestyUser)
-      console.log("🚀 ~ zestyUser:", zestyUser)
-      console.log("🚀 ~ zestyUser:", zestyUser)
-      console.log("🚀 ~ zestyUser:", zestyUser)
-      console.log("🚀 ~ zestyUser:", zestyUser)
 </script>

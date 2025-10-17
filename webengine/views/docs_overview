@@ -1,0 +1,769 @@
+<style>
+  .docs-sidebar {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1.5rem;
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+  }
+  
+  .docs-nav {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+  }
+  
+  .docs-nav-item {
+      margin-bottom: 0.5rem;
+  }
+  
+  .docs-nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    color: #666;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-bottom: 2px;
+}
+
+.docs-nav-link:hover:not(.active) {
+    background-color: #f8f9fa;
+    color: #7b3fee;
+    text-decoration: none;
+}
+
+.docs-nav-link.active {
+    background-color: #7b3fee;
+    color: white;
+    font-weight: 500;
+}
+
+.docs-nav-link-text {
+    flex: 1;
+}
+
+.docs-nav-chevron {
+    margin-left: 8px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.docs-nav-chevron:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.docs-nav-chevron.expanded {
+    transform: rotate(90deg);
+}
+
+.docs-nav-item.has-children .docs-nav-link {
+    padding-right: 8px;
+}
+  
+  .docs-nav-nested {
+    margin-left: 1rem;
+    margin-top: 0.25rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.docs-nav-nested.expanded {
+    max-height: 1000px;
+}
+
+.docs-nav-nested .docs-nav-link {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    margin-left: 16px;
+}
+
+.docs-nav-header {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 0.5rem;
+}
+  
+  .docs-content {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      min-height: 500px;
+  }
+  
+  .docs-content h1 {
+      color: #212529;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #e9ecef;
+  }
+  
+  .docs-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 1rem 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .docs-content ol, .docs-content ul {
+      margin: 1rem 0;
+  }
+  
+  .docs-content li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+  }
+  
+  /* Mobile Navigation Styles */
+.docs-mobile-nav {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.docs-mobile-nav-content {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.docs-mobile-nav-item {
+    margin-bottom: 4px;
+}
+
+.docs-mobile-nav-link {
+    display: block;
+    padding: 8px 12px;
+    color: #666;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.docs-mobile-nav-link:hover:not(.active) {
+    background-color: #e9ecef;
+    color: #7b3fee;
+    text-decoration: none;
+}
+
+.docs-mobile-nav-link.active {
+    background-color: #7b3fee;
+    color: white;
+    font-weight: 500;
+}
+
+.docs-mobile-nav-parent {
+    font-weight: 600;
+    color: #495057;
+    padding: 8px 12px;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 4px;
+    background-color: #e9ecef;
+    border-radius: 6px;
+}
+
+.docs-mobile-nav-nested {
+    margin-left: 16px;
+    border-left: 2px solid #dee2e6;
+    padding-left: 8px;
+    margin-top: 4px;
+}
+
+.docs-mobile-nav-nested .docs-mobile-nav-link {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+}
+
+#mobile-nav-trigger {
+    border: 1px solid #dee2e6;
+    background-color: white;
+    color: #495057;
+}
+
+#mobile-nav-trigger:hover {
+    background-color: #f8f9fa;
+    border-color: #7b3fee;
+    color: #495057;
+}
+
+#mobile-nav-trigger:focus {
+    background-color: white;
+    border-color: #7b3fee;
+    color: #495057;
+    box-shadow: 0 0 0 0.2rem rgba(123, 63, 238, 0.25);
+}
+
+#mobile-nav-trigger:active {
+    background-color: #f8f9fa;
+    border-color: #7b3fee;
+    color: #495057;
+}
+
+#mobile-nav-trigger[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+#mobile-nav-trigger i {
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .docs-sidebar {
+        position: static;
+        max-height: none;
+        margin-bottom: 2rem;
+    }
+    
+    .docs-content {
+        padding: 1rem;
+    }
+    
+    .docs-header h1 {
+        font-size: 2rem;
+    }
+}
+  
+  .fade-in {
+      animation: fadeIn 0.3s ease-in;
+  }
+  
+  @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" as="style" onload="this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
+
+<section id="docs-overview" class="py-sm-1 py-md-3">
+    <div class="container-lg">
+        <div class="row">
+            <!-- Mobile Navigation Dropdown -->
+            <div class="col-12 d-md-none mb-4">
+                <div class="docs-mobile-nav">
+                    <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" 
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#mobile-nav-collapse" 
+                            aria-expanded="false" 
+                            aria-controls="mobile-nav-collapse"
+                            id="mobile-nav-trigger">
+                        <span id="mobile-nav-current">Select Documentation</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <div class="collapse mt-2" id="mobile-nav-collapse">
+                        <div class="card card-body p-2">
+                            <div class="docs-mobile-nav-content" id="docs-mobile-nav">
+                                <!-- Mobile navigation will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Desktop Sidebar Navigation -->
+            <div class="col-lg-3 col-md-4 mb-4 d-none d-md-block">
+                <div class="docs-sidebar">
+                    <div class="sidebar-header mb-3">
+                        <h5 class="mb-0">Contents</h5>
+                    </div>
+                    <div class="docs-nav" id="docs-nav">
+                        <!-- Navigation will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-9 col-md-8">
+                <div class="docs-content">
+                    <div id="docs-content-area">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Loading documentation...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="module">
+    // Global variables
+    let allDocs = [];
+    let docsStructure = {};
+    
+    // Fetch docs data
+    const getDocs = async () => {
+        try {
+            const response = await fetch('/mobileapp/docs.json');
+            const data = await response.json();
+            return data.data;
+        } catch (error) {
+            console.error('Error fetching docs:', error);
+            return [];
+        }
+    }
+  
+    
+    // Parse URI to get path segments
+    const parseDocPath = (uri) => {
+        const path = uri.replace('/docs/', '').replace(/\/$/, '');
+        return path ? path.split('/') : [];
+    }
+    
+    // Build hierarchical structure from flat docs data
+    const buildDocsStructure = (docs) => {
+        const structure = {};
+        const docsByFragment = {};
+        const processedFragments = new Set();
+        
+        // First pass: index docs by fragment for easy lookup
+        docs.forEach(doc => {
+            docsByFragment[doc.meta.web.fragment] = doc;
+        });
+        
+        // Second pass: identify nested documents first
+        const nestedDocs = [];
+        const topLevelDocs = [];
+        
+        docs.forEach(doc => {
+            const uri = doc.meta.web.uri;
+            const uriParts = uri.split('/').filter(part => part !== '');
+            
+            // Check if this is truly nested: should have more than 2 parts after splitting
+            // Example: /docs/parent/child/ -> ['docs', 'parent', 'child']
+            if (uriParts.length > 2 && uriParts[0] === 'docs') {
+                nestedDocs.push(doc);
+            } else {
+                topLevelDocs.push(doc);
+            }
+        });
+        
+        // Third pass: build structure starting with top-level docs
+        topLevelDocs.forEach(doc => {
+            const fragment = doc.meta.web.fragment;
+            if (!processedFragments.has(fragment)) {
+                structure[fragment] = {
+                    doc: doc,
+                    children: {}
+                };
+                processedFragments.add(fragment);
+            }
+        });
+        
+        // Fourth pass: add nested docs to their parents
+        nestedDocs.forEach(doc => {
+            const uri = doc.meta.web.uri;
+            const fragment = doc.meta.web.fragment;
+            const uriParts = uri.split('/').filter(part => part !== '');
+            
+            if (uriParts.length > 2) {
+                const parentFragment = uriParts[1]; // /docs/parent-fragment/child-fragment/
+                
+                // Ensure parent exists in structure
+                if (!structure[parentFragment]) {
+                    const parentDoc = docsByFragment[parentFragment];
+                    if (parentDoc && !processedFragments.has(parentFragment)) {
+                        structure[parentFragment] = {
+                            doc: parentDoc,
+                            children: {}
+                        };
+                        processedFragments.add(parentFragment);
+                    } else if (!parentDoc) {
+                        // Create placeholder for parent if it doesn't exist
+                        structure[parentFragment] = {
+                            doc: null,
+                            children: {}
+                        };
+                    }
+                }
+                
+                // Add current doc as child only if it's not already processed as a top-level doc
+                if (!processedFragments.has(fragment)) {
+                    structure[parentFragment].children[fragment] = {
+                        doc: doc,
+                        children: {}
+                    };
+                    processedFragments.add(fragment);
+                }
+            }
+        });
+        
+        // Clean up: remove any entries where the parent doc is null and has no children
+        Object.keys(structure).forEach(key => {
+            if (!structure[key].doc && Object.keys(structure[key].children).length === 0) {
+                delete structure[key];
+            }
+        });
+        
+        return structure;
+    }
+    
+    // Render navigation for both desktop and mobile
+    const renderNavigation = (structure) => {
+        // Render desktop navigation
+        renderDesktopNavigation(structure);
+        
+        // Render mobile navigation
+        renderMobileNavigation(structure);
+    }
+    
+    // Render desktop navigation (existing sidebar)
+    const renderDesktopNavigation = (structure) => {
+        const nav = $('#docs-nav');
+        nav.empty();
+        
+        Object.keys(structure).forEach(fragment => {
+            const item = structure[fragment];
+            
+            // Skip if no doc and no children
+            if (!item.doc && Object.keys(item.children).length === 0) {
+                return;
+            }
+            
+            const hasChildren = Object.keys(item.children).length > 0;
+            
+            // Create main navigation item
+            const navItem = $(`<div class="docs-nav-item ${hasChildren ? 'has-children' : ''}"></div>`);
+            
+            // Only add clickable link if there's a doc
+            if (item.doc) {
+                const navLink = $(`
+                    <a href="#" class="docs-nav-link" data-fragment="${fragment}" data-path="${fragment}">
+                        <span class="docs-nav-link-text">${item.doc.title}</span>
+                        ${hasChildren ? '<i class="bi bi-chevron-right docs-nav-chevron" data-parent="' + fragment + '"></i>' : ''}
+                    </a>
+                `);
+                navItem.append(navLink);
+            } else {
+                // If no doc but has children, create a non-clickable header
+                const navHeader = $(`
+                    <div class="docs-nav-header">
+                        <span class="docs-nav-link-text">${fragment}</span>
+                        ${hasChildren ? '<i class="bi bi-chevron-right docs-nav-chevron" data-parent="' + fragment + '"></i>' : ''}
+                    </div>
+                `);
+                navItem.append(navHeader);
+            }
+            
+            // Add children if any
+            if (hasChildren) {
+                const nestedNav = $('<div class="docs-nav-nested" data-parent="' + fragment + '"></div>');
+                
+                Object.keys(item.children).forEach(childFragment => {
+                    const childItem = item.children[childFragment];
+                    const childPath = `${fragment}/${childFragment}`;
+                    
+                    if (childItem.doc) {
+                        const childNavItem = $(`
+                            <div class="docs-nav-item">
+                                <a href="#" class="docs-nav-link" data-fragment="${childFragment}" data-path="${childPath}">
+                                    <span class="docs-nav-link-text">${childItem.doc.title}</span>
+                                </a>
+                            </div>
+                        `);
+                        nestedNav.append(childNavItem);
+                    }
+                });
+                
+                navItem.append(nestedNav);
+            }
+            
+            nav.append(navItem);
+        });
+    }
+    
+    // Render mobile navigation (flat list in dropdown)
+    const renderMobileNavigation = (structure) => {
+        const mobileNav = $('#docs-mobile-nav');
+        mobileNav.empty();
+        
+        Object.keys(structure).forEach(fragment => {
+            const item = structure[fragment];
+            
+            // Skip if no doc and no children
+            if (!item.doc && Object.keys(item.children).length === 0) {
+                return;
+            }
+            
+            const hasChildren = Object.keys(item.children).length > 0;
+            
+            // Add parent doc if it exists
+            if (item.doc) {
+                const mobileNavItem = $(`
+                    <div class="docs-mobile-nav-item">
+                        <a href="#" class="docs-mobile-nav-link" data-fragment="${fragment}" data-path="${fragment}">
+                            ${item.doc.title}
+                        </a>
+                    </div>
+                `);
+                mobileNav.append(mobileNavItem);
+            } else if (hasChildren) {
+                // Add parent header if no doc but has children
+                const mobileNavParent = $(`
+                    <div class="docs-mobile-nav-parent">
+                        ${fragment}
+                    </div>
+                `);
+                mobileNav.append(mobileNavParent);
+            }
+            
+            // Add children if any
+            if (hasChildren) {
+                const mobileNestedNav = $('<div class="docs-mobile-nav-nested"></div>');
+                
+                Object.keys(item.children).forEach(childFragment => {
+                    const childItem = item.children[childFragment];
+                    const childPath = `${fragment}/${childFragment}`;
+                    
+                    if (childItem.doc) {
+                        const childMobileNavItem = $(`
+                            <div class="docs-mobile-nav-item">
+                                <a href="#" class="docs-mobile-nav-link" data-fragment="${childFragment}" data-path="${childPath}">
+                                    ${childItem.doc.title}
+                                </a>
+                            </div>
+                        `);
+                        mobileNestedNav.append(childMobileNavItem);
+                    }
+                });
+                
+                mobileNav.append(mobileNestedNav);
+            }
+        });
+    }
+    
+    // Find doc by path
+    const findDocByPath = (path) => {
+        const segments = path.split('/');
+        
+        if (segments.length === 1) {
+            // Top-level doc
+            const fragment = segments[0];
+            return docsStructure[fragment] ? docsStructure[fragment].doc : null;
+        } else if (segments.length === 2) {
+            // Nested doc
+            const [parentFragment, childFragment] = segments;
+            return docsStructure[parentFragment] && docsStructure[parentFragment].children[childFragment] 
+                ? docsStructure[parentFragment].children[childFragment].doc 
+                : null;
+        }
+        
+        return null;
+    }
+    
+    // Render doc content
+    const renderDocContent = (doc) => {
+        const contentArea = $('#docs-content-area');
+        
+        if (!doc) {
+            contentArea.html(`
+                <div class="text-center py-5">
+                    <h3 class="text-muted">Documentation not found</h3>
+                    <p>Please select a document from the navigation.</p>
+                </div>
+            `);
+            return;
+        }
+        
+        const content = $(`
+            <div class="fade-in">
+                <h1>${doc.title}</h1>
+                <div class="docs-body">
+                    ${doc.content}
+                </div>
+            </div>
+        `);
+        
+        contentArea.html(content);
+    }
+    
+    // Update URL and navigation state
+    const updateNavigation = (path) => {
+        // Update URL hash
+        if (path) {
+            window.location.hash = path;
+        } else {
+            window.location.hash = '';
+        }
+        
+        // Update desktop navigation active states
+        $('.docs-nav-link').removeClass('active');
+        $('.docs-mobile-nav-link').removeClass('active');
+        
+        if (path) {
+            // Update desktop navigation
+            $(`.docs-nav-link[data-path="${path}"]`).addClass('active');
+            
+            // Update mobile navigation
+            $(`.docs-mobile-nav-link[data-path="${path}"]`).addClass('active');
+            
+            // Update mobile nav trigger text
+            const activeDoc = findDocByPath(path);
+            if (activeDoc) {
+                $('#mobile-nav-current').text(activeDoc.title);
+            }
+            
+            // If this is a nested path, expand the parent navigation (desktop only)
+            const pathSegments = path.split('/');
+            if (pathSegments.length > 1) {
+                const parentFragment = pathSegments[0];
+                expandNestedNav(parentFragment);
+            }
+        } else {
+            // Reset mobile nav trigger text
+            $('#mobile-nav-current').text('Select Documentation');
+        }
+        
+        // Find and render the doc
+        const doc = path ? findDocByPath(path) : null;
+        renderDocContent(doc);
+    }
+    
+    // Handle navigation clicks
+    const setupNavigation = () => {
+        // Handle desktop document navigation clicks
+        $(document).on('click', '.docs-nav-link', function(e) {
+            e.preventDefault();
+            
+            // Check if click was on chevron
+            if ($(e.target).hasClass('docs-nav-chevron')) {
+                return; // Let chevron handler deal with it
+            }
+            
+            const path = $(this).data('path');
+            if (path) {
+                updateNavigation(path);
+                
+                // If this item has children, also expand them
+                const parentFragment = $(this).data('fragment');
+                if (parentFragment) {
+                    expandNestedNav(parentFragment);
+                }
+            }
+        });
+        
+        // Handle mobile navigation clicks
+        $(document).on('click', '.docs-mobile-nav-link', function(e) {
+            e.preventDefault();
+            
+            const path = $(this).data('path');
+            if (path) {
+                updateNavigation(path);
+                
+                // Update mobile nav trigger text
+                const docTitle = $(this).text().trim();
+                $('#mobile-nav-current').text(docTitle);
+                
+                // Close mobile nav
+                $('#mobile-nav-collapse').collapse('hide');
+            }
+        });
+        
+        // Handle chevron clicks for expanding/collapsing (desktop only)
+        $(document).on('click', '.docs-nav-chevron', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const parentFragment = $(this).data('parent');
+            toggleNestedNav(parentFragment);
+        });
+        
+        // Handle browser back/forward
+        $(window).on('hashchange', function() {
+            const hash = window.location.hash.substring(1);
+            updateNavigation(hash);
+        });
+    }
+    
+    // Toggle nested navigation visibility
+    const toggleNestedNav = (parentFragment) => {
+        const nestedNav = $(`.docs-nav-nested[data-parent="${parentFragment}"]`);
+        const chevron = $(`.docs-nav-chevron[data-parent="${parentFragment}"]`);
+        
+        if (nestedNav.hasClass('expanded')) {
+            nestedNav.removeClass('expanded');
+            chevron.removeClass('expanded');
+        } else {
+            nestedNav.addClass('expanded');
+            chevron.addClass('expanded');
+        }
+    }
+    
+    // Expand nested navigation (used when clicking parent doc)
+    const expandNestedNav = (parentFragment) => {
+        const nestedNav = $(`.docs-nav-nested[data-parent="${parentFragment}"]`);
+        const chevron = $(`.docs-nav-chevron[data-parent="${parentFragment}"]`);
+        
+        if (!nestedNav.hasClass('expanded')) {
+            nestedNav.addClass('expanded');
+            chevron.addClass('expanded');
+        }
+    }
+    
+    // Get initial path from URL hash
+    const getInitialPath = () => {
+        const hash = window.location.hash.substring(1);
+        return hash || null;
+    }
+    
+    // Initialize the docs page
+    const initializeDocs = async () => {
+        try {
+            // Fetch and process docs
+            allDocs = await getDocs();
+            
+            docsStructure = buildDocsStructure(allDocs);
+            
+            // Render navigation
+            renderNavigation(docsStructure);
+            
+            // Setup event handlers
+            setupNavigation();
+            
+            // Load initial content based on URL hash
+            const initialPath = getInitialPath();
+            
+            if (initialPath) {
+                updateNavigation(initialPath);
+            } else {
+                // If no hash, show the first available doc
+                const firstFragment = Object.keys(docsStructure)[0];
+                if (firstFragment) {
+                    updateNavigation(firstFragment);
+                } else {
+                    // No docs available
+                    renderDocContent(null);
+                }
+            }
+            
+        } catch (error) {
+            $('#docs-content-area').html(`
+                <div class="text-center py-5">
+                    <h3 class="text-danger">Error loading documentation</h3>
+                    <p>Please try refreshing the page.</p>
+                </div>
+            `);
+        }
+    }
+    
+    // Initialize when document is ready
+    $(document).ready(function() {
+        initializeDocs();
+    });
+</script>

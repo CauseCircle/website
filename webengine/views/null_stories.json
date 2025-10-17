@@ -1,0 +1,6 @@
+[
+    {{ each stories as story limit 100 }}
+{"name":"{{story.title}}"},
+{"approval_status": "{{story.npo_approval_status}}" }{{story._arraycomma}}
+{{/each}}
+]

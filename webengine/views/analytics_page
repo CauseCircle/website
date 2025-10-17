@@ -239,8 +239,8 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
   const currentUser = localStorage.getItem("user");
 
   if (currentUser) {

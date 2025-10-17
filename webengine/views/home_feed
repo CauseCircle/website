@@ -1,25 +1,215 @@
 {{ $profileZuid = 7-f8f2fe8ee5-2wc7td }}
 
-<style>
-  .carousel-control-prev-icon {
-    background-color: #575757;
-    border-radius: 5px;
-  }
-  .carousel-control-next-icon {
-    background-color: #575757;
-    border-radius: 5px;
-  }
-</style>
-<!-- prettier-ignore -->
-{{include /components/global/HomeFeed/create_story_modal.html}}
-<!-- prettier-ignore -->
-{{include /components/global/HomeFeed/create_event_modal.html}}
+{{include /components/global/HomeFeed/styles.html}}
 <!-- prettier-ignore -->
 {{include /components/global/HomeFeed/download_app_modal.html}}
+
+<!-- Story Card Share Modal -->
+<div
+  class="modal fade"
+  id="storyCardShareModal"
+  tabindex="-1"
+  aria-labelledby="storyCardShareModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="storyCardShareModalLabel">Share this story</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body px-4 pb-4">
+        <div class="share__modal__options">
+          <div class="row row-cols-3 row-cols-md-4 g-3">
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="twitter">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/twitter.svg"
+                    class="social__logo"
+                    alt="twitter-logo"
+                  />
+                </div>
+                <span>Twitter</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="facebook">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/facebook.svg"
+                    class="social__logo"
+                    alt="facebook-logo"
+                  />
+                </div>
+                <span>Facebook</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="linkedin">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/linkedin.svg"
+                    class="social__logo"
+                    alt="linkedin-logo"
+                  />
+                </div>
+                <span>LinkedIn</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="whatsapp">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/whatsapp.svg"
+                    class="social__logo"
+                    alt="whatsapp-logo"
+                  />
+                </div>
+                <span>WhatsApp</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="reddit">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/reddit.svg"
+                    class="social__logo"
+                    alt="reddit-logo"
+                  />
+                </div>
+                <span>Reddit</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="telegram">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/telegram.svg"
+                    class="social__logo"
+                    alt="telegram-logo"
+                  />
+                </div>
+                <span>Telegram</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="pinterest">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/pinterest.svg"
+                    class="social__logo"
+                    alt="pinterest-logo"
+                  />
+                </div>
+                <span>Pinterest</span>
+              </div>
+            </div>
+            <div class="col">
+              <div class="list__item">
+                <div class="icon_holder" data-icon="email">
+                  <img
+                    src="https://cdn.jsdelivr.net/npm/simple-icons@3.13.0/icons/mail-dot-ru.svg"
+                    class="social__logo"
+                    alt="email-logo"
+                  />
+                </div>
+                <span>Email</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="share__modal_link mt-4">
+          <span class="d-block mb-2">Story link</span>
+          <div class="share__modal_input input-group">
+            <input type="text" class="form-control" id="storyCardUrl" readonly />
+            <button
+              class="btn btn-outline-secondary position-relative"
+              type="button"
+              id="storyCardCopyButton"
+            >
+              <i class="bi bi-clipboard"></i>
+              <span class="copied-message">Copied!</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Home Feed Onboarding Modal -->
+<div class="modal fade" id="homeFeedOnboardingModal" tabindex="-1" aria-labelledby="homeFeedOnboardingModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-0">
+      <button type="button" class="close-btn" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+      
+      <!-- Slide 1 -->
+      <div class="onboarding-slide active" data-slide="1">
+        <div class="modal-header-custom">
+          <img src="https://4xxglxlj.media.zestyio.com/Follow-3-Nonprofits.png" alt="Follow Your First 3 Nonprofits" class="slide-image">
+        </div>
+        <div class="slide-content">
+          <h2 class="slide-title">Follow Your First 3 Nonprofits</h2>
+          <p class="slide-description">Start by connecting with causes you care about. Your feed will come alive with their latest stories, events, and updates.</p>
+        </div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="onboarding-slide" data-slide="2">
+        <div class="modal-header-custom">
+          <img src="https://4xxglxlj.media.zestyio.com/Create-your-First-Story.png" alt="Create Your First Story" class="slide-image">
+        </div>
+        <div class="slide-content">
+          <h2 class="slide-title">Create Your First Story</h2>
+          <p class="slide-description">Use photos or videos to share a moment that moved you. Every story helps nonprofits reach more hearts.</p>
+        </div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="onboarding-slide" data-slide="3">
+        <div class="modal-header-custom">
+          <img src="https://4xxglxlj.media.zestyio.com/Download-the-Mobile-App.png" alt="Download the Mobile App" class="slide-image">
+        </div>
+        <div class="slide-content">
+          <h2 class="slide-title">Download the Mobile App</h2>
+          <p class="slide-description">Keep the cause in your pocket. Post, follow, and engage on the go—just like Instagram, but for good.</p>
+        </div>
+      </div>
+
+      <!-- Slide 4 -->
+      <div class="onboarding-slide" data-slide="4">
+        <div class="modal-header-custom">
+          <img src="https://4xxglxlj.media.zestyio.com/Update-your-Volunteer-Profile.png" alt="Update Your Volunteer Profile" class="slide-image">
+        </div>
+        <div class="slide-content">
+          <h2 class="slide-title">Update Your Volunteer Profile</h2>
+          <p class="slide-description">Add a photo, your interests, and more. This helps nonprofits know who's behind the support—and makes your profile shine.</p>
+        </div>
+      </div>
+
+      <div class="modal-footer-custom">
+        <div class="pagination-dots">
+          <div class="pagination-dot active" data-slide="1"></div>
+          <div class="pagination-dot" data-slide="2"></div>
+          <div class="pagination-dot" data-slide="3"></div>
+          <div class="pagination-dot" data-slide="4"></div>
+        </div>
+        <button type="button" class="btn btn-primary" id="homeFeedNextSlideBtn">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="container py-3">
   <div class="row">
     <section id="left-column" class="col-3 d-none d-md-flex">
-      <div>
+      <div class="w-100">
         <!-- prettier-ignore -->
         {{ include /components/global/HomeFeed/profile_card.html }}
         <!-- prettier-ignore -->
@@ -27,8 +217,6 @@
       </div>
     </section>
     <section id="middle-column" class="col-12 col-md-6">
-      <!-- prettier-ignore -->
-      {{ include /components/global/HomeFeed/media_creation_card.html }}
       <!-- prettier-ignore -->
       {{ include /components/global/HomeFeed/causes_slider.html }}
       <!-- prettier-ignore -->
@@ -45,203 +233,10 @@
   </div>
 </div>
 
-<script>
-  const authUser = JSON.parse(localStorage.getItem("user"));
-  let userUrl = "";
-  let favoriteNPOs = [];
-  let favoriteCauses = [];
-
-  $.ajax({
-    url: "https://4xxglxlj-dev.webengine.zesty.io/mobileapp/user_profile.json?zpw=causecircle",
-    method: "GET",
-    data: {
-      user_zuid: authUser.zuid,
-    },
-    success: function (data) {
-      // console.log("User profile:", data);
-      userUrl = `https://causecircle.org/${data.meta.web.uri}`;
-      favoriteNPOs = data.favorite_npos?.data || [];
-      favoriteCauses = data.favorite_causes?.data;
-
-      // Populate NPO slider
-      populateNPOSlider(favoriteNPOs);
-
-      // Get stories for favorite NPOs
-      if (favoriteNPOs.length > 0) {
-        const npoZuids = favoriteNPOs.map((npo) => npo.meta.zuid);
-        getStoriesForNPOs(npoZuids);
-      }
-    },
-  });
-
-  function populateNPOSlider(npos) {
-    const npoCardsContainer = $("#npoCards");
-    npoCardsContainer.empty(); // Clear existing content
-
-    // Determine the number of NPOs per slide based on screen size
-    const nposPerSlide = window.innerWidth < 768 ? 1 : 3;
-
-    // Create carousel items
-    let carouselItem;
-    npos.forEach((npo, index) => {
-      if (index % nposPerSlide === 0) {
-        // Start a new carousel item for every nposPerSlide NPOs
-        if (carouselItem) {
-          npoCardsContainer.append(carouselItem); // Append the previous carousel item
-        }
-        carouselItem = $(`<div class="carousel-item"><div class="row"></div></div>`);
-        if (index === 0) {
-          carouselItem.addClass("active"); // Make the first item active
-        }
-      }
-
-      const npoCard = `
-        <div class="col-md-4 mb-3">
-          <div
-            class="card d-flex flex-column h-100 p-3 gap-2 npo-card"
-            data-story-url="${npo.meta.web.url}"
-          >
-            <img src="${
-              typeof npo.hero_image === "string"
-                ? npo.hero_image
-                : npo.hero_image.data[0].url
-            }" class="npo-image" />
-            <div class="d-flex flex-column gap-2 h-100">
-              <div class="d-flex flex-grow-1 align-items-center gap-2">
-                <img
-                  src="${
-                    typeof npo.logo === "string"
-                      ? npo.logo
-                      : npo.logo.data[0].url
-                  }"
-                  class="npo-npo-logo"
-                />
-                <p class="npo-name my-auto">${npo.name}</p>
-              </div>
-              <div class="npo-subtitle">${npo.cause_description}</div>
-              <a
-                href="https://causecircle.org/${npo.meta.web.uri}"
-                class="btn btn-secondary npo-btn card-btn"
-                >View Profile</a
-              >
-            </div>
-          </div>
-        </div>
-      `;
-      carouselItem.find(".row").append(npoCard);
-
-      // In mobile view, remove the col-md-4 class to take full width
-      if (window.innerWidth < 768) {
-        carouselItem.find(".col-md-4").removeClass("col-md-4");
-      }
-    });
-
-    // Append the last carousel item if it has any content
-    if (carouselItem) {
-      npoCardsContainer.append(carouselItem);
-    }
-  }
-
-  function getStoriesForNPOs(npoZuids) {
-    const promises = npoZuids.map((npoZuid) => {
-      return $.ajax({
-        url: "https://4xxglxlj-dev.webengine.zesty.io/mobileapp/stories.json?zpw=causecircle",
-        method: "GET",
-        data: {
-          npo: npoZuid,
-          approved: 1, // Only get approved stories
-        },
-      });
-    });
-
-    Promise.all(promises)
-      .then((responses) => {
-        // Combine all stories from different NPOs
-        const allStories = responses.flatMap((response) => response.data || []);
-
-        // Sort stories by date (newest first)
-        allStories
-          .sort((a, b) => {
-            return new Date(b.date_published) - new Date(a.date_published);
-          })
-          .reverse();
-
-        // Populate big story cards
-        populateStoryCards(allStories);
-      })
-      .catch((err) => {
-        console.error("Error fetching stories:", err);
-      });
-  }
-
-  function populateStoryCards(stories) {
-    const bigStoryCardContainer = $("#big-stories-container");
-
-    // Take first 2 stories as per the original template
-    stories.forEach((story) => {
-      const relatedNPO = story.related_npos?.data?.[0] || {};
-
-      const storyCard = `
-        <div class="post-card my-3" onclick="window.location.href='${
-          story.meta.web.url
-        }'" style="cursor: pointer">
-          <div class="post-header">
-            <img
-              src="${
-                typeof relatedNPO.logo === "string"
-                  ? relatedNPO.logo
-                  : relatedNPO.logo.data[0].url
-              }"
-              alt=""
-              class="profile-img"
-            />
-            <div class="post-meta">
-              <h5 class="mb-0">${relatedNPO.name || "Organization"}</h5>
-            </div>
-            <button class="btn btn-light ms-auto">+</button>
-          </div>
-          <div class="post-content p-3">
-            <h4>${story.title}</h4>
-            <div class="story-subtitle">${
-              story.description ?? story.story_body
-            }</div>
-          </div>
-          <img
-            src="${
-              typeof story.story_image === "string"
-                ? story.story_image
-                : story.story_image.data[0].url
-            }"
-            class="post-image"
-          />
-        </div>
-      `;
-
-      bigStoryCardContainer.append(storyCard);
-    });
-  }
-
-  $(document).ready(function () {
-    // Add click handler for create story button
-    $(".create-story").on("click", function (e) {
-      e.preventDefault();
-      $("#createStoryModal").modal("show");
-    });
-
-    $("#my-stories").click(function () {
-      window.location.href = userUrl;
-    });
-    $("#my-npos").click(function () {
-      window.location.href = userUrl;
-    });
-
-    if (window.location.search.includes("create-story")) {
-      $("#createStoryModal").modal("show");
-    }
-
-    // Recalculate NPO slider on window resize
-    $(window).resize(function () {
-      populateNPOSlider(favoriteNPOs);
-    });
-  });
-</script>
+<!-- Include modular scripts for home feed functionality -->
+{{ include /scripts/core/pages/home-feed/media-handling.html }}
+{{ include /scripts/core/pages/home-feed/comments.html }}
+{{ include /scripts/core/pages/home-feed/interaction-handlers.html }}
+{{ include /scripts/core/pages/home-feed/story-rendering.html }}
+{{ include /scripts/core/pages/home-feed/onboarding.html }}
+{{ include /scripts/core/pages/home-feed/main-init.html }}

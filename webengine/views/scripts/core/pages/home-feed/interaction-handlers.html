@@ -1,0 +1,123 @@
+<script type="module">
+  // Interaction Handlers Module for Home Feed
+  // Handles like, donate, share, and other user interaction events
+
+  // Function to handle like button clicks using TanStack Query mutation
+  async function handleLikeClick(storyZuid, event) {
+    try {
+      // Prevent event bubbling to parent elements
+      event.stopPropagation();
+      
+      // Store the button reference to ensure we update the correct one
+      const likeButton = $(event.currentTarget);
+      
+      // Create mutation observer
+      const updateStoryLikesMutation = window.createUpdateStoryLikesMutation();
+      
+      // Subscribe to mutation state changes before triggering
+      const unsubscribe = updateStoryLikesMutation.subscribe((result) => {
+        if (result.status === 'success') {
+          // Handle success UI updates
+          
+          // Reset button state
+          likeButton.prop('disabled', false);
+          
+          unsubscribe();
+        } else if (result.status === 'error') {
+          // Handle error UI updates
+          console.error("Error updating story likes:", result.error);
+          
+          // Reset button state on error
+          likeButton.prop('disabled', false);
+          
+          unsubscribe();
+        }
+      });
+
+      // Set loading state manually
+      likeButton.prop('disabled', true);
+      
+      // Trigger mutation
+      updateStoryLikesMutation.mutate(storyZuid);
+      
+    } catch (error) {
+      console.error("Error updating story likes:", error);
+    }
+  }
+
+  // Function to handle donate button clicks using TanStack Query mutation
+  async function handleDonateClick(npoZuid, donateLink, event) {
+    // Prevent event bubbling to parent elements
+    event.stopPropagation();
+    
+    // Update NPO donate click count using TanStack Query mutation
+    if (npoZuid) {
+      try {
+        const clickNpoDonateMutation = window.createClickNpoDonateMutation();
+        
+        // Subscribe to mutation state changes before triggering
+        const unsubscribe = clickNpoDonateMutation.subscribe((result) => {
+          if (result.status === 'success') {
+            // Handle success UI updates
+            unsubscribe();
+          } else if (result.status === 'error') {
+            // Handle error UI updates
+            console.error("Error updating NPO donate clicks:", result.error);
+            unsubscribe();
+          }
+        });
+
+        // Trigger the mutation
+        clickNpoDonateMutation.mutate(npoZuid);
+      } catch (error) {
+        console.error("Error updating NPO donate clicks:", error);
+        // Continue with donation link opening even if click count update fails
+      }
+    }
+    
+    // Open donation link if available
+    if (donateLink) {
+      window.open(donateLink, '_blank');
+    }
+  }
+
+  // Function to handle share button clicks and open the share modal using TanStack Query mutation
+  async function openShareModal(storyUrl, storyZuid, event) {
+    // Prevent event bubbling to parent elements
+    if (event) event.stopPropagation();
+    
+    // Update story shares count using TanStack Query mutation
+    try {
+      const updateStorySharesMutation = window.createUpdateStorySharesMutation();
+      
+      // Subscribe to mutation state changes before triggering
+      const unsubscribe = updateStorySharesMutation.subscribe((result) => {
+        if (result.status === 'success') {
+          // Handle success UI updates
+          unsubscribe();
+        } else if (result.status === 'error') {
+          // Handle error UI updates
+          console.error("Error updating story shares:", result.error);
+          unsubscribe();
+        }
+      });
+
+      // Trigger the mutation
+      updateStorySharesMutation.mutate(storyZuid);
+    } catch (error) {
+      console.error("Error updating story shares:", error);
+      // Continue with modal opening even if share count update fails
+    }
+    
+    // Set the story URL in the input field
+    $("#storyCardUrl").val(storyUrl);
+    
+    // Show the modal
+    $("#storyCardShareModal").modal("show");
+  }
+
+  // Export functions to window for global access
+  window.handleLikeClick = handleLikeClick;
+  window.handleDonateClick = handleDonateClick;
+  window.openShareModal = openShareModal;
+</script>

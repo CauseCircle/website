@@ -1,0 +1,297 @@
+<script type="module">
+  // Main Initialization Module for Home Feed
+  // Coordinates all modules and handles main page initialization
+
+  // Helper function to escape HTML
+  function escapeHtml(unsafe) {
+      if (!unsafe) return '';
+
+      // First decode any existing HTML entities to avoid double-encoding
+      const decoded = decodeHtmlEntities(unsafe);
+
+      // Then properly escape HTML characters
+      return decoded
+           .replace(/&/g, "&amp;")
+           .replace(/</g, "&lt;")
+           .replace(/>/g, "&gt;")
+           .replace(/"/g, "&quot;")
+           .replace(/'/g, "&#039;");
+  }
+  
+  // Helper function to format date
+  function formatDate(dateString) {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+  
+  // Function to format a date in a human-readable time-ago format
+  function formatTimeAgo(dateString) {
+    if (!dateString) return '';
+    
+    try {
+      let date;
+      
+      // Check if dateString is already in ISO format (includes 'T' and ends with 'Z' or timezone)
+      if (dateString.includes('T') && (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-'))) {
+        // ISO format with timezone info - parse directly
+        date = new Date(dateString);
+      } else {
+        // Legacy format without timezone - treat as UTC
+        date = new Date(dateString + ' UTC');
+      }
+      
+      // Validate the date
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date');
+      }
+      
+      const now = new Date();
+      const diffInMilliseconds = now - date;
+      const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+      const diffInMinutes = Math.floor(diffInSeconds / 60);
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      const diffInDays = Math.floor(diffInHours / 24);
+      const diffInMonths = Math.floor(diffInDays / 30);
+      const diffInYears = Math.floor(diffInDays / 365);
+      
+      if (diffInSeconds < 60) {
+        return diffInSeconds <= 1 ? 'just now' : `${diffInSeconds}s ago`;
+      } else if (diffInMinutes < 60) {
+        return `${diffInMinutes}m ago`;
+      } else if (diffInHours < 24) {
+        return `${diffInHours}h ago`;
+      } else if (diffInDays < 30) {
+        return `${diffInDays}d ago`;
+      } else if (diffInMonths < 12) {
+        return `${diffInMonths}mo ago`;
+      } else {
+        return `${diffInYears}y ago`;
+      }
+    } catch (error) {
+      console.error('Error formatting time:', error, 'Input:', dateString);
+      return '';
+    }
+  }
+
+  // Function to decode HTML entities
+  function decodeHtmlEntities(text) {
+    if (!text) return '';
+    
+    // Create a temporary div element to decode HTML entities
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = text;
+    return tempDiv.textContent || tempDiv.innerText || '';
+  }
+
+  // Function to extract hashtags from story text
+  function extractHashtagsFromText(text) {
+    if (!text) return [];
+    
+    // First decode HTML entities (like &#39; &#32; etc.)
+    const decodedText = decodeHtmlEntities(text);
+    
+    // Regular expression to find hashtags (#word)
+    const hashtagRegex = /#[a-zA-Z0-9_]+/g;
+    const hashtags = decodedText.match(hashtagRegex);
+    
+    if (!hashtags || hashtags.length === 0) return [];
+    
+    // Remove duplicates and clean up
+    const uniqueHashtags = [...new Set(hashtags.map(tag => tag.toLowerCase()))];
+    
+    return uniqueHashtags;
+  }
+
+  // Function to generate hashtag HTML for story cards
+  function generateHashtagsHtml(storyText) {
+    const hashtags = extractHashtagsFromText(storyText);
+    
+    if (hashtags.length === 0) return '';
+    
+    // Create hashtag HTML with proper links
+    const hashtagsHtml = hashtags.map(hashtag => {
+      const encodedHashtag = encodeURIComponent(hashtag);
+      return `<a href="/stories/?search=${encodedHashtag}" class="hashtag-item" target="_blank" rel="noopener noreferrer">${hashtag}</a>`;
+    }).join('');
+    
+    return `<div class="hashtags-container">${hashtagsHtml}</div>`;
+  }
+
+  // Main initialization function
+  $(document).ready(function () {
+    const authUser = JSON.parse(localStorage.getItem("user"));
+    
+    if (!authUser || !authUser.zuid) {
+      console.error("No authenticated user found");
+      return;
+    }
+
+    // Create user profile query observer
+    const userProfileQuery = window.createUserProfileQuery(authUser.zuid);
+    
+    // Subscribe to user profile query changes
+    const unsubscribe = userProfileQuery.subscribe((result) => {
+      if (result.status === 'success' && result.data) {
+        const userProfile = result.data;
+        const data = userProfile.data[0];
+        
+        if (data) {
+          const userUrl = `{{ $base_url }}${data.meta.web.uri}`;
+          const favoriteNPOs = data.favorite_npos?.data || [];
+          const favoriteCauses = data.favorite_causes?.data;
+
+          // Check if favorite NPOs have changed to avoid unnecessary story re-renders
+          const currentNpoZuids = favoriteNPOs.map((npo) => npo.meta.zuid);
+          const previousNpoZuids = window.favoriteNPOs ? window.favoriteNPOs.map((npo) => npo.meta.zuid) : [];
+          const nposChanged = JSON.stringify(currentNpoZuids.sort()) !== JSON.stringify(previousNpoZuids.sort());
+
+          $("#my-stories").click(function () {
+            if (userUrl) {
+              window.location.href = userUrl;
+            }
+          });
+          $("#my-npos").click(function () {
+            if (userUrl) {
+              window.location.href = userUrl;
+            }
+          });
+
+          if (favoriteNPOs.length > 0) {
+            $("#nposCarousel-container").removeClass("d-none");
+          }
+
+          // Populate NPO slider
+          window.populateNPOSlider(favoriteNPOs);
+
+          // Only get stories if NPOs have changed or this is the first load
+          if (nposChanged || !window.favoriteNPOs) {
+            const npoZuids = favoriteNPOs.map((npo) => npo.meta.zuid);
+            window.getStoriesForNPOs(npoZuids);
+            
+            // Enable infinite scroll refresh after initial render (only if there are NPOs)
+            if (favoriteNPOs.length > 0) {
+              window.setupInfiniteScroll(npoZuids);
+            }
+          } else {
+          }
+
+          // Store userUrl and favoriteNPOs for later use
+          window.userUrl = userUrl;
+          window.favoriteNPOs = favoriteNPOs;
+        }
+      } else if (result.status === 'error') {
+        console.error("Error loading user profile:", result.error);
+      }
+    });
+
+    // Add click handler for create story button
+    $(".create-story").on("click", function (e) {
+      e.preventDefault();
+      $("#createStoryModal").modal("show");
+    });
+
+
+    if (window.location.search.includes("create-story")) {
+      $("#createStoryModal").modal("show");
+    }
+
+    if (window.location.search.includes("followed-npo")) {
+      $("#downloadModal").modal("show");
+    }
+    
+    // Initial image width parameter application
+    window.addWidthParamToImages();
+
+    // Handle share modal social media clicks
+    $("#storyCardShareModal .list__item").click(function () {
+      var platform = $(this).find(".icon_holder").data("icon");
+      var shareUrl = $("#storyCardUrl").val();
+      var storyTitle = "Check out this story on CauseCircle";
+      var shareTarget = "";
+
+      switch (platform) {
+        case "twitter":
+          shareTarget = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(storyTitle)}`;
+          break;
+        case "facebook":
+          shareTarget = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+          break;
+        case "linkedin":
+          shareTarget = `https://www.linkedin.com/shareArticle?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(storyTitle)}`;
+          break;
+        case "whatsapp":
+          shareTarget = `https://wa.me/?text=${encodeURIComponent(storyTitle + " " + shareUrl)}`;
+          break;
+        case "reddit":
+          shareTarget = `https://reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(storyTitle)}`;
+          break;
+        case "telegram":
+          shareTarget = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(storyTitle)}`;
+          break;
+        case "pinterest":
+          shareTarget = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&description=${encodeURIComponent(storyTitle)}`;
+          break;
+        case "email":
+          shareTarget = `mailto:?subject=${encodeURIComponent(storyTitle)}&body=${encodeURIComponent(shareUrl)}`;
+          break;
+      }
+
+      if (shareTarget) {
+        window.open(shareTarget, "_blank");
+      }
+    });
+
+    // Handle story card URL copy button
+    $("#storyCardCopyButton").click(function () {
+      $("#storyCardUrl").select();
+      document.execCommand("copy");
+      $(this).addClass("copied");
+      setTimeout(() => {
+        $(this).removeClass("copied");
+      }, 1500);
+    });
+
+    // Recalculate NPO slider on window resize
+    $(window).resize(function () {
+      if (window.favoriteNPOs) {
+        window.populateNPOSlider(window.favoriteNPOs);
+      }
+      // Re-apply width parameters on resize
+      window.addWidthParamToImages();
+    });
+    
+    // Image load handler
+    $(document).on('load', '.post-image', function() {
+       window.addWidthParamToImage($(this));
+    });
+
+    // Prevent story navigation when clicking inside interactive elements
+    $(document).on('click', '.story-carousel, .post-actions button, .story-comments, .comment-options-btn', function(e) {
+      e.stopPropagation();
+    });
+    
+    // Carousel control click handler
+    $(document).on('click', '.story-carousel .carousel-control-prev, .story-carousel .carousel-control-next', function(e) {
+      e.preventDefault(); // Already preventing default
+      e.stopPropagation(); // Already stopping propagation
+      const targetId = $(this).data('bs-target');
+      const direction = $(this).hasClass('carousel-control-prev') ? 'prev' : 'next';
+      $(targetId).carousel(direction);
+      // return false; // Not strictly needed due to preventDefault
+    });
+
+    // Comment interactions now handled via inline onclick handlers
+  });
+
+  // Export functions to window for global access
+  window.escapeHtml = escapeHtml;
+  window.formatDate = formatDate;
+  window.formatTimeAgo = formatTimeAgo;
+  window.decodeHtmlEntities = decodeHtmlEntities;
+  window.extractHashtagsFromText = extractHashtagsFromText;
+  window.generateHashtagsHtml = generateHashtagsHtml;
+</script>

@@ -1,0 +1,697 @@
+
+<style>
+  ul.custom-bullet {
+    list-style: none;
+    padding: 0;
+  }
+
+  ul.custom-bullet li {
+    margin-left: 25px;
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  ul.custom-bullet li::before {
+    content: "";
+    position: absolute;
+    left: -25px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    background-image: url("{{cause_circle_cms_page.first().list_icon.getImage()}}");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  /* ===== MISSION CARD STYLES ===== */
+  .mission-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    box-shadow: 0 0 0px rgba(0, 0, 0, 0);
+  }
+
+  .mission-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  /* ===== TYPOGRAPHY STYLES ===== */
+  h5 {
+    color: rgb(94, 94, 94);
+    font-size: 2.4vw;
+    font-weight: 400;
+  }
+
+  .mission-description h5 {
+    color: white;
+  }
+
+  @media (min-width: 600px) {
+    h5 {
+      font-size: min(2.4vw, 24px);
+    }
+  }
+
+  @media (max-width: 599px) {
+    h5 {
+      font-size: max(2.4vw, 20px);
+    }
+  }
+
+  /* ===== FORM STYLES ===== */
+  .label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-input {
+    border: 1px solid #dfe1e7;
+    background-color: #f8fafb;
+    border-radius: 5px;
+    height: 48px;
+    padding: 8px 12px;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--bs-primary);
+    border-width: 2px;
+  }
+</style>
+<style>
+  /* Mentor carousel dark controls/indicators */
+  #mentorCarousel {
+    --bs-carousel-control-color: #212529;
+    --bs-carousel-control-opacity: 0.9;
+    --bs-carousel-indicator-bg: rgba(33, 37, 41, 0.35);
+    --bs-carousel-indicator-active-bg: #212529;
+  }
+
+  /* Fallback for older Bootstrap builds where variables may not apply */
+  #mentorCarousel .carousel-control-prev-icon,
+  #mentorCarousel .carousel-control-next-icon {
+    filter: invert(1) brightness(0);
+  }
+
+  #mentorCarousel .carousel-indicators [data-bs-target] {
+    background-color: rgba(33, 37, 41, 0.35);
+  }
+  #mentorCarousel .carousel-indicators .active {
+    background-color: #212529;
+  }
+</style>
+
+<!-- ===== HERO SECTION ===== -->
+<section class="container d-flex align-items-center mt-4 mt-sm-7 mb-0">
+  <div class="row">
+    <div class="col-sm-12 col-md-5 d-flex flex-column align-items-center align-items-sm-start gap-3 pe-2 pe-sm-4 justify-content-center">
+      <div class="w-100 w-sm-100 text-start d-flex flex-column gap-4">
+        <h1 id="hero-title">{{ this.hero_title }}</h1>
+        <div id="hero-description" class="d-flex flex-column gap-3">
+          {{ this.hero_description }}
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-md-3">
+        <a href="#application-form" class="btn btn-primary">
+          {{ this.hero_primary_cta_label }}
+        </a>
+      </div>
+    </div>
+    <div class="col-sm-12 col-md-7 d-flex flex-column align-items-start gap-4 pe-2 pe-sm-4 justify-content-center mt-6 mt-md-0">
+      <img src="{{ this.hero_image.getImage() }}" alt="" style="width: 100%; max-width: 100%; height: auto" />
+    </div>
+  </div>
+</section>
+
+<!-- prettier-ignore -->
+{{include /components/global/brand_logos.html}}
+
+<!-- ===== NPO FEATURES SECTION ===== -->
+<section id="npo-features" class="container my-5 d-none">
+  <h2 class="section-title text-center mb-4">{{ this.npo_features_title }}</h2>
+  <div class="hero-description mx-auto text-center mb-5">
+    {{ this.npo_features_description }}
+  </div>
+  <div class="row g-4 justify-content-center">
+    {{each {this.npo_features} as feature sort by feature.sort }}
+    <div class="col-sm-6 col-lg-3">
+      <div class="card h-100 border-0 shadow" style="border-radius: 16px; transition: all 0.3s ease; cursor: pointer;" 
+           onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.15)'" 
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'">
+        <div class="card-body p-4 text-center">
+          <div class="d-flex justify-content-center mb-4">
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 80px; height: 80px;">
+              <img src="{{feature.logo.getImage()}}" alt="" class="w-100 h-100" style="object-fit: cover;" />
+            </div>
+          </div>
+          <h5 class="card-title mb-3 fw-bold" style="color: #2c3e50; font-size: 1.1rem;">{{feature.title}}</h5>
+          <p class="card-text mb-0" style="color: #6c757d; line-height: 1.6; font-size: 0.95rem;">{{feature.description}}</p>
+        </div>
+      </div>
+    </div>
+    {{end-each}}
+  </div>
+</section>
+
+<!-- ===== WHAT YOU'LL WALK AWAY WITH SECTION ===== -->
+<section id="what-you-ll-walk-away-with" class="container my-5">
+  <h2 class="section-title text-center mb-5">What You'll Walk Away With: Stories, Strategy, and a Grant-Ready Report</h2>
+  <div class="row g-4">
+    <div class="col-sm-6 mb-4">
+      <div class="d-flex align-items-start">
+        <div class="me-4 d-flex align-items-center justify-content-center flex-shrink-0">
+          <i class="bi bi-list-ul" style="color: var(--bs-primary); font-size: 32px;"></i>
+        </div>
+        <div>
+          <h5 class="mb-2" style="color: #2c3e50; font-weight: 600; font-size: 1.1rem;">A Fundraising-Ready Content Pipeline</h5>
+          <p class="mb-0" style="color: #34495e; line-height: 1.6;">Stories, event coverage, and supporter highlights designed to spark giving in San Diego.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 mb-4">
+      <div class="d-flex align-items-start">
+        <div class="me-4 d-flex align-items-center justify-content-center flex-shrink-0">
+          <i class="bi bi-geo-alt" style="color: var(--bs-primary); font-size: 32px;"></i>
+        </div>
+        <div>
+          <h5 class="mb-2" style="color: #2c3e50; font-weight: 600; font-size: 1.1rem;">Real Visibility in your Community</h5>
+          <p class="mb-0" style="color: #34495e; line-height: 1.6;">Content that connects you with San Diego supporters and new audiences.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 mb-4">
+      <div class="d-flex align-items-start">
+        <div class="me-4 d-flex align-items-center justify-content-center flex-shrink-0">
+          <i class="bi bi-bar-chart" style="color: var(--bs-primary); font-size: 32px;"></i>
+        </div>
+        <div>
+          <h5 class="mb-2" style="color: #2c3e50; font-weight: 600; font-size: 1.1rem;">A Content Audit + Data-driven Strategy</h5>
+          <p class="mb-0" style="color: #34495e; line-height: 1.6;">A clear pulse on your presence in San Diego, plus fresh stories tied to your goals.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 mb-4">
+      <div class="d-flex align-items-start">
+        <div class="me-4 d-flex align-items-center justify-content-center flex-shrink-0">
+          <i class="bi bi-heart" style="color: var(--bs-primary); font-size: 32px;"></i>
+        </div>
+        <div>
+          <h5 class="mb-2" style="color: #2c3e50; font-weight: 600; font-size: 1.1rem;">A Grant-Ready Profile, Built for You</h5>
+          <p class="mb-0" style="color: #34495e; line-height: 1.6;">A living digital report with KPIs and stories to share with San Diego funders and beyond.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-center mt-5">
+    <a href="#application-form" class="btn btn-primary">APPLY NOW</a>
+  </div>
+</section>
+
+<!-- ===== WHY THIS PROGRAM SECTION ===== -->
+<section id="why-this-program" class="my-5">
+  <div class="row g-0 container mx-auto border shadow-lg">
+    <!-- Left Column: Why This Program Is Different -->
+    <div class="col-md-6" style="background: linear-gradient(135deg, #6f42c1, var(--bs-primary)); padding: 4rem 3rem;">
+      <div class="text-white">
+        <h2 class="section-title text-start">Why This Program Is Different</h2>
+        <p class="mb-4 fs-5 opacity-75">This isn't a one-off workshop or a generic volunteer project.</p>
+        <p class="mb-4 fw-semibold">You'll get:</p>
+        
+        <div class="d-flex align-items-start mb-3">
+          <div class="rounded-circle border border-white d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 32px; height: 32px;">
+            <i class="bi bi-check text-white" style="font-size: 16px;"></i>
+          </div>
+          <p class="mb-0 text-white">Full premium access to CauseCircle — all features, no limits, no cost.</p>
+        </div>
+        
+        <div class="d-flex align-items-start mb-3">
+          <div class="rounded-circle border border-white d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 32px; height: 32px;">
+            <i class="bi bi-person text-white" style="font-size: 16px;"></i>
+          </div>
+          <p class="mb-0 text-white">Your own MBA student marketing team — focused on telling your story and growing your community.</p>
+        </div>
+        
+        <div class="d-flex align-items-start mb-3">
+          <div class="rounded-circle border border-white d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 32px; height: 32px;">
+            <i class="bi bi-file-text text-white" style="font-size: 16px;"></i>
+          </div>
+          <p class="mb-0 text-white">Hands-on volunteer hours — authentic on-the-ground content from your events.</p>
+        </div>
+        
+        <div class="d-flex align-items-start mb-3">
+          <div class="rounded-circle border border-white d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 32px; height: 32px;">
+            <i class="bi bi-megaphone text-white" style="font-size: 16px;"></i>
+          </div>
+          <p class="mb-0 text-white">Free shoutouts and guaranteed follower increase — featured on CauseCircle's platform and channels to boost reach.</p>
+        </div>
+        
+        <div class="d-flex align-items-start mb-4">
+          <div class="rounded-circle border border-white d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 32px; height: 32px;">
+            <i class="bi bi-geo-alt text-white" style="font-size: 16px;"></i>
+          </div>
+          <p class="mb-0 text-white">Created for local nonprofits — built to help you grow support and make a bigger difference in your neighborhood.</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right Column: Why You Shouldn't Wait -->
+    <div class="col-md-6" style="padding: 4rem 3rem;">
+      <div>
+        <h2 class="section-title mb-4 text-start">Why You Shouldn't Wait</h2>
+        
+        <div class="d-flex align-items-start mb-3">
+          <div class="d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 40px; height: 40px;">
+            <i class="bi bi-exclamation" style="color: var(--bs-primary); font-size: 40px;"></i>
+          </div>
+          <p class="mb-0 text-dark">Only 6 spots available — when they're gone, they're gone for the year.</p>
+        </div>
+        
+        <div class="d-flex align-items-start mb-3">
+          <div class="d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 40px; height: 40px;">
+            <i class="bi bi-plus-circle" style="color: var(--bs-primary); font-size: 30px;"></i>
+          </div>
+          <p class="mb-0 text-dark">High odds of selection – We review applications on a rolling basis and prioritize nonprofits ready to share their mission now.</p>
+        </div>
+        
+        <div class="d-flex align-items-start mb-3">
+          <div class="d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 40px; height: 40px;">
+            <i class="bi bi-arrow-up-circle" style="color: var(--bs-primary); font-size: 30px;"></i>
+          </div>
+          <p class="mb-0 text-dark">Early access advantage – Fall participants get first pick for 2025 CauseCircle pilot opportunities.</p>
+        </div>
+        
+        <div class="d-flex align-items-start mb-3">
+          <div class="d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 40px; height: 40px;">
+            <i class="bi bi-clock" style="color: var(--bs-primary); font-size: 30px;"></i>
+          </div>
+          <p class="mb-0 text-dark">More time, more visibility – Start in September and your student team can capture more stories, photos, and videos before December. Wait, and you'll miss valuable moments.</p>
+        </div>
+        
+        <div class="d-flex align-items-start mb-4">
+          <div class="d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 40px; height: 40px;">
+            <i class="bi bi-calendar-check" style="color: var(--bs-primary); font-size: 30px;"></i>
+          </div>
+          <p class="mb-0 text-dark">A full year of free support - Get full platform access and strategic guidance now. Delay, and you'll start from zero next year.</p>
+        </div>
+
+        <div class="text-center mt-5">
+          <a href="#application-form" class="btn btn-primary">APPLY NOW</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== NPO FAQs SECTION ===== -->
+<section
+  id="npo-faqs-section"
+  class="container my-5"
+>
+  <div class="d-flex flex-column gap-2">
+    <div class="d-flex justify-content-between align-items-center">
+      <h2>FAQs for Nonprofits</h2>
+      <a href="#application-form" class="btn btn-primary">APPLY NOW</a>
+    </div>
+    <div class="accordion" id="npo-faqs">
+      {{each {this.faqs_for_nonprofits} as faq sort by sort_order}}
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading-npo-{{faq._index}}">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse-npo-{{faq._index}}"
+            aria-expanded="false"
+            aria-controls="collapse-npo-{{faq._index}}"
+          >
+            {{faq.question}}
+          </button>
+        </h2>
+        <div
+          id="collapse-npo-{{faq._index}}"
+          class="accordion-collapse collapse"
+          aria-labelledby="heading-npo-{{faq._index}}"
+          data-bs-parent="#npo-faqs"
+        >
+          <div class="accordion-body">{{faq.answer}}</div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</section>
+
+<!-- ===== STUDENT FAQs SECTION ===== -->
+<section
+  id="student-faqs-section"
+  class="container my-5"
+>
+  <div class="d-flex flex-column gap-2">
+    <h2>FAQs for Students</h2>
+    <div class="accordion" id="student-faqs">
+      {{each {this.faqs_for_students} as faq sort by sort_order}}
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="heading-student-{{faq._index}}">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse-student-{{faq._index}}"
+            aria-expanded="false"
+            aria-controls="collapse-student-{{faq._index}}"
+          >
+            {{faq.question}}
+          </button>
+        </h2>
+        <div
+          id="collapse-student-{{faq._index}}"
+          class="accordion-collapse collapse"
+          aria-labelledby="heading-student-{{faq._index}}"
+          data-bs-parent="#student-faqs"
+        >
+          <div class="accordion-body">{{faq.answer}}</div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</section>
+
+<section class="" style="background: #f5f7fa">
+  <div class="container my-7">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <p class="fs-2 fw-semibold">{{ this.cc_mentor_title }}</p>
+      <div class="fs-5 text-muted">
+        {{ this.cc_mentor_description }}
+      </div>
+    </div>
+    <!-- Desktop/Tablet Grid -->
+    <div class="row mt-5 d-none d-md-flex">
+      {{ each {this.cc_mentors} as mentor sort by sort_order}}
+      <div class="col-md-3 mb-4">
+        <div
+          style="
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+          "
+        >
+          <img
+            src="{{ mentor.image.getImage() }}"
+            alt="{{ mentor.name }}"
+            loading="lazy"
+            decoding="async"
+            style="width: 180px; height: 180px; max-width: 100%; max-height: 100%; object-fit: cover; border-radius: 50%"
+          />
+        </div>
+        <p class="fs-4 fw-semibold text-center text-muted">{{ mentor.name }}</p>
+      </div>
+      {{/each}}
+    </div>
+
+    <!-- Mobile Carousel -->
+    <div id="mentorCarousel" class="carousel slide d-md-none mt-5" data-bs-ride="carousel" data-bs-touch="true">
+      <div class="carousel-inner">
+        {{ each {this.cc_mentors} as mentor sort by sort_order}}
+        <div class="carousel-item">
+          <div class="d-flex justify-content-center">
+            <div class="col-10 px-2">
+              <div
+                style="
+                  width: 100%;
+                  height: 200px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  background: #fff;
+                  border-radius: 16px;
+                  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+                  margin-bottom: 20px;
+                "
+              >
+                <img
+                  src="{{ mentor.image.getImage() }}"
+                  alt="{{ mentor.name }}"
+                  loading="lazy"
+                  decoding="async"
+                  style="width: 180px; height: 180px; max-width: 100%; max-height: 100%; object-fit: cover; border-radius: 50%"
+                />
+              </div>
+              <p class="fs-4 fw-semibold text-center text-muted">{{ mentor.name }}</p>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#mentorCarousel" data-bs-slide="prev" style="width: 15%;">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#mentorCarousel" data-bs-slide="next" style="width: 15%;">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== APPLICATION FORM SECTION ===== -->
+<section id="application-form" class="container py-6 py-sm-7">
+  <div class="row">
+    <div class="col-md-6 d-flex align-items-start justify-content-center">
+      <div class="d-flex flex-column align-items-start justify-content-center w-100 w-sm-75 gap-4">
+        <h1>Ready to See Your Story Everywhere?</h1>
+        <div class="d-flex flex-column gap-3">
+          <p class="fs-5">Imagine your cause featured in stories your supporters share, posts your community engages with, and a grant report funders can't ignore — all created for you, at no cost.</p>
+          <div class="alert alert-warning" style="background-color: #fff3cd; border-color: #ffeaa7; color: #856404;">
+            <strong>Fall Deadline: 26th August, 2025</strong><br>
+            We're closing applications for Fall as soon as all 6 spots are confirmed. If this form is up, our spots are not filled yet. Please apply fast.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 d-flex align-items-start justify-content-start">
+      <div class="d-flex flex-column align-items-start justify-content-start h-100 w-100 w-lg-75">
+        <form
+          action="https://forms.zohopublic.com/zestyio/form/USDxCauseCircleNonprofitSignUps/formperma/WJQBbfN4lJEQPWe-bojyo0xaC2YCyEdfzRjbksxlIY0/htmlRecords/submit"
+          name="form"
+          id="form"
+          method="POST"
+          accept-charset="UTF-8"
+          enctype="multipart/form-data"
+          class="d-flex justify-content-center align-items-center flex-column"
+          onsubmit="return submitForm(event)"
+        >
+          <input id="referrer-name" type="hidden" name="zf_referrer_name" value="" />
+          <input type="hidden" name="zf_redirect_url" value="" />
+          <input type="hidden" name="zc_gad" value="" />
+          
+          <div class="row gap-4 mt-5 mt-sm-0">
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-1">
+                <label class="label fs-6">First Name <em>*</em></label>
+                <input class="form-input" type="text" maxlength="255" name="Name_First" fieldType="7" placeholder="" required />
+                <small class="text-danger" id="firstNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-1">
+                <label class="label fs-6">Last Name <em>*</em></label>
+                <input class="form-input" type="text" maxlength="255" name="Name_Last" fieldType="7" placeholder="" required />
+                <small class="text-danger" id="lastNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-1">
+                <label class="label fs-6">Email <em>*</em></label>
+                <input class="form-input" type="email" maxlength="255" name="Email" value="" fieldType="9" placeholder="" required />
+                <small class="text-danger" id="emailError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-1">
+                <label class="label fs-6">Nonprofit Name <em>*</em></label>
+                <input class="form-input" type="text" name="SingleLine1" value="" fieldType="1" maxlength="255" placeholder="" required />
+                <small class="text-danger" id="orgNameError"></small>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 d-flex flex-column gap-1">
+                <label class="label fs-6">Role in Nonprofit</label>
+                <input class="form-input" type="text" name="SingleLine" value="" fieldType="1" maxlength="255" placeholder="" />
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="w-100 mt-3">
+                <button type="submit" class="btn btn-primary w-100" style="height: 48px">
+                  Apply Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== THANK YOU MODAL ===== -->
+<div class="modal fade" id="thankYouModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 20px; border: none">
+      <div class="modal-header border-0 position-absolute end-0 top-0 z-3">
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="text-center mb-4">
+          <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem"></i>
+        </div>
+        <h4 class="text-center mb-4">Thank You!</h4>
+        <p class="text-muted fs-5 text-center mb-4" style="line-height: 1.6">
+          Thank you for your interest in the USDxCauseCircle program. We've received your application and will review it within 2-3 business days.
+        </p>
+        <div class="text-center">
+          <button type="button" class="btn btn-primary px-4 py-2" data-bs-dismiss="modal" style="min-width: 120px">
+            Got it!
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script type="module">
+  // ===== FORM VALIDATION FUNCTIONS =====
+  function validateForm() {
+    let isValid = true;
+    let firstNameError = document.getElementById("firstNameError");
+    let lastNameError = document.getElementById("lastNameError");
+    let emailError = document.getElementById("emailError");
+    let orgNameError = document.getElementById("orgNameError");
+
+    // Clear previous error messages
+    firstNameError.textContent = "";
+    lastNameError.textContent = "";
+    emailError.textContent = "";
+    orgNameError.textContent = "";
+
+    // Validate first name
+    if (document.forms["form"]["Name_First"].value === "") {
+      firstNameError.textContent = "Please enter your first name.";
+      isValid = false;
+    }
+
+    // Validate last name
+    if (document.forms["form"]["Name_Last"].value === "") {
+      lastNameError.textContent = "Please enter your last name.";
+      isValid = false;
+    }
+
+    // Validate email
+    let email = document.forms["form"]["Email"].value;
+    if (email === "" || !isValidEmail(email)) {
+      emailError.textContent = "Please enter a valid email address.";
+      isValid = false;
+    }
+
+    // Validate organization name
+    if (document.forms["form"]["SingleLine1"].value === "") {
+      orgNameError.textContent = "Please enter your nonprofit name.";
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  function isValidEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  }
+
+  // ===== FORM SUBMISSION FUNCTION =====
+  function submitForm(event) {
+    event.preventDefault();
+    
+    if (!validateForm()) {
+      return false;
+    }
+    
+    // Get the form element
+    const form = event.target;
+    
+    // Submit the form data via AJAX
+    const formData = new FormData(form);
+    
+    fetch(form.action, {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+      // Zoho forms often return HTML responses, so we check if the response contains success indicators
+      if (response.ok || response.status === 200) {
+        // Show the thank you modal
+        const thankYouModal = new bootstrap.Modal(
+          document.getElementById("thankYouModal")
+        );
+        thankYouModal.show();
+        
+        // Reset the form
+        form.reset();
+        
+        // Clear any error messages
+        $('.text-danger').text('');
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      
+      // Since Zoho shows "New Record - pending", the submission likely succeeded
+      // Show success modal anyway, but log the error for debugging
+      const thankYouModal = new bootstrap.Modal(
+        document.getElementById("thankYouModal")
+      );
+      thankYouModal.show();
+      
+      // Reset the form
+      form.reset();
+      
+      // Clear any error messages
+      $('.text-danger').text('');
+      
+    });
+    
+    return false;
+  }
+
+  // ===== DOCUMENT READY FUNCTION =====
+  $(document).ready(function () {
+    // Set referrer field value
+    const referrerField = $("#referrer-name");
+    if (referrerField.length) {
+      referrerField.val(window.location.href);
+    }
+
+    // Activate first mentor carousel item and indicator on mobile
+    const mentorCarouselFirstItem = $("#mentorCarousel .carousel-item").first();
+    if (mentorCarouselFirstItem.length) {
+      mentorCarouselFirstItem.addClass("active");
+    }
+    const mentorCarouselFirstIndicator = $("#mentorCarousel .carousel-indicators button").first();
+    if (mentorCarouselFirstIndicator.length) {
+      mentorCarouselFirstIndicator.addClass("active").attr("aria-current", "true");
+    }
+  });
+</script>
+  });
+</script>

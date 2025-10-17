@@ -94,7 +94,7 @@
   <div class="row d-none d-sm-flex mt-5">
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -117,7 +117,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -135,7 +135,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -162,7 +162,7 @@
   <div class="row d-none d-sm-flex mt-5">
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -185,7 +185,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -203,7 +203,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -230,7 +230,7 @@
   <div class="row d-none d-sm-flex mt-5">
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -253,7 +253,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -271,7 +271,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -313,7 +313,7 @@
 <!-- prettier-ignore -->
 {{include /components/global/demo.html}}
 
-<script>
+<script type="module">
   $(document).ready(function () {
     $("#hero-description ul").each(function () {
       $(this).addClass("custom-bullet");

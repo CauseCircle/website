@@ -1,19 +1,122 @@
+<style>
+  .story-image {
+    height: 100%;
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .story-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #0e121b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .story-subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em; /* Adjust this value based on your line-height */
+    line-height: 1.4em; /* Adjust this value as needed */
+  }
+  .story-subtitle,
+  .npo-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: #0e121b;
+  }
+  .story-cause {
+    padding: 0 10px;
+    /* height: 28px; */
+    border-radius: 14px;
+    background-color: #eceff3;
+    text-transform: uppercase;
+    font-size: 12px;
+    /* font-weight: bold; */
+  }
+  .story-date {
+    font-size: 12px;
+  }
+  .story-npo-logo {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #aeaeae;
+    border-radius: 3px;
+    object-fit: cover;
+    object-position: center;
+  }
+  .story-btn {
+    font-size: 12px;
+    font-weight: 500;
+    color: #0e121b;
+  }
+  .story-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    position: relative;
+  }
+  .story-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .story-btn {
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  .story-card:hover .story-btn {
+    background-color: #7b3fee;
+    color: white;
+  }
+  .card-btn {
+    height: 36px;
+  }
+  .npo-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .floating-buttons {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: none;
+    gap: 8px;
+  }
+  .story-card:hover .floating-buttons {
+    display: flex;
+  }
+  .floating-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  .floating-btn:hover {
+    background: #7b3fee;
+    border-color: #7b3fee;
+    color: white;
+  }
+  .floating-btn.delete-story:hover {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: white;
+  }
+</style>
+
 <div id="storiesSettings" class="container">
-  <section id="featured-stories" class="py-4 d-flex flex-column gap-4">
-    <div class="row">
-      {{each stories as story where story.author='{get_var.zuid}'}}
-      <!--prettier-ignore-->
-      {{ if {story._length} > 0 }}
-      <div class="col-12 col-sm-6 col-md-3">
-        <!--prettier-ignore-->
-        {{ include /components/global/UserSettings/Stories/story_card.html }}
-      </div>
-      <!--prettier-ignore-->
-      {{else}}
+  <section id="featured-stories" class="py-4">
+    <div class="row g-3" id="storiesContainer">
+      <!-- Stories will be injected here dynamically -->
+    </div>
+    <div id="noStoriesMessage" class="d-none">
       <p>No stories found</p>
-      <!--prettier-ignore-->
-      {{/if}}
-      {{/each}}
     </div>
   </section>
 </div>
@@ -67,54 +170,108 @@
   </div>
 </div>
 
-<script>
-  $(document).ready(function () {
-    const deleteModal = new bootstrap.Modal(
-      document.getElementById("deleteStoryModal")
-    );
+<script type="module"> 
+  $(document).ready(async function () {
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    if (!localUser) return;
+
+    const storiesContainer = $("#storiesContainer");
+    const noStoriesMessage = $("#noStoriesMessage");
+    const deleteModal = new bootstrap.Modal(document.getElementById("deleteStoryModal"));
     let currentStoryCard = null;
-    let currentDeleteBtn = null;
 
-    // Handle delete button click
-    $(".delete-story").on("click", function (e) {
-      e.preventDefault();
-      currentStoryCard = $(this).closest(".story-card");
-      currentDeleteBtn = $(this);
-      deleteModal.show();
-    });
+    try {
+      const response = await fetch(`{{ $base_url }}mobileapp/stories.json?author=${localUser.zuid}&zpw=causecircle&status=all`);
+      const data = await response.json();
 
-    // Handle confirm delete
+      storiesContainer.empty();
+      
+      if (data?.data?.length > 0) {
+        noStoriesMessage.addClass("d-none");
+        data.data.forEach(story => {
+          const storyCard = `
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="card d-flex flex-column h-100 p-3 gap-2 story-card" 
+                   data-story-zuid="${story.meta.zuid}">
+                <div class="floating-buttons">
+                  <button class="floating-btn edit-story" title="Edit Story">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="floating-btn delete-story" title="Delete Story">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+                <img src="${story.story_image?.data && (typeof story.story_image === "string" ? story.story_image : story.story_image?.data[0]?.url)}" class="story-image" alt="Story image" />
+                <div class="d-flex flex-column gap-2 h-100">
+                  <div class="d-flex align-items-end gap-2">
+                    ${story.related_npos?.data?.length ? `
+                      <img src="${story.related_npos.data[0].logo?.data && (typeof story.related_npos.data[0].logo === "string" ? story.related_npos.data[0].logo : story.related_npos.data[0].logo?.data[0]?.url)}" 
+                           class="story-npo-logo" alt="NPO logo" />
+                      <p class="npo-name my-auto">${story?.related_npos?.data[0]?.name}</p>
+                    ` : ''}
+                  </div>
+                  <div class="flex-grow-1">
+                    <p class="story-title">${story.title}</p>
+                    <div class="story-subtitle">${story.story_body}</div>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-start flex-wrap">
+                    ${story.related_causes?.data?.length ? `
+                      <div class="story-cause d-flex align-items-center">
+                        <p class="text-center">${story.related_causes.data[0].title}</p>
+                      </div>
+                    ` : ''}
+                  </div>
+                  <a href="${story.meta.web.uri}" 
+                     class="btn btn-secondary story-btn card-btn">
+                    Read More
+                  </a>
+                </div>
+              </div>
+            </div>`;
+          storiesContainer.append(storyCard);
+        });
+        
+        // Single event handler setup for dynamically created elements
+        $(document).on('click', '.delete-story', function(e) {
+          e.preventDefault();
+          currentStoryCard = $(this).closest(".story-card");
+          deleteModal.show();
+        });
+      } else {
+        noStoriesMessage.removeClass("d-none");
+      }
+    } catch (error) {
+      console.error("Error loading stories:", error);
+      noStoriesMessage.removeClass("d-none");
+    }
+
+    // Confirm delete handler
     $("#confirmDeleteStory").on("click", async function () {
       const confirmBtn = $(this);
       const buttonContent = confirmBtn.find(".button-content");
       const spinner = confirmBtn.find(".spinner-border");
 
       try {
+        if (!currentStoryCard) {
+          console.error('No story selected for deletion');
+          return;
+        }
+
         // Show loading state
         confirmBtn.prop("disabled", true);
         buttonContent.addClass("d-none");
         spinner.removeClass("d-none");
 
-        // Call the delete story function
         await window.deleteStory(currentStoryCard.data("story-zuid"));
-
-        // Hide modal first
         deleteModal.hide();
 
-        // Wait for modal to finish hiding
-        setTimeout(() => {
-          // Remove the story card with animation
-          currentStoryCard.fadeOut(300, function () {
-            $(this).closest(".col-12").remove();
-          });
-
-          toastr.success("Story deleted successfully");
-        }, 150);
+        currentStoryCard.closest(".col-12").fadeOut(300, function() {
+          $(this).remove();
+          currentStoryCard = null; // Clear reference after deletion
+        });
       } catch (error) {
         console.error("Error deleting story:", error);
-        toastr.error("Failed to delete story. Please try again.");
       } finally {
-        // Reset button state
         confirmBtn.prop("disabled", false);
         buttonContent.removeClass("d-none");
         spinner.addClass("d-none");
@@ -126,7 +283,6 @@
       e.preventDefault();
       const storyZuid = $(this).closest(".story-card").data("story-zuid");
       // TODO: Implement edit functionality
-      console.log("Edit story:", storyZuid);
     });
   });
 </script>

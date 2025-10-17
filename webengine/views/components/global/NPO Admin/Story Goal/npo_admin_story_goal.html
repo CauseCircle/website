@@ -1,0 +1,762 @@
+<style>
+  .story-goal-container {
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    margin: 20px 0;
+  }
+
+  .progress-circle {
+    position: relative;
+    width: 260px;
+    height: 170px;
+    margin: 0 auto 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .progress-circle svg {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 120px;
+    overflow: visible;
+    filter: drop-shadow(0 4px 8px rgba(123, 63, 238, 0.15));
+  }
+
+  .progress-circle-bg {
+    transition: none;
+    opacity: 0.2;
+  }
+
+  .progress-circle-fill {
+    transition: stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 2px 4px rgba(123, 63, 238, 0.3));
+  }
+
+  .progress-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin-top: 90px;
+  }
+
+  .goal-label {
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+
+  .goal-count {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 0;
+    line-height: 1;
+  }
+
+  .progress-text {
+    color: #666;
+    font-size: 14px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.4;
+  }
+
+  .goal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+  }
+
+  .goal-btn {
+    background: #7b3fee;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .goal-btn:hover {
+    background: #6930c3;
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .goal-btn-secondary {
+    background: white;
+    color: #7b3fee;
+    border: 2px solid #7b3fee;
+  }
+
+  .goal-btn-secondary:hover {
+    background: #7b3fee;
+    color: white;
+  }
+
+  .weekly-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 40px;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    color: #666;
+    font-size: 14px;
+  }
+
+  .goal-title {
+    font-size: 32px;
+    font-weight: 300;
+    color: #2d3748;
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+
+  .goal-subtitle {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 30px;
+  }
+
+  /* Loading skeleton styles */
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+  }
+
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  .skeleton-text {
+    height: 20px;
+    margin-bottom: 10px;
+  }
+
+  .skeleton-count {
+    height: 40px;
+    width: 150px;
+    margin: 0 auto 10px;
+  }
+
+  .skeleton-btn {
+    height: 44px;
+    width: 150px;
+    margin: 5px;
+  }
+
+  .skeleton-stat {
+    height: 30px;
+    margin-bottom: 10px;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .story-goal-container {
+      padding: 30px 20px;
+    }
+    
+    .progress-circle {
+      width: 220px;
+      height: 140px;
+    }
+    
+    .progress-circle svg {
+      width: 220px;
+      height: 100px;
+    }
+    
+    .progress-content {
+      margin-top: 75px;
+    }
+    
+    .goal-count {
+      font-size: 24px;
+    }
+    
+    .goal-title {
+      font-size: 24px;
+    }
+    
+    .goal-subtitle {
+      font-size: 16px;
+    }
+    
+    .goal-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  /* Create Story Prompt Modal Styles */
+  .create-story-prompt-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .create-story-prompt-list li:last-child {
+    border-bottom: none;
+  }
+  
+  .create-story-prompt-list .bi-check-circle-fill {
+    color: #28a745;
+  }
+</style>
+
+<div class="tab-pane fade" id="story-goal">
+  <div class="story-goal-container">
+    <h1 class="goal-title">Set your <strong>Story Goals</strong> for<br>the quality of your outreach</h1>
+    <p class="goal-subtitle mb-7">Track your weekly story collection progress and stay connected with your community</p>
+    
+    <div class="progress-circle">
+      <svg viewBox="0 0 260 120" width="260" height="120">
+        <defs>
+          <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+            <stop offset="20%" style="stop-color:#7c3aed;stop-opacity:1" />
+            <stop offset="80%" style="stop-color:#6366f1;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+          </linearGradient>
+          <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#c6c7c7;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#cccccc;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <path class="progress-circle-bg" d="M 30 100 A 100 100 0 0 1 230 100" stroke="url(#bgGradient)" stroke-width="16" fill="none"></path>
+        <path id="progress-circle-fill" class="progress-circle-fill" d="M 30 100 A 100 100 0 0 1 230 100" stroke="url(#progressGradient)" stroke-width="16" fill="none" stroke-linecap="round"></path>
+      </svg>
+      <div class="progress-content">
+        <div class="goal-label">Weekly Goal</div>
+        <div class="goal-count" id="goal-display">
+          <span id="current-count">0</span>/<span id="target-count">0</span> Stories
+        </div>
+      </div>
+    </div>
+    
+    <p class="progress-text" id="progress-text">You have reached 0% of your goal this week</p>
+    
+    <div class="goal-actions">
+      <button class="goal-btn" id="set-goal-btn" data-bs-toggle="modal" data-bs-target="#setGoalModal">
+        <i class="bi bi-target"></i>
+        Set Story Goals
+      </button>
+      <button type="button" class="goal-btn goal-btn-secondary" id="viewStoriesBtn">
+        <i class="bi bi-collection"></i>
+        View Stories
+      </button>
+    </div>
+    
+    <div class="weekly-stats">
+      <div class="stat-card">
+        <div class="stat-value" id="week-start-count">0</div>
+        <div class="stat-label">Stories This Week Start</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="total-week-count">0</div>
+        <div class="stat-label">Total This Week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="weekly-goal-stat">0</div>
+        <div class="stat-label">Weekly Target</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="progress-percentage">0%</div>
+        <div class="stat-label">Progress</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Set Goal Modal -->
+<div class="modal fade" id="setGoalModal" tabindex="-1" aria-labelledby="setGoalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="setGoalModalLabel">Set Weekly Story Goal</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="weeklyGoalInput" class="form-label">Weekly Story Goal</label>
+          <input type="number" class="form-control" id="weeklyGoalInput" min="1" max="100" 
+                 placeholder="Enter number of stories per week">
+          <div class="form-text">Set a realistic weekly target for story collection and approval.</div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveGoalBtn">
+          <span class="normal-state">Save Goal</span>
+          <span class="loading-state d-none">
+            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            Saving...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="goalSuccessModal" tabindex="-1" aria-labelledby="goalSuccessModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <div class="mb-3">
+          <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+        </div>
+        <h4 class="mb-3">Story Goal Updated!</h4>
+        <p class="text-muted mb-0">Your weekly story goal has been successfully updated. Track your progress and keep building momentum with your community!</p>
+      </div>
+      <div class="modal-footer border-0 justify-content-center">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Story Prompt Modal -->
+<div class="modal fade" id="createStoryPromptModal" tabindex="-1" aria-labelledby="createStoryPromptModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <div class="mb-3">
+          <i class="bi bi-lightbulb text-warning" style="font-size: 3rem;"></i>
+        </div>
+        <h4 class="mb-3">Great! You've Set Your Goal</h4>
+        <p class="text-muted mb-3">Now it's time to start collecting stories! Since you don't have any stories yet, here are some ways to get started:</p>
+        <div class="text-start">
+          <ul class="list-unstyled create-story-prompt-list">
+            <li><p class="text-dark mb-2"><i class="bi bi-check-circle-fill me-2"></i>Share a story with your community.</p></li>
+            <li><p class="text-dark mb-2"><i class="bi bi-check-circle-fill me-2"></i>Reach out to volunteers and supporters.</p></li>
+            <li><p class="text-dark mb-2"><i class="bi bi-check-circle-fill me-2"></i>Create a campaign to encourage story submissions.</p></li>
+            <li><p class="text-dark mb-2"><i class="bi bi-check-circle-fill me-2"></i>Use social media to spread the word.</p></li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer border-0 justify-content-center">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got It!</button>
+        <button type="button" class="btn btn-outline-primary" id="viewStoriesFromPrompt">
+          <i class="bi bi-collection me-2"></i>Create a Story
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  // ==================== TANSTACK QUERY OBSERVERS ====================
+  // Create TanStack Query observers for reactive data management
+  
+  const npoZuid = "{{$zuid}}";
+  
+  // NPO Profile Query (contains weekly_story_goal)
+  const npoProfileQuery = window.createNPOProfileQuery(npoZuid);
+  
+  // Stories Query (all stories for weekly count calculation)
+  const storiesQuery = window.createStoriesQuery({
+    npo: npoZuid,
+    status: "all",
+    limit: 9999
+  });
+  
+  // Update NPO Profile Mutation
+  const updateNPOProfileMutation = window.createUpdateNPOProfileMutation();
+
+  // Function to get current week dates
+  function getCurrentWeekDates() {
+    const date = new Date();
+    const day = date.getDay();
+    const diffToMonday = (day === 0 ? -6 : 1) - day;
+
+    const monday = new Date(date);
+    monday.setHours(0, 0, 0, 0);
+    monday.setDate(date.getDate() + diffToMonday);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    return { startOfWeek: monday, endOfWeek: sunday };
+  }
+
+  // Function to calculate weekly story count from stories data
+  function calculateWeeklyStoryCount(stories) {
+    const { startOfWeek, endOfWeek } = getCurrentWeekDates();
+    
+    const mondayStart = new Date(startOfWeek);
+    const mondayEnd = new Date(startOfWeek);
+    mondayEnd.setHours(23, 59, 59, 999);
+
+    const weeklyStoryCount = stories.filter((item) => {
+      const createdAt = new Date(item.meta.createdAt);
+      return createdAt >= startOfWeek && createdAt <= endOfWeek;
+    }).length;
+
+    const weekStartStoryCount = stories.filter((item) => {
+      const createdAt = new Date(item.meta.createdAt);
+      return createdAt >= mondayStart && createdAt <= mondayEnd;
+    }).length;
+
+    return {
+      weeklyStoryCount,
+      weekStartStoryCount,
+      totalStories: stories.length
+    };
+  }
+
+  // Function to update progress circle using jQuery (semicircle)
+  function updateProgressCircle(percentage) {
+    const $arc = $('#progress-circle-fill');
+    const radius = 100;
+    const circumference = Math.PI * radius; // Half circle circumference
+    
+    // Calculate the offset based on percentage for semicircle
+    const offset = circumference - (percentage / 100) * circumference;
+    
+    $arc.css({
+      'stroke-dasharray': circumference,
+      'stroke-dashoffset': offset
+    });
+  }
+
+  // Function to show loading state using jQuery
+  function showLoadingState() {
+    // Keep the goal numbers as 0 and just show skeleton loaders for other stats
+    $('#current-count').text('0');
+    $('#target-count').text('--');
+    $('#progress-text').html('<div class="skeleton skeleton-text" style="width: 200px; height: 16px; margin: 0 auto;"></div>');
+    $('#week-start-count').html('<div class="skeleton skeleton-stat"></div>');
+    $('#total-week-count').html('<div class="skeleton skeleton-stat"></div>');
+    $('#weekly-goal-stat').html('<div class="skeleton skeleton-stat"></div>');
+    $('#progress-percentage').html('<div class="skeleton skeleton-stat"></div>');
+    
+    // Clear any existing no-stories message
+    $('.no-stories-message').remove();
+    
+    // Show empty progress circle during loading
+    updateProgressCircle(0);
+  }
+
+  // ==================== REACTIVE SUBSCRIPTIONS ====================
+  // Subscribe to queries for automatic UI updates when data changes
+  
+  // Subscribe to NPO Profile Query for weekly goal data
+  npoProfileQuery.subscribe((result) => {
+    if (result.isLoading) {
+      // Show loading state
+      showLoadingState();
+    } else if (result.isSuccess) {
+      // Profile data loaded - update UI with goal info
+      const npoData = result.data?.data?.[0];
+      if (npoData) {
+        updateUIWithProfileData(npoData);
+      }
+    } else if (result.isError) {
+      console.error('Error loading NPO profile:', result.error);
+      $('#progress-text').text('Error loading profile data. Please refresh the page.');
+    }
+  });
+  
+  // Subscribe to Stories Query for weekly count data
+  storiesQuery.subscribe((result) => {
+    if (result.isLoading) {
+      // Show loading state
+      showLoadingState();
+    } else if (result.isSuccess) {
+      // Stories data loaded - calculate and update weekly counts
+      const stories = result.data?.data || [];
+      const { weeklyStoryCount, weekStartStoryCount, totalStories } = calculateWeeklyStoryCount(stories);
+      
+      // Update UI with story counts
+      updateUIWithStoryCounts(weeklyStoryCount, weekStartStoryCount, totalStories);
+      
+      // Store total stories count for use in other functions
+      $('#story-goal').data('total-stories', totalStories);
+    } else if (result.isError) {
+      console.error('Error loading stories:', result.error);
+      $('#progress-text').text('Error loading stories data. Please refresh the page.');
+    }
+  });
+
+  // Function to update UI with profile data (weekly goal)
+  function updateUIWithProfileData(npoData) {
+    let weeklyGoal = 0;
+    let hasGoalSet = false;
+    
+    if (npoData?.weekly_story_goal && parseInt(npoData.weekly_story_goal) > 0) {
+      weeklyGoal = parseInt(npoData.weekly_story_goal);
+      hasGoalSet = true;
+    }
+    
+    // Update goal display
+    if (hasGoalSet) {
+      $('#target-count').text(weeklyGoal);
+      $('#weekly-goal-stat').text(weeklyGoal);
+    } else {
+      $('#target-count').text('--');
+      $('#weekly-goal-stat').text('Not Set');
+    }
+    
+    // Update modal input with current goal
+    if (hasGoalSet) {
+      $('#weeklyGoalInput').val(weeklyGoal);
+    } else {
+      $('#weeklyGoalInput').val('');
+    }
+    
+    // Get current story counts and update progress
+    const storiesResult = storiesQuery.getCurrentResult();
+    if (storiesResult.isSuccess) {
+      const stories = storiesResult.data?.data || [];
+      const { weeklyStoryCount, totalStories } = calculateWeeklyStoryCount(stories);
+      updateProgressDisplay(weeklyStoryCount, weeklyGoal, hasGoalSet, totalStories);
+    }
+  }
+
+  // Function to update UI with story counts
+  function updateUIWithStoryCounts(weeklyStoryCount, weekStartStoryCount, totalStories) {
+    // Update story count displays
+    $('#current-count').text(weeklyStoryCount);
+    $('#week-start-count').text(weekStartStoryCount);
+    $('#total-week-count').text(weeklyStoryCount);
+    
+    // Add/remove no-stories message
+    if (totalStories === 0) {
+      $('.no-stories-message').remove();
+      $('.weekly-stats').after(`
+        <div class="no-stories-message mt-3">
+          <div class="alert alert-info text-center border-0" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>No stories yet?</strong> Start by reaching out to your community and encouraging story submissions!
+          </div>
+        </div>
+      `);
+    } else {
+      $('.no-stories-message').remove();
+    }
+    
+    // Get current profile data and update progress
+    const profileResult = npoProfileQuery.getCurrentResult();
+    if (profileResult.isSuccess) {
+      const npoData = profileResult.data?.data?.[0];
+      if (npoData) {
+        let weeklyGoal = 0;
+        let hasGoalSet = false;
+        
+        if (npoData?.weekly_story_goal && parseInt(npoData.weekly_story_goal) > 0) {
+          weeklyGoal = parseInt(npoData.weekly_story_goal);
+          hasGoalSet = true;
+        }
+        
+        updateProgressDisplay(weeklyStoryCount, weeklyGoal, hasGoalSet, totalStories);
+      }
+    }
+  }
+
+  // Function to update progress display (circle, percentage, message)
+  function updateProgressDisplay(weeklyStoryCount, weeklyGoal, hasGoalSet, totalStories) {
+    // Calculate progress percentage
+    const progressPercentage = hasGoalSet && weeklyGoal > 0 ? Math.round((weeklyStoryCount / weeklyGoal) * 100) : 0;
+    
+    // Update progress percentage display
+    if (hasGoalSet) {
+      $('#progress-percentage').text(progressPercentage + '%');
+    } else {
+      $('#progress-percentage').text('--');
+    }
+    
+    // Update progress text based on email templates
+    const formatDate = (date) => {
+      return new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+      }).format(date);
+    };
+    
+    const { startOfWeek } = getCurrentWeekDates();
+    const weekDate = formatDate(startOfWeek);
+    
+    let progressMessage = '';
+    if (!hasGoalSet) {
+      // No goal set message
+      if (totalStories === 0) {
+        progressMessage = `📌 Set your weekly story goal to start tracking your progress! You haven't collected any stories yet. Start by setting a goal and reaching out to your community.`;
+      } else {
+        progressMessage = `📌 Set your weekly story goal to start tracking your progress! You've collected ${weeklyStoryCount} ${weeklyStoryCount === 1 ? 'story' : 'stories'} this week.`;
+      }
+    } else if (totalStories === 0) {
+      // Goal set but no stories at all
+      progressMessage = `🎯 You've set a goal of ${weeklyGoal} stories per week, but haven't collected any stories yet. Start by reaching out to your community and encouraging story submissions!`;
+    } else if (progressPercentage > 100) {
+      // Over 100% - Exceeded goal message
+      progressMessage = `🚀 Amazing! You've exceeded your weekly story goal by ${progressPercentage - 100}%! You collected ${weeklyStoryCount} stories when your goal was ${weeklyGoal} for the week of ${weekDate}. Outstanding work!`;
+    } else if (progressPercentage === 100) {
+      // Exactly 100% Goal Achieved message
+      progressMessage = `🎉 Congratulations! You've met ${progressPercentage}% of your weekly story goal for the week of ${weekDate}! Your dedication is making a real impact.`;
+    } else if (progressPercentage >= 50) {
+      // >=50% Progress message
+      progressMessage = `🚀 Awesome job! You've reached ${progressPercentage}% of your weekly stories goal for the week of ${weekDate}! Keep up the momentum — you're halfway to the finish line.`;
+    } else if (progressPercentage > 0) {
+      // Some progress message
+      progressMessage = `You have reached ${progressPercentage}% of your goal for the week of ${weekDate}. Keep going!`;
+    } else {
+      // No progress message
+      progressMessage = `⏰ Let's start collecting stories! Your progress for the week of ${weekDate} is still at 0%. Take a moment to review and approve new stories.`;
+    }
+    
+    $('#progress-text').text(progressMessage);
+    
+    // Update progress circle
+    if (hasGoalSet) {
+      updateProgressCircle(Math.min(progressPercentage, 100));
+    } else {
+      updateProgressCircle(0); // Show empty circle when no goal is set
+    }
+  }
+
+  // ==================== MUTATION SUBSCRIPTION PATTERN ====================
+  // Handle saving goal using TanStack Query mutation with subscription pattern
+  
+  $('#saveGoalBtn').on('click', function() {
+    const newGoal = parseInt($('#weeklyGoalInput').val());
+    
+    if (!newGoal || newGoal < 1) {
+      alert('Please enter a valid goal (minimum 1 story per week)');
+      return;
+    }
+    
+    const $saveBtn = $(this);
+    
+    // Get current total stories count for modal decision
+    const totalStories = $('#story-goal').data('total-stories') || 0;
+    
+    // Subscribe to mutation state changes before triggering
+    const unsubscribe = updateNPOProfileMutation.subscribe((result) => {
+      if (result.status === 'success') {
+        // Handle success UI updates
+        $saveBtn.prop('disabled', false);
+        $saveBtn.find('.normal-state').removeClass('d-none');
+        $saveBtn.find('.loading-state').addClass('d-none');
+        
+        // Close modal
+        $('#setGoalModal').modal('hide');
+        
+        // Show appropriate success modal
+        if (totalStories > 0) {
+          $('#goalSuccessModal').modal('show');
+        } else {
+          $('#createStoryPromptModal').modal('show');
+        }
+        
+        unsubscribe();
+      } else if (result.status === 'error') {
+        // Handle error UI updates
+        $saveBtn.prop('disabled', false);
+        $saveBtn.find('.normal-state').removeClass('d-none');
+        $saveBtn.find('.loading-state').addClass('d-none');
+        
+        alert('Failed to update story goal. Please try again.');
+        unsubscribe();
+      }
+    });
+    
+    // Set loading state manually
+    $saveBtn.prop('disabled', true);
+    $saveBtn.find('.normal-state').addClass('d-none');
+    $saveBtn.find('.loading-state').removeClass('d-none');
+    
+    // Trigger mutation
+    updateNPOProfileMutation.mutate({
+      zuid: npoZuid,
+      data: {
+        data: {
+          weekly_story_goal: newGoal
+        }
+      }
+    });
+  });
+
+  // Handle View Stories button click
+  $('#viewStoriesBtn').on('click', function() {
+    // Find and trigger the Story Stream tab
+    const $storyStreamTab = $('a[href="#story-stream"][data-bs-toggle="tab"]');
+    if ($storyStreamTab.length) {
+      // Use Bootstrap's tab API to show the Story Stream tab
+      const storyStreamTab = new bootstrap.Tab($storyStreamTab[0]);
+      storyStreamTab.show();
+      
+      // Update URL hash
+      if (history.pushState) {
+        history.pushState(null, null, '#story-stream');
+      } else {
+        location.hash = '#story-stream';
+      }
+    }
+  });
+
+  // Handle View Stories from prompt modal
+  $('#viewStoriesFromPrompt').on('click', function() {
+    // Find and trigger create-post-btn button 
+    const $createPostBtn = $('button[id="create-post-btn"]');
+    if ($createPostBtn.length) {
+      // Use Bootstrap's tab API to show the Story Stream tab
+      $createPostBtn.click();
+      //close the modal
+      $('#createStoryPromptModal').modal('hide');
+    }
+  });
+
+  // ==================== TAB INITIALIZATION ====================
+  // Initialize tab behavior - queries handle data loading automatically
+  
+  $(document).ready(function() {
+    // No need for manual data loading - TanStack Query subscriptions handle it
+    // Queries will automatically load when the tab is shown due to staleTime configuration
+  });
+</script> 

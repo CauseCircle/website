@@ -385,7 +385,7 @@
 <!-- prettier-ignore -->
 {{include /components/global/faqs_section.html}}
 
-<script>
+<script type="module">
   function validateForm() {
     let isValid = true;
     let firstNameError = document.getElementById("firstNameError");

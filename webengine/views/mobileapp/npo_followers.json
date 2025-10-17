@@ -1,0 +1,9 @@
+{
+  "data" :
+  [
+      {{each users as member where find_in_set('{get_var.zuid}', member.favorite_npos)}}
+      {{member.toJSON(1)}}
+      {{member._arraycomma}}
+      {{/each}}
+  ]
+}

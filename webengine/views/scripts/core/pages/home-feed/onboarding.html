@@ -1,0 +1,99 @@
+<script type="module">
+  // Onboarding Module for Home Feed
+  // Handles the onboarding modal logic and slide navigation
+
+  // Home Feed Onboarding Modal Logic
+  $(document).ready(function() {
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    if (!localUser) {
+      return;
+    }
+
+    // Check if this is the first time visiting the home feed
+    const onboardingKey = `home_feed_onboarding_${localUser.zuid}`;
+    const hasSeenOnboarding = localStorage.getItem(onboardingKey);
+    
+    if (!hasSeenOnboarding) {
+      // Show onboarding modal after a short delay
+      setTimeout(() => {
+        const onboardingModal = new bootstrap.Modal(document.getElementById('homeFeedOnboardingModal'));
+        onboardingModal.show();
+      }, 1000);
+    }
+
+    // Handle onboarding modal dismissal
+    $('#homeFeedOnboardingModal .close-btn').on('click', function() {
+      localStorage.setItem(onboardingKey, 'true');
+      const onboardingModal = bootstrap.Modal.getInstance(document.getElementById('homeFeedOnboardingModal'));
+      onboardingModal.hide();
+    });
+
+    // Handle modal backdrop click
+    $('#homeFeedOnboardingModal').on('click', function(e) {
+      if (e.target === this) {
+        localStorage.setItem(onboardingKey, 'true');
+      }
+    });
+
+    // Slide navigation logic
+    let currentSlide = 1;
+    const totalSlides = 4;
+
+    function showSlide(slideNumber) {
+      // Hide all slides
+      document.querySelectorAll('#homeFeedOnboardingModal .onboarding-slide').forEach(slide => {
+        slide.classList.remove('active');
+      });
+      
+      // Show current slide
+      document.querySelector(`#homeFeedOnboardingModal [data-slide="${slideNumber}"]`).classList.add('active');
+      
+      // Update pagination dots
+      document.querySelectorAll('#homeFeedOnboardingModal .pagination-dot').forEach(dot => {
+        dot.classList.remove('active');
+      });
+      document.querySelector(`#homeFeedOnboardingModal .pagination-dot[data-slide="${slideNumber}"]`).classList.add('active');
+      
+      // Update button text
+      const btnAction = document.querySelector('#homeFeedNextSlideBtn');
+      btnAction.textContent = slideNumber === totalSlides ? 'Done' : 'Next';
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        showSlide(currentSlide);
+      } else {
+        // On final slide, close modal
+        localStorage.setItem(onboardingKey, 'true');
+        const onboardingModal = bootstrap.Modal.getInstance(document.getElementById('homeFeedOnboardingModal'));
+        onboardingModal.hide();
+      }
+    }
+
+    // Handle next button clicks
+    $('#homeFeedNextSlideBtn').on('click', function() {
+      nextSlide();
+    });
+
+    // Add click handlers to pagination dots
+    document.querySelectorAll('#homeFeedOnboardingModal .pagination-dot').forEach((dot) => {
+      dot.addEventListener('click', (e) => {
+        currentSlide = parseInt(e.target.getAttribute('data-slide'));
+        showSlide(currentSlide);
+      });
+    });
+
+    // Escape key to close
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('homeFeedOnboardingModal').classList.contains('show')) {
+        localStorage.setItem(onboardingKey, 'true');
+        const onboardingModal = bootstrap.Modal.getInstance(document.getElementById('homeFeedOnboardingModal'));
+        onboardingModal.hide();
+      }
+    });
+
+    // Initialize first slide
+    showSlide(1);
+  });
+</script>

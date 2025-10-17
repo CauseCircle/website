@@ -181,7 +181,7 @@
 <!-- prettier-ignore -->
 {{ include /components/global/demo.html}}
 
-<script>
+<script type="module">
   $(document).ready(function () {
     // Add custom bullet class to specific elements
     $("#hero-description ul, .usecase-description ul").addClass(

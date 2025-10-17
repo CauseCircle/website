@@ -1,6 +1,6 @@
 <style>
   .hero {
-    background-image: url("{{this.story_image.getImage()}}");
+    background-image: none;
     background-size: cover;
     background-position: center;
     color: #fff;
@@ -41,12 +41,24 @@
   .back-btn i {
     font-size: 1.6rem;
   }
-  .hero-img {
+  
+  .card-img-bottom {
     width: 100%;
-    height: 100%;
-    max-height: 300px;
+    border-radius: 0 0 10px 10px;
     object-fit: cover;
-    border-radius: 10px;
+  }
+  
+  /* New classes for aspect ratio handling */
+  .card-img-wide {
+    height: 400px;
+    object-fit: contain;
+    background-color: #F5F7FA;
+  }
+  
+  .card-img-tall {
+    max-height: 800px;
+    object-fit: contain;
+    background-color: #F5F7FA;
   }
 
   .story-container img {
@@ -54,14 +66,89 @@
     max-height: auto;
     padding: 20px 0;
   }
-  .story-container p {
+  
+  .story-container, .story-container p {
     padding-bottom: 12px;
+    text-align: justify;
+    white-space: normal;
   }
+  
   .author-img {
     width: 48px;
     height: 48px;
     border-radius: 8px;
     object-fit: cover;
+  }
+
+  /* Author name hover effect */
+  #author-name:hover {
+    color: #7b3fee !important;
+    transition: color 0.2s ease;
+  }
+
+  /* Post Card Styles (matching home_feed) */
+  .post-card {
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #fff;
+  }
+
+  .post-header {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    gap: 12px;
+    border-bottom: 1px solid #f1f1f1;
+  }
+
+  .profile-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .post-meta {
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .npo-name {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .npo-name a {
+    color: inherit;
+  }
+
+  .npo-name a:hover {
+    color: #7b3fee !important;
+  }
+
+  .post-content {
+    padding: 0 16px 16px 16px;
+  }
+
+  .story-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #212529;
+  }
+
+  .story-subtitle {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #6c757d;
+    margin-bottom: 8px;
+  }
+
+  .story-carousel {
+    border-radius: 12px !important;
+    overflow: hidden;
   }
 
   .story-description p,
@@ -86,6 +173,7 @@
 
   .card {
     border-radius: 10px;
+    overflow: hidden;
   }
 
   .npo-logo {
@@ -106,93 +194,731 @@
     transform: translateY(-5px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
+  
+  .story-hashtag {
+    color: #7b3fee;
+    text-decoration: none;
+  }
+  
+  .story-hashtag:hover {
+    text-decoration: underline;
+  }
+
+  /* Cause pill styles */
+  .cause-pill {
+    background-color: #f8f9fa;
+    color: #495057;
+    padding: 6px 12px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+    display: inline-block;
+    margin: 2px;
+  }
+  
+  .cause-pill:hover {
+    background-color: #e9ecef;
+    color: #495057;
+    text-decoration: none;
+    border-color: #adb5bd;
+    transform: translateY(-1px);
+  }
+
+  /* Hashtag styles */
+  .hashtag-item {
+    color: #7b3fee;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  
+  .hashtag-item:hover {
+    text-decoration: underline;
+    color: #5a2bb8;
+  }
+
+  .hashtags-container {
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  .causes-container {
+    margin-top: 12px;
+  }
+
+  /* Custom Carousel Control Buttons */
+  #storyImageCarousel .carousel-control-prev,
+  #storyImageCarousel .carousel-control-next {
+    opacity: 0.9;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #FFFFFF; /* White background */
+    top: 50%;
+    transform: translateY(-50%);
+    transition: background-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  }
+
+  #storyImageCarousel .carousel-control-prev:hover,
+  #storyImageCarousel .carousel-control-next:hover {
+    opacity: 1;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+  }
+
+  /* Override Bootstrap's default styling for the icons */
+  #storyImageCarousel .carousel-control-prev-icon,
+  #storyImageCarousel .carousel-control-next-icon {
+    background-image: none !important;
+    color: #575757; /* Gray icon color */
+    font-size: 1.5rem;
+    line-height: 1;
+    font-weight: bold;
+    width: auto;
+    height: auto;
+    display: inline-block;
+    background-color: transparent; /* Remove background color from icon */
+    border-radius: 0;
+  }
+  
+  /* Remove any ::before content */
+  #storyImageCarousel .carousel-control-prev-icon::before,
+  #storyImageCarousel .carousel-control-next-icon::before {
+    display: none !important;
+    content: none !important;
+  }
+
+  /* Adjust positioning slightly inwards */
+  #storyImageCarousel .carousel-control-prev {
+    left: 15px;
+  }
+
+  #storyImageCarousel .carousel-control-next {
+    right: 15px;
+  }
+  
+  /* Story image carousel container styling */
+  #storyImageCarousel {
+    background-color: #000; /* Black background for letterboxing */
+    overflow: hidden;
+    border-radius: 0;
+    max-height: 480px; /* Increased max height */
+  }
+  
+  /* Image container style for maintaining aspect ratio */
+  #storyImageCarousel .carousel-item {
+    position: relative;
+    overflow: hidden;
+    max-height: 480px; /* Increased max height */
+  }
+  
+  /* Apply aspect ratio to image carousel items */
+  #storyImageCarousel .carousel-item.image-item {
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio for images */
+  }
+  
+  /* Video carousel items use the video-container for sizing */
+  #storyImageCarousel .carousel-item.video-item {
+    height: auto;
+  }
+  
+  /* Style for contained images that maintain aspect ratio */
+  #storyImageCarousel .carousel-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Maintain aspect ratio */
+    background-color: #000; /* Black background */
+    max-height: 480px; /* Increased max height */
+  }
+  
+  /* Style for carousel indicators */
+  #storyImageCarousel .carousel-indicators {
+    bottom: 15px;
+  }
+  
+  #storyImageCarousel .carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    border: none;
+    margin: 0 4px;
+  }
+  
+  #storyImageCarousel .carousel-indicators .active {
+    background-color: white;
+  }
+  
+  /* Video player styling */
+  .carousel-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: #000;
+    display: block;
+  }
+  
+  .video-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    background-color: #000;
+    overflow: hidden;
+  }
+  
+  .video-container iframe,
+  .video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  /* Different aspect ratios for video containers */
+  .video-container.aspect-16-9 {
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  }
+  
+  .video-container.aspect-4-3 {
+    padding-bottom: 75%; /* 4:3 aspect ratio */
+  }
+  
+  .video-container.aspect-1-1 {
+    padding-bottom: 100%; /* 1:1 square aspect ratio */
+  }
+  
+  /* Responsive video container adjustments */
+  @media (max-width: 768px) {
+    .video-container {
+      padding-bottom: 75% !important; /* 4:3 aspect ratio on mobile for better viewing */
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    .video-container {
+      max-height: 500px; /* Limit maximum height on large screens */
+    }
+  }
+  
+
+  
+  /* Action Buttons Styling */
+  .post-actions {
+    background-color: #ffffff;
+    border-radius: 0 0 10px 10px;
+    border-top: 1px solid #f1f1f1;
+  }
+  
+  .action-btn {
+    padding: 12px 8px;
+    color: #636363;
+    font-weight: 400;
+    transition: background-color 0.2s;
+    border: none;
+    background-color: transparent;
+    font-size: 0.9rem;
+  }
+  
+  .action-btn:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .action-btn i {
+    margin-right: 6px;
+  }
+  
+  /* Liked button state */
+  .action-btn.liked {
+    color: #7b3fee;
+    font-weight: 500;
+  }
+  
+  .action-btn.liked i {
+    color: #7b3fee;
+  }
+
+  /* === START Comment Section CSS === */
+  .story-comments {
+      /* Styles for the main comment section container */
+      background-color: #fff;
+      /* Add padding or margins as needed */
+      margin-top: 0; /* Removed top margin as actions div has border */
+  }
+
+  .comment-input-container {
+      border-top: 1px solid #e1e4ea;
+      padding: 10px 16px;
+  }
+
+  .comment-input {
+      width: 100%;
+      border-radius: 18px;
+      padding: 8px 16px;
+      border: 1px solid #ced4da;
+      background-color: #f8f9fa;
+      font-size: 0.9rem;
+  }
+
+  .comment-input:focus {
+      outline: none;
+      border-color: #ced4da;
+      box-shadow: none;
+  }
+
+  .latest-comment-container,
+  .all-comments-container .comment-container {
+      /* Shared container styles if any, otherwise specific */
+       padding-bottom: 0; /* Reduce bottom padding for list items */
+  }
+  
+   .latest-comment-container .comment-container {
+       padding-top: 10px; 
+       padding-bottom: 10px; 
+   }
+
+
+  .all-comments-container {
+      max-height: 300px; /* Increased height slightly for page view */
+      overflow-y: auto;
+  }
+
+  .toggle-comments-btn {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      color: #6c757d;
+      font-size: 0.85rem;
+      text-decoration: none;
+      cursor: pointer;
+      gap: 4px;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      border-top: 1px solid #e1e4ea;
+      margin-top: 5px;
+  }
+
+  .toggle-comments-btn:hover {
+      text-decoration: underline;
+      background-color: #f8f9fa;
+  }
+
+  .toggle-comments-btn i {
+      font-size: 0.75rem;
+      transition: transform 0.2s ease-in-out;
+  }
+
+  .toggle-comments-btn.expanded i {
+      transform: rotate(180deg);
+  }
+
+  .comment-container {
+      display: flex;
+      padding: 10px 16px;
+      gap: 10px;
+      align-items: flex-start;
+  }
+
+  .comment-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-top: 5px; /* Align slightly better */
+  }
+
+  .comment-content {
+      flex: 1;
+      background-color: #F5F7FA;
+      border-radius: 10px;
+      padding: 10px;
+  }
+
+  .comment-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between; /* Push options button to right */
+      gap: 8px;
+      margin-bottom: 4px; /* Space between header and text */
+  }
+
+  .comment-author {
+      font-weight: 500;
+      font-size: 0.9rem;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 1; /* Allow shrinking */
+  }
+
+  .comment-time {
+      color: #6c757d;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      margin-left: auto; /* Push time next to options */
+      padding-left: 8px; /* Space before time */
+      flex-shrink: 0; /* Prevent time from shrinking */
+  }
+
+  .comment-text {
+      font-size: 0.9rem;
+      margin: 0;
+      word-wrap: break-word;
+      white-space: pre-wrap; /* Respect newlines */
+  }
+
+  .comment-options-btn {
+      background: none;
+      border: none;
+      color: #6c757d;
+      padding: 0;
+      line-height: 1; /* Align icon better */
+      cursor: pointer;
+      flex-shrink: 0; /* Prevent button from shrinking */
+  }
+
+  .comments-loading {
+      text-align: center;
+      padding: 15px;
+      color: #6c757d;
+  }
+
+  .comments-loading .spinner-border-sm {
+      width: 1rem;
+      height: 1rem;
+      border-width: .2em;
+      vertical-align: -0.125em;
+      margin-right: 0.5em;
+  }
+  /* === END Comment Section CSS === */
+
+  /* === START Skeleton Loading CSS === */
+  @keyframes shimmer {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: calc(200px + 100%) 0;
+    }
+  }
+
+  @keyframes skeleton-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+
+  .skeleton-pulse {
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+
+  .story-skeleton {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .skeleton-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f1f1;
+  }
+
+  .skeleton-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  .skeleton-line {
+    height: 16px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    margin-bottom: 8px;
+  }
+
+  .skeleton-line-short {
+    width: 40%;
+    height: 14px;
+  }
+
+  .skeleton-line-medium {
+    width: 70%;
+    height: 20px;
+    margin-bottom: 12px;
+  }
+
+  .skeleton-line-long {
+    width: 100%;
+  }
+
+  .skeleton-content {
+    margin-bottom: 16px;
+  }
+
+  .skeleton-image {
+    width: 100%;
+    height: 420px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    margin-bottom: 16px;
+  }
+
+  .skeleton-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f1f1;
+  }
+
+  .skeleton-action-btn {
+    flex: 1;
+    height: 40px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  .placeholder-glow .placeholder {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  .placeholder-glow .placeholder.rounded {
+    border-radius: 6px;
+  }
+
+  .placeholder-glow .placeholder.rounded-pill {
+    border-radius: 50rem;
+  }
+
+  /* Enhanced shimmer for larger areas */
+  .placeholder-glow {
+    position: relative;
+  }
+
+  /* Smooth transitions when skeleton is removed */
+  .post-header img,
+  .story-title,
+  .story-container,
+  .action-btn {
+    transition: opacity 0.3s ease-in-out;
+  }
+  /* === END Skeleton Loading CSS === */
 </style>
 
 <section class="container py-4 pb-md-7">
   <div class="row">
     <!-- Main content column -->
     <div class="col-12 col-md-7 col-xl-8">
-      <div class="w-100 d-flex flex-column gap-2">
-        <img class="hero-img" src="{{ this.story_image.getImage() }}" alt="" />
-
-        <!-- Story title and description -->
-        <div id="active-story" data-zuid="{{ this.zuid }}" class="d-flex">
-          <div class="flex-grow-1">
-            <p class="fs-4 fw-normal story-title mt-3">{{ this.title }}</p>
-          </div>
-          <div
-            class="flex-grow-1 d-flex align-items-center justify-content-end"
-          >
-            <div class="dropdown">
-              <button
-                class="btn btn-secondary"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i class="bi bi-three-dots-vertical"></i>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <button class="dropdown-item" id="report-story">
-                    <i class="bi bi-flag"></i> Report
-                  </button>
-                </li>
-              </ul>
+      <div class="w-100 d-flex flex-column gap-3">
+        <!-- Single card for author, content, and image -->
+        <div class="card post-card" style="position: relative; min-height: 750px;">
+          <!-- Loading Skeleton Overlay (shown initially, removed by JS) -->
+          <div class="story-skeleton skeleton-pulse" id="story-loading-skeleton" style="position: absolute; top: 0; left: 0; right: 0; z-index: 10; background: white; border-radius: 10px;">
+            <!-- Skeleton Post Header -->
+            <div class="skeleton-author" style="padding: 16px; padding-bottom: 16px; margin-bottom: 0;">
+              <div class="skeleton-circle"></div>
+              <div class="d-flex flex-column flex-grow-1">
+                <div class="skeleton-line skeleton-line-short"></div>
+                <div class="skeleton-line skeleton-line-short" style="width: 30%; height: 12px; margin-top: 4px; margin-bottom: 0;"></div>
+              </div>
+            </div>
+            
+            <!-- Skeleton Image with padding -->
+            <div style="padding: 0 16px 16px 16px;">
+              <div class="skeleton-image"></div>
+            </div>
+            
+            <!-- Skeleton Content -->
+            <div class="skeleton-content" style="padding: 0 16px 16px 16px;">
+              <div class="skeleton-line skeleton-line-medium"></div>
+              <div class="skeleton-line skeleton-line-long"></div>
+              <div class="skeleton-line skeleton-line-long"></div>
+              <div class="skeleton-line" style="width: 60%;"></div>
+              
+              <!-- Skeleton hashtags -->
+              <div style="margin-top: 12px; display: flex; gap: 8px;">
+                <div class="skeleton-line" style="width: 80px; height: 22px; border-radius: 50rem; margin-bottom: 0;"></div>
+                <div class="skeleton-line" style="width: 100px; height: 22px; border-radius: 50rem; margin-bottom: 0;"></div>
+                <div class="skeleton-line" style="width: 70px; height: 22px; border-radius: 50rem; margin-bottom: 0;"></div>
+              </div>
+              
+              <!-- Skeleton causes -->
+              <div style="margin-top: 12px; display: flex; gap: 8px; margin-bottom: 0;">
+                <div class="skeleton-line" style="width: 110px; height: 26px; border-radius: 50rem; margin-bottom: 0;"></div>
+                <div class="skeleton-line" style="width: 95px; height: 26px; border-radius: 50rem; margin-bottom: 0;"></div>
+                <div class="skeleton-line" style="width: 120px; height: 26px; border-radius: 50rem; margin-bottom: 0;"></div>
+              </div>
+            </div>
+            
+            <!-- Skeleton Actions -->
+            <div class="skeleton-actions" style="margin: 0; padding: 12px 0 0 0;">
+              <div class="skeleton-action-btn"></div>
+              <div class="skeleton-action-btn"></div>
+              <div class="skeleton-action-btn"></div>
+              <div class="skeleton-action-btn"></div>
             </div>
           </div>
-        </div>
-        <div class="fs-5 text-muted story-description d-none">
-          {{ this.description }}
-        </div>
-
-        <!-- Author card -->
-        {{ if {this.author} }}
-        <div class="card my-2">
-          <div class="card-body">
-            <div class="d-flex justify-content-between">
-              <div class="d-flex gap-2">
-                <div>
-                  {{ $profile_image = {users.filter({this.author}).profile_image.getImage()} }}
-                  {{ if {$profile_image} }}
-                  <img class="author-img" src="{{ $profile_image }}" />
-                  {{ else }}
-                  <img
-                    class="author-img"
-                    src="https://placehold.co/600x400?text=Profile"
-                  />
-                  {{ end-if }}
-                </div>
-                <div class="d-flex flex-column justify-content-between">
-                  <p class="fs-6 fw-medium">
-                    {{ users.filter({this.author}).first_name }}
-                    {{ users.filter({this.author}).last_name }}
-                  </p>
-                  <p class="fs-6 text-muted">{{ this.date_published }}</p>
-                </div>
+          
+          <div class="card-body p-0" style="opacity: 0;">
+            <!-- Post Header with NPO/Organization Info -->
+            <div class="post-header">
+              <img
+                id="npo-logo-img"
+                src="https://placehold.co/100x100?text=Logo"
+                alt="Organization"
+                class="profile-img"
+              />
+              <div class="post-meta">
+                <h5 class="mb-0 npo-name">
+                  <a id="npo-name-link" class="text-decoration-none text-primary" href="#" target="_blank"></a>
+                  <span id="posted-by-text" class="text-muted" style="display: none;"> posted by </span>
+                  <a id="author-name" class="text-decoration-none text-primary" href="#" style="display: none;"></a>
+                </h5>
+                <small id="story-date" class="text-muted"></small>
               </div>
-              <div class="d-flex gap-3 align-items-center">
-                <a
-                  href="{{ users.filter({this.author}).path_full }}"
+              <div class="ms-auto">
+                <!-- Action buttons -->
+                <div class="dropdown">
+                  <button
                   class="btn btn-secondary"
-                >
-                  View Profile
-                </a>
-                <a href="" class="btn btn-primary">
-                  <i class="bi bi-plus"></i>
-                  Follow
-                </a>
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  aria-label="Story options menu"
+                  >
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <button class="dropdown-item d-flex align-items-center justify-content-center gap-2" id="report-story">
+                        <i class="bi bi-flag"></i> Report
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        class="dropdown-item d-flex align-items-center justify-content-center gap-2"
+                        onclick="window.handleStoryShareClick(storyZuid, event)"
+                        data-bs-toggle="modal"
+                        data-bs-target="#shareModal"
+                      >
+                        <i class="bi bi-share"></i> Share
+                      </button>
+                    </li>
+                    <!-- Edit Story Button -->
+                    <li>
+                      <button
+                        class="dropdown-item d-flex align-items-center justify-content-center gap-2 d-none"
+                        id="edit-story-button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#updateStoryModal"
+                      >
+                        <i class="bi bi-pencil-square"></i> Edit Story
+                      </button>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
+
+            <!-- Image/Video Carousel -->
+            <div class="pb-3 px-3">
+              <div id="storyImageCarousel" class="carousel slide story-carousel rounded-4" data-bs-touch="true">
+                <div class="carousel-indicators" id="carouselIndicators">
+                  <!-- Indicators will be generated by JavaScript -->
+                </div>
+                <div class="carousel-inner" id="carouselInner">
+                  <!-- Carousel items will be generated by JavaScript -->
+                </div>
+                <!-- Navigation controls will be added by JavaScript if needed -->
+              </div>
+            </div>
+
+            <!-- Post Content -->
+            <div class="post-content">
+              <h4 class="story-title"></h4>
+              <div class="story-subtitle story-container text-muted" style="white-space: pre-wrap;"></div>
+              <!-- Hashtags extracted from story body -->
+              <div class="hashtags-container" id="extracted-hashtags" style="display: none;"></div>
+              <!-- Related causes will be added here by JavaScript -->
+              <div id="related-causes-container"></div>
+            </div>
+            <!-- Action Buttons -->
+            <div class="post-actions d-flex" onclick="event.stopPropagation()">
+              <button class="btn flex-grow-1 action-btn" id="like-button" onclick="window.handleLikeClick(storyZuid, event)">
+                <i class="bi bi-hand-thumbs-up"></i> Like
+              </button>
+              <button id="donate-button" class="btn flex-grow-1 action-btn" style="border-radius: 0;">
+                <i class="bi bi-heart"></i> Donate
+              </button>
+              <button id="comment-button" class="btn flex-grow-1 action-btn" style="border-radius: 0;" onclick="window.toggleCommentSection(storyZuid, event)">
+                 <i class="bi bi-chat"></i> <span id="comment-count-text">Comment</span>
+              </button>
+              <button class="btn flex-grow-1 action-btn" onclick="window.handleStoryShareClick(storyZuid, event)" data-bs-toggle="modal" data-bs-target="#shareModal">
+                <i class="bi bi-share"></i> Share
+              </button>
+            </div>
+            
+            <!-- Comments Section -->
+            <div class="story-comments" id="comments-placeholder" onclick="event.stopPropagation()" data-visible="false" style="display: none;">
+              <div class="comment-input-container">
+                <input type="text" class="comment-input" placeholder="Add a Comment..." onkeydown="if(event.key === 'Enter') window.handleCommentSubmit(storyZuid, this, event)">
+              </div>
+              
+              <!-- Container for the latest comment preview -->
+              <div class="latest-comment-container" style="display: none;">
+                 <!-- Latest comment will be loaded here -->
+              </div>
+    
+              <!-- Container for all comments (initially hidden and empty) -->
+              <div class="all-comments-container" style="display: none;">
+                 <!-- All comments will be loaded here -->
+              </div>
+    
+              <!-- Toggle Comments Button (dynamically added) -->
+              
+            </div>
+            <!-- End Comments Section -->
+            
           </div>
         </div>
-        {{ else}}
-        <div class="table-group-divider border-light-subtle"></div>
-        {{ end-if }}
-
-        <!-- Story content -->
-        <p class="fs-4 fw-normal">Story</p>
-        <div class="story-container py-2">{{ this.story_body }}</div>
+        
+        <!-- Hidden element for story ID (set at runtime) -->
+        <div id="active-story" class="d-none"></div>
       </div>
     </div>
 
@@ -209,9 +935,9 @@
               <div class="text-muted npo-description">
                 {{ npo.cause_description }}
               </div>
-              <a href="{{ npo.donate_link }}" class="btn btn-primary w-100 mt-2"
-                >Donate Now</a
-              >
+              <button class="btn btn-primary w-100 mt-2" onclick="window.handleStoryDonateClick('{{ npo._zuid }}', '{{ npo.donate_link }}', event)">
+                Donate Now
+              </button>
             </div>
           </div>
         </div>
@@ -222,7 +948,7 @@
             <div class="d-flex flex-column gap-2">
               <p class="fw-normal">About the Nonprofit</p>
               <div class="d-flex gap-2">
-                <img src="{{ npo.logo.getImage() }}" class="npo-logo" />
+                <img src="{{ npo.logo.getImage() }}?width=48" class="npo-logo" alt="NPO logo"/>
                 <div class="d-flex flex-column justify-content-between">
                   <p class="fw-normal">{{ npo.name }}</p>
                   <div class="text-muted one-line-text">
@@ -258,7 +984,7 @@
         <div class="card">
           <div class="card-body">
             <div class="d-flex flex-column gap-2">
-              <p class="fw-normal">Tags</p>
+              <p class="fw-normal">Causes</p>
               <div class="d-flex gap-2 flex-wrap">
                 {{ each {this.related_causes} as tag }}
                 <span class="badge text-primary">{{ tag.title }}</span>
@@ -273,6 +999,10 @@
         <p class="fw-normal fs-6 py-2">Related Stories</p>
         <div class="d-flex flex-column gap-2">
           {{ each stories as story limit 5 where story.zuid != '{this.zuid}' and story.related_npos = '{this.related_npos}'}}
+          {{ $story_image = {story.story_image.getImage()} }}
+          {{ if {$story_image} == '' }}
+          {{ $story_image = https://4xxglxlj.media.zestyio.com/Asset-2--1---1-.jpg }}
+          {{ /if }}
           <a
             href="{{ story.getUrl() }}"
             class="text-decoration-none text-reset"
@@ -280,24 +1010,26 @@
             <div class="card story-card">
               <div class="card-body p-2">
                 <div class="d-flex align-items-center gap-2">
-                  <img
-                    src="{{ story.story_image.getImage() }}"
-                    class="rounded border border-light-subtle"
-                    width="72"
-                    height="72"
-                    style="border-radius: 8px; object-fit: cover"
-                  />
+                  <div>
+                    <img
+                      src="{{ $story_image }}?width=72"
+                      class="rounded border border-light-subtle"
+                      width="72"
+                      height="72"
+                      style="border-radius: 8px; object-fit: cover"
+                    />
+                  </div>
                   <div
                     class="d-flex flex-column justify-content-between overflow-hidden"
                   >
                     <p class="fw-light text-muted">
-                      {{ story.date_published }}
+                      {{ story.created_at.dateDiffForHumans() }}
                     </p>
                     <p class="m-0 p-0 fw-normal one-line-text">
                       {{ story.title }}
                     </p>
                     <div class="one-line-text text-muted">
-                      {{ story.description }}
+                      {{ story.story_body }}
                     </div>
                   </div>
                 </div>
@@ -314,12 +1046,1163 @@
 <!-- prettier-ignore -->
 {{include /components/global/NPO Admin/Dashboard/Review Story Modal/report_modal.html}}
 
-<script>
-  $(document).ready(function () {
+<!-- Add this with other includes at the bottom -->
+{{include /components/global/Modals/share_story_modal.html}}
+{{include /components/global/Stories/LoginPromptModal/login_prompt_modal.html}}
+{{include /components/global/Stories/update_story_modal.html}}
+
+<!-- Handle like button functionality -->
+<script type="module">
+  async function handleLikeClick(storyZuid, event) {
+    try {
+      // Prevent event bubbling to parent elements
+      if (event) {
+        event.stopPropagation();
+      }
+
+      // Wait for Firebase auth to be ready and check user status
+      const user = await new Promise((resolve) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+          unsubscribe();
+          resolve(user);
+        });
+      });
+
+      // Check if user is logged in
+      if (!user) {
+        // Ensure the modal exists and show it
+        const loginModalElement = document.getElementById('storyActionLoginPromptModal'); 
+        if (loginModalElement) {
+            loginModalElement.setAttribute('data-action-type', 'like'); // Set action type
+            const loginModal = new bootstrap.Modal(loginModalElement);
+            loginModal.show();
+        } else {
+            console.error("Login prompt modal element not found.");
+            alert("Please log in to like this story."); // Fallback alert
+        }
+        return; // Stop execution if not logged in
+      }
+
+      // Use TanStack Query mutation with subscription pattern
+      const mutation = window.createUpdateStoryLikesMutation();
+      
+      mutation.mutate(storyZuid, {
+        onSuccess: () => {
+          // Query will automatically refetch and update UI via subscription
+          console.log('Story like updated successfully');
+        },
+        onError: (error) => {
+          console.error("Error updating story likes:", error);
+          alert('Failed to update like. Please try again.');
+        }
+      });
+    } catch (error) {
+      console.error("Error updating story likes:", error);
+    }
+  }
+  
+  // Export to window for global access from onclick handlers
+  window.handleLikeClick = handleLikeClick;
+</script>
+
+<script type="module">
+  // === START Comment Functionality JS ===
+  const authorCache = {}; // Simple cache for author details
+  const storyZuid = '{{ this.zuid }}'; // Get story ZUID from template (will be set on hidden element as well)
+  window.storyZuid = storyZuid; // Make globally accessible for onclick handlers
+  let currentStory = null; // Will be loaded from API
+  let storyAuthorZuid = '{{ this.author }}'; // Get story author ZUID from template (fallback)
+  const authUser = JSON.parse(localStorage.getItem("user")); // Assumes user is in localStorage
+
+  // ===== TanStack Query Observers =====
+  
+  // Story query - main data source
+  const storyQuery = window.createStoryQuery(storyZuid);
+  
+  // Story stats query - likes, views, shares
+  const storyStatsQuery = window.createStoryStatsQuery(storyZuid);
+  
+  // Story comments query - all comments
+  const storyCommentsQuery = window.createStoryCommentsQuery(storyZuid);
+  
+  // Mutations
+  const updateStoryLikesMutation = window.createUpdateStoryLikesMutation();
+  const updateStorySharesMutation = window.createUpdateStorySharesMutation();
+  const updateStoryViewsMutation = window.createUpdateStoryViewsMutation();
+  const postCommentMutation = window.createPostCommentMutation();
+  const updateStoryMutation = window.createUpdateStoryMutation();
+  const clickNpoDonateMutation = window.createClickNpoDonateMutation();
+  
+  // ===== Reactive Subscriptions =====
+  
+  // Subscribe to story data changes
+  storyQuery.subscribe((result) => {
+    if (result.isSuccess && result.data?.data?.[0]) {
+      currentStory = result.data.data[0];
+      
+      // Update the story author ZUID from API data
+      if (currentStory.author) {
+        storyAuthorZuid = currentStory.author?.data?.[0]?.meta?.zuid;
+      }
+      
+      // Initialize components that depend on story data
+      initializeStoryDependentComponents();
+    } else if (result.isError) {
+      console.error('Error loading story:', result.error);
+      hideStoryLoadingSkeleton();
+    }
+  });
+  
+  // Subscribe to story stats changes
+  storyStatsQuery.subscribe((result) => {
+    if (result.isSuccess && result.data?.data) {
+      const likeButton = $("#like-button");
+      if (likeButton.length > 0) {
+        updateLikeButtonFromStats(result.data.data, likeButton);
+      }
+    }
+  });
+  
+  // Subscribe to comments changes
+  storyCommentsQuery.subscribe((result) => {
+    if (result.isSuccess && result.data?.data) {
+      const commentCount = result.data.data.length;
+      const currentUser = JSON.parse(localStorage.getItem("user"));
+      const commentedByCurrentUser = result.data.data.some(comment => comment.authorId === currentUser?.zuid);
+      
+      const commentButton = $("#comment-button");
+      commentButton.html(`<i class="${commentedByCurrentUser ? 'bi bi-chat-fill text-primary' : 'bi bi-chat'}"></i> ${commentCount > 0 ? commentCount.toString() : 'Comment'}`);
+      
+      $('#comment-count-text').text(commentCount > 0 ? commentCount.toString() : 'Comment');
+    }
+  });
+  
+  // Function to load story data from API (legacy - now uses reactive query)
+  async function loadStoryData() {
+    // This function is now replaced by reactive subscriptions
+    // Trigger the query to fetch data
+    storyQuery.refetch();
+    return currentStory;
+  }
+
+  // Function to hide skeleton loading state and show actual content
+  function hideStoryLoadingSkeleton() {
+    // Remove the skeleton overlay
+    const $skeleton = $('#story-loading-skeleton');
+    if ($skeleton.length) {
+      $skeleton.remove();
+    }
+    
+    // Show the actual card content and reset styles
+    const $card = $('.post-card');
+    if ($card.length) {
+      $card.find('.card-body').css('opacity', '1');
+      $card.css({
+        'position': '',
+        'min-height': ''
+      });
+    }
+  }
+
+  // Helper function to update like button from stats data
+  function updateLikeButtonFromStats(statsData, likeButton) {
+    const likeCount = statsData.likedBy ? statsData.likedBy.length : 0;
+    const likeText = likeCount > 0 ? likeCount.toString() : 'Like';
+    
+    // Check if current user has liked the story
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const isLiked = currentUser && statsData.likedBy && statsData.likedBy?.some(user => user.user_zuid || user.id === currentUser?.zuid);
+    
+    // Replace button text using the filled icon if liked
+    likeButton.html(`<i class="bi ${isLiked ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up'}"></i> ${likeText}`);
+    
+    // Visual indication of liked state with primary color
+    if (isLiked) {
+      likeButton.addClass('liked');
+      // Apply primary color directly to the icon
+      likeButton.find('i').css('color', '#7b3fee');
+    } else {
+      likeButton.removeClass('liked');
+      likeButton.find('i').css('color', '');
+    }
+  }
+
+  // Initialize like button state when page loads (now handled by reactive subscription)
+  async function initializeLikeButton() {
+    try {
+      const likeButton = $("#like-button");
+      
+      // Wait for Firebase auth to be ready first
+      const user = await new Promise((resolve) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+          unsubscribe();
+          resolve(user);
+        });
+      });
+
+      // Check if user is logged in before fetching stats
+      if (!user) {
+           // Set default like button state (not liked)
+          if (likeButton.length > 0) {
+              likeButton.html(`<i class="bi bi-hand-thumbs-up"></i> Like`);
+              likeButton.removeClass('liked');
+              likeButton.find('i').css('color', '');
+          }
+          return; 
+      }
+      
+      // Reactive subscription now handles this automatically
+      // Just trigger a refetch to ensure we have the latest data
+      storyStatsQuery.refetch();
+    } catch (error) {
+      console.error("Error initializing like button:", error);
+    }
+  }
+
+  // Function to decode HTML entities (strips all HTML tags - for plain text conversion)
+  function decodeHtmlEntities(text) {
+    if (!text) return '';
+    
+    // Create a temporary div element to decode HTML entities
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = text;
+    let decodedText = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // Additional manual decoding for common entities that might not be handled
+    decodedText = decodedText.replace(/&nbsp;/g, ' ');
+    decodedText = decodedText.replace(/&amp;/g, '&');
+    decodedText = decodedText.replace(/&lt;/g, '<');
+    decodedText = decodedText.replace(/&gt;/g, '>');
+    decodedText = decodedText.replace(/&quot;/g, '"');
+    decodedText = decodedText.replace(/&#039;/g, "'");
+    decodedText = decodedText.replace(/&#39;/g, "'");
+    
+    return decodedText;
+  }
+
+  // Function to decode HTML entities while preserving HTML tags
+  function decodeHtmlEntitiesPreserveTags(text) {
+    if (!text) return '';
+    
+    // Manual decoding for common entities without stripping HTML tags
+    let decodedText = text;
+    decodedText = decodedText.replace(/&nbsp;/g, ' ');
+    decodedText = decodedText.replace(/&amp;/g, '&');
+    decodedText = decodedText.replace(/&lt;/g, '<');
+    decodedText = decodedText.replace(/&gt;/g, '>');
+    decodedText = decodedText.replace(/&quot;/g, '"');
+    decodedText = decodedText.replace(/&#039;/g, "'");
+    decodedText = decodedText.replace(/&#39;/g, "'");
+    
+    return decodedText;
+  }
+
+  // Function to convert HTML content to plain text suitable for textarea editing
+  function htmlToPlainText(htmlContent) {
+    if (!htmlContent) return '';
+    
+    let plainText = htmlContent;
+    
+    // Convert <br>, <br/>, <br /> tags to newlines
+    plainText = plainText.replace(/<br\s*\/?>/gi, '\n');
+    
+    // Convert closing </p> tags to double newlines (paragraph breaks)
+    plainText = plainText.replace(/<\/p>/gi, '\n\n');
+    
+    // Remove opening <p> tags
+    plainText = plainText.replace(/<p[^>]*>/gi, '');
+    
+    // Remove other HTML tags
+    plainText = plainText.replace(/<[^>]*>/g, '');
+    
+    // Decode HTML entities (including &nbsp;)
+    plainText = decodeHtmlEntities(plainText);
+    
+    // Clean up multiple consecutive newlines (max 2 for paragraph breaks)
+    plainText = plainText.replace(/\n{3,}/g, '\n\n');
+    
+    // Trim leading and trailing whitespace
+    plainText = plainText.trim();
+    
+    return plainText;
+  }
+
+  // Function to process raw story content for proper HTML display
+  function processStoryContentForDisplay(rawContent) {
+    if (!rawContent) return '';
+    
+    let processedContent = rawContent;
+    
+    // Check if content appears to already be properly formatted HTML
+    const hasHTMLTags = /<[^>]+>/i.test(processedContent);
+    const hasExistingBrTags = /<br\s*\/?>/i.test(processedContent);
+    
+    if (hasHTMLTags && hasExistingBrTags) {
+      // Content already has HTML formatting - decode entities while preserving HTML tags
+      processedContent = decodeHtmlEntitiesPreserveTags(processedContent);
+      // Clean up excessive consecutive <br> tags only
+      processedContent = processedContent.replace(/(<br\s*\/?>\s*){3,}/gi, '<br /><br />');
+      return processedContent;
+    }
+    
+    // Content appears to be raw text - process it fully
+    // First decode HTML entities like &nbsp; to regular spaces
+    // Use the tag-preserving version in case there are some HTML tags mixed in
+    processedContent = decodeHtmlEntitiesPreserveTags(processedContent);
+    
+    // Convert actual newlines (\n) to HTML line breaks for display
+    processedContent = processedContent.replace(/\n/g, '<br />');
+    
+    // Clean up multiple consecutive <br> tags (max 2 for paragraph breaks)
+    processedContent = processedContent.replace(/(<br\s*\/?>\s*){3,}/gi, '<br /><br />');
+    
+    // Clean up multiple spaces (but preserve single spaces)
+    processedContent = processedContent.replace(/\s{2,}/g, ' ');
+    
+    return processedContent;
+  }
+
+  // Function to extract hashtags from story body text
+  function extractHashtagsFromStoryBody() {
+    const storyBodyElement = $('.story-container.text-muted');
+    if (!storyBodyElement.length) return [];
+    
+    // Get the text content (without HTML tags)
+    const storyText = storyBodyElement.text();
+    
+    // First decode HTML entities (like &#39; &#32; etc.)
+    const decodedText = decodeHtmlEntities(storyText);
+    
+    // Regular expression to find hashtags (#word)
+    const hashtagRegex = /#[a-zA-Z0-9_]+/g;
+    const hashtags = decodedText.match(hashtagRegex);
+    
+    if (!hashtags || hashtags.length === 0) return [];
+    
+    // Remove duplicates and clean up
+    const uniqueHashtags = [...new Set(hashtags.map(tag => tag.toLowerCase()))];
+    
+    return uniqueHashtags;
+  }
+  
+  // Function to display extracted hashtags under author info
+  function displayExtractedHashtags() {
+    const hashtags = extractHashtagsFromStoryBody();
+    const hashtagsContainer = $('#extracted-hashtags');
+    
+    if (hashtags.length === 0) {
+      hashtagsContainer.hide();
+      return;
+    }
+    
+    // Create hashtag HTML with proper links
+    const hashtagsHtml = hashtags.map(hashtag => {
+      const encodedHashtag = encodeURIComponent(hashtag);
+      return `<a href="/stories/?search=${encodedHashtag}" class="hashtag-item fs-6" target="_blank" rel="noopener noreferrer">${hashtag}</a>`;
+    }).join('');
+    
+    hashtagsContainer.html(hashtagsHtml).show();
+  }
+
+  // Function to display related causes
+  function displayRelatedCauses() {
+    const causesContainer = $('#related-causes-container');
+    
+    if (!currentStory || !currentStory.related_causes?.data || currentStory.related_causes.data.length === 0) {
+      causesContainer.hide();
+      return;
+    }
+    
+    const relatedCauses = currentStory.related_causes.data;
+    
+    // Create causes HTML with badges matching home_feed style
+    const causesHtml = relatedCauses.map(cause => {
+      return `<span class="badge bg-primary bg-opacity-10 text-primary" style="flex-shrink: 0;">${escapeHtml(cause.title || '')}</span>`;
+    }).join(' ');
+    
+    causesContainer.html(`
+      <div class="my-2 d-flex gap-2" style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
+        ${causesHtml}
+      </div>
+    `).show();
+  }
+
+  // Function to update donate button with NPO info
+  function updateDonateButton() {
+    const donateButton = $('#donate-button');
+    
+    if (!currentStory || !currentStory.related_npos?.data || currentStory.related_npos.data.length === 0) {
+      donateButton.prop('disabled', true);
+      return;
+    }
+    
+    const relatedNPO = currentStory.related_npos.data[0];
+    const npoZuid = relatedNPO.meta?.zuid || '';
+    const donateLink = relatedNPO.donate_link || '';
+    
+    if (donateLink) {
+      donateButton.prop('disabled', false);
+      donateButton.off('click'); // Remove any existing click handlers
+      donateButton.on('click', function(event) {
+        handleStoryDonateClick(npoZuid, donateLink, event);
+      });
+    } else {
+      donateButton.prop('disabled', true);
+    }
+  }
+
+  // Function to initialize components that depend on story data
+  function initializeStoryDependentComponents() {
+    if (!currentStory) {
+      console.warn('Cannot initialize components - story data not available');
+      return;
+    }
+    
+    // Hide skeleton loading state
+    hideStoryLoadingSkeleton();
+    
+    // Update story title using API data
+    const storyTitle = $('.story-title');
+    if (storyTitle.length && currentStory.title) {
+      storyTitle.text(currentStory.title);
+    }
+    
+    // Update story content using API data with proper processing
+    const storyContainer = $('.story-container.text-muted');
+    if (storyContainer.length && currentStory.story_body) {
+      const processedContent = processStoryContentForDisplay(currentStory.story_body);
+      storyContainer.html(processedContent);
+    }
+    
+    // Update story date using API data
+    const storyDate = $("#story-date");
+    if (storyDate.length && (currentStory.createdAt || currentStory.meta?.createdAt)) {
+      storyDate.text(formatTimeAgo(currentStory.createdAt || currentStory.meta.createdAt));
+    }
+
+    // Update NPO and author details from API data
+    try {
+      const relatedNPO = currentStory.related_npos?.data?.[0] || null;
+      const apiAuthor = currentStory.author?.data?.[0] || null;
+      const storyAuthorType = currentStory.author?.model || '';
+      
+      // Get NPO logo
+      let npoLogo = 'https://placehold.co/100x100?text=Logo';
+      if (relatedNPO) {
+        if (typeof relatedNPO.logo === 'string') {
+          npoLogo = relatedNPO.logo;
+        } else if (relatedNPO.logo?.data?.[0]?.url) {
+          npoLogo = relatedNPO.logo.data[0].url;
+        }
+      }
+      
+      // Update NPO logo
+      const $npoLogo = $('#npo-logo-img');
+      if ($npoLogo.length && npoLogo) {
+        $npoLogo.attr('src', npoLogo + '?width=48');
+      }
+      
+      // Update NPO name and link
+      const $npoNameLink = $('#npo-name-link');
+      if ($npoNameLink.length && relatedNPO) {
+        $npoNameLink.text(relatedNPO.name || 'Organization');
+        const npoUrl = relatedNPO.meta?.web?.uri ? `{{$base_url}}${relatedNPO.meta.web.uri}` : '#';
+        $npoNameLink.attr('href', npoUrl);
+      }
+      
+      // Handle "posted by" author info
+      if (storyAuthorType === 'users' && apiAuthor) {
+        const authorName = `${apiAuthor.first_name || ''} ${apiAuthor.last_name || ''}`.trim();
+        const authorProfileUrl = apiAuthor?.meta?.web?.uri ? `{{$base_url}}${apiAuthor.meta.web.uri}` : '#';
+        
+        const $postedByText = $('#posted-by-text');
+        const $authorName = $('#author-name');
+        
+        if ($postedByText.length) $postedByText.show();
+        if ($authorName.length) {
+          $authorName.text(authorName);
+          $authorName.attr('href', authorProfileUrl);
+          $authorName.show();
+        }
+      } else {
+        // Hide "posted by" text if story is posted by NPO
+        $('#posted-by-text').hide();
+        $('#author-name').hide();
+      }
+      
+    } catch (e) {
+      console.warn('Failed to update NPO and author details from API data', e);
+    }
+    
+    // Extract and display hashtags from story body
+    displayExtractedHashtags();
+    
+    // Display related causes
+    displayRelatedCauses();
+    
+    // Update donate button with NPO info
+    updateDonateButton();
+    
+    // Initialize like button with story stats data
+    setTimeout(initializeLikeButton, 100);
+    
+    // Initialize carousel with story media
+    initializeMediaCarousel();
+    
+    // Initialize carousel navigation - call after a small delay to ensure DOM is ready
+    setTimeout(() => {
+      if (typeof initializeStoryCarousel === 'function') {
+        initializeStoryCarousel();
+      }
+    }, 100);
+  }
+
+  // Function to detect if a URL is a video
+  function isVideoUrl(url) {
+    if (!url) return false;
+    const videoPatterns = [
+      /vimeo\.com\/video\/\d+/i,
+      /vimeo\.com\/\d+/i,
+      /player\.vimeo\.com\/video\/\d+/i,
+      /youtube\.com\/watch\?v=/i,
+      /youtu\.be\//i,
+      /\.mp4$/i,
+      /\.webm$/i,
+      /\.ogg$/i,
+      /\.mov$/i,
+      /\.avi$/i
+    ];
+    return videoPatterns.some(pattern => pattern.test(url));
+  }
+
+  // Function to get video embed URL
+  function getVideoEmbedUrl(url) {
+    if (!url) return null;
+    
+    
+    // Check if it's already a Vimeo player URL
+    if (url.includes('player.vimeo.com/video/')) {
+      return url.includes('?') ? url : `${url}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // Vimeo regular URLs - handles both /video/ID and direct /ID formats
+    const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+    if (vimeoMatch) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // YouTube
+    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i);
+    if (youtubeMatch) {
+      return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // Direct video files
+    if (/\.(mp4|webm|ogg|mov|avi)$/i.test(url)) {
+      return url;
+    }
+    
+    return null;
+  }
+
+  // Function to initialize carousel with mixed media content
+  function initializeMediaCarousel() {
+    const carouselContainer = document.getElementById('storyImageCarousel');
+    const carouselInner = document.getElementById('carouselInner');
+    const carouselIndicators = document.getElementById('carouselIndicators');
+    
+    if (!carouselContainer || !carouselInner || !carouselIndicators) {
+      console.warn('Carousel elements not found');
+      return;
+    }
+
+    // Check if currentStory is loaded
+    if (!currentStory) {
+      console.warn('Story data not loaded yet, cannot initialize carousel');
+      return;
+    }
+
+    // Get media data from current story
+    const mediaData = typeof currentStory?.story_image === 'string' ? [{zuid: currentStory?.story_image}] : currentStory?.story_image?.data || [];
+    
+    if (mediaData.length === 0) {
+      carouselContainer.style.display = 'none';
+      return;
+    }
+
+    let mediaItems = [];
+    let indicatorsHTML = '';
+    let carouselHTML = '';
+    let slideIndex = 0; // Track actual slide index (skipping invalid items)
+
+    // Process each media item
+    mediaData.forEach((item, originalIndex) => {
+      
+      // Try both url and zuid fields for the media URL
+      const mediaUrl = item.url || item.zuid;
+      const isVideo = isVideoUrl(mediaUrl);
+      
+      
+      if (!mediaUrl) {
+        return; // Skip invalid items
+      }
+      
+      const isActive = slideIndex === 0 ? 'active' : '';
+      const ariaCurrent = slideIndex === 0 ? 'true' : 'false';
+      
+      // Create indicator
+      indicatorsHTML += `
+        <button type="button" data-bs-target="#storyImageCarousel" data-bs-slide-to="${slideIndex}" 
+                class="${isActive}" aria-current="${ariaCurrent}" aria-label="Slide ${slideIndex + 1}"></button>
+      `;
+      
+      // Create carousel item
+      if (isVideo) {
+        const embedUrl = getVideoEmbedUrl(mediaUrl);
+        
+        if (embedUrl) {
+          if (embedUrl.includes('youtube.com') || embedUrl.includes('vimeo.com')) {
+            // Embedded video (YouTube/Vimeo)
+            carouselHTML += `
+              <div class="carousel-item video-item ${isActive}">
+                <div class="video-container aspect-16-9">
+                  <iframe class="carousel-video" src="${embedUrl}" 
+                          frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
+                          title="Video ${slideIndex + 1}"></iframe>
+                </div>
+              </div>
+            `;
+          } else {
+            // Direct video file
+            carouselHTML += `
+              <div class="carousel-item video-item ${isActive}">
+                <div class="video-container aspect-16-9">
+                  <video class="carousel-video" controls preload="metadata" controlsList="nodownload">
+                    <source src="${embedUrl}" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              </div>
+            `;
+          }
+          mediaItems.push({ type: 'video', url: mediaUrl, embedUrl, index: slideIndex });
+          slideIndex++;
+        } else {
+        }
+      } else {
+        // Regular image
+        const imageUrl = mediaUrl.includes('?') ? `${mediaUrl}&width=400&optimize=high&quality=80&auto=webp` : `${mediaUrl}?width=400&optimize=high&quality=80&auto=webp`;
+        carouselHTML += `
+          <div class="carousel-item image-item ${isActive}">
+            <img class="d-block w-100 carousel-image" src="${imageUrl}" 
+                 alt="${currentStory.title || 'Story image'} - Slide ${slideIndex + 1}">
+          </div>
+        `;
+        mediaItems.push({ type: 'image', url: mediaUrl, index: slideIndex });
+        slideIndex++;
+      }
+    });
+
+
+    // Insert generated HTML
+    carouselInner.innerHTML = carouselHTML;
+    
+    // Only show indicators if there are multiple items
+    if (mediaItems.length > 1) {
+      carouselIndicators.innerHTML = indicatorsHTML;
+      carouselIndicators.style.display = 'flex'; // Ensure indicators are visible
+    } else {
+      carouselIndicators.innerHTML = '';
+      carouselIndicators.style.display = 'none'; // Hide indicators for single item
+    }
+    
+    
+    // Add navigation controls if there are multiple items
+    if (mediaItems.length > 1) {
+      const navigationHTML = `
+        <button class="carousel-control-prev" type="button" data-bs-target="#storyImageCarousel" data-bs-slide="prev" aria-label="Previous slide">
+          <span class="carousel-control-prev-icon p-1" aria-hidden="true">
+            <i class="bi bi-chevron-left" style="color: #575757; font-size: 1.5rem;"></i>
+          </span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#storyImageCarousel" data-bs-slide="next" aria-label="Next slide">
+          <span class="carousel-control-next-icon p-1" aria-hidden="true">
+            <i class="bi bi-chevron-right" style="color: #575757; font-size: 1.5rem;"></i>
+          </span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      `;
+      carouselInner.insertAdjacentHTML('afterend', navigationHTML);
+    }
+    
+    // Store media items for later reference
+    carouselContainer.mediaItems = mediaItems;
+    
+  }
+
+
+  
+
+  // Function to escape HTML (Define if not already available globally)
+  function escapeHtml(unsafe) {
+      if (!unsafe) return '';
+      return unsafe
+           .replace(/&/g, "&amp;")
+           .replace(/</g, "&lt;")
+           .replace(/>/g, "&gt;")
+           .replace(/"/g, "&quot;")
+           .replace(/'/g, "&#039;");
+  }
+
+  // Function to format a date in a human-readable time-ago format
+  function formatTimeAgo(dateString) {
+    if (!dateString) return '';
+    
+    try {
+      let date;
+      
+      // Check if dateString is already in ISO format (includes 'T' and ends with 'Z' or timezone)
+      if (dateString.includes('T') && (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-'))) {
+        // ISO format with timezone info - parse directly
+        date = new Date(dateString);
+      } else {
+        // Legacy format without timezone - treat as UTC
+        date = new Date(dateString + ' UTC');
+      }
+      
+      // Validate the date
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date');
+      }
+      
+      const now = new Date();
+      const diffInMilliseconds = now - date;
+      const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+      const diffInMinutes = Math.floor(diffInSeconds / 60);
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      const diffInDays = Math.floor(diffInHours / 24);
+      const diffInMonths = Math.floor(diffInDays / 30);
+      const diffInYears = Math.floor(diffInDays / 365);
+      
+      if (diffInSeconds < 60) {
+        return diffInSeconds <= 1 ? 'just now' : `${diffInSeconds}s ago`;
+      } else if (diffInMinutes < 60) {
+        return `${diffInMinutes}m ago`;
+      } else if (diffInHours < 24) {
+        return `${diffInHours}h ago`;
+      } else if (diffInDays < 30) {
+        return `${diffInDays}d ago`;
+      } else if (diffInMonths < 12) {
+        return `${diffInMonths}mo ago`;
+      } else {
+        return `${diffInYears}y ago`;
+      }
+    } catch (error) {
+      console.error('Error formatting time:', error, 'Input:', dateString);
+      return '';
+    }
+  }
+
+  // Function to get author details (fetches if not in cache)
+  async function getCommentAuthorDetails(authorId) {
+    if (authorCache[authorId]) {
+      return authorCache[authorId];
+    }
+    if (!authorId) {
+        return { name: "Unknown User", avatar: "https://placehold.co/100x100?text=?" };
+    }
+    try {
+      const userResponse = await window.getUserProfile(authorId);
+      if (!userResponse) throw new Error(`Failed to fetch user ${authorId}`);
+      const userData = userResponse.data[0];
+      const authorDetails = {
+        name: userData?.first_name && userData?.last_name ? `${userData?.first_name} ${userData?.last_name}` : "User",
+        avatar: userData?.profile_image ? typeof userData?.profile_image === 'string' ? userData?.profile_image : userData?.profile_image?.data[0]?.url : "https://placehold.co/100x100?text=User"
+      };
+      authorCache[authorId] = authorDetails;
+      return authorDetails;
+    } catch (error) {
+      console.error("Error getting comment author info:", error);
+      return { name: "User", avatar: "https://placehold.co/100x100?text=User" };
+    }
+  }
+
+  // Function to generate HTML for a single comment
+  function generateCommentHtml(comment, authorDetails) {
+      const commentTimeAgo = comment.createdAt ? formatTimeAgo(comment.createdAt) : "";
+      return `
+        <div class="comment-container" data-comment-id="${comment.zuid || comment.tempId || ''}">
+          <img src="${authorDetails.avatar}?width=100" alt="${authorDetails.name}" class="comment-avatar">
+          <div class="comment-content">
+            <div class="comment-header">
+              <p class="comment-author">${escapeHtml(authorDetails.name)}</p>
+              <span class="comment-time">${commentTimeAgo}</span>
+               <button class="comment-options-btn" onclick="event.stopPropagation(); /* TODO: Implement options */" aria-label="Comment options">
+                 <i class="bi bi-three-dots"></i>
+               </button>
+            </div>
+            <p class="comment-text">${escapeHtml(comment.content)}</p>
+          </div>
+        </div>
+      `;
+  }
+
+  // Helper function to load all comments for a story
+  async function loadAllComments(storyZuid) {
+       // Use reactive query data instead of manual API call
+       const result = storyCommentsQuery.getCurrentResult();
+       
+       if (result.isError) {
+           throw new Error("Failed to load comments");
+       }
+       
+       const allComments = result.data?.data || [];
+       if (allComments.length === 0) {
+            return '';
+       }
+       
+       allComments.sort((a, b) => (new Date(b.createdAt || 0)) - (new Date(a.createdAt || 0)));
+       const authorIds = [...new Set(allComments.map(c => c.authorId).filter(id => id))];
+       const authorDetailsMap = new Map();
+       await Promise.all(authorIds.map(async (id) => {
+           const details = await getCommentAuthorDetails(id);
+           authorDetailsMap.set(id, details);
+       }));
+       let allCommentsHtml = '';
+       for (const comment of allComments) {
+           const authorDetails = authorDetailsMap.get(comment.authorId) || await getCommentAuthorDetails(null);
+           allCommentsHtml += generateCommentHtml(comment, authorDetails);
+       }
+       return allCommentsHtml;
+  }
+
+  // Function to toggle the display of all comments
+  async function toggleAllComments(storyZuid, buttonElement, event) {
+      event.preventDefault();
+      event.stopPropagation();
+      const button = $(buttonElement);
+      const storyCard = button.closest('.card'); // Adjusted selector for story page structure
+      const commentsSection = storyCard.find(`#comments-${storyZuid}`);
+      const latestCommentContainer = commentsSection.find('.latest-comment-container');
+      const allCommentsContainer = commentsSection.find('.all-comments-container');
+      const isLoaded = button.data('loaded') === true;
+      const currentlyExpanded = allCommentsContainer.is(':visible');
+      const totalCount = parseInt(button.data('count') || '0', 10);
+
+      if (!isLoaded) {
+          button.html('<div class="comments-loading" style="width:100%; text-align:left; padding: 0;"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...</div>').prop('disabled', true);
+          try {
+              const allCommentsHtml = await loadAllComments(storyZuid);
+              if (allCommentsHtml) {
+                 allCommentsContainer.html(allCommentsHtml);
+              } else {
+                 allCommentsContainer.html('<div class="text-center text-muted p-3">No comments found.</div>');
+              }
+              allCommentsContainer.show();
+              latestCommentContainer.hide();
+              button.html(`<i class="bi bi-chevron-down"></i> Hide Comments`).addClass('expanded').data('loaded', true).prop('disabled', false);
+          } catch (error) {
+              console.error(`Error loading all comments for story ${storyZuid}:`, error);
+              allCommentsContainer.html('<div class="text-center text-danger p-3">Could not load comments.</div>').show();
+              latestCommentContainer.hide();
+              button.html(`<i class="bi bi-chevron-down"></i> View All ${totalCount} Comments`).removeClass('expanded').prop('disabled', false);
+          }
+      } else {
+          if (currentlyExpanded) {
+              allCommentsContainer.hide();
+              latestCommentContainer.show();
+              button.html(`<i class="bi bi-chevron-down"></i> View All ${totalCount} Comments`).removeClass('expanded');
+          } else {
+              allCommentsContainer.show();
+              latestCommentContainer.hide();
+              button.html(`<i class="bi bi-chevron-down"></i> Hide Comments`).addClass('expanded');
+          }
+      }
+  }
+
+  // Update the handleCommentSubmit function
+  async function handleCommentSubmit(storyZuid, inputElement, event) {
+     event.preventDefault();
+     event.stopPropagation();
+     const commentText = inputElement.value.trim();
+     if (!commentText) return;
+     const storyCard = $(inputElement).closest('.card'); // Adjusted selector
+     const commentsSection = storyCard.find(`#comments-${storyZuid}`);
+     const allCommentsContainer = commentsSection.find('.all-comments-container');
+     const latestCommentContainer = commentsSection.find('.latest-comment-container');
+     const toggleButton = commentsSection.find('.toggle-comments-btn');
+     const mainCommentButton = storyCard.find('.action-btn').filter((i, btn) => $(btn).find('.bi-chat').length > 0);
+
+     // Check if user is logged in *before* clearing input
+     const currentUser = JSON.parse(localStorage.getItem("user")); // Re-check authUser just in case
+     if (!currentUser) {
+        // Ensure the modal exists and show it
+        const loginModalElement = document.getElementById('storyActionLoginPromptModal'); 
+        if (loginModalElement) {
+            loginModalElement.setAttribute('data-action-type', 'comment'); // Set action type
+            const loginModal = new bootstrap.Modal(loginModalElement);
+            loginModal.show();
+        } else {
+            console.error("Login prompt modal element not found.");
+            alert("Please log in to comment."); // Fallback alert
+        }
+        return; // Stop execution if not logged in
+     }
+
+     inputElement.value = ''; // Clear input only if logged in
+     
+     const tempCommentId = `temp-${Date.now()}`;
+     const authorDetails = { name: `${currentUser.firstName || ''} ${currentUser.lastName || ''}`, avatar: currentUser.profilePhoto || 'https://placehold.co/100x100?text=User' };
+     const newCommentHtml = $(generateCommentHtml({ content: commentText, createdAt: new Date().toISOString(), authorId: currentUser.zuid, tempId: tempCommentId }, authorDetails))
+                             .attr('data-comment-id', tempCommentId);
+
+     latestCommentContainer.html(newCommentHtml.clone());
+     commentsSection.show().attr('data-visible', 'true');
+     latestCommentContainer.show();
+
+     const commentsLoaded = toggleButton.data('loaded') === true;
+     if (commentsLoaded) {
+         allCommentsContainer.prepend(newCommentHtml.clone());
+     }
+
+     const currentlyExpanded = allCommentsContainer.is(':visible');
+     if (currentlyExpanded) {
+         allCommentsContainer.hide();
+         toggleButton.removeClass('expanded');
+     }
+
+     const mainButtonText = $('#comment-count-text').text().trim(); // Get count from dedicated span
+     const countMatch = mainButtonText.match(/\d+/);
+     const currentCount = countMatch ? parseInt(countMatch[0], 10) : 0;
+     const newCount = currentCount + 1;
+     $('#comment-count-text').text(newCount); // Update count span
+
+     if (newCount > 1) {
+         const existingToggleButton = commentsSection.find('.toggle-comments-btn');
+         if (existingToggleButton.length === 0) {
+             const newToggleButtonHtml = `
+                <button class="toggle-comments-btn" data-loaded="${commentsLoaded}" data-count="${newCount}" onclick="window.toggleAllComments('${storyZuid}', this, event)">
+                  <i class="bi bi-chevron-down"></i> View All ${newCount} Comments
+                </button>
+             `;
+             allCommentsContainer.after(newToggleButtonHtml);
+         } else {
+             existingToggleButton.data('count', newCount);
+             existingToggleButton.html(`<i class="bi bi-chevron-down"></i> View All ${newCount} Comments`).removeClass('expanded');
+         }
+     } else {
+          commentsSection.find('.toggle-comments-btn').remove();
+     }
+
+     // Use TanStack Query mutation for posting comment
+     const commentData = { authorId: currentUser.zuid, storyId: storyZuid, content: commentText, createdAt: new Date().toISOString() };
+     
+     postCommentMutation.mutate(
+       { storyZuid, commentData },
+       {
+         onSuccess: (response) => {
+           const realZuid = response?.data?.zuid;
+           if (realZuid) {
+             storyCard.find(`.comment-container[data-comment-id="${tempCommentId}"]`).attr('data-comment-zuid', realZuid);
+           }
+           if (commentsLoaded) {
+             const btn = commentsSection.find('.toggle-comments-btn');
+             if(btn.length) btn.data('loaded', false); // Invalidate load state
+           }
+           // Query will automatically refetch comments via invalidation
+         },
+         onError: (error) => {
+           console.error("Error posting comment:", error);
+           alert('Failed to post comment. Please try again.');
+           // Revert optimistic UI
+           storyCard.find(`.comment-container[data-comment-id="${tempCommentId}"]`).remove();
+           $('#comment-count-text').text(currentCount > 0 ? currentCount : 'Comment');
+           if(latestCommentContainer.find(`.comment-container[data-comment-id="${tempCommentId}"]`).length) {
+             latestCommentContainer.empty();
+             if(currentCount === 0) commentsSection.hide().attr('data-visible', 'false');
+           }
+           const toggleButtonAfterFailedAttempt = commentsSection.find('.toggle-comments-btn');
+           if (currentCount === 1 && newCount === 2) {
+             toggleButtonAfterFailedAttempt.remove();
+           } else if (currentCount > 1) {
+             toggleButtonAfterFailedAttempt.data('count', currentCount);
+             toggleButtonAfterFailedAttempt.html(`<i class="bi bi-chevron-down"></i> View All ${currentCount} Comments`).removeClass('expanded');
+           }
+           allCommentsContainer.hide();
+         }
+       }
+     );
+   }
+
+  // Function to handle story share button clicks
+  async function handleStoryShareClick(storyZuid, event) {
+    // Prevent event bubbling to parent elements
+    if (event) event.stopPropagation();
+    
+    // Use TanStack Query mutation for share tracking
+    updateStorySharesMutation.mutate(storyZuid, {
+      onError: (error) => {
+        console.error("Error updating story shares:", error);
+        // Continue with modal opening even if share count update fails
+      }
+    });
+    
+    // The modal will be opened by the data-bs-toggle attribute
+  }
+
+  // Function to handle story donate button clicks
+  async function handleStoryDonateClick(npoZuid, donateLink, event) {
+    // Prevent event bubbling to parent elements
+    event.stopPropagation();
+    
+    // Use TanStack Query mutation for donate click tracking
+    if (npoZuid) {
+      clickNpoDonateMutation.mutate(npoZuid, {
+        onError: (error) => {
+          console.error("Error updating NPO donate clicks:", error);
+          // Continue with donation link opening even if click count update fails
+        }
+      });
+    }
+    
+    // Open donation link if available
+    if (donateLink) {
+      window.open(donateLink, '_blank');
+    }
+  }
+
+  // Simplified toggleCommentSection - just shows/hides the main container
+  function toggleCommentSection(storyZuid, event) {
+    event.stopPropagation();
+    const commentsSection = $(`#comments-${storyZuid}`);
+    if (commentsSection.is(':visible')) {
+      commentsSection.hide().attr('data-visible', 'false');
+    } else {
+      commentsSection.show().attr('data-visible', 'true');
+      commentsSection.find('.comment-input').focus();
+    }
+  }
+  
+  // Function to track story view
+  async function trackStoryView() {
+    try {
+      // Check if user is logged in
+      const user = await new Promise((resolve) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+          unsubscribe();
+          resolve(user);
+        });
+      });
+
+      // Only track view if user is logged in
+      if (user) {
+        updateStoryViewsMutation.mutate(storyZuid, {
+          onError: (error) => {
+            console.error("Error tracking story view:", error);
+            // Don't throw error - view tracking failure shouldn't break the page
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error tracking story view:", error);
+      // Don't throw error - view tracking failure shouldn't break the page
+    }
+  }
+
+  // Function to initialize the comment section state on page load
+  async function initializeCommentSection(storyZuid) {
+      const commentsSection = $(`#comments-${storyZuid}`);
+      const latestCommentContainer = commentsSection.find('.latest-comment-container');
+      const allCommentsContainer = commentsSection.find('.all-comments-container');
+      const mainCommentButtonText = $('#comment-count-text'); // Target the span
+      
+      // Use reactive query data instead of manual API call
+      const result = storyCommentsQuery.getCurrentResult();
+      
+      if (result.isLoading) {
+          mainCommentButtonText.text('Comment');
+          return;
+      }
+      
+      if (result.isError) {
+          console.error("Error initializing comment section:", result.error);
+          mainCommentButtonText.text('Comment');
+          latestCommentContainer.html('<p class="text-danger p-3">Could not load comments.</p>').show();
+          commentsSection.show().attr('data-visible', 'true');
+          return;
+      }
+      
+      try {
+          const currentUser = JSON.parse(localStorage.getItem("user"));
+          const storyComments = result.data?.data || [];
+          const commentCount = storyComments.length;
+          const commentedByCurrentUser = storyComments.some(comment => comment.authorId === currentUser?.zuid);
+
+          const commentButton = $("#comment-button");
+          commentButton.html(`<i class="${commentedByCurrentUser ? 'bi bi-chat-fill text-primary' : 'bi bi-chat'}"></i> ${commentCount > 0 ? commentCount.toString() : 'Comment'}`);
+          
+          // Update main comment button text
+          mainCommentButtonText.text(commentCount > 0 ? commentCount.toString() : 'Comment');
+      
+          // Only render the section details if user is logged in; keep hidden otherwise
+          if (commentCount > 0) {
+              if (currentUser) {
+                  commentsSection.show().attr('data-visible', 'true');
+              } else {
+                  commentsSection.hide().attr('data-visible', 'false');
+              }
+
+              // Sort to find the latest comment
+              const sortedComments = [...storyComments].sort((a, b) => (new Date(b.createdAt || 0)) - (new Date(a.createdAt || 0)));
+              const latestComment = sortedComments[0];
+              
+              if (latestComment) {
+                  const authorDetails = await getCommentAuthorDetails(latestComment.authorId);
+                  const latestCommentHtml = generateCommentHtml(latestComment, authorDetails);
+                  latestCommentContainer.html(latestCommentHtml).show();
+              }
+              
+              // Add toggle button if needed
+              if (commentCount > 1 && currentUser) {
+                  const toggleButtonHtml = `
+                     <button class="toggle-comments-btn" data-loaded="false" data-count="${commentCount}" onclick="window.toggleAllComments('${storyZuid}', this, event)">
+                       <i class="bi bi-chevron-down"></i> View All ${commentCount} Comments
+                     </button>
+                  `;
+                  allCommentsContainer.after(toggleButtonHtml); // Append button after the container
+              }
+          } else {
+             // Ensure section is hidden if no comments
+             commentsSection.hide().attr('data-visible', 'false'); 
+             latestCommentContainer.empty().hide();
+             allCommentsContainer.empty().hide();
+             commentsSection.find('.toggle-comments-btn').remove(); 
+          }
+          
+      } catch (error) {
+          console.error("Error initializing comment section:", error);
+          mainCommentButtonText.text('Comment');
+      }
+  }
+  // === END Comment Functionality JS ===
+
+
+
+  $(document).ready(async function () {
+    // Skeleton is already visible in HTML, just load data
+    // Load story data from API
+    await loadStoryData();
+    // Track story view when page loads
+    await trackStoryView();
+    
     // Back button functionality
     $(".back-btn").click(function () {
       window.history.back();
     });
+
+    // Note: Story content cleaning is now handled by processStoryContentForDisplay() 
+    // in initializeStoryDependentComponents() when API data is loaded
 
     // Restructure paragraphs with embedded images
     $(".story-container p span").each(function () {
@@ -341,5 +2224,374 @@
         $span.closest("p").remove();
       }
     });
+    
+    // Convert story date to time ago format - will be updated when story data loads
+    // This is handled in initializeStoryDependentComponents after API data is loaded
+    
+    // Handle image aspect ratio for story images
+    function handleImageAspectRatio() {
+      // Process the main story image
+      $('.card-img-bottom').each(function() {
+        const img = $(this);
+        
+        // Create a new Image object to get the natural dimensions
+        const tempImg = new Image();
+        tempImg.src = img.attr('src');
+        
+        // When the image loads, calculate aspect ratio and apply appropriate styling
+        tempImg.onload = function() {
+          const aspectRatio = this.width / this.height;
+          
+          // Remove any previously applied classes
+          img.removeClass('card-img-wide card-img-tall');
+          
+          if (aspectRatio > 2) {
+            // Very wide image
+            img.addClass('card-img-wide');
+          } else if (aspectRatio < 0.8) {
+            // Very tall image
+            img.addClass('card-img-tall');
+          }
+          // Normal aspect ratio (0.8-2) uses default styling
+        };
+      });
+      
+      // Also handle images within the story content
+      $('.story-container img').each(function() {
+        const img = $(this);
+        
+        // Create a new Image object to get the natural dimensions
+        const tempImg = new Image();
+        tempImg.src = img.attr('src');
+        
+        // When the image loads, calculate aspect ratio and apply appropriate styling
+        tempImg.onload = function() {
+          const aspectRatio = this.width / this.height;
+          
+          // Remove any previously applied classes
+          img.removeClass('card-img-wide card-img-tall');
+          
+          if (aspectRatio > 2) {
+            // Very wide image
+            img.css({
+              'height': '400px',
+              'object-fit': 'contain',
+              'background-color': '#F5F7FA',
+              'width': '100%'
+            });
+          } else if (aspectRatio < 0.8) {
+            // Very tall image
+            img.css({
+              'max-height': '800px',
+              'object-fit': 'contain',
+              'background-color': '#F5F7FA',
+              'width': '100%'
+            });
+          } else {
+            // Normal aspect ratio (0.8-2)
+            img.css({
+              'width': '100%',
+              'object-fit': 'cover'
+            });
+          }
+        };
+      });
+    }
+    
+    // Add width parameter to images
+    function addWidthParamToImages() {
+      // Process card images - set width to 800px
+      $('.card-img-bottom').each(function() {
+        const img = $(this);
+        const src = img.attr('src');
+        
+        if (src && src.includes('https://4xxglxlj.media.zestyio.com')) {
+          if (src.includes('?')) {
+            if (!src.includes('width=')) {
+              img.attr('src', src + '&width=400&optimize=high&quality=80&auto=webp');
+            }
+          } else {
+            img.attr('src', src + '?width=400&optimize=high&quality=80&auto=webp');
+          }
+        }
+      });
+      
+      // Process background images in hero section
+      const heroStyle = $('.hero').css('background-image');
+      if (heroStyle && heroStyle !== 'none' && heroStyle.includes('https://4xxglxlj.media.zesty.io')) {
+        let url = heroStyle.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
+        
+        if (url.includes('?')) {
+          if (!url.includes('width=')) {
+            url = url + '&width=400&optimize=high&quality=80&auto=webp';
+          }
+        } else {
+          url = url + '?width=400&optimize=high&quality=80&auto=webp';
+        }
+        
+        $('.hero').css('background-image', `url('${url}')`);
+      }
+      
+      // Process profile and other images - set width to 600px
+      $('.author-img, .npo-logo').each(function() {
+        const img = $(this);
+        const src = img.attr('src');
+        
+        if (src && src.includes('https://4xxglxlj.media.zestyio.com')) {
+          if (src.includes('?')) {
+            if (!src.includes('width=')) {
+              img.attr('src', src + '&width=48&optimize=high&quality=80&auto=webp');
+            }
+          } else {
+            img.attr('src', src + '?width=48&optimize=high&quality=80&auto=webp');
+          }
+        }
+      });
+      
+      // Process background images in cards
+      $('.card').each(function() {
+        const card = $(this);
+        const bgImage = card.css('background-image');
+        
+        if (bgImage && bgImage !== 'none' && bgImage.includes('https://4xxglxlj.media.zestyio.com')) {
+          let url = bgImage.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
+          
+          if (url.includes('?')) {
+            if (!url.includes('width=')) {
+              url = url + '&width=600&optimize=high&quality=80&auto=webp';
+            }
+          } else {
+            url = url + '?width=600&optimize=high&quality=80&auto=webp';
+          }
+          
+          card.css('background-image', `url('${url}')`);
+        }
+      });
+      
+      // Process carousel images - set width to 800px
+      $('.carousel-image').each(function() {
+        const img = $(this);
+        const src = img.attr('src');
+        
+        if (src && src.includes('https://4xxglxlj.media.zestyio.com')) {
+          if (src.includes('?')) {
+            if (!src.includes('width=')) {
+              img.attr('src', src + '&width=400&optimize=high&quality=80&auto=webp');
+            }
+          } else {
+            img.attr('src', src + '?width=400&optimize=high&quality=80&auto=webp');
+          }
+        }
+      });
+    }
+    
+    // Run the functions when document is ready
+    addWidthParamToImages();
+    
+    // Run the aspect ratio handler after images have been loaded
+    // Use a small timeout to ensure images have started loading
+    setTimeout(handleImageAspectRatio, 100);
+    
+    // Function to initialize carousel with navigation behavior
+    function initializeStoryCarousel() {
+      const carousel = $('#storyImageCarousel');
+      
+      // Only run if carousel exists
+      if (!carousel.length) return;
+      
+      // Wait a moment for the carousel content to be generated
+      setTimeout(() => {
+        const totalSlides = carousel.find('.carousel-item').length;
+        
+        if (totalSlides === 0) return;
+        
+        // Initialize Bootstrap carousel with touch support
+        const carouselInstance = new bootstrap.Carousel(carousel[0], {
+          interval: false, // Don't auto-rotate
+          touch: true,     // Enable touch swiping
+          wrap: false      // Don't loop back to the beginning
+        });
+        
+        // Set up navigation arrows based on slide count and position
+        carousel.on('slide.bs.carousel', function(e) {
+          const currentIndex = e.to;
+          const prevControl = carousel.find('.carousel-control-prev');
+          const nextControl = carousel.find('.carousel-control-next');
+          
+          // Show/hide navigation arrows based on position
+          if (totalSlides <= 1) {
+            // Hide both arrows if only one item
+            prevControl.hide();
+            nextControl.hide();
+          } else if (currentIndex === 0) {
+            // First item - hide prev, show next
+            prevControl.hide();
+            nextControl.show();
+          } else if (currentIndex === totalSlides - 1) {
+            // Last item - show prev, hide next
+            prevControl.show();
+            nextControl.hide();
+          } else {
+            // Middle items - show both
+            prevControl.show();
+            nextControl.show();
+          }
+        });
+        
+        // Set initial arrow visibility
+        if (totalSlides <= 1) {
+          carousel.find('.carousel-control-prev, .carousel-control-next').hide();
+        } else {
+          // On the first slide, hide the prev button
+          carousel.find('.carousel-control-prev').hide();
+        }
+        
+        // Prevent event propagation when clicking carousel controls
+        carousel.find('.carousel-control-prev, .carousel-control-next').on('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        });
+        
+        // Handle video pause when sliding away from video slides
+        carousel.on('slide.bs.carousel', function(e) {
+          const fromSlide = carousel.find('.carousel-item').eq(e.from);
+          const video = fromSlide.find('video')[0];
+          if (video && !video.paused) {
+            video.pause();
+          }
+        });
+      }, 100);
+    }
+    
+    // Ensure hidden active story element exists and is updated with storyZuid
+    const $activeStoryEl = $('#active-story');
+    if ($activeStoryEl.length === 0) {
+      $('body').append('<div id="active-story" style="display:none;"></div>');
+    }
+    $('#active-story').attr('data-zuid', storyZuid);
+
+    // Ensure comments container id matches dynamic storyZuid
+    const $commentsPlaceholder = $('#comments-placeholder');
+    if ($commentsPlaceholder.length) {
+      $commentsPlaceholder.attr('id', `comments-${storyZuid}`);
+    }
+    
+    // Initialize the comment section
+    initializeCommentSection(storyZuid);
+    
+    // Extract and display hashtags immediately (for template data)
+    displayExtractedHashtags();
+    
+    // --- START Conditional Edit Button Visibility ---
+    const loggedInUser = JSON.parse(localStorage.getItem("user"));
+    // Use storyAuthorZuid which is updated from API data
+    if (loggedInUser && loggedInUser.zuid && storyAuthorZuid && loggedInUser.zuid === storyAuthorZuid) {
+      $('#edit-story-button').removeClass('d-none');
+    }
+    // --- END Conditional Edit Button Visibility ---
+    
+    // Like button initialization is now handled in initializeStoryDependentComponents
+    
+    // --- START Edit Story Functionality ---
+    const updateStoryModalElement = document.getElementById('updateStoryModal');
+    let updateStoryModalInstance = null;
+    if (updateStoryModalElement) {
+      updateStoryModalInstance = new bootstrap.Modal(updateStoryModalElement);
+    }
+
+    $('#edit-story-button').on('click', function() {
+      // Use API data instead of DOM elements
+      if (!currentStory) {
+        alert('Story data not available for editing.');
+        return;
+      }
+
+      const currentTitle = currentStory.title || '';
+      const currentBodyHTML = currentStory.story_body || '';
+      
+      // Convert HTML content to plain text suitable for textarea editing
+      const currentBodyText = htmlToPlainText(currentBodyHTML);
+
+      $('#editStoryZuid').val(storyZuid);
+      $('#editStoryTitle').val(currentTitle);
+      $('#editStoryBody').val(currentBodyText); 
+      
+      if (updateStoryModalInstance) {
+        updateStoryModalInstance.show();
+      }
+    });
+
+    $('#saveStoryChanges').on('click', async function() {
+      const storyZuid = $('#editStoryZuid').val();
+      const newTitle = $('#editStoryTitle').val();
+      const newBodyText = $('#editStoryBody').val(); // Text from textarea
+
+      // Convert plain text from textarea back to HTML
+      // First escape HTML characters from user input to prevent XSS
+      let newBodyHTML = newBodyText.replace(/&/g, "&amp;")
+                                 .replace(/</g, "&lt;")
+                                 .replace(/>/g, "&gt;")
+                                 .replace(/"/g, "&quot;")
+                                 .replace(/'/g, "&#039;");
+      
+      // Then convert actual newlines to <br /> tags
+      newBodyHTML = newBodyHTML.replace(/\n/g, '<br />');
+
+
+      if (!newTitle.trim() || !newBodyText.trim()) {
+        alert('Title and Story body cannot be empty.');
+        return;
+      }
+
+      const $saveButton = $(this);
+      
+      // Add some loading indicator to the save button
+      $saveButton.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
+
+      const currentApprovalStatus = currentStory?.npo_approval_status || '';
+      const updateData = { 
+        title: newTitle, 
+        story_body: newBodyHTML, 
+        ...(currentApprovalStatus === 'changes_requested' ? { npo_approval_status: 'pending' } : {}) 
+      };
+
+      // Use TanStack Query mutation for updating story
+      updateStoryMutation.mutate(
+        { zuid: storyZuid, data: updateData },
+        {
+          onSuccess: (response) => {
+            // Update the story display on the page
+            $('.story-title').text(newTitle);
+            $('.story-container.text-muted').html(newBodyHTML);
+            
+            // Re-extract hashtags from the updated content
+            displayExtractedHashtags();
+            
+            if (updateStoryModalInstance) {
+              updateStoryModalInstance.hide();
+            }
+            
+            // Query will automatically refetch story data via invalidation
+            $saveButton.prop('disabled', false).html('Save Changes');
+          },
+          onError: (error) => {
+            console.error('Error updating story:', error);
+            alert('An error occurred while updating the story. Please try again.');
+            $saveButton.prop('disabled', false).html('Save Changes');
+          }
+        }
+      );
+    });
+    // --- END Edit Story Functionality ---
+
   });
+  
+  // Export functions to window for global access from onclick handlers
+  window.handleStoryShareClick = handleStoryShareClick;
+  window.handleStoryDonateClick = handleStoryDonateClick;
+  window.toggleCommentSection = toggleCommentSection;
+  window.handleCommentSubmit = handleCommentSubmit;
+  window.toggleAllComments = toggleAllComments;
 </script>
+

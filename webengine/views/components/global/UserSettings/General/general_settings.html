@@ -130,7 +130,7 @@
   </div>
 </div>
 
-<script>
+<script type="module"> 
   $(document).ready(function () {
     // Hide all content sections initially except regionalPreferences
     $("#themeOptions").hide();
@@ -168,8 +168,6 @@
         timeFormat: $("#timeFormat").val(),
         dateFormat: $("#dateFormat").val(),
       };
-      // console.log("Regional preferences:", formData);
-      // Add your form submission logic here
     });
   });
 </script>

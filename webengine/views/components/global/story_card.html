@@ -78,7 +78,7 @@
 </style>
 
 <div class="card d-flex flex-column h-100 p-3 gap-2 story-card">
-  <img src="{{ story.story_image.getImage() }}" class="story-image" />
+  <img src="{{ story.story_image.getImage() }}?width=150" class="story-image" alt="Story image" />
   <div class="d-flex flex-column gap-2 h-100">
     <div class="d-flex align-items-end gap-2">
       {{ $related_npo = {story.related_npos} }}
@@ -87,6 +87,7 @@
       <img
         src="{{ npo.logo.getImage('w_24,h_24,c_fill') }}"
         class="story-npo-logo"
+        alt="NPO logo"
       />
       <p class="npo-name my-auto">{{ npo.name }}</p>
       {{/each}}

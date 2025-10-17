@@ -110,8 +110,9 @@
           <div class="col-2 d-flex justify-content-start align-items-center">
             <img
               src="{{ globals.logo.getImage() }}"
-              style="max-width: 160px"
+              style="max-width: 160px; object-fit: contain"
               alt="cause circle brand logo"
+              class="img-fluid"
             />
           </div>
           <div class="col-8 d-flex justify-content-center align-items-center">
@@ -159,19 +160,19 @@
   </div>
 </div>
 
-<script>
-  const selectionHeaderTexts = [
+<script type="module">
+  const selectionHeaderTextsForClaimListing = [
     {
       title: "Verify Your Nonprofit",
       description:
-        "To ensure you’re the rightful representative, please verify your identity.",
-      icon: "https://4xxglxlj.media.zestyio.com/verify.png",
+        "To claim your listing for the nonprofit {{this.name}}, please verify your identity. This ensures that only authorized representatives can manage the nonprofit's profile.",
+      icon: "{{this.logo.getImage()}}",
     },
     {
       title: "Claim Pending!",
       description:
         "Your listing claim has been submitted and is under review. You will receive a confirmation email once it's approved.",
-      icon: "https://4xxglxlj.media.zestyio.com/clock.png",
+      icon: "{{this.logo.getImage()}}",
     },
   ];
 
@@ -195,7 +196,7 @@
       $(`#${getSectionId(step)}`).removeClass("d-none");
 
       // Update section content
-      const content = selectionHeaderTexts[step - 1];
+      const content = selectionHeaderTextsForClaimListing[step - 1];
       $(`#${getSectionId(step)} .section-title`).text(content.title);
       $(`#${getSectionId(step)} .section-description`).text(
         content.description
@@ -221,7 +222,6 @@
 
     // Handle back button clicks
     $(document).on("click", "#backBtn", function () {
-      // console.log("Back button clicked");
       $("#claimListingModal #nextBtn").prop("disabled", false);
       if (currentStep > 1) {
         currentStep--;
@@ -271,7 +271,6 @@
 
     // Log when the modal is shown
     $("#claimListingModal").on("shown.bs.modal", function () {
-      // console.log("Claim Listing Modal shown");
       resetModalStates();
     });
 
@@ -283,20 +282,29 @@
         try {
           // Get the current user
           const localUser = JSON.parse(localStorage.getItem("user"));
-          const zestyUser = await getZestyUser(localUser.zuid);
+          const userData = await window.getUserProfile(localUser.zuid);
+          const zestyUser = userData?.data[0];
 
           // Prepare form data
           const formData = {
-            First_Name: localUser.firstName,
-            Last_Name: localUser.lastName,
-            Email: localUser.email,
+            First_Name: localUser?.firstName,
+            Last_Name: localUser?.lastName,
+            Email: localUser?.email,
             Work_Email: $("#workEmail").val(),
             Company: $("#organizationName").val(),
             NPO_Multiple_Locations: $("#DecisionBox1").is(":checked"),
             NPO_ZUID: $("#npoZuid").val(),
             NPO_URL: window.location.href,
-            User_URL: `${window.location.origin}${zestyUser.user.web.path}`,
-            CC_User_ZUID: localUser.zuid,
+            User_URL: `${window.location.origin}${zestyUser?.meta?.web?.uri || ''}`,
+            CC_User_ZUID: localUser?.zuid,
+            Lead_Source: "Website",
+            Lead_Source_Detail: "CauseCircle Supporter",
+            Pick_List_14: "PENDING",
+            CC_User_Type: localUser?.userRole || "volunteer",
+            Inquiry_Reason: "CauseCircle",
+            Account_Status: "PENDING",
+            Agree_to_Terms_PP: $("#termsCheck").is(":checked"),
+            Listing_Claimed: true,
           };
 
           // Show loading state
@@ -325,11 +333,38 @@
 
           const result = await response.json();
 
+          // follow the npo
+          let currentFavorites = [];
+          let isCurrentlyFollowing = false;
+          
+          // Check if favorite_npos is a relationship object with data
+          if (zestyUser.favorite_npos?.data && Array.isArray(zestyUser.favorite_npos.data)) {
+            // Extract ZUIDs from the relationship data
+            currentFavorites = zestyUser.favorite_npos.data.map(npo => npo.meta.zuid);
+            isCurrentlyFollowing = currentFavorites.includes("{{this.zuid}}");
+          } 
+          // Fallback for legacy format (comma separated string)
+          else if (typeof zestyUser.favorite_npos === 'string') {
+            currentFavorites = zestyUser.favorite_npos.split(',').filter(zuid => zuid);
+            isCurrentlyFollowing = currentFavorites.includes("{{this.zuid}}");
+          }
+
+          // Toggle follow status
+          if (!isCurrentlyFollowing) {
+            // Add this NPO to favorites
+            currentFavorites.push("{{this.zuid}}");
+          }
+          
+          // Update user with only the changed field
+          await window.updateZestyUser(localUser.zuid, {
+            favorite_npos: currentFavorites.join(",")
+          });
+
           // Handle success
           const multipleLocations = $("#DecisionBox1").is(":checked");
           const redirectUrl = multipleLocations
-            ? "{{claim_listing_confirmation_page.first().path_full}}?multiplelocations=true"
-            : "{{claim_listing_confirmation_page.first().path_full}}";
+            ? "{{claim_listing_confirmation_page.first().path_full}}?multiplelocations=true&zuid={{this.zuid}}"
+            : "{{claim_listing_confirmation_page.first().path_full}}?zuid={{this.zuid}}";
 
           window.location.href = redirectUrl;
         } catch (error) {
@@ -348,7 +383,7 @@
   });
 </script>
 
-<script>
+<script type="module">
   $(document).ready(function () {
     const localUser = JSON.parse(localStorage.getItem("user"));
     const categorySearchInput = $("#categorySearchInput");
@@ -376,7 +411,7 @@
       const limit = searchTerm ? 20 : 100;
 
       $.ajax({
-        url: "https://causecircle.org/mobileapp/causes.json",
+        url: "{{ $base_url }}mobileapp/causes.json",
         method: "GET",
         data: {
           limit: limit,
@@ -429,13 +464,12 @@
     }
 
     function updateNextButtonState() {
-      const idUploadFile = $("#idUpload")[0].files[0];
-      const nonprofitDocsFile = $("#nonprofitDocsUpload")[0].files[0];
       const isFormValid = $("#profileInformationForm")[0].checkValidity();
-
-      $("#claimListingModal #nextBtn").prop(
+      const termsChecked = $("#termsCheck").is(":checked");
+      
+      $("#submitClaimBtn").prop(
         "disabled",
-        !(idUploadFile && nonprofitDocsFile && isFormValid)
+        !(isFormValid && termsChecked)
       );
     }
 
@@ -465,7 +499,7 @@
     });
 
     $("#idUpload, #nonprofitDocsUpload").on("change", updateNextButtonState);
-    $("#profileInformationForm input, #profileInformationForm select").on(
+    $("#profileInformationForm input, #profileInformationForm select, #termsCheck").on(
       "input change",
       updateNextButtonState
     );

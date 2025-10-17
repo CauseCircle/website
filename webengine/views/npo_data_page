@@ -222,7 +222,7 @@
   <div class="row d-none d-sm-flex mt-5">
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -243,7 +243,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -259,7 +259,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -373,7 +373,7 @@
           <input
             type="hidden"
             name="zf_redirect_url"
-            value="https://causecircle.org/about/confirmation-page/"
+            value="{{ $base_url }}about/confirmation-page/"
           /><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
           <input
             type="hidden"
@@ -462,7 +462,7 @@
   </div>
 </div>
 
-<script>
+<script type="module">
   function validateForm() {
     let isValid = true;
     let firstNameError = document.getElementById("firstNameError");

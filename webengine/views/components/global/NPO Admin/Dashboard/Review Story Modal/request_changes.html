@@ -89,7 +89,7 @@
   }
 </style>
 
-<script>
+<script type="module">
   function showRequestStep(stepNumber) {
     $(".request-step").addClass("d-none");
     $(`#requestStep${stepNumber}`).removeClass("d-none");
@@ -97,41 +97,18 @@
 
   async function submitChangeRequest() {
     const changeDetails = $("#changeDetails").val().trim();
-    const submitButton = $("#submitChanges");
-    const icon = submitButton.find(".bi");
-    const spinner = submitButton.find(".spinner-border");
 
     if (!changeDetails) {
       alert("Please describe what changes are needed.");
       return;
     }
 
-    const storyZuid = $("#active-story").data("zuid");
-
     try {
-      // Show loading state
-      submitButton.prop("disabled", true);
-      icon.addClass("d-none");
-      spinner.removeClass("d-none");
-
+      // handleStoryAction now handles showing loading states, updating the modal, and closing it
       await handleStoryAction("changes_requested", changeDetails);
-      showRequestStep(2);
-
-      // Auto close after 3 seconds
-      setTimeout(() => {
-        $("#requestChangesModal").modal("hide");
-        showRequestStep(1);
-        // Reset form
-        $("#changeDetails").val("");
-      }, 5000);
     } catch (error) {
       console.error("Error submitting change request:", error);
       alert("Failed to submit change request. Please try again.");
-    } finally {
-      // Reset button state
-      submitButton.prop("disabled", false);
-      icon.removeClass("d-none");
-      spinner.addClass("d-none");
     }
   }
 

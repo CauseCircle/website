@@ -44,15 +44,14 @@
             "article": "{{article.article.escapeForJS()}}",
             "thumbnail_image": "{{article.thumbnail_image.getImage()}}",
             "hero_image": "{{article.hero_image.getImage()}}",
-            "date": "{{article.date.date(F Y)}}",
+            "date": "{{article.date.date(d F Y)}}",
             "author": "{{article.author}}",
-            "tags": "{{article.tags}}",
+            "tags": "{{blog_tags.filter({article.tags}).tag}}",
             "category": "{{article.category}}",
             "related_articles": "{{article.related_articles}}",
             "index": "{{article._index}}",
             "zuid": "{{z.zuid}}",
             "href": "{{article.path_full}}"
-
         }{{npo._arraycomma}}
         {{/each}}
     ],

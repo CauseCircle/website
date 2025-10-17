@@ -1,14 +1,98 @@
+<style>
+  .npo-image {
+    height: 100%;
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .npo-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #0e121b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .npo-subtitle p,
+  .npo-subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em;
+    line-height: 1.4em;
+  }
+  .npo-subtitle,
+  .npo-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: #0e121b;
+  }
+  .npo-btn {
+    font-size: 12px;
+    font-weight: 500;
+    color: #0e121b;
+  }
+  .npo-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    position: relative;
+  }
+  .npo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .npo-btn {
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  .npo-card:hover .npo-btn {
+    background-color: #7b3fee;
+    color: white;
+  }
+  .card-btn {
+    height: 36px;
+  }
+  .floating-buttons {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: none;
+    gap: 8px;
+  }
+  .npo-card:hover .floating-buttons {
+    display: flex;
+  }
+  .floating-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  .floating-btn:hover {
+    background: #7b3fee;
+    border-color: #7b3fee;
+    color: white;
+  }
+  .floating-btn.delete-npo:hover {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: white;
+  }
+</style>
+
 <div id="nposSettings" class="container">
-  <section id="featured-npos" class="py-4 d-flex flex-column gap-4">
-    <div class="row">
-      {{ $author = {users.filter({get_var.zuid}).favorite_npos} }}
-      <!--prettier-ignore-->
-      {{each non_profits as npo where find_in_set(npo.zuid, '{$author}')}}
-      <div class="col-12 col-sm-6 col-md-3">
-        <!--prettier-ignore-->
-        {{ include /components/global/UserSettings/NPOs/npo_card.html }}
-      </div>
-      {{/each}}
+  <section id="featured-npos" class="py-4">
+    <div class="row g-3" id="nposContainer">
+      <!-- NPOs will be injected here dynamically -->
+    </div>
+    <div id="noNposMessage" class="d-none">
+      <p>No favorite NPOs found</p>
     </div>
   </section>
 </div>
@@ -62,71 +146,110 @@
   </div>
 </div>
 
-<script>
-  $(document).ready(function () {
-    const deleteModal = new bootstrap.Modal(
-      document.getElementById("deleteNpoModal")
-    );
+<script type="module"> 
+  $(document).ready(async function () {
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    if (!localUser?.zuid) return;
+
+    const nposContainer = $("#nposContainer");
+    const noNposMessage = $("#noNposMessage");
+    const deleteModal = new bootstrap.Modal(document.getElementById("deleteNpoModal"));
     let currentNpoCard = null;
-    let currentDeleteBtn = null;
 
-    // Handle delete button click
-    $(".delete-npo").on("click", function (e) {
-      e.preventDefault();
-      currentNpoCard = $(this).closest(".npo-card");
-      currentDeleteBtn = $(this);
-      deleteModal.show();
-    });
+    try {
+      // Fetch user profile with favorite NPOs
+      const response = await window.getUserProfile(localUser.zuid);
+      const userData = response.data[0];
+      
+      const favoriteNPOs = userData?.favorite_npos?.data || [];
+      nposContainer.empty();
 
-    // Handle confirm delete
+      if (favoriteNPOs.length > 0) {
+        noNposMessage.addClass("d-none");
+        favoriteNPOs.forEach(npo => {
+          const npoCard = `
+            <div class="col-12 col-sm-6 col-md-3">
+              <div class="card d-flex flex-column h-100 p-3 gap-2 npo-card" 
+                   data-npo-zuid="${npo.meta.zuid}">
+                <div class="floating-buttons">
+                  <button class="floating-btn delete-npo" title="Remove NPO">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+                <img src="${typeof npo.hero_image === 'string' ? npo.hero_image : npo.hero_image?.data?.[0]?.url || 'https://placehold.co/600x400?text=NPO'}" class="npo-image" alt="NPO cover image" />
+                <div class="d-flex flex-column gap-2 h-100">
+                  <p class="npo-title">${npo.name}</p>
+                  <div class="npo-subtitle">${npo.cause_description}</div>
+                  <a href="{{ $base_url }}${npo.meta.web.uri}" 
+                     class="btn btn-secondary npo-btn card-btn">
+                    View Profile
+                  </a>
+                </div>
+              </div>
+            </div>`;
+          nposContainer.append(npoCard);
+        });
+
+        // Re-initialize delete handlers
+        $(".delete-npo").off("click").on("click", function(e) {
+          e.preventDefault();
+          currentNpoCard = $(this).closest(".npo-card");
+          deleteModal.show();
+        });
+      } else {
+        noNposMessage.removeClass("d-none");
+      }
+    } catch (error) {
+      console.error("Error loading NPOs:", error);
+      noNposMessage.removeClass("d-none");
+    }
+
+    // Keep delete confirmation handler
     $("#confirmDeleteNpo").on("click", async function () {
       const confirmBtn = $(this);
       const buttonContent = confirmBtn.find(".button-content");
       const spinner = confirmBtn.find(".spinner-border");
 
       try {
-        // Show loading state
         confirmBtn.prop("disabled", true);
         buttonContent.addClass("d-none");
         spinner.removeClass("d-none");
 
-        const localUser = JSON.parse(localStorage.getItem("user"));
-        if (!localUser?.zuid) {
-          throw new Error("User not found");
+        const npoToRemove = currentNpoCard.data("npo-zuid");
+        const response = await window.getUserProfile(localUser.zuid);
+        const userData = response.data[0];
+        
+        let currentFavorites = [];
+        
+        // Handle both relationship and string formats
+        if (userData.favorite_npos?.data && Array.isArray(userData.favorite_npos.data)) {
+          // Extract ZUIDs from relationship data
+          currentFavorites = userData.favorite_npos.data.map(npo => npo.meta.zuid);
+        } else if (typeof userData.favorite_npos === 'string') {
+          // Handle legacy string format
+          currentFavorites = userData.favorite_npos.split(",").filter(zuid => zuid);
         }
+        
+        // Filter out the NPO to remove
+        const updatedFavorites = currentFavorites.filter(zuid => zuid !== npoToRemove);
+        
+        // Update the user data - only send the field we're changing
+        await window.updateZestyUser(localUser.zuid, {
+          favorite_npos: updatedFavorites.join(",")
+        });
 
-        const userData = await window.getZestyUser(localUser.zuid);
-        if (!userData?.user?.data) {
-          throw new Error("Failed to fetch user data");
-        }
-
-        const currentFavorites =
-          userData.user.data.favorite_npos?.split(",").filter((zuid) => zuid) ||
-          [];
-        const updatedFavorites = currentFavorites.filter(
-          (zuid) => zuid !== currentNpoCard.data("npo-zuid")
-        );
-
-        userData.user.data.favorite_npos = updatedFavorites.join(",");
-        await window.updateZestyUser(localUser.zuid, userData.user);
-
-        // Hide modal first
         deleteModal.hide();
-
-        // Wait for modal to finish hiding
-        setTimeout(() => {
-          // Remove the NPO card with animation
-          currentNpoCard.fadeOut(300, function () {
-            $(this).closest(".col-12").remove();
-          });
-
-          toastr.success("NPO removed from favorites");
-        }, 150);
+        currentNpoCard.closest(".col-12").fadeOut(300, function() {
+          $(this).remove();
+          
+          // Check if there are any NPOs left
+          if ($("#nposContainer").children().length === 0) {
+            $("#noNposMessage").removeClass("d-none");
+          }
+        });
       } catch (error) {
         console.error("Error removing NPO:", error);
-        toastr.error("Failed to remove NPO. Please try again.");
       } finally {
-        // Reset button state
         confirmBtn.prop("disabled", false);
         buttonContent.removeClass("d-none");
         spinner.addClass("d-none");

@@ -181,9 +181,9 @@
   </div>
 </div>
 
-<script>
+<script type="module">
   async function getStory(zuid) {
-    const apiUrl = "https://causecircle.org/mobileapp/story.json";
+    const apiUrl = "{{ $base_url }}mobileapp/story.json";
 
     try {
       const response = await $.ajax({
@@ -193,7 +193,6 @@
         dataType: "json",
       });
 
-      // console.log("Story data:", response);
       return response.data;
     } catch (error) {
       console.error("Error fetching story:", error);
@@ -240,16 +239,6 @@
     let currentStep = 1;
     const totalSteps = 4;
 
-    const printStates = () => {
-      console.log(window.hero_image);
-      console.log(window.story_title);
-      console.log(window.story_description);
-      console.log(window.story_content);
-      console.log(window.story_location);
-      console.log(window.story_npo);
-      console.log(window.story_category);
-    };
-
     const resetStates = () => {
       window.hero_image = [];
       window.story_title = "";
@@ -271,7 +260,6 @@
 
     // Centralized next button click handler
     $("#createEventModal #nextBtn").on("click", async function () {
-      // console.log("Next button clicked");
       $("#createEventModal #nextBtn").prop("disabled", true);
 
       try {
@@ -280,7 +268,6 @@
           // case 1:
           //   // Handle hero image upload
           //   window.hero_image = $("#previewImage").attr("src");
-          //   console.log(currentStep);
           //   break;
           case 1:
             // Handle story information submission
@@ -302,16 +289,14 @@
               : null;
 
             window.story_location = $("#location").val();
-            // console.log(currentStep);
-            //   break;
-            // case 2:
+
             // Handle content addition
             window.story_content = $("#storyContent").val();
-            printStates();
 
             try {
-              const uploadedHeroImages = await uploadImages(window.hero_image);
-              // console.log("All images uploaded:", uploadedHeroImages);
+              const uploadedHeroImages = await window.newUploadImages(
+                window.hero_image
+              );
 
               const imageIds = uploadedHeroImages.map((img) => img.data[0].id);
 
@@ -329,9 +314,7 @@
               const story = await createStory(storyData);
 
               window.story_data = await getStory(story?.story_zuid);
-              // console.log(window.story_data[0]?.meta, "story data 1");
               $("#shareLink").val(`${window.story_data[0]?.meta?.web?.url}`);
-              // console.log(window.story_data[0]?.meta?.web?.url, "story data");
             } catch (error) {
               console.error("Error uploading story:", error);
               alert("Failed to upload story. Please try again.");
@@ -410,7 +393,6 @@
 
     // Handle back button clicks
     $(document).on("click", "#backBtn", function () {
-      // console.log("Back button clicked");
       $("#createEventModal #nextBtn").prop("disabled", false);
       if (currentStep > 1) {
         currentStep--;

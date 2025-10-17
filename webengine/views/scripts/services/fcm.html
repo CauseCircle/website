@@ -1,0 +1,229 @@
+<script type="module">
+  // ==================== FCM PUSH NOTIFICATIONS ====================
+  const BASE_URL = "https://api.causecircle.org";
+  // const BASE_URL = "http://localhost:8080";
+
+  // Generate a unique device ID using browser characteristics
+  function generateUniqueDeviceId() {
+    try {
+      // Collect browser characteristics
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = 'top';
+      ctx.font = '14px Arial';
+      ctx.fillText('Device fingerprint', 2, 2);
+
+      const fingerprint = {
+        // More stable browser info
+        platform: navigator.platform,
+        cookieEnabled: navigator.cookieEnabled,
+        doNotTrack: navigator.doNotTrack,
+
+        // Keep only stable display info
+        colorDepth: screen.colorDepth,
+
+        // Timezone (name is stable; offset can change with DST)
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+
+        // WebGL vendor (if available)
+        webglVendor: (() => {
+          try {
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            return gl ? gl.getParameter(gl.VENDOR) : 'unknown';
+          } catch (e) {
+            return 'unknown';
+          }
+        })(),
+
+        // Hardware concurrency
+        hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
+
+        // Touch support
+        touchSupport: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
+      };
+
+      // Create a hash-like string from the fingerprint
+      const fingerprintString = JSON.stringify(fingerprint);
+      let hash = 0;
+      for (let i = 0; i < fingerprintString.length; i++) {
+        const char = fingerprintString.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+      }
+
+      // hash the user.uid
+      const userId = firebase.auth().currentUser.uid;
+
+      // Convert to positive hex string and add prefix
+      const deviceId = `web_${Math.abs(hash).toString(16)}_${userId}`;
+
+      // console.log('Generated device ID:', deviceId);
+      return deviceId;
+
+    } catch (error) {
+      console.error('Error generating device ID:', error);
+      // Fallback to simpler method
+      return `web_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+  }
+
+  // Request notification permission
+  window.requestNotificationPermission = async () => {
+    if (!window.firebaseMessaging) {
+      console.warn('Firebase messaging not supported');
+      return null;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        // console.log('Notification permission granted');
+        const token = await getFCMToken();
+        await window.registerFCMToken(token);
+      } else {
+        // console.log('Notification permission denied');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error requesting notification permission:', error);
+      return null;
+    }
+  };
+
+  // Get FCM token
+  async function getFCMToken() {
+    if (!window.firebaseMessaging) {
+      console.warn('Firebase messaging not supported');
+      return null;
+    }
+
+    try {
+      const token = await window.firebaseMessaging.getToken({
+        vapidKey: 'BLFjkjjgOezlAqZ9UuL0NhKkwcwGqmC_EeGdAcGbBxYIrpBoWdt4BkSOKCNu_k_ac6mBK6gYORbsD0yEY60NDW8' // You'll need to get this from Firebase Console
+      });
+
+      if (token) {
+        // console.log('FCM Token generated:', token);
+        return token;
+      } else {
+        // console.log('No registration token available.');
+        return null;
+      }
+    } catch (error) {
+      console.error('An error occurred while retrieving token:', error);
+      return null;
+    }
+  }
+
+  // Register FCM token with backend
+  window.registerFCMToken = async (token) => {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      console.warn('User not authenticated for FCM token registration');
+      return false;
+    }
+
+    const userId = user.uid;
+
+    // Generate a unique device ID using multiple browser characteristics
+    let deviceId = localStorage.getItem('fcm_device_id');
+    if (!deviceId) {
+      deviceId = generateUniqueDeviceId();
+      localStorage.setItem('fcm_device_id', deviceId);
+    }
+
+    try {
+      const response = await fetch(`${BASE_URL}/notifications/fcm-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userId}`,
+        },
+        body: JSON.stringify({
+          token: token,
+          device_id: deviceId,
+        }),
+      });
+
+      if (response.ok) {
+        // console.log('FCM token registered successfully');
+        localStorage.setItem('fcm_token_registered', 'true');
+        return true;
+      } else {
+        console.error('Failed to register FCM token:', response.statusText);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error registering FCM token:', error);
+      return false;
+    }
+  };
+
+  // Initialize FCM for authenticated users
+  window.initializeFCM = async () => {
+    if (!window.firebaseMessaging) {
+      console.warn('Firebase messaging not supported');
+      return;
+    }
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      console.warn('User not authenticated for FCM initialization');
+      return;
+    }
+
+    // Check if we already have permission and token registered
+    const tokenRegistered = localStorage.getItem('fcm_token_registered');
+
+    if (Notification.permission === 'granted' && !tokenRegistered) {
+      // Get token and register it
+      const token = await getFCMToken();
+      if (token) {
+        await window.registerFCMToken(token);
+      }
+    }else{
+      await window.requestNotificationPermission(); // test
+    }
+
+    // Listen for foreground messages
+    window.firebaseMessaging.onMessage((payload) => {
+      // Display notification in foreground
+      if (Notification.permission === 'granted') {
+        const notificationTitle = payload.notification?.title || 'CauseCircle';
+        const notificationOptions = {
+          body: payload.notification?.body || 'You have a new notification',
+          icon: payload.notification?.icon || 'https://4xxglxlj.media.zestyio.com/Asset-2--1-.SyPd9S1zkx.png?width=200',
+          badge: 'https://4xxglxlj.media.zestyio.com/Asset-2--1-.SyPd9S1zkx.png?width=200',
+          tag: payload.data?.tag || 'causecircle-notification',
+          data: payload.data || {},
+        };
+
+        new Notification(notificationTitle, notificationOptions);
+      }
+    });
+
+    // Listen for token refresh
+    window.firebaseMessaging.onTokenRefresh(async () => {
+      // console.log('FCM token refreshed');
+      const newToken = await getFCMToken();
+      if (newToken) {
+        await window.registerFCMToken(newToken);
+      }
+    });
+  };
+
+  // Sync FCM token for authenticated users
+  window.syncFCMToken = async () => {
+    const user = firebase.auth().currentUser;
+    if (!user || !window.firebaseMessaging) {
+      return;
+    }
+
+    try {
+      // Initialize FCM
+      await window.initializeFCM();
+    } catch (error) {
+      console.error('Error syncing FCM token:', error);
+    }
+  };
+</script>

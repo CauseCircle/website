@@ -1,18 +1,34 @@
-<div id="profileSettings" class="mt-4">
-  <div class="d-flex">
-    <div style="max-width: 260px; width: 100%">
+<div id="profileSettings" class="mt-2 mt-md-4 container">
+  <!-- Mobile sidebar toggle -->
+  <!-- <button
+    class="btn btn-secondary d-md-none mb-3"
+    type="button"
+    data-bs-toggle="offcanvas"
+    data-bs-target="#mobileSidebar"
+    aria-controls="mobileSidebar"
+  >
+    <i class="bi bi-list"></i> Menu
+  </button> -->
+
+  <div class="row">
+    <!-- Desktop sidebar (visible on md and up) -->
+    <div class="col-md-3 d-none d-md-block">
       <div class="sidebar sidebar-profile">
         <div class="card">
           <div class="card-body">
             <h6 class="card-title text-muted mb-3">SELECT MENU</h6>
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" href="#">
+                <a class="nav-link active" 
+                   data-bs-toggle="tab" 
+                   data-bs-target="#profileSettingsContent">
                   <i class="bi bi-person-circle me-2"></i> Profile Settings
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" 
+                   data-bs-toggle="tab" 
+                   data-bs-target="#contactInformationContent">
                   <i class="bi bi-envelope me-2"></i> Contact Information
                 </a>
               </li>
@@ -26,257 +42,307 @@
                   <i class="bi bi-box-arrow-up-right me-2"></i> Export Data
                 </a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link text-danger" 
+                   data-bs-toggle="modal" 
+                   data-bs-target="#deleteAccountModal">
+                  <i class="bi bi-trash me-2"></i> Delete Account
+                </a>
+              </li>
             </ul>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="profileSettingsContent" class="w-100">
-      <div class="mx-auto" style="max-width: 500px; width: 100%">
-        <div class="p-4">
-          <div class="mb-4 d-flex align-items-center gap-3">
-            <div class="upload-image mb-2">
-              <img
-                id="profileImage"
-                src="https://via.placeholder.com/100"
-                alt="Profile Placeholder"
-                class="fs-1 text-muted object-fit-cover"
-                style="border-radius: 50%; width: 100px; height: 100px"
-              />
-            </div>
-            <div>
-              <h5>Upload Image</h5>
-              <small class="text-muted">Min 400x400px, PNG or JPEG</small>
-              <div class="mt-2">
-                <button
-                  class="btn btn-secondary btn-sm"
-                  data-bs-toggle="modal"
-                  data-bs-target="#uploadProfileImageModal"
-                >
-                  <i class="bi bi-upload me-1"></i> Upload
-                </button>
+    <!-- Content sections -->
+    <div class="col-12 col-md-9">
+      <!-- Add mobile tabs at the top -->
+      <div class="d-md-none mb-4">
+        <div class="nav nav-pills nav-justified" id="mobileTabs" role="tablist">
+          <button class="nav-link active" 
+                  data-bs-toggle="tab" 
+                  data-bs-target="#profileSettingsContent" 
+                  type="button">
+            <i class="bi bi-person fs-5"></i>
+            <span class="small d-block">Profile</span>
+          </button>
+          <button class="nav-link" 
+                  data-bs-toggle="tab" 
+                  data-bs-target="#contactInformationContent" 
+                  type="button">
+            <i class="bi bi-envelope fs-5"></i>
+            <span class="small d-block">Contact</span>
+          </button>
+          <button class="nav-link d-none" 
+                  data-bs-toggle="tab" 
+                  data-bs-target="#socialLinks" 
+                  type="button">
+            <i class="bi bi-link-45deg fs-5"></i>
+            <span class="small d-block">Social</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tab-content">
+        <div id="profileSettingsContent" class="tab-pane fade show active">
+          <div class="mx-auto" style="max-width: 500px; width: 100%">
+            <div class="">
+              <div class="mb-4 d-flex align-items-center gap-3">
+                <div class="upload-image mb-2">
+                  <img
+                    id="profileImage"
+                    src="https://via.placeholder.com/100"
+                    alt="Profile Placeholder"
+                    class="fs-1 text-muted object-fit-cover"
+                    style="border-radius: 50%; width: 100px; height: 100px"
+                  />
+                </div>
+                <div>
+                  <h5>Upload Image</h5>
+                  <small class="text-muted">Min 400x400px, PNG or JPEG</small>
+                  <div class="mt-2">
+                    <button
+                      class="btn btn-secondary btn-sm"
+                      data-bs-toggle="modal"
+                      data-bs-target="#uploadProfileImageModal"
+                    >
+                      <i class="bi bi-upload me-1"></i> Upload
+                    </button>
+                  </div>
+                </div>
               </div>
+              <form id="profileForm">
+                <div class="mb-3">
+                  <label for="firstName" class="form-label"
+                    >First Name <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="firstName"
+                    value=""
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="lastName" class="form-label"
+                    >Last Name <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="lastName"
+                    value=""
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="userType" class="form-label d-none"
+                    >User Type <span class="text-danger">*</span></label
+                  >
+                  <select class="form-select d-none" id="userType">
+                    <option value="volunteer">Volunteer</option>
+                    <option value="donor">Donor</option>
+                    <option value="staff">Staff</option>
+                    <option value="individual">Individual</option>
+                    <option value="beneficiary">Beneficiary</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="aboutme" class="form-label"
+                    >About Me (Optional)</label
+                  >
+                  <textarea
+                    class="form-control"
+                    id="aboutme"
+                    rows="3"
+                    placeholder="Describe yourself..."
+                  ></textarea>
+                  <div class="d-flex justify-content-between mt-1">
+                    <small class="text-muted"
+                      >It will be displayed on your profile.</small
+                    >
+                    <small class="text-muted"
+                      ><span id="charCount">0</span>/200</small
+                    >
+                  </div>
+                </div>
+                <div class="d-flex justify-content-end mt-4 form-actions d-none">
+                  <button id="discardBtn" type="button" class="btn btn-light me-2">
+                    Discard
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    Apply Changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-          <form id="profileForm">
-            <div class="mb-3">
-              <label for="fullName" class="form-label"
-                >Full Name <span class="text-danger">*</span></label
-              >
-              <input
-                type="text"
-                class="form-control"
-                id="fullName"
-                value=""
-                required
-              />
-            </div>
-            <div class="mb-3">
-              <label for="userType" class="form-label"
-                >User Type <span class="text-danger">*</span></label
-              >
-              <select class="form-select" id="userType" required>
-                <option value="volunteer">Volunteer</option>
-                <option value="donor">Donor</option>
-                <option value="staff">Staff</option>
-                <option value="individual">Individual</option>
-                <option value="beneficiary">Beneficiary</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="aboutme" class="form-label"
-                >About Me (Optional)</label
-              >
-              <textarea
-                class="form-control"
-                id="aboutme"
-                rows="3"
-                placeholder="Describe yourself..."
-              ></textarea>
-              <div class="d-flex justify-content-between mt-1">
-                <small class="text-muted"
-                  >It will be displayed on your profile.</small
-                >
-                <small class="text-muted"
-                  ><span id="charCount">0</span>/200</small
-                >
-              </div>
-            </div>
-            <div class="d-flex justify-content-end mt-4 form-actions d-none">
-              <button id="discardBtn" type="button" class="btn btn-light me-2">
-                Discard
-              </button>
-              <button type="submit" class="btn btn-primary">
-                Apply Changes
-              </button>
-            </div>
-          </form>
         </div>
-      </div>
-    </div>
 
-    <div id="contactInformation" class="w-100">
-      <div class="mx-auto" style="max-width: 500px; width: 100%">
-        <div class="p-4">
-          <h5 class="mb-2">Contact Information</h5>
-          <p class="text-muted mb-4">
-            Enter your contact details for communication.
-          </p>
-          <hr class="my-4" />
-          <form id="contactForm">
-            <div class="mb-3">
-              <label for="emailAddress" class="form-label">
-                Email Address <span class="text-danger">*</span>
-              </label>
-              <input
-                type="email"
-                class="form-control"
-                id="emailAddress"
-                placeholder="example@domain.com"
-                required
-              />
-            </div>
+        <div id="contactInformationContent" class="tab-pane fade">
+          <div class="mx-auto" style="max-width: 500px; width: 100%">
+            <div class="">
+              <h5 class="mb-2">Contact Information</h5>
+              <p class="text-muted mb-4">
+                Enter your contact details for communication.
+              </p>
+              <hr class="my-4" />
+              <form id="contactForm">
+                <div class="mb-3">
+                  <label for="emailAddress" class="form-label">
+                    Email Address <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="emailAddress"
+                    placeholder="example@domain.com"
+                    required
+                  />
+                </div>
 
-            <div class="mb-3">
-              <label for="phoneNumber" class="form-label">
-                Phone Number <span class="text-muted">(Optional)</span>
-                <i
-                  class="bi bi-info-circle ms-1"
-                  data-bs-toggle="tooltip"
-                  title="Enter your contact number"
-                ></i>
-              </label>
-              <input
-                type="tel"
-                class="form-control"
-                id="phoneNumber"
-                placeholder="(555) 000-0000"
-              />
-            </div>
+                <div class="mb-3">
+                  <label for="phoneNumber" class="form-label">
+                    Phone Number <span class="text-muted">(Optional)</span>
+                    <i
+                      class="bi bi-info-circle ms-1"
+                      data-bs-toggle="tooltip"
+                      title="Enter your contact number"
+                    ></i>
+                  </label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="phoneNumber"
+                    placeholder="(555) 000-0000"
+                  />
+                </div>
 
-            <div class="mb-3">
-              <label for="address" class="form-label">
-                Address <span class="text-danger">*</span>
-              </label>
-              <textarea
-                class="form-control"
-                id="address"
-                rows="3"
-                placeholder="Enter your full address here..."
-                required
-              ></textarea>
-              <div class="d-flex justify-content-between mt-1">
-                <small class="text-muted"
-                  >Input your residential address for HR records.</small
+                <div class="mb-3 d-none">
+                  <label for="address" class="form-label">
+                    Address <span class="text-danger">*</span>
+                  </label>
+                  <textarea
+                    class="form-control"
+                    id="address"
+                    rows="3"
+                    placeholder="Enter your full address here..."
+                  ></textarea>
+                  <div class="d-flex justify-content-between mt-1">
+                    <small class="text-muted"
+                      >Input your residential address for HR records.</small
+                    >
+                    <small class="text-muted"
+                      ><span id="addressCharCount">0</span>/200</small
+                    >
+                  </div>
+                </div>
+
+                <div
+                  class="d-flex justify-content-end mt-4 contact-form-actions d-none"
                 >
-                <small class="text-muted"
-                  ><span id="addressCharCount">0</span>/200</small
-                >
-              </div>
-            </div>
-
-            <div
-              class="d-flex justify-content-end mt-4 contact-form-actions d-none"
-            >
-              <button
-                type="button"
-                class="btn btn-light me-2"
-                id="discardContactBtn"
-              >
-                Discard
-              </button>
-              <button type="submit" class="btn btn-primary">
-                Apply Changes
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <div id="socialLinks" class="w-100">
-      <div class="mx-auto" style="max-width: 500px; width: 100%">
-        <div class="p-4">
-          <h5 class="mb-2">Social Links</h5>
-          <p class="text-muted mb-4">Manage your social media connections.</p>
-          <hr class="my-4" />
-          <form id="socialForm">
-            <div id="socialLinksContainer">
-              <!-- Default social links -->
-              <div class="mb-3">
-                <label for="facebook" class="form-label">
-                  Facebook <span class="text-muted">(Optional)</span>
-                </label>
-                <div class="input-group">
-                  <span class="input-group-text bg-secondary"
-                    >facebook.com</span
+                  <button
+                    type="button"
+                    class="btn btn-light me-2"
+                    id="discardContactBtn"
                   >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="facebook"
-                    placeholder="username"
-                  />
+                    Discard
+                  </button>
+                  <button type="submit" class="btn btn-primary">
+                    Apply Changes
+                  </button>
                 </div>
-              </div>
-
-              <div class="mb-3">
-                <label for="instagram" class="form-label">
-                  Instagram <span class="text-muted">(Optional)</span>
-                </label>
-                <div class="input-group">
-                  <span class="input-group-text bg-secondary"
-                    >instagram.com</span
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="instagram"
-                    placeholder="username"
-                  />
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label for="twitter" class="form-label">
-                  X <span class="text-muted">(Optional)</span>
-                </label>
-                <div class="input-group">
-                  <span class="input-group-text bg-secondary">x.com</span>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="twitter"
-                    placeholder="username"
-                  />
-                </div>
-              </div>
+              </form>
             </div>
-
-            <button
-              type="button"
-              class="btn btn-secondary w-100 mb-4"
-              id="addSocialLink"
-            >
-              <i class="bi bi-plus"></i> Add Social Link
-            </button>
-
-            <div class="d-flex justify-content-end d-none">
-              <button type="button" class="btn btn-light me-2">Discard</button>
-              <button type="submit" class="btn btn-primary">
-                Apply Changes
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div id="exportData" class="row mt-4">
-      <div class="mx-auto" style="max-width: 500px; width: 100%">
-        <div class="p-4">
-          <h5>Export Data</h5>
+        <div id="socialLinks" class="tab-pane fade">
+          <div class="mx-auto" style="max-width: 500px; width: 100%">
+            <div class="">
+              <h5 class="mb-2">Social Links</h5>
+              <p class="text-muted mb-4">Manage your social media connections.</p>
+              <hr class="my-4" />
+              <form id="socialForm">
+                <div id="socialLinksContainer">
+                  <!-- Default social links -->
+                  <div class="mb-3">
+                    <label for="facebook" class="form-label">
+                      Facebook <span class="text-muted">(Optional)</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-secondary"
+                        >facebook.com</span
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="facebook"
+                        placeholder="username"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="instagram" class="form-label">
+                      Instagram <span class="text-muted">(Optional)</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-secondary"
+                        >instagram.com</span
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="instagram"
+                        placeholder="username"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="twitter" class="form-label">
+                      X <span class="text-muted">(Optional)</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-secondary">x.com</span>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="twitter"
+                        placeholder="username"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="btn btn-secondary w-100 mb-4"
+                  id="addSocialLink"
+                >
+                  <i class="bi bi-plus"></i> Add Social Link
+                </button>
+
+                <div class="d-flex justify-content-end d-none">
+                  <button type="button" class="btn btn-light me-2">Discard</button>
+                  <button type="submit" class="btn btn-primary">
+                    Apply Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div id="exportData" class="tab-pane fade">
+          <div class="mx-auto" style="max-width: 500px; width: 100%">
+            <div class="">
+              <h5>Export Data</h5>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -327,37 +393,168 @@
   </div>
 </div>
 
-<script>
+<!-- Mobile offcanvas sidebar for navigation -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="mobileSidebarLabel">Menu</h5>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="offcanvas"
+      aria-label="Close"
+    ></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="sidebar sidebar-profile">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title text-muted mb-3">SELECT MENU</h6>
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">
+                <i class="bi bi-person-circle me-2"></i> Profile Settings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" 
+                 data-bs-toggle="tab" 
+                 data-bs-target="#contactInformationContent">
+                <i class="bi bi-envelope me-2"></i> Contact Information
+              </a>
+            </li>
+            <li class="nav-item d-none">
+              <a class="nav-link" href="#">
+                <i class="bi bi-link-45deg me-2"></i> Social Links
+              </a>
+            </li>
+            <li class="nav-item d-none">
+              <a class="nav-link" href="#">
+                <i class="bi bi-box-arrow-up-right me-2"></i> Export Data
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" 
+                 data-bs-toggle="modal" 
+                 data-bs-target="#deleteAccountModal">
+                <i class="bi bi-trash me-2"></i> Delete Account
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 20px;">
+      <div class="modal-body p-4">
+        <div class="mb-4 d-flex align-items-start">
+          <div style="width: 46px; height: 46px; background-color: #ffe5e5; border-radius: 12px;" class="d-flex align-items-center justify-content-center me-3">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 6.375C3 6.16789 3.08289 5.96933 3.23096 5.82126C3.37903 5.67318 3.57754 5.59034 3.78465 5.59034H20.2024C20.4095 5.59034 20.608 5.67318 20.7561 5.82126C20.9042 5.96933 20.9868 6.16789 20.9868 6.375C20.9868 6.58211 20.9042 6.78067 20.7561 6.92874C20.608 7.07682 20.4095 7.15966 20.2024 7.15966H3.78465C3.57754 7.15966 3.37903 7.07682 3.23096 6.92874C3.08289 6.78067 3 6.58211 3 6.375ZM3.78465 9.54749H20.2024V19.4351C20.2024 19.8608 20.0364 20.2689 19.7406 20.5647C19.4449 20.8605 19.0368 21.0264 18.611 21.0264H5.37609C4.95033 21.0264 4.5422 20.8605 4.24646 20.5647C3.95072 20.2689 3.78465 19.8608 3.78465 19.4351V9.54749ZM8.20306 12.3775V17.2132C8.20306 17.4253 8.28594 17.6289 8.43368 17.7809C8.58142 17.9329 8.78459 18.0243 8.99678 18.0302C9.20897 18.0361 9.41719 17.9555 9.57399 17.8113C9.73079 17.6671 9.82599 17.4677 9.83245 17.2556V12.4199C9.83316 12.3095 9.81123 12.2002 9.76809 12.099C9.72496 11.9979 9.66154 11.9072 9.58175 11.8329C9.50196 11.7585 9.4076 11.7021 9.30384 11.6668C9.20007 11.6315 9.08935 11.6179 8.9788 11.6268C8.86825 11.6357 8.76079 11.6671 8.66273 11.7187C8.56467 11.7703 8.47797 11.8411 8.40815 11.9269C8.33833 12.0127 8.28702 12.1119 8.25759 12.2184C8.22815 12.3249 8.22121 12.4367 8.23727 12.5465L8.20306 12.3775ZM14.1845 12.3775V17.2132C14.1845 17.4253 14.2674 17.6289 14.4151 17.7809C14.5629 17.9329 14.7661 18.0243 14.9782 18.0302C15.1904 18.0361 15.3986 17.9555 15.5554 17.8113C15.7122 17.6671 15.8074 17.4677 15.8139 17.2556V12.4199C15.8146 12.3095 15.7927 12.2002 15.7495 12.099C15.7064 11.9979 15.643 11.9072 15.5632 11.8329C15.4834 11.7585 15.3891 11.7021 15.2853 11.6668C15.1815 11.6315 15.0708 11.6179 14.9603 11.6268C14.8497 11.6357 14.7422 11.6671 14.6442 11.7187C14.5461 11.7703 14.4594 11.8411 14.3896 11.9269C14.3198 12.0127 14.2685 12.1119 14.2391 12.2184C14.2096 12.3249 14.2027 12.4367 14.2187 12.5465L14.1845 12.3775Z" fill="#FF4D4D"/>
+            </svg>
+          </div>
+        </div>
+          <div>
+            <h5 class="mb-2" style="font-size: 18px; font-weight: 600;">We're sorry to see you leaving</h5>
+            <p class="text-muted mb-2" style="font-size: 15px;">Account deletion is final. There will be no way to restore your account.</p>
+          </div>
+        
+        <div class="mb-4">
+          <div class="d-flex mb-2 align-items-center">
+            <div class="me-2 text-danger"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 18.3333C14.6024 18.3333 18.3334 14.6023 18.3334 9.99996C18.3334 5.39759 14.6024 1.66663 10 1.66663C5.39765 1.66663 1.66669 5.39759 1.66669 9.99996C1.66669 14.6023 5.39765 18.3333 10 18.3333Z" stroke="#FF4D4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12.5 7.5L7.5 12.5" stroke="#FF4D4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M7.5 7.5L12.5 12.5" stroke="#FF4D4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg></div>
+            <div style="font-size: 15px;">Log you out on all devices</div>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="me-2 text-danger"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 18.3333C14.6024 18.3333 18.3334 14.6023 18.3334 9.99996C18.3334 5.39759 14.6024 1.66663 10 1.66663C5.39765 1.66663 1.66669 5.39759 1.66669 9.99996C1.66669 14.6023 5.39765 18.3333 10 18.3333Z" stroke="#FF4D4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12.5 7.5L7.5 12.5" stroke="#FF4D4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M7.5 7.5L12.5 12.5" stroke="#FF4D4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg></div>
+            <div style="font-size: 15px;">Delete all of your account information</div>
+          </div>
+        </div>
+        
+        <hr style="margin-top: 20px; margin-bottom: 20px; opacity: 0.1;">
+        
+        <div class="d-flex justify-content-end gap-3">
+          <button type="button" class="btn btn-light px-4 py-2" style="border-radius: 8px; font-weight: 500; min-width: 140px;" data-bs-dismiss="modal">Keep Account</button>
+          <button id="deleteAccountBtn" type="button" class="btn btn-danger px-4 py-2" style="border-radius: 8px; font-weight: 500; min-width: 140px; background-color: #FF3B30; border-color: #FF3B30;">Delete Account Anyway</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Mobile-first styles */
+  @media (max-width: 767.98px) {
+    #mobileTabs .nav-link {
+      color: #495057; /* Ensure text is visible */
+    }
+    
+    #mobileTabs .nav-link.active {
+      color: #0d6efd !important; /* Blue text for active state */
+      background: white;
+      border-bottom: 3px solid #0d6efd;
+    }
+    
+    .upload-image img {
+      width: 80px !important;
+      height: 80px !important;
+    }
+  }
+
+  /* Desktop sidebar */
+  .sidebar-profile .nav-link {
+    cursor: pointer; /* Add pointer cursor */
+    color: #6c757d;
+    transition: all 0.2s ease;
+  }
+  
+  .sidebar-profile .nav-link.active {
+    color: #0d6efd !important;
+    background-color: rgba(13, 110, 253, 0.1);
+    border-left: 3px solid #0d6efd;
+  }
+  
+  .sidebar-profile .nav-link:hover:not(.active) {
+    color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.05);
+  }
+
+  /* Mobile tabs */
+  @media (max-width: 767.98px) {
+    #mobileTabs button {
+      cursor: pointer; /* Ensure mobile tabs have pointer cursor */
+    }
+  }
+</style>
+
+<script type="module"> 
   $(document).ready(function () {
-    // Hide all content sections initially except profileSettings
-    $("#contactInformation, #socialLinks, #exportData").hide();
+    // Initialize Bootstrap tabs
+    const tabTriggers = [].slice.call(document.querySelectorAll('[data-bs-toggle="tab"]'))
+    tabTriggers.forEach(tabTriggerEl => {
+      new bootstrap.Tab(tabTriggerEl)
+    })
 
-    // Handle sidebar navigation clicks
-    $(".sidebar-profile .nav-link").on("click", function (e) {
-      e.preventDefault();
-
-      // Remove active class from all nav items
-      $(".sidebar-profile .nav-link").removeClass("active");
-      // Add active class to clicked item
-      $(this).addClass("active");
-
-      // Hide all content sections
-      $(
-        "#profileSettingsContent, #contactInformation, #socialLinks, #exportData"
-      ).hide();
-
-      // Show the corresponding content section based on the clicked link
-      const linkText = $(this).text().trim().toLowerCase();
-      if (linkText.includes("profile")) {
-        $("#profileSettingsContent").show();
-      } else if (linkText.includes("contact")) {
-        $("#contactInformation").show();
-      } else if (linkText.includes("social")) {
-        $("#socialLinks").show();
-      } else if (linkText.includes("export")) {
-        $("#exportData").show();
-      }
-    });
+    // Handle tab shown event to update desktop sidebar
+    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+      // Remove active class from all desktop nav items
+      $('.sidebar-profile .nav-link').removeClass('active');
+      
+      // Add active class to corresponding desktop nav item
+      const target = $(e.target).attr('data-bs-target')
+      $(`.sidebar-profile .nav-link[data-bs-target="${target}"]`).addClass('active')
+    })
 
     // Character counter for address
     $("#address").on("input", function () {
@@ -405,7 +602,6 @@
       const fullPhoneNumber = phoneNumber
         ? `${selectedCountryCode} ${phoneNumber}`
         : "";
-      // console.log("Full phone number:", fullPhoneNumber);
       // Add your form submission logic here
     });
 
@@ -477,8 +673,32 @@
         }
       });
 
-      // console.log("Social links data:", socialLinks);
-      // Add your form submission logic here
+    });
+
+    // Handle delete account modal
+    $("#deleteAccountBtn").on("click", function () {
+      const user = localStorage.getItem("user");
+      const userData = JSON.parse(user);
+
+      // Add loading state and disable button
+      const $deleteButton = $(this);
+      const originalButtonText = $deleteButton.html();
+      $deleteButton.prop('disabled', true);
+      $deleteButton.html(`
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Deleting...
+      `);
+
+      // Call the delete function
+      window.deleteUser(userData.zuid)
+        .then(() => {
+          window.location.href = "/login";
+        })
+        .catch((error) => {
+          console.error("Error deleting user:", error);
+          $deleteButton.prop('disabled', false);
+          $deleteButton.html(originalButtonText);
+        });
     });
   });
 </script>

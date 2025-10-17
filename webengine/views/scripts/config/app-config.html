@@ -1,0 +1,42 @@
+<script type="module">
+  // ==================== CONFIG ====================
+  const BASE_URL = "https://api.causecircle.org";
+  // const BASE_URL = "http://localhost:8080";
+
+  window.CONFIG = {
+    CLOUD_FUNCTIONS_KEY: "c14c4fc76f791e76281a015c5feaf7f9",
+    CLOUD_FUNCTIONS_URL: {
+      "create-profile":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/create-profile",
+      "update-profile":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/update-profile",
+      "get-profile":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/get-profile",
+      "create-story":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/post-story",
+      "upload-media":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/upload-media",
+      "delete-story":
+        "https://us-central1-causecircle-functions.cloudfunctions.net/delete-story",
+    },
+    ZESTY_MODEL_ZUID: "6-d6de86c395-416dtw",
+    ZESTY_BASE_URL: "https://8-d6c4f5cdd8-sg6188.api.zesty.io/v1/",
+    AUTHENTICATED_ROUTES: [
+      "{{home_feed.first().getUrl()}}",
+      "/dashboard",
+      "/settings",
+      "{{npo_admin_page.first().getUrl()}}",
+      "{{user_settings.first().getUrl()}}",
+      "/non-profit-directory/*/create-story",
+      "/non-profit-directory/*/create-story/",
+      "/non-profit-directory/*/admin",
+      "/non-profit-directory/*/admin/",
+    ],
+    UNAUTHENTICATED_ROUTES: [
+      "{{login_page.first().getUrl()}}",
+      "/signup",
+      "/forgot-password",
+      "/",
+    ],
+  };
+</script>

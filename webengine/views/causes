@@ -6,6 +6,8 @@
 {{ $causeImg = "https://placehold.co/1200x400/png?text=Cause+Image" }}
 {{/if}}
 
+{{include /components/global/Modals/share_page_modal.html}}
+
 <style>
   .hero-container {
     background-image: url("{{$causeImg}}");
@@ -62,6 +64,26 @@
     color: var(--bs-gray-500);
     max-width: 53.125rem;
   }
+
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  .btn-container {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  .card {
+    border: 1px solid #e1e4ea;
+    padding: 24px;
+    border-radius: 16px;
+    opacity: 1;
+  }
 </style>
 
 <style>
@@ -112,8 +134,9 @@
     height: 24px;
     border: 1px solid #aeaeae;
     border-radius: 3px;
-    object-fit: cover;
+    object-fit: contain; 
     object-position: center;
+    background-color: white;
   }
   .npo-btn {
     font-size: 12px;
@@ -137,27 +160,65 @@
   .card-btn {
     height: 36px;
   }
+  .cause-subtitle,
+  .cause-subtitle * {
+    width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+  }
 </style>
 
 <section id="hero-section" class="my-4">
-  <div class="container hero-container p-0">
-    <div class="gradient-overlay d-flex align-items-end p-4 h-100 w-100">
-      <p
-        class="cause-title fs-3 fw-semibold"
-        style="color: rgba(255, 255, 255, 0.719)"
-      >
-        {{ this.title }}
-      </p>
+  <div class="container">
+    <div class="card pb-0">
+      <img class="hero-img mb-4" src="{{$causeImg}}" alt="{{ this.title }}" />
+      <div class="row mb-4">
+        <div class="col-12 col-md-8">
+          <h3 class="card-title mb-0">{{ this.title }}</h3>
+          <div class="card-text cause-subtitle text-muted">
+            {{ this.short_description }}
+          </div>
+        </div>
+        <div class="col-12 col-md-4 pt-4 pt-md-0">
+          <div class="btn-container h-100 d-flex align-items-end">
+            <button
+              class="btn btn-secondary"
+              data-bs-toggle="modal"
+              data-bs-target="#shareModal"
+            >
+              <i class="bi bi-share"></i> Share Page
+            </button>
+            <button id="followButton" class="btn btn-outline-primary">
+              <span class="button-content">
+                <i class="bi bi-plus follow-icon"></i>
+                <span class="follow-text">Follow</span>
+              </span>
+              <span class="loading-spinner d-none">
+                <span
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <span class="loading-text ms-1">Loading...</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <section id="search-section" class="my-4">
   <div class="container">
-    <div id="search-results" class="py-4 flex-column gap-4">
-      <div class="d-flex justify-content-between align-items-center">
-        <p class="fs-5 fw-bold py-4">Explore Nonprofits for this Cause</p>
-        <div class="d-flex w-100 align-items-center justify-content-center">
+    <div id="search-results" class="mb-4 flex-column gap-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <p class="fs-5 fw-bold mb-4">Explore Nonprofits for this Cause</p>
+        <div class="d-flex align-items-center justify-content-end mb-4 flex-grow-1">
           <input
             type="text"
             id="cause-search"
@@ -202,7 +263,11 @@
   </div>
 </section>
 
-<script>
+<!-- Share Modal -->
+<!--prettier-ignore-->
+{{ include /components/global/Modals/share_page_modal.html }}
+
+<script type="module">
   $(document).ready(function () {
     const $causeSearch = $("#cause-search");
     const $searchCausesContainer = $("#search-causes-container");
@@ -221,6 +286,13 @@
     const $exploreNPOsText = $(".fs-5.fw-bold.py-4");
     let currentPage = 1;
     let isSearching = false;
+
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    
+    // Hide follow button if user isn't logged in
+    if (!localUser?.zuid) {
+      $("#followButton").hide();
+    }
 
     // Perform initial search
     searchNpos();
@@ -250,7 +322,7 @@
       }
 
       $.ajax({
-        url: `https://causecircle.org/mobileapp/npos_by_cause.json`,
+        url: `{{ $base_url }}mobileapp/npos_by_cause.json`,
         method: "GET",
         data: {
           limit: limit,
@@ -274,7 +346,7 @@
               removeLoadMoreButton();
             }
           } else if (currentPage === 1) {
-            $exploreNPOsText.hide();
+            // $exploreNPOsText.hide();
             removeLoadMoreButton();
             $searchCausesContainer.append($noResultsMessage);
           }
@@ -283,7 +355,7 @@
         error: function (error) {
           console.error("Error fetching search results:", error);
           if (currentPage === 1) {
-            $exploreNPOsText.hide();
+            // $exploreNPOsText.hide();
             removeLoadMoreButton();
             $searchCausesContainer
               .empty()
@@ -305,7 +377,7 @@
           : npo.hero_image?.data[0]?.url || "";
 
       if (npoImage.includes("https://placehold.co/")) {
-        npoImage = "https://placehold.co/600x400/png?text=NPO+Image";
+        npoImage = "{{globals.npo_placeholder_image.getImage()}}";
       }
 
       return `
@@ -313,14 +385,14 @@
         <div class="card d-flex flex-column h-100 p-3 gap-2 npo-card" data-story-url="${
           npo.meta?.web?.uri || "#"
         }">
-          <img src="${npoImage}" class="npo-image" />
+          <img src="${npoImage}" class="npo-image" alt="NPO cover image"/>
           <div class="d-flex flex-column gap-2 h-100">
             <div class="d-flex flex-grow-1 align-items-center gap-2">
               <img src="${
                 typeof npo.logo === "string"
                   ? npo.logo
                   : npo.logo?.data[0]?.url || ""
-              }" class="npo-npo-logo" />
+              }" class="npo-npo-logo" alt="NPO logo"/>
               <p class="npo-name my-auto">${npo.name || "Unknown NPO"}</p>
             </div>
             <p class="npo-title">${npo.name || "Unknown NPO"}</p>
@@ -359,8 +431,119 @@
 
     $("img").each(function () {
       if ($(this).attr("src").includes("https://placehold.co/")) {
-        $(this).attr("src", "https://placehold.co/600x400/png?text=NPO+Image");
+        $(this).attr("src", "{{globals.npo_placeholder_image.getImage()}}");
       }
     });
+
+    const followBtn = $("#followButton");
+    const followIcon = followBtn.find(".follow-icon");
+    const followText = followBtn.find(".follow-text");
+    const buttonContent = followBtn.find(".button-content");
+    const loadingSpinner = followBtn.find(".loading-spinner");
+
+    async function updateButtonState(isFollowing) {
+      if (isFollowing) {
+        followBtn.removeClass("btn-outline-primary").addClass("btn-primary");
+        followIcon.removeClass("bi-plus").addClass("bi-check2");
+        followText.text("Following");
+      } else {
+        followBtn.addClass("btn-outline-primary").removeClass("btn-primary");
+        followIcon.addClass("bi-plus").removeClass("bi-check2");
+        followText.text("Follow");
+      }
+    }
+
+    async function showLoading(isLoading) {
+      if (isLoading) {
+        buttonContent.addClass("d-none");
+        loadingSpinner.removeClass("d-none");
+        followBtn.prop("disabled", true);
+      } else {
+        buttonContent.removeClass("d-none");
+        loadingSpinner.addClass("d-none");
+        followBtn.prop("disabled", false);
+      }
+    }
+
+    followBtn.on("click", async function() {
+      if (!localUser?.zuid) {
+        localStorage.setItem("followCause", "{{this.zuid}}");
+        window.location.href = "{{login_page.first().getUrl()}}?follow_cause={{this.zuid}}";
+        return;
+      }
+
+      try {
+        showLoading(true);
+        const data = await window.getUserProfile(localUser.zuid);
+        const zestyUser = data?.data[0];
+        
+        // Get favorite causes from relationship or create empty array
+        let currentFavorites = [];
+        let isFollowing = false;
+        
+        // Check if favorite_causes is a relationship object with data
+        if (zestyUser.favorite_causes?.data && Array.isArray(zestyUser.favorite_causes.data)) {
+          // Extract ZUIDs from the relationship data
+          currentFavorites = zestyUser.favorite_causes.data.map(cause => cause.meta.zuid);
+          isFollowing = currentFavorites.includes("{{this.zuid}}");
+        } 
+        // Fallback for legacy format (comma separated string)
+        else if (typeof zestyUser.favorite_causes === 'string') {
+          currentFavorites = zestyUser.favorite_causes.split(',').filter(zuid => zuid);
+          isFollowing = currentFavorites.includes("{{this.zuid}}");
+        }
+
+        if (isFollowing) {
+          // Unfollow - remove this cause from favorites
+          const updatedFavorites = currentFavorites.filter(zuid => zuid !== "{{this.zuid}}");
+          zestyUser.favorite_causes = updatedFavorites.join(',');
+        } else {
+          // Follow - add this cause to favorites
+          currentFavorites.push("{{this.zuid}}");
+          // Update user data with the modified favorites
+          zestyUser.favorite_causes = currentFavorites.join(',');
+        }
+        
+        // Use the original update function
+        await window.updateZestyUser(localUser.zuid, {
+          "favorite_causes": zestyUser.favorite_causes
+        });
+        
+        updateButtonState(!isFollowing);
+        
+      } catch (error) {
+        console.error("Error updating follow status:", error);
+        // toastr.error("Failed to update follow status. Please try again.");
+      } finally {
+        showLoading(false);
+      }
+    });
+
+    // Initial state check for logged-in users
+    if (localUser?.zuid) {
+      (async () => {
+        try {
+          const data = await window.getUserProfile(localUser.zuid);
+          const zestyUser = data?.data[0];
+          
+          let isFollowing = false;
+          
+          // Check if favorite_causes is a relationship object
+          if (zestyUser.favorite_causes?.data && Array.isArray(zestyUser.favorite_causes.data)) {
+            const favoriteZuids = zestyUser.favorite_causes.data.map(cause => cause.meta.zuid);
+            isFollowing = favoriteZuids.includes("{{this.zuid}}");
+          } 
+          // Fallback for legacy format
+          else if (typeof zestyUser.favorite_causes === 'string') {
+            const favoriteZuids = zestyUser.favorite_causes.split(',').filter(zuid => zuid);
+            isFollowing = favoriteZuids.includes("{{this.zuid}}");
+          }
+          
+          updateButtonState(isFollowing);
+        } catch (error) {
+          console.error("Error checking follow status:", error);
+        }
+      })();
+    }
   });
 </script>

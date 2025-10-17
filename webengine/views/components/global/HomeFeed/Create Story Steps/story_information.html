@@ -28,9 +28,36 @@
     background-color: #f8f9fa;
   }
   .preview-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  .preview-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  .preview-item.video-preview::before {
+    content: "▶";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: white;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    z-index: 5;
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 3px;
   }
   .custom-file-input {
     display: none;
@@ -74,12 +101,9 @@
     height: 100px;
     position: relative;
     overflow: hidden;
-  }
-  .preview-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
     border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
   }
   .remove-btn {
     position: absolute;
@@ -96,6 +120,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 10;
   }
   .add-more {
     width: 100px;
@@ -106,6 +131,11 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    background-color: #f8f9fa;
+    transition: background-color 0.3s;
+  }
+  .add-more:hover {
+    background-color: #e9ecef;
   }
   .extra-images-overlay {
     position: absolute;
@@ -121,6 +151,10 @@
     font-size: 24px;
     font-weight: bold;
   }
+  .preview-item.dragging {
+    opacity: 0.5;
+    border: 2px dashed #007bff; /* Using a Bootstrap primary color for consistency */
+  }
 </style>
 
 <section id="storyInformationSelection" class="section-container d-none">
@@ -128,7 +162,7 @@
     <div
       class="d-flex flex-column gap-2 justify-content-center align-items-center"
     >
-      <img class="section-icon" src="" style="max-width: 160px" />
+      <img class="section-icon d-none" src="" style="max-width: 160px" alt="Step icon" />
       <div class="d-flex flex-column gap-2 align-items-center">
         <p class="section-title fs-1 fw-normal mb-0"></p>
         <p class="section-description fs-5 text-muted mb-0 text-center"></p>
@@ -140,48 +174,8 @@
     <div class="mb-4" style="max-width: 480px; width: 100%">
       <form id="storyDetailsForm" novalidate>
         <div class="mb-4">
-          <label for="storyImages" class="form-label">
-            Story Image <span class="text-danger">*</span>
-          </label>
-          <div id="uploadArea" class="upload-area mt-3">
-            <p class="mb-1">Choose an image or drag & drop it here.</p>
-            <p class="text-muted small">
-              JPEG, PNG, and other image formats, up to 50 MB.
-            </p>
-            <button
-              id="browseButton"
-              class="btn btn-secondary mt-2"
-              type="button"
-            >
-              Browse File
-            </button>
-          </div>
-          <input
-            type="file"
-            id="fileInput"
-            style="display: none"
-            multiple
-            accept="image/jpeg,image/png,image/jpg,image/webp"
-          />
-          <div id="previewContainer" class="preview-container"></div>
-        </div>
-
-        <div class="mb-4">
-          <label for="storyDescription" class="form-label">
-            Description <span class="text-danger">*</span>
-          </label>
-          <textarea
-            class="form-control"
-            id="storyDescription"
-            rows="3"
-            required
-          ></textarea>
-          <div class="invalid-feedback">Please enter a story description.</div>
-        </div>
-
-        <div class="mb-4">
           <label for="selectNPO" class="form-label">
-            Select Nonprofit Organization <span class="text-danger">*</span>
+            What Nonprofit are you sharing about? <span class="text-danger">*</span>
           </label>
           <div class="dropdown">
             <input
@@ -203,9 +197,51 @@
           <div class="invalid-feedback">Please select an NPO.</div>
         </div>
 
+        <div class="">
+          <label for="storyImages" class="form-label">
+            Story Media <span class="text-danger">*</span>
+          </label>
+          <div id="uploadArea" class="upload-area mt-3">
+            <p class="mb-1">Choose images or videos, or drag & drop them here.</p>
+            <p class="text-muted small">
+              JPEG, PNG, MP4 and other formats, up to 30 MB each. Maximum 5 media files allowed.
+            </p>
+            <button
+              id="browseButton"
+              class="btn btn-secondary mt-2"
+              type="button"
+            >
+              Browse Files
+            </button>
+          </div>
+          <input
+            type="file"
+            id="fileInput"
+            style="display: none"
+            multiple
+            accept="image/jpeg,image/png,image/jpg,image/webp,image/heic,image/heif,video/mp4,video/x-flv,video/quicktime"
+          />
+          <div id="previewContainer" class="preview-container"></div>
+        </div>
+
+        <div class="mb-4">
+          <label for="storyDescription" class="form-label">
+            Post Caption <span class="text-danger">*</span>
+          </label>
+          <textarea
+            class="form-control"
+            id="storyDescription"
+            rows="3"
+            required
+          ></textarea>
+          <div class="invalid-feedback">Please enter a story description.</div>
+        </div>
+
+        
+
         <div class="mb-4">
           <label for="selectCategory" class="form-label">
-            Select Cause
+            Select a Cause Category your post is related to
           </label>
           <div class="dropdown">
             <input
@@ -229,33 +265,31 @@
             id="selectedCategory"
             name="selectedCategory"
           />
-          <div class="invalid-feedback">Please select a category.</div>
+          <div class="invalid-feedback">Please select a category (optional).</div>
         </div>
 
         <div class="mb-4">
-          <label for="location" class="form-label">
-            Location <span class="text-danger">*</span>
+          <label for="postAsInput" class="form-label">
+            Select which profile to post with
           </label>
-          <div class="input-group">
-            <input type="text" class="form-control" id="location" required />
-            <button
-              class="btn btn-secondary"
-              type="button"
-              id="useCurrentLocation"
+          <div class="dropdown">
+            <input
+              type="text"
+              class="form-control"
+              id="postAsInput"
+              placeholder="Select profile..."
+              autocomplete="off"
+              readonly
+            />
+            <ul
+              class="dropdown-menu w-100"
+              id="postAsDropdown"
+              style="max-height: 300px; overflow-y: auto"
             >
-              <span
-                class="spinner-border spinner-border-sm d-none"
-                role="status"
-                aria-hidden="true"
-              ></span>
-              <span class="button-text"
-                ><i class="bi bi-geo-alt"></i> Use Current</span
-              >
-            </button>
+              <!-- Post-as options will be dynamically added here -->
+            </ul>
           </div>
-          <div id="locationFeedback" class="invalid-feedback">
-            Please enter a location.
-          </div>
+          <input type="hidden" id="selectedPostAsZuid" name="selectedPostAsZuid" />
         </div>
       </form>
       <button id="nextBtn" class="btn btn-primary w-100 mt-4" disabled>
@@ -270,15 +304,337 @@
   </div>
 </section>
 
-<script>
+<script type="module">
+  
+  // Make npoPageZuid available globally for NPO following checks
+  window.npoPageZuid = "{{ $npoZuid }}";
+
+  // TanStack Query observers
+  let userProfileQuery;
+  let userManagedNposQuery;
+  let npoSearchQuery;
+  let currentNpoQuery;
+
+  // Initialize queries when user is available
+  function initializeQueries() {
+    const localUser = localStorage.getItem("user");
+    if (!localUser) {
+      console.error("No user found in localStorage for query initialization");
+      return;
+    }
+    
+    const userData = JSON.parse(localUser);
+    if (!userData.zuid) {
+      console.error("No ZUID found in user data for query initialization");
+      return;
+    }
+    // Check if query client is available
+    if (!window.queryClient) {
+      console.error("TanStack Query client is not available");
+      return;
+    }
+    
+    // Check if query functions are available
+    if (!window.createUserProfileQuery) {
+      console.error("createUserProfileQuery function is not available");
+      return;
+    }
+    
+    if (!window.createUserManagedNposQuery) {
+      console.error("createUserManagedNposQuery function is not available");
+      return;
+    }
+    
+    try {
+      userProfileQuery = window.createUserProfileQuery(userData.zuid);
+      userManagedNposQuery = window.createUserManagedNposQuery(userData.zuid);
+      // Trigger initial fetch to ensure queries start
+      setTimeout(() => {
+        if (userProfileQuery) {
+          userProfileQuery.refetch();
+        }
+        if (userManagedNposQuery) {
+          userManagedNposQuery.refetch();
+        }
+      }, 100);
+    } catch (error) {
+      console.error("Error creating TanStack Query observers:", error);
+    }
+  }
+
+  // Load and pre-select first NPO reactively
+  function loadAndPreselectFirstNPO(userProfile) {
+    let userNpoIds = [];
+    
+    if (userProfile?.favorite_npos?.data && Array.isArray(userProfile.favorite_npos.data)) {
+      userNpoIds = userProfile.favorite_npos.data.map(npo => npo.meta.zuid);
+    } else if (userProfile?.favorite_npos && typeof userProfile.favorite_npos === 'string' && userProfile.favorite_npos !== "") {
+      userNpoIds = userProfile.favorite_npos.split(",");
+    }
+
+    if (userNpoIds.length === 0) {
+      return;
+    }
+
+    // Fetch all user's favorite NPOs using TanStack Query with reactive subscriptions
+    const loadedNpos = [];
+    let hasPreSelected = false; // Flag to prevent multiple pre-selections
+    
+    userNpoIds.forEach(npoId => {
+      const query = window.createNPOProfileQuery(npoId);
+      
+      // Subscribe to each NPO query reactively
+      query.subscribe((result) => {
+        if (result.isSuccess && result.data?.data?.[0]) {
+          const npo = result.data.data[0];
+          
+          // Store the NPO data for category loading
+          if (!window.npo_data) {
+            window.npo_data = [];
+          }
+          
+          // Add the NPO to the global data if not already present
+          const existingNpo = window.npo_data.find(n => n.meta.zuid === npo.meta.zuid);
+          if (!existingNpo) {
+            window.npo_data.push(npo);
+          }
+          
+          // Add to loaded list
+          loadedNpos.push(npo);
+          
+          // Check if all NPOs are loaded and we haven't pre-selected yet
+          if (loadedNpos.length === userNpoIds.length && !hasPreSelected) {
+            hasPreSelected = true;
+            
+            // Sort alphabetically and pre-select the first one
+            const sortedNpos = loadedNpos.sort((a, b) => a.name.localeCompare(b.name));
+            const firstNpo = sortedNpos[0];
+            
+            preSelectFirstNPO(firstNpo);
+          }
+        } else if (result.isError) {
+          console.error("Failed to load NPO:", npoId, result.error);
+        }
+      });
+      
+      // Trigger initial fetch
+      query.refetch();
+    });
+  }
+
+  // Pre-select the first NPO
+  function preSelectFirstNPO(npo) {
+    
+    // Set the NPO in the form
+    $("#selectedNPO").val(npo.meta.zuid);
+    $("#npoSearchInput").val(npo.name).removeClass("is-invalid").addClass("is-valid");
+    
+    // Update validation state
+    if (window.validationState) {
+      window.validationState.selectedNPO = true;
+    }
+    
+    // Enable category input and load categories for this NPO
+    $("#categorySearchInput").prop("disabled", false);
+    
+    // Load categories for the selected NPO and pre-select first cause
+    loadCategoriesForNPO(npo, true); // Enable cause pre-selection
+    
+    // Trigger validation check after pre-selection
+    if (typeof checkAllValid === 'function') {
+      checkAllValid();
+    }
+  }
+
+  // Update post-as options reactively
+  function updatePostAsOptions(managedNpos) {
+    const postAsDropdown = $("#postAsDropdown");
+    postAsDropdown.empty();
+    
+    // Default option: My Profile
+    postAsDropdown.append(
+      '<li><a class="dropdown-item" href="#" data-zuid="" data-type="user">My Profile</a></li>'
+    );
+
+    if (managedNpos.length > 0) {
+      // Sort alphabetically
+      managedNpos.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      
+      postAsDropdown.append('<li><h5 class="dropdown-header text-primary fst-italic">Managed Nonprofits</h5></li>');
+      managedNpos.forEach((npo) => {
+        const zuid = npo.meta?.zuid || npo.zuid || '';
+        const displayName = npo.name || 'Untitled';
+        postAsDropdown.append(
+          `<li><a class="dropdown-item" href="#" data-zuid="${zuid}" data-type="npo">${displayName}</a></li>`
+        );
+      });
+    }
+
+    // Set default selection to My Profile if nothing chosen yet
+    if (!$("#selectedPostAsZuid").val()) {
+      $("#selectedPostAsZuid").val("");
+      $("#postAsInput").val("My Profile");
+      window.story_post_as_npo_zuid = null;
+    }
+  }
+
+  // Load categories for selected NPO reactively
+  function loadCategoriesForNPO(npo, shouldPreselectFirst = false) {
+    if (!npo || !npo.category || !npo.category.data) {
+      updateCategoryDropdown([]);
+      return;
+    }
+
+    let categories = npo.category.data;
+    
+    // Sort categories alphabetically by title
+    categories.sort((a, b) => a.title.localeCompare(b.title));
+    
+    // Pre-select the first cause if requested
+    if (shouldPreselectFirst && categories.length > 0) {
+      const firstCategory = categories[0];
+      
+      // Set the category in the form
+      $("#selectedCategory").val(firstCategory.meta.zuid);
+      $("#categorySearchInput").val(firstCategory.title).removeClass("is-invalid").addClass("is-valid");
+    }
+    
+    updateCategoryDropdown(categories);
+  }
+
+  // Update category dropdown with results
+  function updateCategoryDropdown(categories, shouldShowDropdown = true) {
+    const categoryDropdown = $("#categoryDropdown");
+    categoryDropdown.empty();
+    
+    if (categories.length > 0) {
+      // Sort categories alphabetically by title
+      categories.sort((a, b) => a.title.localeCompare(b.title));
+      window.category_data = categories;
+      
+      categories.forEach((category) => {
+        categoryDropdown.append(
+          `<li><a class="dropdown-item" href="#" data-category-id="${category.meta.zuid}">${category.title}</a></li>`
+        );
+      });
+    } else {
+      categoryDropdown.append(
+        '<li><span class="dropdown-item">No categories available</span></li>'
+      );
+    }
+    
+    if (shouldShowDropdown) {
+      categoryDropdown.show();
+    }
+  }
+
+  // Reactive user profile subscription
+  function subscribeToUserProfile() {
+    if (!userProfileQuery) {
+      console.error("userProfileQuery is not available for subscription");
+      return;
+    }
+    
+    userProfileQuery.subscribe((result) => {
+      if (result.isLoading) {
+        // Show loading state
+      } else if (result.isSuccess) {
+        const userProfile = result.data?.data?.[0];
+        if (userProfile) {
+          // Load and pre-select first NPO
+          loadAndPreselectFirstNPO(userProfile);
+        } else {
+          console.error("No user profile data in successful result");
+        }
+      } else if (result.isError) {
+        console.error("Failed to load user profile:", result.error);
+      }
+    });
+  }
+
+  // Reactive user managed NPOs subscription
+  function subscribeToUserManagedNpos() {
+    if (!userManagedNposQuery) {
+      console.error("userManagedNposQuery is not available for subscription");
+      return;
+    }
+    
+    
+    userManagedNposQuery.subscribe((result) => {
+      
+      if (result.isLoading) {
+      } else if (result.isSuccess) {
+        const managedNpos = result.data?.data || [];
+        updatePostAsOptions(managedNpos);
+      } else if (result.isError) {
+        console.error("Failed to load user managed NPOs:", result.error);
+      }
+    });
+  }
+
   function updateNextButtonState(enable) {
     $("#createStoryModal #nextBtn").prop("disabled", enable);
   }
 
   $(document).ready(async function () {
-    const localUser = localStorage.getItem("user");
-    const userData = await getZestyUser(JSON.parse(localUser).zuid);
+    
+    // Initialize TanStack Query observers
+    initializeQueries();
+    subscribeToUserProfile();
+    subscribeToUserManagedNpos();
+    
+    let userData = null;
+    
+    try {
+      const localUser = localStorage.getItem("user");
+      
+      if (!localUser) {
+        console.error("No user found in localStorage");
+        return;
+      }
+      
+      const parsedUser = JSON.parse(localUser);
+      
+      if (!parsedUser.zuid) {
+        console.error("No ZUID found in user data");
+        return;
+      }
+      
+      // Get user data from TanStack Query
+      if (userProfileQuery) {
+        const result = userProfileQuery.getCurrentResult();
+        if (result.isSuccess && result.data?.data?.[0]) {
+          userData = result.data.data[0];
+        } else if (result.isLoading) {
+          // Query is still loading, wait for it to complete
+          // Don't return here, let the subscription handle the data when it arrives
+        } else if (result.isError) {
+          console.error("User profile query failed:", result.error);
+          return;
+        } else {
+          // Query hasn't been triggered yet, trigger it
+          userProfileQuery.refetch();
+        }
+      }
+      
+      // Only return if we have an error, not if we're waiting for data
+      if (!userData && userProfileQuery) {
+        const result = userProfileQuery.getCurrentResult();
+        if (result.isError) {
+          console.error("No user data available from TanStack Query");
+          return;
+        }
+        // If loading or not started, continue and let subscription handle it
+      }
+    } catch (error) {
+      console.error("Error in document ready function:", error);
+      return;
+    }
 
+    // Initialize default post-as selection (My Profile)
+    window.story_post_as_npo_zuid = null;
+
+    // Move all variable declarations and function definitions inside the try block
     const heroImageInput = $("#heroImageInput");
     const imagePreview = $("#imagePreview");
     const previewImage = $("#previewImage");
@@ -287,23 +643,20 @@
     const npoSearchInput = $("#npoSearchInput");
     const npoDropdown = $("#npoDropdown");
     const selectedNPO = $("#selectedNPO");
+    const postAsInput = $("#postAsInput");
+    const postAsDropdown = $("#postAsDropdown");
+    const selectedPostAsZuid = $("#selectedPostAsZuid");
     const categorySearchInput = $("#categorySearchInput");
     const categoryDropdown = $("#categoryDropdown");
     const selectedCategory = $("#selectedCategory");
-    const locationInput = $("#location");
-    const locationFeedback = $("#locationFeedback");
-    const useCurrentLocationBtn = $("#useCurrentLocation");
-    const locationSpinner = useCurrentLocationBtn.find(".spinner-border");
-    const locationButtonText = useCurrentLocationBtn.find(".button-text");
     const nextBtn = $("#nextBtn");
     const storyDescription = $("#storyDescription");
 
-    // Add image to validation state
+    // Add media to validation state
     window.validationState = {
-      storyImage: false,
+      storyMedia: false,
       storyDescription: false,
-      selectedNPO: false,
-      location: false,
+      selectedNPO: false
     };
 
     heroImageInput.on("change", function (event) {
@@ -315,7 +668,7 @@
           uploadMessage.addClass("d-none");
           removeImageBtn.removeClass("d-none");
           // uploadHeroImage();
-          validationState.storyImage = true;
+          validationState.storyMedia = true;
           checkAllValid();
         };
         reader.readAsDataURL(file);
@@ -328,7 +681,7 @@
       previewImage.attr("src", "").addClass("d-none");
       uploadMessage.removeClass("d-none");
       removeImageBtn.addClass("d-none");
-      validationState.storyImage = false;
+      validationState.storyMedia = false;
       checkAllValid();
     }
 
@@ -356,17 +709,14 @@
       checkAllValid();
     }
 
-    function validateLocation() {
-      const value = locationInput.val().trim();
+    function validateSelectedCategory() {
+      const value = selectedCategory.val().trim();
       if (value === "") {
-        locationInput.addClass("is-invalid");
-        locationFeedback.text("Please enter a location.");
-        validationState.location = false;
+        categorySearchInput.removeClass("is-valid is-invalid");
       } else {
-        locationInput.removeClass("is-invalid").addClass("is-valid");
-        validationState.location = true;
+        categorySearchInput.removeClass("is-invalid").addClass("is-valid");
       }
-      checkAllValid();
+      // Category is optional, so no need to call checkAllValid()
     }
 
     function checkAllValid() {
@@ -382,122 +732,167 @@
       };
     }
 
-    window.searchNPOs = function (searchTerm) {
-      const limit = searchTerm ? 20 : 100;
 
-      const userNpoIds =
-        userData.user && userData.user.data.favorite_npos != ""
-          ? userData.user.data.favorite_npos.split(",")
-          : [];
+    // Reactive NPO search function
+    function searchNPOs(searchTerm) {
+      if (!searchTerm || searchTerm.length === 0) {
+        // Show user's favorite NPOs
+        showUserFavoriteNPOs();
+        return;
+      }
+      
+      // Use existing search query
+      npoSearchQuery = window.createSearchNposQuery(searchTerm);
+      
+      npoSearchQuery.subscribe((result) => {
+        if (result.isLoading) {
+          showNpoSearchLoading();
+        } else if (result.isSuccess) {
+          const searchResults = result.data?.data || [];
+          updateNpoDropdown(searchResults, searchTerm);
+        } else if (result.isError) {
+          showNpoSearchError();
+        }
+      });
+    }
 
-      // Function to fetch a single NPO by its ID
-      const fetchSingleNPO = (npoId) => {
-        return $.ajax({
-          url: "https://causecircle.org/mobileapp/npos.json",
-          method: "GET",
-          data: {
-            limit: 1,
-            zuid: npoId,
-          },
-        }).then((response) =>
-          response.data && response.data.length > 0 ? response.data[0] : null
-        );
-      };
+    // Show user's favorite NPOs reactively
+    function showUserFavoriteNPOs() {
+      if (!userProfileQuery) return;
+      
+      const result = userProfileQuery.getCurrentResult();
+      if (!result.isSuccess) return;
+      
+      const user = result.data?.data?.[0];
+      if (!user) return;
+      
+      let userNpoIds = [];
+      
+      // Get user's favorite NPO IDs
+      if (user.favorite_npos?.data && Array.isArray(user.favorite_npos.data)) {
+        userNpoIds = user.favorite_npos.data.map(npo => npo.meta.zuid);
+      } else if (user.favorite_npos && typeof user.favorite_npos === 'string' && user.favorite_npos !== "") {
+        userNpoIds = user.favorite_npos.split(",");
+      }
+      
+      if (userNpoIds.length > 0) {
+        // Fetch user's favorite NPOs using TanStack Query with reactive subscriptions
+        const loadedNpos = [];
+        
+        userNpoIds.forEach(npoId => {
+          const query = window.createNPOProfileQuery(npoId);
+          
+          query.subscribe((result) => {
+            if (result.isSuccess && result.data?.data?.[0]) {
+              const npo = result.data.data[0];
+              loadedNpos.push(npo);
+              
+              // Check if all NPOs are loaded
+              if (loadedNpos.length === userNpoIds.length) {
+                // Sort and update dropdown
+                const sortedNpos = loadedNpos.sort((a, b) => a.name.localeCompare(b.name));
+                updateNpoDropdown(sortedNpos, "", true); // true = show as favorites
+              }
+            } else if (result.isError) {
+              console.error("Failed to load favorite NPO:", npoId, result.error);
+            }
+          });
+          
+          // Trigger initial fetch
+          query.refetch();
+        });
+      } else {
+        // No favorites, show general NPOs
+        showGeneralNPOs();
+      }
+    }
 
-      // Fetch user's favorite NPOs
-      const fetchUserNPOs = Promise.all(userNpoIds.map(fetchSingleNPO));
+    // Show general NPOs (fallback when user has no favorites)
+    function showGeneralNPOs() {
+      npoDropdown.empty();
+      npoDropdown.append(
+        '<li><span class="dropdown-item">No NPOs found</span></li>'
+      );
+      npoDropdown.show();
+    }
 
-      // Fetch search results or all NPOs
-      const fetchSearchNPOs = $.ajax({
-        url: "https://causecircle.org/mobileapp/npos.json",
-        method: "GET",
-        data: {
-          limit: limit,
-          search: searchTerm,
-          page: 1,
-        },
+    // Show loading state for NPO search
+    function showNpoSearchLoading() {
+      npoDropdown.empty().append('<li><span class="dropdown-item text-center"><div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>Loading...</span></li>');
+      npoDropdown.show();
+    }
+
+    // Show error state for NPO search
+    function showNpoSearchError() {
+      npoDropdown.empty().append('<li><span class="dropdown-item">Error fetching NPOs</span></li>');
+      npoDropdown.show();
+    }
+
+    // Update NPO dropdown with results
+    function updateNpoDropdown(npos, searchTerm, isFavorites = false) {
+      npoDropdown.empty();
+
+      // Store NPOs in global data for category lookups
+      if (!window.npo_data) {
+        window.npo_data = [];
+      }
+      
+      // Add NPOs to global data, avoiding duplicates
+      npos.forEach(npo => {
+        const existingNpo = window.npo_data.find(n => n.meta.zuid === npo.meta.zuid);
+        if (!existingNpo) {
+          window.npo_data.push(npo);
+        }
       });
 
-      // Use Promise.all to wait for all requests to complete
-      Promise.all([fetchUserNPOs, fetchSearchNPOs])
-        .then(([userNpoData, searchNposResponse]) => {
-          // Filter out null values (NPOs that couldn't be fetched)
-          userNpoData = userNpoData.filter((npo) => npo !== null);
-          const searchNpoData = searchNposResponse.data || [];
-
-          // Sort user NPOs alphabetically
-          userNpoData.sort((a, b) => a.name.localeCompare(b.name));
-          // Sort search NPOs alphabetically
-          searchNpoData.sort((a, b) => a.name.localeCompare(b.name));
-
-          npoDropdown.empty();
-
-          if (userNpoData.length > 0 || searchNpoData.length > 0) {
-            window.npo_data = [...userNpoData, ...searchNpoData];
-
-            if (searchTerm === "") {
-              // Add "Your Nonprofits" section if user has favorite NPOs
-              if (userNpoData.length > 0) {
-                npoDropdown.append(
-                  '<li><h5 class="dropdown-header text-primary fst-italic">Your Nonprofits</h5></li>'
-                );
-                userNpoData.forEach((npo) => {
-                  npoDropdown.append(
-                    `<li><a class="dropdown-item" href="#" data-npo-id="${npo.meta.zuid}">${npo.name}</a></li>`
-                  );
-                });
-                // Add a divider if there are other NPOs to display
-                if (searchNpoData.length > 0) {
-                  npoDropdown.append('<li><hr class="dropdown-divider"></li>');
-                }
-              }
-
-              // Add "Other Nonprofits" section
-              if (searchNpoData.length > 0) {
-                npoDropdown.append(
-                  '<li><h5 class="dropdown-header text-primary fst-italic">Other Nonprofits</h5></li>'
-                );
-                searchNpoData.forEach((npo) => {
-                  if (!userNpoIds.includes(npo.meta.zuid)) {
-                    npoDropdown.append(
-                      `<li><a class="dropdown-item" href="#" data-npo-id="${npo.meta.zuid}">${npo.name}</a></li>`
-                    );
-                  }
-                });
-              }
-            } else {
-              // If there's a search term, show all matching NPOs without headers
-              searchNpoData.forEach((npo) => {
-                npoDropdown.append(
-                  `<li><a class="dropdown-item" href="#" data-npo-id="${npo.meta.zuid}">${npo.name}</a></li>`
-                );
-              });
-            }
-          } else {
-            npoDropdown.append(
-              '<li><span class="dropdown-item">No NPOs found</span></li>'
-            );
-          }
-          npoDropdown.show();
-        })
-        .catch((error) => {
-          console.error("Error fetching NPOs:", error);
-          npoDropdown
-            .empty()
-            .append(
-              '<li><span class="dropdown-item">Error fetching NPOs</span></li>'
-            );
-          npoDropdown.show();
-        });
-    };
-
-    function searchCategories(searchTerm = "", npo, shouldShowDropdown = true) {
-      categoryDropdown.empty();
-      if (!npo || !npo.category || !npo.category.data) {
-        categoryDropdown.append(
-          '<li><span class="dropdown-item">No categories available</span></li>'
+      if (isFavorites) {
+        // Display user's favorite NPOs
+        npoDropdown.append(
+          '<li><h5 class="dropdown-header text-primary fst-italic">Your Nonprofits</h5></li>'
         );
-        categoryDropdown.show();
+        npos.forEach((npo) => {
+          npoDropdown.append(
+            `<li><a class="dropdown-item" href="#" data-npo-id="${npo.meta.zuid}">${npo.name}</a></li>`
+          );
+        });
+      } else if (searchTerm) {
+        // Display search results
+        if (npos.length > 0) {
+          npos.forEach((npo) => {
+            npoDropdown.append(
+              `<li><a class="dropdown-item" href="#" data-npo-id="${npo.meta.zuid}">${npo.name}</a></li>`
+            );
+          });
+        } else {
+          npoDropdown.append(
+            `<li><span class="dropdown-item">No NPOs found for "${searchTerm}"</span></li>`
+          );
+        }
+      } else {
+        // General NPOs
+        if (npos.length > 0) {
+          npoDropdown.append(
+            '<li><h5 class="dropdown-header text-primary fst-italic">Available Nonprofits</h5></li>'
+          );
+          npos.forEach((npo) => {
+            npoDropdown.append(
+              `<li><a class="dropdown-item" href="#" data-npo-id="${npo.meta.zuid}">${npo.name}</a></li>`
+            );
+          });
+        } else {
+          npoDropdown.append(
+            '<li><span class="dropdown-item">No NPOs found</span></li>'
+          );
+        }
+      }
+      
+      npoDropdown.show();
+    }
+
+
+    function searchCategories(searchTerm = "", npo, shouldShowDropdown = true, shouldPreselectFirst = false) {
+      if (!npo || !npo.category || !npo.category.data) {
+        updateCategoryDropdown([]);
         return;
       }
 
@@ -510,24 +905,84 @@
         );
       }
 
-      if (categories.length > 0) {
-        // Sort categories alphabetically by title
-        categories.sort((a, b) => a.title.localeCompare(b.title));
-        window.category_data = categories;
-        categories.forEach((category) => {
-          categoryDropdown.append(
-            `<li><a class="dropdown-item" href="#" data-category-id="${category.meta.zuid}">${category.title}</a></li>`
-          );
-        });
-      } else {
-        categoryDropdown.append(
-          '<li><span class="dropdown-item">No categories found</span></li>'
-        );
+      // Pre-select the first cause if requested and no search term is applied
+      if (shouldPreselectFirst && !searchTerm && categories.length > 0) {
+        const firstCategory = categories[0];
+        
+        // Set the category in the form
+        $("#selectedCategory").val(firstCategory.meta.zuid);
+        $("#categorySearchInput").val(firstCategory.title).removeClass("is-invalid").addClass("is-valid");
       }
-      if (shouldShowDropdown) {
-        categoryDropdown.show();
+      
+      updateCategoryDropdown(categories, shouldShowDropdown);
+    }
+
+    // Function to prefill NPO based on provided ZUID using TanStack Query
+    function prefillNPOFromZuid(zuid) {
+      try {
+        // Show loading state in NPO input
+        $("#npoSearchInput").val("Loading...").prop("disabled", true);
+        
+        // Use TanStack Query to fetch the specific NPO by ZUID
+        currentNpoQuery = window.createNPOProfileQuery(zuid);
+        
+        currentNpoQuery.subscribe((result) => {
+          if (result.isLoading) {
+            // Keep loading state
+          } else if (result.isSuccess) {
+            const npo = result.data?.data?.[0];
+            
+            if (npo) {
+              
+              // Set the NPO in the form
+              $("#selectedNPO").val(npo.meta.zuid);
+              $("#npoSearchInput").val(npo.name).prop("disabled", false).removeClass("is-invalid").addClass("is-valid");
+              
+              // Store the NPO data for category loading
+              if (!window.npo_data) {
+                window.npo_data = [];
+              }
+              
+              // Add the NPO to the global data if not already present
+              const existingNpo = window.npo_data.find(n => n.meta.zuid === npo.meta.zuid);
+              if (!existingNpo) {
+                window.npo_data.push(npo);
+              }
+              
+              // Update validation state
+              if (window.validationState) {
+                window.validationState.selectedNPO = true;
+              }
+              
+              // Enable category input and load categories for this NPO
+              $("#categorySearchInput").prop("disabled", false);
+              
+              // Load categories for the selected NPO and pre-select first cause
+              loadCategoriesForNPO(npo, true); // Enable cause pre-selection
+              
+              // Trigger validation check after prefill
+              if (typeof checkAllValid === 'function') {
+                checkAllValid();
+              }
+            } else {
+              console.warn("No NPO found with ZUID:", zuid);
+              $("#npoSearchInput").val("").prop("disabled", false);
+            }
+          } else if (result.isError) {
+            console.error("Error prefilling NPO:", result.error);
+            $("#npoSearchInput").val("").prop("disabled", false);
+          }
+        });
+        
+        // Trigger initial fetch
+        currentNpoQuery.refetch();
+        
+      } catch (error) {
+        console.error("Error prefilling NPO:", error);
+        $("#npoSearchInput").val("").prop("disabled", false);
       }
     }
+
 
     const debouncedSearchNPO = debounce(function () {
       const searchTerm = npoSearchInput.val().trim();
@@ -549,14 +1004,40 @@
     npoSearchInput.on("input", debouncedSearchNPO);
     categorySearchInput.on("input", debouncedSearchCategory);
 
+    // Post-as interactions
+    postAsInput.on("focus", function () {
+      if (postAsDropdown.children().length === 0) {
+        postAsDropdown.empty().append('<li><span class="dropdown-item text-center"><div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>Loading...</span></li>');
+        postAsDropdown.show();
+        loadPostAsOptions();
+      } else {
+        postAsDropdown.show();
+      }
+    });
+
+    postAsDropdown.on("click", "a.dropdown-item", function (e) {
+      e.preventDefault();
+      const zuid = $(this).data("zuid") || "";
+      const type = $(this).data("type");
+      const name = $(this).text();
+      selectedPostAsZuid.val(zuid);
+      postAsInput.val(name);
+      postAsDropdown.hide();
+      // Set global for story creation: null for My Profile, ZUID when NPO selected
+      window.story_post_as_npo_zuid = zuid ? String(zuid) : null;
+    });
+
     // Validation Events
     storyDescription.on("input focus", validateStoryDescription);
     npoSearchInput.on("input focus", validateSelectedNPO);
-    locationInput.on("input focus", validateLocation);
+    categorySearchInput.on("input focus", validateSelectedCategory);
 
-    // Trigger search on focus
+    // Modify the focus event handlers to show loading state
     npoSearchInput.on("focus", function () {
       if (npoDropdown.children().length === 0) {
+        // Show loading indicator before starting the search
+        npoDropdown.empty().append('<li><span class="dropdown-item text-center"><div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>Loading...</span></li>');
+        npoDropdown.show();
         searchNPOs("");
       } else {
         npoDropdown.show();
@@ -574,7 +1055,7 @@
           categoryDropdown.show();
           return;
         }
-
+        
         const selectedNPOData = window.npo_data?.find(npo => npo.meta.zuid === selectedNPOId);
         searchCategories("", selectedNPOData, true);
       } else {
@@ -591,14 +1072,14 @@
       npoDropdown.hide();
       validateSelectedNPO();
 
-      // Deselect any selected category
+      // Deselect any selected category and clear validation
       selectedCategory.val("");
-      categorySearchInput.val("");
+      categorySearchInput.val("").removeClass("is-valid is-invalid");
       
       // Enable category input and refresh categories
       categorySearchInput.prop("disabled", false);
       const selectedNPOData = window.npo_data?.find(npo => npo.meta.zuid === npoId);
-      searchCategories("", selectedNPOData, false);
+      loadCategoriesForNPO(selectedNPOData, true); // Enable cause pre-selection
     });
 
     categoryDropdown.on("click", "a.dropdown-item", function (e) {
@@ -608,110 +1089,158 @@
       selectedCategory.val(categoryId);
       categorySearchInput.val(categoryName);
       categoryDropdown.hide();
-      // Remove category validation
-      // validateSelectedCategory();
+      validateSelectedCategory();
     });
 
+    // Fix dropdown behavior to prevent random showing
+    // Add explicit blur handlers to hide dropdowns when input loses focus, unless clicking on the dropdown itself
+    npoSearchInput.on("blur", function(e) {
+      // Use setTimeout to allow click events on dropdown items to register first
+      setTimeout(function() {
+        // Only hide if the related target is not part of the dropdown
+        if (!$(document.activeElement).closest('#npoDropdown').length) {
+          npoDropdown.hide();
+        }
+      }, 150);
+    });
+
+    categorySearchInput.on("blur", function(e) {
+      // Use setTimeout to allow click events on dropdown items to register first
+      setTimeout(function() {
+        // Only hide if the related target is not part of the dropdown
+        if (!$(document.activeElement).closest('#categoryDropdown').length) {
+          categoryDropdown.hide();
+        }
+      }, 150);
+    });
+
+    // Improve the document click handler to be more specific
     $(document).on("click", function (e) {
-      if (!$(e.target).closest(".dropdown").length) {
+      // For NPO dropdown
+      if (!$(e.target).closest(".dropdown").length && 
+          !$(e.target).is("#npoSearchInput") && 
+          npoDropdown.is(":visible")) {
         npoDropdown.hide();
+      }
+      
+      // For Category dropdown
+      if (!$(e.target).closest(".dropdown").length && 
+          !$(e.target).is("#categorySearchInput") && 
+          categoryDropdown.is(":visible")) {
         categoryDropdown.hide();
       }
-    });
-
-    // Initial NPO and Category load
-    // searchNPOs("");
-    // searchCategories("");
-
-    useCurrentLocationBtn.on("click", function () {
-      if ("geolocation" in navigator) {
-        // Show loading spinner and disable button
-        locationSpinner.removeClass("d-none");
-        locationButtonText.addClass("d-none");
-        useCurrentLocationBtn.prop("disabled", true);
-
-        navigator.geolocation.getCurrentPosition(
-          function (position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-
-            $.ajax({
-              url: `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
-              type: "GET",
-              dataType: "json",
-              success: function (data) {
-                if (data.address) {
-                  const city =
-                    data.address.city ||
-                    data.address.town ||
-                    data.address.village ||
-                    "";
-                  const state = data.address.state || "";
-                  const country = data.address.country || "";
-
-                  let locationString = [city, state, country]
-                    .filter(Boolean)
-                    .join(", ");
-                  locationInput.val(locationString);
-                  locationInput.removeClass("is-invalid is-valid");
-                  locationInput.addClass("is-valid");
-                  locationFeedback.text("");
-                  validationState.location = true;
-                } else {
-                  locationInput.addClass("is-invalid");
-                  locationFeedback.text(
-                    "Unable to determine location. Please enter manually."
-                  );
-                  validationState.location = false;
-                }
-              },
-              error: function () {
-                locationInput.addClass("is-invalid");
-                locationFeedback.text(
-                  "Error fetching location. Please enter manually."
-                );
-                validationState.location = false;
-              },
-              complete: function () {
-                // Hide loading spinner and enable button
-                locationSpinner.addClass("d-none");
-                locationButtonText.removeClass("d-none");
-                useCurrentLocationBtn.prop("disabled", false);
-                checkAllValid();
-              },
-            });
-          },
-          function (error) {
-            locationInput.addClass("is-invalid");
-            locationFeedback.text(
-              "Error: " + error.message + ". Please enter location manually."
-            );
-            // Hide loading spinner and enable button
-            locationSpinner.addClass("d-none");
-            locationButtonText.removeClass("d-none");
-            useCurrentLocationBtn.prop("disabled", false);
-            validationState.location = false;
-            checkAllValid();
-          }
-        );
-      } else {
-        locationInput.addClass("is-invalid");
-        locationFeedback.text(
-          "Geolocation is not supported by your browser. Please enter location manually."
-        );
-        validationState.location = false;
-        checkAllValid();
+      // For Post-as dropdown
+      if (!$(e.target).closest('.dropdown').length &&
+          !$(e.target).is('#postAsInput') &&
+          postAsDropdown.is(':visible')) {
+        postAsDropdown.hide();
       }
     });
 
+    // Fix potential race conditions in dropdown visibility
+    // When window is clicked elsewhere, ensure dropdowns are hidden
+    $(window).on("click", function(e) {
+      if (!$(e.target).closest('#npoSearchInput, #npoDropdown').length) {
+        npoDropdown.hide();
+      }
+      
+      if (!$(e.target).closest('#categorySearchInput, #categoryDropdown').length) {
+        categoryDropdown.hide();
+      }
+      if (!$(e.target).closest('#postAsInput, #postAsDropdown').length) {
+        postAsDropdown.hide();
+      }
+    });
+
+    // Ensure dropdowns are hidden when modal is closed or when switching steps
+    $("#createStoryModal").on("hidden.bs.modal", function() {
+      npoDropdown.hide();
+      categoryDropdown.hide();
+      postAsDropdown.hide();
+    });
+
+    $("#nextBtn, #backBtn").on("click", function() {
+      npoDropdown.hide();
+      categoryDropdown.hide();
+    });
+
+    // Check if npoPageZuid is provided and prefill NPO
+    if (window.npoPageZuid && window.npoPageZuid.trim() !== "") {
+      if (typeof prefillNPOFromZuid !== 'function') {
+        console.error("prefillNPOFromZuid function is not available");
+        return;
+      }
+      
+      try {
+        prefillNPOFromZuid(window.npoPageZuid.trim());
+        // Trigger validation check after prefill
+        if (typeof checkAllValid === 'function') {
+          checkAllValid();
+        }
+      } catch (error) {
+        console.error("Error in NPO prefill:", error);
+      }
+    } else {
+      // No npoPageZuid provided, load user's NPOs and pre-select the first one alphabetically
+      loadAndPreselectFirstNPO();
+    }
+
+    // Post-as options are loaded reactively via subscribeToUserManagedNpos
+    // NPO and Category loading is handled reactively via TanStack Query subscriptions
+
     // Initial validation check
-    updateNextButtonState(true);
+    if (typeof updateNextButtonState === 'function') {
+      updateNextButtonState(true);
+    } else {
+      console.warn("updateNextButtonState function is not available");
+    }
 
     const uploadArea = document.getElementById("uploadArea");
     const fileInput = document.getElementById("fileInput");
     const browseButton = document.getElementById("browseButton");
     const previewContainer = document.getElementById("previewContainer");
     let uploadedFiles = [];
+    let draggedItemIndex = null;
+
+    function handleDragStart(event, index) {
+      draggedItemIndex = index;
+      event.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => {
+        event.target.classList.add('dragging');
+      }, 0);
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleDrop(event, targetIndex) {
+      event.preventDefault();
+      if (draggedItemIndex === null || draggedItemIndex === targetIndex) {
+        if (draggedItemIndex !== null) {
+            const draggedElement = previewContainer.children[draggedItemIndex + (uploadedFiles.length > 0 && uploadedFiles.length < 5 ? 1 : 0)]; // Adjust index if "add more" is present
+            if (draggedElement) draggedElement.classList.remove('dragging');
+        }
+        draggedItemIndex = null;
+        return;
+      }
+
+      const itemToMove = uploadedFiles.splice(draggedItemIndex, 1)[0];
+      uploadedFiles.splice(targetIndex, 0, itemToMove);
+
+      window.hero_image = [...uploadedFiles];
+      
+      draggedItemIndex = null;
+      updatePreviews();
+    }
+
+    function handleDragEnd(event) {
+      event.target.classList.remove('dragging');
+      if (draggedItemIndex !== null) {
+          draggedItemIndex = null;
+      }
+    }
 
     uploadArea.addEventListener("click", () => fileInput.click());
 
@@ -740,82 +1269,133 @@
     });
 
     function handleFiles(files) {
-      // Only take the first file
-      const file = files[0];
-
-      if (file && file.type.startsWith("image/")) {
-        // Replace the existing files array with just the new file
-        uploadedFiles = [file];
+      // Convert FileList to Array and filter for images and videos
+      const newFiles = Array.from(files).filter(file => 
+        file.type.startsWith("image/") || 
+        file.type === "video/mp4" || 
+        file.type === "video/x-flv" || 
+        file.type === "video/quicktime"
+      );
+      
+      // Check if adding these files would exceed the 5-media limit
+      if (uploadedFiles.length + newFiles.length > 5) {
+        // If we exceed the limit, only take what we can fit
+        const availableSlots = 5 - uploadedFiles.length;
+        if (availableSlots > 0) {
+          // Add only the number of files that fit within the limit
+          const filesToAdd = newFiles.slice(0, availableSlots);
+          uploadedFiles = [...uploadedFiles, ...filesToAdd];
+          window.hero_image = uploadedFiles;
+          alert(`You can only upload up to 5 media files. Added ${filesToAdd.length} of ${newFiles.length} selected files.`);
+        } else {
+          alert("Maximum of 5 media files allowed. Please remove some files before adding more.");
+        }
+      } else if (newFiles.length > 0) {
+        // If we're within the limit, add all the new files
+        uploadedFiles = [...uploadedFiles, ...newFiles];
         window.hero_image = uploadedFiles;
-        updatePreviews();
       }
+      
+      updatePreviews();
+      fileInput.value = null;
     }
 
     function updatePreviews() {
       previewContainer.innerHTML = "";
 
-      if (uploadedFiles.length === 1) {
+      // Only add the "add more" button if we have at least one file but fewer than 5
+      if (uploadedFiles.length > 0 && uploadedFiles.length < 5) {
+        const addMore = document.createElement("div");
+        addMore.classList.add("add-more");
+        addMore.innerHTML =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/></svg>';
+        addMore.addEventListener("click", () => fileInput.click());
+        previewContainer.appendChild(addMore);
+      }
+
+      // Create preview elements for each uploaded file
+      uploadedFiles.forEach((file, index) => {
         const previewItem = document.createElement("div");
         previewItem.classList.add("preview-item");
+        previewItem.draggable = true; // Make the item draggable
 
-        const preview = document.createElement("img");
-        preview.classList.add("preview-image");
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          preview.src = e.target.result;
-        };
-        reader.readAsDataURL(uploadedFiles[0]);
+        // Attach drag and drop event listeners
+        previewItem.addEventListener('dragstart', (event) => handleDragStart(event, index));
+        previewItem.addEventListener('dragover', handleDragOver);
+        previewItem.addEventListener('drop', (event) => handleDrop(event, index));
+        previewItem.addEventListener('dragend', handleDragEnd);
+
+        let mediaElement;
+        
+        if (file.type === "video/mp4" || file.type === "video/x-flv" || file.type === "video/quicktime") {
+          // Create video element for MP4 files
+          mediaElement = document.createElement("video");
+          mediaElement.classList.add("preview-image"); // Reuse the same CSS class for consistency
+          mediaElement.controls = false; // Disable controls in preview
+          mediaElement.muted = true;
+          mediaElement.preload = "metadata";
+          
+          // Add video-preview class to the preview item for the play icon overlay
+          previewItem.classList.add("video-preview");
+          
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            mediaElement.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          // Create image element for image files
+          mediaElement = document.createElement("img");
+          mediaElement.classList.add("preview-image");
+          
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            mediaElement.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
 
         const removeBtn = document.createElement("button");
         removeBtn.classList.add("remove-btn");
         removeBtn.innerHTML = "&times;";
-        removeBtn.addEventListener("click", () => removeFile(0));
+        removeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          removeFile(index);
+        });
 
-        previewItem.appendChild(preview);
+        previewItem.appendChild(mediaElement);
         previewItem.appendChild(removeBtn);
 
         previewContainer.appendChild(previewItem);
-      }
+      });
 
       updateUploadArea();
-      validationState.storyImage = uploadedFiles.length > 0;
+      validationState.storyMedia = uploadedFiles.length > 0;
       checkAllValid();
     }
 
-    function removeFile() {
-      uploadedFiles = [];
-      window.hero_image = [];
+    function removeFile(index) {
+      // Remove the file at the specified index
+      uploadedFiles.splice(index, 1);
+      window.hero_image = uploadedFiles;
       updatePreviews();
     }
 
     function updateUploadArea() {
-      if (uploadedFiles.length > 0) {
-        uploadArea.style.display = "none";
-        // Keep the add more button for replacing the image
-        if (!document.querySelector(".add-more")) {
-          const addMore = document.createElement("div");
-          addMore.classList.add("add-more");
-          addMore.innerHTML =
-            '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-image" viewBox="0 0 16 16"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/><path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/></svg>';
-          addMore.addEventListener("click", () => fileInput.click());
-          previewContainer.insertBefore(addMore, previewContainer.firstChild);
-        }
-      } else {
+      // Show upload area only if we have no media files
+      if (uploadedFiles.length === 0) {
         uploadArea.style.display = "block";
-        const addMore = document.querySelector(".add-more");
-        if (addMore) {
-          addMore.remove();
-        }
+      } else {
+        uploadArea.style.display = "none";
       }
     }
 
     window.resetAllStates = function () {
       // Reset validation state
       validationState = {
-        storyImage: false,
+        storyMedia: false,
         storyDescription: false,
-        selectedNPO: false,
-        location: false,
+        selectedNPO: false
       };
 
       // Reset uploaded files
@@ -828,35 +1408,50 @@
 
       // Remove validation classes
       $("#storyDetailsForm .form-control").removeClass("is-valid is-invalid");
+      $("#npoSearchInput").removeClass("is-valid is-invalid");
+      $("#categorySearchInput").removeClass("is-valid is-invalid");
 
       // Reset dropdown selections
       $("#selectedNPO").val("");
       $("#selectedCategory").val("");
       $("#npoSearchInput").val("").removeClass("is-valid is-invalid");
       $("#categorySearchInput").val("").removeClass("is-valid is-invalid").prop("disabled", true);
-
-      // Reset location field
-      $("#location").val("").removeClass("is-valid is-invalid");
-      $("#locationFeedback").text("Please enter a location.");
+      // Reset Post-as
+      $("#selectedPostAsZuid").val("");
+      $("#postAsInput").val("My Profile");
+      window.story_post_as_npo_zuid = null;
 
       // Hide dropdown menus
       $("#npoDropdown").hide();
       $("#categoryDropdown").hide();
 
-      // Hide image preview and reset upload area
-      $("#imagePreview").attr("src", "").addClass("d-none");
-      $("#uploadMessage").removeClass("d-none");
-      $("#removeImageBtn").addClass("d-none");
-
-      // Clear preview container
-      $("#previewContainer").empty();
+      // Show upload area and clear preview container
+      uploadArea.style.display = "block";
+      previewContainer.innerHTML = "";
 
       // Optionally, reset any global variables or additional states
       window.npo_data = [];
       window.category_data = [];
 
       // Reset Next button state
-      updateNextButtonState(true);
+      if (typeof updateNextButtonState === 'function') {
+        updateNextButtonState(true);
+      } else {
+        console.warn("updateNextButtonState function is not available");
+      }
+
+      // Re-prefill NPO if npoPageZuid is provided, otherwise pre-select first NPO alphabetically
+      if (window.npoPageZuid && window.npoPageZuid.trim() !== "") {
+        prefillNPOFromZuid(window.npoPageZuid.trim());
+      } else {
+        // No npoPageZuid provided, get user data from TanStack Query and pre-select first NPO
+        if (userProfileQuery) {
+          const result = userProfileQuery.getCurrentResult();
+          if (result.isSuccess && result.data?.data?.[0]) {
+            loadAndPreselectFirstNPO(result.data.data[0]);
+          }
+        }
+      }
     };
   });
 </script>

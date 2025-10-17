@@ -1,3 +1,4 @@
+{{ $npoZuid = {get_var.zuid} }}
 <style>
   h5 {
     color: rgb(94, 94, 94);
@@ -55,13 +56,39 @@
   >
     <i>
       <p class="text-muted text-center" style="max-width: 600px">
-        We will notify you when we launch Beta. If you'd like to find out more
-        details about your free benefits now, please schedule a meeting using
-        the links below
+        Look out for our email confirming your admin access. We'll be in touch soon so you can start enjoying your Early Adopter benefits.
       </p>
     </i>
   </div>
 </div>
+
+<section class="container-fluid container-md my-4" style="background-color: #f5f7fa;">
+  <div class="row p-4">
+    <div class="col-md-4">
+      <div class="h-100 d-flex flex-column justify-content-center">
+        <img src="{{ this.storyfest_image.getImage() }}" alt="StoryFest 2025" class="img-fluid rounded w-100" style="min-height: 100%; object-fit: cover;" />
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="py-4">
+        <h3 class="fw-bold mb-3">While We Verify Your Profile, Submit your Nonprofit Story to StoryFest 2025</h3>
+        <p>Submit your Story to StoryFest and get the chance to:</p>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li>📰 National Media Exposure</li>
+          <li>📍 Featured in CauseCircle's Nonprofit Directory</li>
+          <li>🚀 Amplify Your Mission to New Supporters</li>
+        </ul>
+        <div class="mt-4 d-flex flex-column gap-2">
+          <p class="fw-bold">To Enter: Create a story for {{non_profits.filter({get_var.zuid}).name}} with hashtag #StoryFest2025.</p>
+          <div class="d-flex gap-2">
+            <a href="{{non_profits.filter({get_var.zuid}).path_full}}" class="btn btn-primary px-4">Submit a Story</a>
+            <a href="{{storyfest.first().path_full}}" class="btn btn-secondary px-4">Learn more about StoryFest</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <div
   id="multipleLocations"
@@ -77,11 +104,10 @@
   </iframe>
 </div>
 
-<script>
+<script type="module">
   //get url param multipleLocations
   const urlParams = new URLSearchParams(window.location.search);
   const multipleLocations = urlParams.get("multiplelocations");
-  // console.log(multipleLocations);
 
   if (multipleLocations === "true") {
     $("#multipleLocations").removeClass("d-none");

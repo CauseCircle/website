@@ -1,1 +1,29 @@
-{{ stories.last().toJSON(1, false) }}
+{{$page = 1}}
+{{$limit = 25}}
+{{$search = }}
+
+{{if {get_var.page} }}
+    {{$page = {get_var.page} }}
+{{/if}}
+
+{{if {get_var.name} }}
+    {{$search = WHERE item.first_name LIKE '%{get_var.name}%' OR item.last_name LIKE '%{get_var.name}%' }}
+{{else-if {get_var.email} }}
+    {{$search = WHERE item.email LIKE '%{get_var.email}%' }}
+{{/if}}
+
+{{$start = {math(({$page} - 1) * {$limit})} }}
+{
+    "data" :
+    [
+        {{each users as item {$search} limit {$start}, {$limit} }}
+        {{item.toJSON()}}
+        {{item._arraycomma}}
+        {{/each}}
+    ],
+    "meta" : {
+        "page" : {{$page}},
+        "limit" : {{$limit}},
+        "search": {{$search}}
+    }
+}

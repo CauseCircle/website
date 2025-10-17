@@ -76,11 +76,232 @@
   .interaction-btn:hover {
     color: #0d6efd;
   }
+
+  /* Hashtag styles */
+  .hashtag-item {
+    color: #7b3fee;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  
+  .hashtag-item:hover {
+    text-decoration: underline;
+    color: #5a2bb8;
+  }
+
+  .hashtags-container {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .clickable {
+    cursor: pointer;
+  }
+
+  .checklist-item {
+    background: #fff;
+    border: 1px solid #e6e6e6;
+  }
+
+  .checklist-item.hidden {
+    display: none !important;
+  }
+
+  /* Smooth transitions for checklist items */
+  .checklist-item {
+    transition: opacity 0.3s ease, transform 0.3s ease, height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+  }
+
+  .checklist-item.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Ensure proper spacing when items are hidden */
+  .checklist-item:not(.hidden) + .checklist-item:not(.hidden) {
+    margin-top: 0.75rem;
+  }
+
+  /* Progress badge styles */
+  #completionProgress {
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  /* Quick tips link styling */
+  .bg-light a {
+    color: var(--bs-primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .checklist-icon-container {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Skeleton loader styles */
+  .skeleton {
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    border-radius: 4px;
+  }
+
+  @keyframes skeleton-loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  .skeleton.skeleton-avatar { width: 48px; height: 48px; border-radius: 50%; }
+  .skeleton.skeleton-title { height: 20px; width: 70%; }
+  .skeleton.skeleton-text { height: 14px; width: 100%; }
+  .skeleton.skeleton-text-short { height: 12px; width: 40%; }
+  .skeleton.skeleton-image { width: 100%; height: 200px; border-radius: 8px; }
+  .skeleton.skeleton-button { width: 90px; height: 32px; }
+
+  /* Author section hover effect */
+  .author-section:hover .author-name {
+    color: var(--bs-primary) !important;
+    transition: color 0.2s ease;
+  }
 </style>
 
-<div class="tab-pane active" id="dashboard">
+<div class="tab-pane fade show active" id="dashboard">
+  <!-- Completion Checklist Skeleton -->
+  <div id="completionChecklistSkeleton" class="card mb-3 p-3">
+    <div class="skeleton skeleton-title mb-4" style="width: 200px; height: 24px;"></div>
+    
+    <div class="checklist-item d-flex align-items-center justify-content-between mb-3 p-3 rounded">
+      <div class="d-flex align-items-center gap-3 w-100">
+        <div class="skeleton" style="width: 32px; height: 32px; border-radius: 50%;"></div>
+        <div style="flex-grow: 1;">
+          <div class="skeleton skeleton-title mb-2" style="width: 40%;"></div>
+          <div class="skeleton skeleton-text" style="width: 70%;"></div>
+        </div>
+      </div>
+      <div class="skeleton skeleton-button" style="flex-shrink: 0;"></div>
+    </div>
+    <div class="checklist-item d-flex align-items-center justify-content-between mb-3 p-3 rounded">
+      <div class="d-flex align-items-center gap-3 w-100">
+        <div class="skeleton" style="width: 32px; height: 32px; border-radius: 50%;"></div>
+        <div style="flex-grow: 1;">
+          <div class="skeleton skeleton-title mb-2" style="width: 50%;"></div>
+          <div class="skeleton skeleton-text" style="width: 80%;"></div>
+        </div>
+      </div>
+      <div class="skeleton skeleton-button" style="flex-shrink: 0;"></div>
+    </div>
+    <div class="checklist-item d-flex align-items-center justify-content-between mb-3 p-3 rounded">
+      <div class="d-flex align-items-center gap-3 w-100">
+        <div class="skeleton" style="width: 32px; height: 32px; border-radius: 50%;"></div>
+        <div style="flex-grow: 1;">
+          <div class="skeleton skeleton-title mb-2" style="width: 45%;"></div>
+          <div class="skeleton skeleton-text" style="width: 75%;"></div>
+        </div>
+      </div>
+      <div class="skeleton skeleton-button" style="flex-shrink: 0;"></div>
+    </div>
+  </div>
+
+  <!-- Completion Checklist -->
+  <div id="completionChecklistCard" class="card mb-3 p-3 d-none">
+    <div class="d-flex justify-content-between align-items-center w-100">
+      <div class="d-flex align-items-center gap-2">
+        <h5 class="mb-0">Completion Checklist</h5>
+        <span id="completionProgress" class="badge bg-primary rounded-pill">0 items remaining</span>
+      </div>
+      <button class="btn btn-link p-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#completionChecklistCollapse" aria-expanded="true" aria-controls="completionChecklistCollapse" title="Toggle checklist">
+        <i class="bi bi-chevron-down" id="completionChecklistChevron"></i>
+      </button>
+    </div>
+    <div id="completionChecklistCollapse" class="collapse show w-100 mt-3">
+      <!-- Simplified 4-item Checklist -->
+
+      <!-- Verify Profile Details -->
+      <div id="checklist-profile" class="checklist-item d-flex align-items-center justify-content-between mb-3 p-3 rounded">
+        <div class="d-flex align-items-center gap-3">
+          <span class="checklist-icon-container d-flex align-items-center justify-content-center rounded-circle">
+            <i class="checklist-icon bi bi-person-badge fs-5"></i>
+          </span>
+          <div>
+            <div class="fw-semibold">Verify your Organization's details</div>
+            <div class="text-muted small">Review your organization's branding, logo, banner, EIN, mission, and etc.</div>
+          </div>
+        </div>
+        <button class="btn btn-sm">Complete Profile</button>
+      </div>
+
+      <!-- Add your first story -->
+      <div id="checklist-story" class="checklist-item d-flex align-items-center justify-content-between mb-3 p-3 rounded">
+        <div class="d-flex align-items-center gap-3">
+          <span class="checklist-icon-container d-flex align-items-center justify-content-center rounded-circle">
+            <i class="checklist-icon bi bi-clock-history fs-5"></i>
+          </span>
+          <div>
+            <div class="fw-semibold">Get started with your Org's first story</div>
+            <div class="text-muted small">Share your first story to your organization's page.</div>
+          </div>
+        </div>
+        <button class="btn btn-sm">Post a Story</button>
+      </div>
+
+      <!-- Set your story goal -->
+      <div id="checklist-goal" class="checklist-item d-flex align-items-center justify-content-between mb-3 p-3 rounded">
+        <div class="d-flex align-items-center gap-3">
+          <span class="checklist-icon-container d-flex align-items-center justify-content-center rounded-circle">
+            <i class="checklist-icon bi bi-flag fs-5"></i>
+          </span>
+          <div>
+            <div class="fw-semibold">Add a Story goal</div>
+            <div class="text-muted small">Set a goal for how many stories your org wants to publish per week.</div>
+          </div>
+        </div>
+        <button class="btn btn-sm">Set Goal</button>
+      </div>
+
+      <!-- Invite your supporters -->
+      <div id="checklist-invite" class="checklist-item d-flex align-items-center justify-content-between mb-3 p-3 rounded">
+        <div class="d-flex align-items-center gap-3">
+          <span class="checklist-icon-container d-flex align-items-center justify-content-center rounded-circle">
+            <i class="checklist-icon bi bi-people fs-5"></i>
+          </span>
+          <div>
+            <div class="fw-semibold">Invite your supporters</div>
+            <div class="text-muted small">Share your CauseCircle profile with your supporters, so they can add their stories to your cause.</div>
+          </div>
+        </div>
+        <button class="btn btn-sm">Invite</button>
+      </div>
+
+      <!-- Quick Tips -->
+      <div class="mt-4 p-3 rounded bg-light d-flex align-items-start gap-3 bg-opacity-50">
+        <span class="mt-1"><i class="bi bi-info-circle text-primary"></i></span>
+        <div>
+          <div class="fw-semibold mb-1">Quick Tips</div>
+          <div class="text-muted small mb-1">
+            Complete required items first to maximize your profile's visibility. High-quality images and compelling stories help attract more supporters. Optional items like events can further enhance your organization's presence
+          </div>
+          <a href="#" class="text-decoration-underline">Learn More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <!-- Today's Actions -->
-  <div class="card d-flex gap-3 mb-3">
+  <div id="today-actions" class="card d-flex gap-3 mb-3 d-none">
     <div>
       <h5 class="mb-0">Today's actions</h5>
       <p class="text-muted">
@@ -88,8 +309,7 @@
       </p>
     </div>
     <div
-      class="card d-flex flex-row justify-content-between align-items-center"
-      style="cursor: pointer;"
+      class="card d-flex flex-row justify-content-between align-items-center clickable"
       data-bs-toggle="modal"
       data-bs-target="#reviewStoriesModal"
     >
@@ -98,11 +318,8 @@
           <i class="bi bi-list-check fs-4"></i>
         </div>
         <div id="review-stories-count">
-          <h6 class="mb-0">Review 0 New User Stories</h6>
-          <small class="text-muted"
-            >Approve or reject stories created by users for your non
-            profit</small
-          >
+          <div class="skeleton skeleton-title mb-2" style="width: 250px;"></div>
+          <div class="skeleton skeleton-text" style="width: 350px;"></div>
         </div>
       </div>
       <div class="btn btn-link">
@@ -122,7 +339,7 @@
         <div class="card">
           {{$followersCount = 0}}
           <!--prettier-ignore-->
-          {{ each users as user where user.favorite_npos = '{get_var.zuid}'}}
+          {{ each users as user where user.favorite_npos = '{$zuid}'}}
           {{$followersCount = {user._num} }}
           {{/each}}
           <div class="metric-value">0</div>
@@ -133,7 +350,7 @@
         <div class="card">
           {{$storiesCount = 0}}
           <!--prettier-ignore-->
-          {{ each stories as story where story.related_npos = '{get_var.zuid}' }}
+          {{ each stories as story where story.related_npos = '{$zuid}' }}
           {{$storiesCount = {story._num} }}
           {{/each}}
           <div class="metric-value">{{$storiesCount}}</div>
@@ -157,40 +374,112 @@
 
   <!-- Join the Conversation -->
   <div class="card d-flex gap-3 mb-3">
-    <div>
-      <h5 class="mb-0">Join the Conversation</h5>
-      <p class="text-muted">
+    <div class="d-flex justify-content-between align-items-center w-100">
+      <div>
+        <h5 class="mb-0">Join the Conversation</h5>
+        <p class="text-muted mb-0 d-none d-md-block">
+          Write comments and create awareness about your non profit
+        </p>
+      </div>
+      <button class="btn btn-link p-0 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#joinConversationCollapse" aria-expanded="true" aria-controls="joinConversationCollapse" title="Toggle conversation">
+        <i class="bi bi-chevron-down" id="joinConversationChevron"></i>
+      </button>
+    </div>
+    <div id="joinConversationCollapse" class="collapse show w-100">
+      <p class="text-muted d-md-none mt-2">
         Write comments and create awareness about your non profit
       </p>
-    </div>
-
-    <!-- Posts Container -->
-    <div class="posts-container">
-      <div id="stories-scroll" class="row g-4 stories-grid"></div>
+      <!-- Posts Container -->
+      <div class="posts-container">
+        <div id="stories-scroll" class="row g-4 stories-grid">
+          <!-- Story Skeleton -->
+          <div class="col-12 col-md-6">
+            <div class="post-card h-100 p-3">
+              <div class="d-flex align-items-center mb-3">
+                <div class="skeleton skeleton-avatar"></div>
+                <div class="ms-3 w-100">
+                  <div class="skeleton skeleton-title mb-2" style="width: 60%;"></div>
+                  <div class="skeleton skeleton-text-short"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton-title mb-2" style="width: 90%;"></div>
+              <div class="skeleton skeleton-text mb-1"></div>
+              <div class="skeleton skeleton-text mb-3" style="width: 95%;"></div>
+              <div class="skeleton skeleton-image"></div>
+            </div>
+          </div>
+          <!-- Story Skeleton -->
+          <div class="col-12 col-md-6">
+            <div class="post-card h-100 p-3">
+              <div class="d-flex align-items-center mb-3">
+                <div class="skeleton skeleton-avatar"></div>
+                <div class="ms-3 w-100">
+                  <div class="skeleton skeleton-title mb-2" style="width: 50%;"></div>
+                  <div class="skeleton skeleton-text-short"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton-title mb-2" style="width: 80%;"></div>
+              <div class="skeleton skeleton-text mb-1"></div>
+              <div class="skeleton skeleton-text mb-3" style="width: 90%;"></div>
+              <div class="skeleton skeleton-image"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
+<script type="module">
+  // ==================== TANSTACK QUERY SETUP ====================
+  const npoZuid = "{{$zuid}}";
 
+  // Create query observers for different story lists
+  const pendingStoriesQuery = window.createStoriesQuery({
+    npo: npoZuid,
+    approved: '0',
+    status: 'pending',
+    limit: 9999
+  });
 
-<script>
-  window.getStories = function (zuid, approved = 1, status = "") {
-    return $.getJSON(
-      `https://4xxglxlj-dev.webengine.zesty.io/mobileapp/stories.json?npo=${zuid}&approved=${approved}&status=${status}&zpw=causecircle`
-    ).then((data) => data?.data);
-  };
+  const approvedStoriesQuery = window.createStoriesQuery({
+    npo: npoZuid,
+    approved: '1',
+    status: 'approved',
+    limit: 9999
+  });
 
-  window.getNewStoriesCount = async function (zuid) {
+  const allStoriesQuery = window.createStoriesQuery({
+    npo: npoZuid,
+    status: 'all',
+    limit: 9999
+  });
+
+  const npoProfileQuery = window.createNPOProfileQuery(npoZuid);
+
+  // Subscribe to pending stories query for "Review Stories" section
+  pendingStoriesQuery.subscribe((result) => {
     const reviewStoriesCount = $("#review-stories-count");
     const modalReviewStoriesCount = $("#modal-review-stories-count");
+    const todayActions = $("#today-actions");
 
-    try {
-      const stories = await getStories(zuid, 0, "null");
+    if (result.isLoading) {
+      todayActions.removeClass("d-none");
+      reviewStoriesCount.html(`
+        <div class="skeleton skeleton-title mb-2" style="width: 250px;"></div>
+        <div class="skeleton skeleton-text" style="width: 350px;"></div>
+      `);
+    } else if (result.isError) {
+      console.error("Error loading pending stories:", result.error);
+      reviewStoriesCount.html("<p>Error updating review stories display</p>");
+      todayActions.addClass("d-none");
+    } else if (result.isSuccess) {
+      const stories = result.data?.data || [];
 
       // Update the review stories count on the dashboard
       reviewStoriesCount.empty();
       reviewStoriesCount.append(
-        `<h6 class="mb-0">Review ${stories?.length || 0} New User Stories</h6>`
+        `<h6 class="mb-0">Review ${stories.length} New User Stories</h6>`
       );
       reviewStoriesCount.append(`<small class="text-muted"
         >Approve or reject stories created by users for your non
@@ -198,74 +487,581 @@
 
       // Update the review stories count on the modal
       modalReviewStoriesCount.text(
-        `You have ${stories?.length || 0} stories left to review`
+        `You have ${stories.length} stories left to review`
       );
-    } catch (error) {
-      console.error("Error updating review stories count:", error);
-      reviewStoriesCount.append("<p>Error updating review stories display</p>");
+
+      if (stories.length > 0) {
+        todayActions.removeClass("d-none");
+      } else {
+        todayActions.addClass("d-none");
+      }
     }
+  });
+
+  window.getNewStoriesCount = function (zuid) {
+    // Trigger refetch if needed
+    return pendingStoriesQuery.refetch();
   };
 
-  window.getApprovedStories = async function (zuid) {
-    const approvedStoriesContainer = $("#stories-scroll");
-    const stories = await getStories(zuid, 1, "approved");
+  window.loadStories = function (zuid) {
+    // Return cached pending stories or trigger refetch
+    const currentState = pendingStoriesQuery.getCurrentResult();
+    if (currentState.data) {
+      return Promise.resolve(currentState.data?.data || []);
+    }
+    return pendingStoriesQuery.refetch().then(result => result.data?.data || []);
+  };
 
-    approvedStoriesContainer.empty();
-    stories.forEach((story) => {
-      approvedStoriesContainer.append(`
-        <div class="col-12 col-md-6">
-          <div class="post-card h-100">
-            <div class="d-flex align-items-center mb-3">
-              <img
-                src="${story.author.data[0].profile_image || 'https://placehold.co/100x100?text=Profile'}"
-                alt="Profile"
-                class="rounded-circle profile-image"
-              />
-              <div class="ms-3">
-                <h6 class="mb-0">${story.author.data[0].first_name} ${story.author.data[0].last_name}</h6>
-                <small class="text-muted">${formatDate(story.date_published)}</small>
-              </div>
+  // Function to extract hashtags from story text
+  function extractHashtagsFromText(text) {
+    if (!text) return [];
+    
+    // Regular expression to find hashtags (#word)
+    const hashtagRegex = /#[a-zA-Z0-9_]+/g;
+    const hashtags = text.match(hashtagRegex);
+    
+    if (!hashtags || hashtags.length === 0) return [];
+    
+    // Remove duplicates and clean up
+    const uniqueHashtags = [...new Set(hashtags.map(tag => tag.toLowerCase()))];
+    
+    return uniqueHashtags;
+  }
+
+  // Function to generate hashtag HTML for story cards
+  function generateHashtagsHtml(storyText) {
+    const hashtags = extractHashtagsFromText(storyText);
+    
+    if (hashtags.length === 0) return '';
+    
+    // Create hashtag HTML with proper links
+    const hashtagsHtml = hashtags.map(hashtag => {
+      const encodedHashtag = encodeURIComponent(hashtag);
+      return `<a href="/stories/?search=${encodedHashtag}" class="hashtag-item" target="_blank" rel="noopener noreferrer">${hashtag}</a>`;
+    }).join('');
+    
+    return `<div class="hashtags-container">${hashtagsHtml}</div>`;
+  }
+
+  // Function to detect if a URL is a video
+  function isVideoUrl(url) {
+    if (!url) return false;
+    const videoPatterns = [
+      /vimeo\.com\/video\/\d+/i,
+      /vimeo\.com\/\d+/i,
+      /player\.vimeo\.com\/video\/\d+/i,
+      /youtube\.com\/watch\?v=/i,
+      /youtu\.be\//i,
+      /\.mp4$/i,
+      /\.webm$/i,
+      /\.ogg$/i,
+      /\.mov$/i,
+      /\.avi$/i
+    ];
+    return videoPatterns.some(pattern => pattern.test(url));
+  }
+
+  // Function to get video embed URL
+  function getVideoEmbedUrl(url) {
+    if (!url) return null;
+    
+    // Check if it's already a Vimeo player URL
+    if (url.includes('player.vimeo.com/video/')) {
+      return url.includes('?') ? url : `${url}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // Vimeo regular URLs - handles both /video/ID and direct /ID formats
+    const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+    if (vimeoMatch) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // YouTube
+    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i);
+    if (youtubeMatch) {
+      return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // Direct video files
+    if (/\.(mp4|webm|ogg|mov|avi)$/i.test(url)) {
+      return url;
+    }
+
+    return null;
+  }
+
+  // Function to create media element (image or video)
+  function createMediaElement(mediaUrl, storyTitle) {
+    if (!mediaUrl) {
+      return `<img src="https://placehold.co/600x400?text=No+Image" class="story-image mb-3" alt="${storyTitle}">`;
+    }
+
+    const isVideo = isVideoUrl(mediaUrl);
+    
+    if (isVideo) {
+      const embedUrl = getVideoEmbedUrl(mediaUrl);
+      
+      if (embedUrl) {
+        if (embedUrl.includes('youtube.com') || embedUrl.includes('vimeo.com')) {
+          // Embedded video (YouTube/Vimeo) - match image dimensions
+          return `
+            <div class="video-container mb-3" style="width: 100%; height: 200px; background-color: #000; border-radius: 8px; overflow: hidden;">
+              <iframe style="width: 100%; height: 100%; object-fit: cover;" 
+                      src="${embedUrl}" 
+                      frameborder="0" 
+                      allow="autoplay; fullscreen; picture-in-picture" 
+                      allowfullscreen
+                      title="${storyTitle}"></iframe>
             </div>
+          `;
+        } else {
+          // Direct video file - match image dimensions
+          return `
+            <div class="video-container mb-3" style="width: 100%; height: 200px; background-color: #000; border-radius: 8px; overflow: hidden;">
+              <video style="width: 100%; height: 100%; object-fit: cover;" 
+                     controls 
+                     preload="metadata" 
+                     controlsList="nodownload">
+                <source src="${embedUrl}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          `;
+        }
+      }
+    }
+    
+    // Default to image
+    return `<img src="${mediaUrl}?width=200&auto=webp&quality=80&optimize=high" alt="${storyTitle}" class="story-image mb-3">`;
+  }
+
+  // Subscribe to approved stories query for "Your Stories" section
+  approvedStoriesQuery.subscribe((result) => {
+    const approvedStoriesContainer = $("#stories-scroll");
+
+    if (result.isLoading) {
+      approvedStoriesContainer.html(`
+        <div class="text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      `);
+    } else if (result.isError) {
+      console.error("Error loading approved stories:", result.error);
+      approvedStoriesContainer.html(`
+        <div class="text-center py-4 text-danger">
+          Error loading stories. Please try again later.
+        </div>
+      `);
+    } else if (result.isSuccess) {
+      const stories = result.data?.data || [];
+
+      approvedStoriesContainer.empty();
+      if (stories.length === 0) {
+        approvedStoriesContainer.html(`
+          <div class="text-center py-4 text-muted">
+            No approved stories yet. Start by creating your first story!
+          </div>
+        `);
+        return;
+      }
+
+      stories.forEach((story) => {
+      // Determine media URL - handle both string and object formats
+      let mediaUrl = '';
+      if (typeof story?.story_image === 'string') {
+        mediaUrl = story.story_image || '';
+      } else if (story?.story_image?.data && story.story_image.data.length > 0) {
+        mediaUrl = story.story_image.data[0]?.url || '';
+      }
+
+      // Create media element (image or video)
+      const mediaElement = createMediaElement(mediaUrl, story?.title || '');
+
+      approvedStoriesContainer.append(`
+      <div class="col-12 col-md-6">
+        <div class="post-card h-100">
+          <div class="d-flex align-items-center mb-3 author-section" onclick="if('${story.author.data[0].meta?.web?.uri || ''}') window.open('{{ $base_url }}${story.author.data[0].meta?.web?.uri || ''}', '_blank');" style="cursor: pointer;">
+            <img
+              src="${(() => {
+                const profileImage = story.author.data[0].profile_image;
+                const placeholder = "https://www.gravatar.com/avatar/?d=mp";
+                
+                if (!profileImage) return placeholder;
+                
+                if (typeof profileImage === "string") {
+                  return profileImage.trim() !== "" ? `${profileImage}?width=48` : placeholder;
+                } else {
+                  return `${profileImage.data?.[0]?.url}?width=48` || placeholder;
+                }
+              })()}"
+              alt="Profile"
+              class="rounded-circle profile-image"
+            />
+            <div class="ms-3">
+              <h6 class="mb-0 author-name">${story.author.data[0].first_name} ${
+        story.author.data[0].last_name
+      }</h6>
+              <small class="text-muted">${formatTimeAgo(
+                story.createdAt || story.meta?.createdAt || story.date_published
+              )}</small>
+            </div>
+          </div>
+          <a href="{{ $base_url }}${story?.meta?.web?.uri}" class="text-decoration-none text-dark story-content-link">
             <h5 class="mb-2">${story.title}</h5>
             <div class="text-muted mb-3 story-subtitle">
               ${story.story_body}
             </div>
-            <img
-              src="${typeof story.story_image == 'string' ? story.story_image : story.story_image.data[0]?.url}"
-              alt="${story.title}"
-              class="story-image mb-3"
-            />
-            <div class="post-interaction d-none">
-              <a href="#" class="interaction-btn">
-                <i class="bi bi-heart"></i> Like
-              </a>
-              <a href="#" class="interaction-btn">
-                <i class="bi bi-cash"></i> Donate
-              </a>
-              <a href="#" class="interaction-btn">
-                <i class="bi bi-chat"></i> Comment
-              </a>
-              <a href="#" class="interaction-btn">
-                <i class="bi bi-share"></i> Share
-              </a>
-            </div>
+            ${generateHashtagsHtml(story.story_body || '')}
+            ${mediaElement}
+          </a>
+          <div class="post-interaction d-none">
+            <a href="#" class="interaction-btn">
+              <i class="bi bi-heart"></i> Like
+            </a>
+            <a href="#" class="interaction-btn">
+              <i class="bi bi-cash"></i> Donate
+            </a>
+            <a href="#" class="interaction-btn">
+              <i class="bi bi-chat"></i> Comment
+            </a>
+            <a href="#" class="interaction-btn">
+              <i class="bi bi-share"></i> Share
+            </a>
           </div>
         </div>
+      </div>
       `);
-    });
-  };
+      });
+    }
+  });
 
-  // Helper function to format dates
-  function formatDate(dateString) {
+  // Helper function to format dates as time ago
+  function formatTimeAgo(dateString) {
     if (!dateString) return '';
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
+    
+    try {
+      let date;
+      
+      // Check if dateString is already in ISO format (includes 'T' and ends with 'Z' or timezone)
+      if (dateString.includes('T') && (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-'))) {
+        // ISO format with timezone info - parse directly
+        date = new Date(dateString);
+      } else {
+        // Legacy format without timezone - treat as UTC
+        date = new Date(dateString + ' UTC');
+      }
+      
+      // Validate the date
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date');
+      }
+      
+      const now = new Date();
+      const diffInMilliseconds = now - date;
+      const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+      const diffInMinutes = Math.floor(diffInSeconds / 60);
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      const diffInDays = Math.floor(diffInHours / 24);
+      const diffInMonths = Math.floor(diffInDays / 30);
+      const diffInYears = Math.floor(diffInDays / 365);
+      
+      if (diffInSeconds < 60) {
+        return diffInSeconds <= 1 ? 'just now' : `${diffInSeconds}s ago`;
+      } else if (diffInMinutes < 60) {
+        return `${diffInMinutes}m ago`;
+      } else if (diffInHours < 24) {
+        return `${diffInHours}h ago`;
+      } else if (diffInDays < 30) {
+        return `${diffInDays}d ago`;
+      } else if (diffInMonths < 12) {
+        return `${diffInMonths}mo ago`;
+      } else {
+        return `${diffInYears}y ago`;
+      }
+    } catch (error) {
+      console.error('Error formatting time:', error, 'Input:', dateString);
+      return '';
+    }
   }
 
-  $(document).ready(async function () {
-    const reviewStoriesCount = $("#review-stories-count");
+  // Backward compatibility function
+  function formatDate(dateString) {
+    return formatTimeAgo(dateString);
+  }
 
-    await getNewStoriesCount("{{get_var.zuid}}");
-    await getApprovedStories("{{get_var.zuid}}");
+  // Initial document ready
+  $(document).ready(function () {
+    // TanStack Query automatically loads data via subscriptions
+    // No need to manually trigger on tab show - staleTime handles freshness
+    
+    // Link checklist buttons to profile tab or other actions
+    $('#completionChecklistCollapse').on('click', '.checklist-item .btn', function (e) {
+      e.preventDefault();
+      const item = $(this).closest('.checklist-item');
+
+      // Handle story action
+      if (item.attr('id') === 'checklist-story') {
+        const $createPostBtn = $('button#\x63\x72\x65\x61\x74\x65\x2d\x70\x6f\x73\x74\x2d\x62\x74\x6e');
+        if ($createPostBtn.length) {
+          $createPostBtn.trigger('click');
+          return;
+        }
+        // Fallback: try opening a modal trigger if present
+        const $modalTrigger = $('[data-bs-target="#createStoryModal"]');
+        if ($modalTrigger.length) {
+          $modalTrigger.trigger('click');
+          return;
+        }
+        // Last resort fallback: open create-story page
+        const currentPath = window.location.pathname;
+        const adminPathIndex = currentPath.lastIndexOf('/admin');
+        if (adminPathIndex !== -1) {
+          const basePath = currentPath.substring(0, adminPathIndex);
+          const newUrl = window.location.origin + basePath + '/create-story';
+          window.location.href = newUrl;
+        }
+        return; // Stop other handlers
+      }
+      
+      // Handle goal action
+      if (item.attr('id') === 'checklist-goal') {
+        const goalTab = $('a[data-bs-toggle="tab"][href="#story-goal"]');
+        if (goalTab.length) {
+          const tab = bootstrap.Tab.getInstance(goalTab[0]) || new bootstrap.Tab(goalTab[0]);
+          tab.show();
+        }
+        return;
+      }
+
+      // Handle invite action
+      if (item.attr('id') === 'checklist-invite') {
+        const followersTab = $('a[data-bs-toggle="tab"][href="#followers"]');
+        if (followersTab.length) {
+          const tab = bootstrap.Tab.getInstance(followersTab[0]) || new bootstrap.Tab(followersTab[0]);
+          tab.show();
+          setTimeout(() => {
+            const inviteModalEl = document.getElementById('inviteModal');
+            if (inviteModalEl) {
+              const inviteModal = new bootstrap.Modal(inviteModalEl);
+              inviteModal.show();
+            }
+          }, 300);
+        }
+        return;
+      }
+
+      //Handle profile action
+      if (item.attr('id') === 'checklist-profile') {
+        const profileTab = $('a[data-bs-toggle="tab"][href="#profile"]');
+        if (profileTab.length) {
+          const tab = bootstrap.Tab.getInstance(profileTab[0]) || new bootstrap.Tab(profileTab[0]);
+          tab.show();
+          const data = window.updateNPOAdminProfile(
+          "{{$zuid}}",
+          {
+            data: {
+              organization_details_verified: true
+            }
+          }
+        );
+        }
+      }
+      
+      // Default: open Profile tab
+      // const profileTabTrigger = $('a[data-bs-toggle="tab"][href="#profile"], button[data-bs-toggle="tab"][data-bs-target="#profile"]');
+      // if (profileTabTrigger.length) {
+      //   const tab = bootstrap.Tab.getInstance(profileTabTrigger[0]) || new bootstrap.Tab(profileTabTrigger[0]);
+      //   tab.show();
+      // } else {
+      //   console.error('Profile tab trigger not found.');
+      // }
+    });
+    
+    // Setup for checklist collapse icon
+    const checklistCollapse = $('#completionChecklistCollapse');
+    const checklistChevron = $('#completionChecklistChevron');
+    checklistCollapse.on('show.bs.collapse', function () {
+      checklistChevron.removeClass('bi-chevron-right').addClass('bi-chevron-down');
+    });
+    checklistCollapse.on('hide.bs.collapse', function () {
+      checklistChevron.removeClass('bi-chevron-down').addClass('bi-chevron-right');
+    });
+  });
+
+  // Function to get NPO Admin Profile
+  async function getNPOAdminProfile(zuid) {
+    if (window.CONFIG?.API_ROUTES?.["get-npo-admin-profile"]) {
+      const url = window.CONFIG.API_ROUTES["get-npo-admin-profile"];
+      const response = await fetch(`${url}/${zuid}`);
+      return response.json();
+    }
+    console.error("Missing API configuration for getNPOAdminProfile.");
+    return null;
+  }
+
+  // Function to reset progress badge
+  function resetProgressBadge() {
+    $("#completionProgress").removeClass("bg-success bg-warning").addClass("bg-primary");
+    $("#completionProgress").text("0 items remaining");
+  }
+
+  // Function to update a single checklist item UI
+  function updateChecklistItemUI(id, completed, buttonTexts) {
+    const container = $(`#checklist-${id}`);
+    const iconContainer = container.find('.checklist-icon-container');
+    const icon = container.find('.checklist-icon');
+    const button = container.find('.btn');
+
+    // Always show items; style based on completion
+    container.removeClass('hidden');
+    if (completed) {
+      iconContainer.removeClass('bg-white icon-border').addClass('bg-success bg-opacity-10');
+      // Swap to green check icon when completed
+      icon.attr('class', 'checklist-icon bi bi-check-circle-fill text-success');
+      button.removeClass('btn-primary').addClass('btn-secondary').text(buttonTexts.completed || 'Edit');
+    } else {
+      iconContainer.removeClass('bg-success bg-opacity-10').addClass('bg-white icon-border');
+      // Restore base icon for each checklist item
+      const baseIconById = {
+        profile: 'bi-person-badge',
+        story: 'bi-clock-history',
+        goal: 'bi-flag',
+        invite: 'bi-people'
+      };
+      const baseIcon = baseIconById[id] || 'bi-circle';
+      icon.attr('class', `checklist-icon bi ${baseIcon} text-muted`);
+      button.removeClass('btn-secondary').addClass('btn-primary').html(`<i class="bi bi-plus me-1"></i> ${buttonTexts.incomplete}`);
+    }
+  }
+
+  // Function to process NPO data and update checklist
+  function updateCompletionChecklist(npoData, hasStories) {
+    if (!npoData) {
+      console.warn('No NPO data provided to updateCompletionChecklist');
+      return 0;
+    }
+
+    // Reset progress badge and show all items initially
+    resetProgressBadge();
+    $('.checklist-item').removeClass('hidden');
+
+    let incompleteCount = 0;
+
+    const checkAndUpdate = (id, condition, buttonTexts) => {
+      try {
+        updateChecklistItemUI(id, condition, buttonTexts);
+        if (!condition) {
+          incompleteCount++;
+        }
+      } catch (error) {
+        console.error(`Error updating checklist item ${id}:`, error);
+        // Still count as incomplete if there's an error
+        incompleteCount++;
+      }
+    };
+
+    // Composite: Profile completion (all key fields)
+    const hasLogo = !!(npoData.logo && (typeof npoData.logo === 'string' || npoData.logo?.data?.[0]?.url));
+    const hasBanner = !!(npoData.hero_image && (typeof npoData.hero_image === 'string' || npoData.hero_image?.data?.[0]?.url));
+    const hasEin = !!npoData.ein_number;
+    const hasMission = !!npoData.mission;
+    const hasDescription = !!npoData.cause_description;
+    const hasWebsite = !!npoData.website;
+    const hasDonation = !!npoData.donate_link;
+    const hasLocation = !!npoData.headquarters_address;
+    const hasCauses = !!(npoData.category?.data?.length > 0);
+    const isProfileVerified = npoData.organization_details_verified === "1";
+    const isProfileComplete = hasLogo && hasBanner && hasEin && hasMission && hasDescription && hasWebsite && hasDonation && hasLocation && hasCauses;
+
+    // 1. Verify profile details
+    checkAndUpdate('profile', isProfileVerified, { completed: 'Edit Profile', incomplete: 'Complete Profile' });
+
+    // 2. Add your first story
+    checkAndUpdate('story', hasStories, { completed: 'Edit', incomplete: 'Post a Story' });
+
+    // 3. Set your story goal
+    const hasGoal = !!(npoData.weekly_story_goal && parseInt(npoData.weekly_story_goal) > 0);
+    checkAndUpdate('goal', hasGoal, { completed: 'Edit Goal', incomplete: 'Set Goal' });
+
+    // 4. Invite your supporters (complete if any pending invites exist)
+    const pendingInvites = (npoData?.pending_follower_invite || '').split(',').map(e => e.trim()).filter(Boolean);
+    const hasSupporters = pendingInvites.length > 0;
+    checkAndUpdate('invite', hasSupporters, { completed: 'Invite More', incomplete: 'Invite' });
+
+    return incompleteCount;
+  }
+
+  // Function to update completion checklist UI based on profile and stories data
+  function updateCompletionChecklistUI(profileData, allStoriesData) {
+    const hasStories = allStoriesData && allStoriesData.length > 0;
+
+    if (profileData) {
+      try {
+        const incompleteCount = updateCompletionChecklist(profileData, hasStories);
+        if (incompleteCount > 0) {
+          $("#completionChecklistCard").removeClass("d-none");
+          $("#completionProgress").text(`${incompleteCount} item${incompleteCount === 1 ? '' : 's'} remaining`);
+        } else {
+          // Hide the entire completion checklist when all items are done
+          $("#completionChecklistCard").addClass("d-none");
+        }
+      } catch (checklistError) {
+        console.error('Error updating completion checklist:', checklistError);
+      }
+    }
+  }
+
+  // Subscribe to both profile and all stories queries for completion checklist
+  let completionChecklistData = { profile: null, stories: null };
+
+  npoProfileQuery.subscribe((result) => {
+    if (result.isSuccess) {
+      completionChecklistData.profile = result.data?.data?.[0];
+      if (completionChecklistData.stories !== null) {
+        updateCompletionChecklistUI(completionChecklistData.profile, completionChecklistData.stories);
+      }
+    }
+  });
+
+  allStoriesQuery.subscribe((result) => {
+    if (result.isLoading) {
+      // Show skeleton
+      $("#completionChecklistSkeleton").removeClass("d-none");
+      $("#completionChecklistCard").addClass("d-none");
+    } else if (result.isSuccess) {
+      // Hide skeleton
+      $("#completionChecklistSkeleton").addClass("d-none");
+
+      completionChecklistData.stories = result.data?.data || [];
+      if (completionChecklistData.profile !== null) {
+        updateCompletionChecklistUI(completionChecklistData.profile, completionChecklistData.stories);
+      }
+    } else if (result.isError) {
+      console.error('Error loading all stories:', result.error);
+      $("#completionChecklistSkeleton").addClass("d-none");
+      $("#completionChecklistCard").addClass("d-none");
+    }
+  });
+
+  // Function to refresh completion checklist
+  window.refreshCompletionChecklist = function() {
+    return Promise.all([
+      npoProfileQuery.refetch(),
+      allStoriesQuery.refetch()
+    ]);
+  };
+
+  // Add a small script to rotate the chevron icon on collapse for Completion Checklist
+  $(document).ready(function () {
+    const checklistCollapse = $('#completionChecklistCollapse');
+    const checklistChevron = $('#completionChecklistChevron');
+    checklistCollapse.on('show.bs.collapse', function () {
+      checklistChevron.removeClass('bi-chevron-right').addClass('bi-chevron-down');
+    });
+    checklistCollapse.on('hide.bs.collapse', function () {
+      checklistChevron.removeClass('bi-chevron-down').addClass('bi-chevron-right');
+    });
   });
 </script>

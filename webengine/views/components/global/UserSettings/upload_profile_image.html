@@ -105,7 +105,7 @@
   </div>
 </div>
 
-<script>
+<script type="module"> 
   $(document).ready(function () {
     const profileImageInput = $("#profileImageInput");
     const profileImagePreview = $("#profileImagePreview");
@@ -150,24 +150,28 @@
           throw new Error("No file selected");
         }
 
-        const image = await uploadImages([file]);
+        const image = await window.newUploadImages([file]);
 
         if (image && image.length > 0) {
           const localUser = await window.localStorage.getItem("user");
           const user = JSON.parse(localUser);
           const userZuid = user.zuid;
 
-          let userData = await getZestyUser(userZuid);
-          if (!userData?.user) return;
-
-          // Edit the user data
-          userData.user.data.image = image[0].data[0].id;
-          userData.user.data.profile_image = image[0].data[0].id;
-
-          const updatedUser = await updateZestyUser(userZuid, userData.user.data);
+          const updatedUser = await window.updateZestyUser(userZuid, {
+            image: image[0].data[0].id,
+            profile_image: image[0].data[0].id
+          });
 
           //load the image
           $("#profileImage").attr("src", image[0].data[0].url);
+
+          $("#profileDropdown img").attr("src", image[0].data[0].url);
+          $(".profile-header img").attr("src", image[0].data[0].url);
+          $(".offcanvasProfile .profile-header img").attr(
+            "src",
+            image[0].data[0].url
+          );
+          $("#offcanvas-profile-image").attr("src", image[0].data[0].url);
           
           // Update originalFormData to include the new profile image URL
           if (window.originalFormData) {

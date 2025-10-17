@@ -1,0 +1,53 @@
+<script type="module">
+  // ==================== BASE URL ====================
+  const BASE_URL = "https://api.causecircle.org";
+  // const BASE_URL = "http://localhost:8080";
+
+  // ==================== COMMENT MANAGEMENT ====================
+
+  window.postComment = async (zuid, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const url = `${BASE_URL}/stories/${zuid}/comments`;
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error posting comment:", error);
+      throw error;
+    }
+  };
+
+  window.getStoryComments = async (zuid) => {
+    const user = firebase.auth().currentUser;
+    const userId = user?.uid;
+    const url = `${BASE_URL}/stories/${zuid}/comments`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error getting story comments:", error);
+      throw error;
+    }
+  };
+</script>

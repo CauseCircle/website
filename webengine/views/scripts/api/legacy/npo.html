@@ -1,0 +1,302 @@
+<script type="module">
+  // ==================== BASE URL ====================
+  const BASE_URL = "https://api.causecircle.org";
+  // const BASE_URL = "http://localhost:8080";
+
+  // ==================== NPO ADMIN ====================
+  window.getNpoAdmins = async (zuid) => {
+    const response = await fetch(
+      `{{ $base_url }}mobileapp/npo_admins.json?zuid=${zuid}&zpw=causecircle`
+    );
+    try {
+      return await response.json();
+    } catch (error) {
+      console.error("Error parsing JSON response:", error);
+      throw error;
+    }
+  }
+
+  window.getNpoFollowers = async (zuid) => {
+    const response = await fetch(
+      `{{ $base_url }}mobileapp/npo_followers.json?zuid=${zuid}&zpw=causecircle`
+    );
+    try {
+      return await response.json();
+    } catch (error) {
+      console.error("Error parsing JSON response:", error);
+      throw error;
+    }
+  }
+
+  window.createNpoAdmin = async (zuid, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const idToken = await user.getIdToken();
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/npos/${zuid}/admin/create`, options);
+      const data = await response.text();
+      if (!response.ok && response.status === 401) {
+        throw new Error(`${data}`);
+      }
+      return data;
+    } catch (error) {
+      console.error("Error creating NPO admin:", error);
+      throw error;
+    }
+  };
+
+  window.createNpoFollower = async (zuid, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/npos/${zuid}/follower/create`, options);
+      const data = await response.text();
+      if (!response.ok && response.status === 401) {
+        // throw new Error(`${data}`);
+      }
+      return data;
+    } catch (error) {
+      console.error("Error following NPO:", error);
+      throw error;
+    }
+  };
+
+  window.getUserManagedNpos = async (zuid) => {
+    try {
+      const response = await fetch(
+        `{{ $base_url }}mobileapp/npos.json?admin_zuid=${zuid}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching managed NPOs:", error);
+      throw error;
+    }
+  };
+
+  window.updateNPOAdminProfile = async (zuid, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const idToken = await user.getIdToken();
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/npos/${zuid}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userId}`,
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error updating NPO profile:", error);
+      throw error;
+    }
+  };
+
+  window.getNPOAdminProfile = async (zuid) => {
+    try {
+      const response = await fetch(`${BASE_URL}/npos/${zuid}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching NPO admin profile:", error);
+      throw error;
+    }
+  };
+
+  // story stream
+  window.createStoryStream = async (zuid, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const idToken = await user.getIdToken();
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/npos/${zuid}/story-stream`, options);
+      const data = await response.text();
+      if (!response.ok && response.status === 401) {
+        throw new Error(`${data}`);
+      }
+      return data;
+    } catch (error) {
+      console.error("Error creating story stream:", error);
+      throw error;
+    }
+  }
+
+  window.updateStoryStream = async (zuid, id, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const idToken = await user.getIdToken();
+
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/npos/${zuid}/story-stream/${id}`, options);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error updating story stream:", error);
+      throw error;
+    }
+  }
+
+  window.getStoryStream = async (npoZuid, streamId) => {
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/npos/${npoZuid}/story-stream/${streamId}`, options);
+      return await response.json();
+    } catch (error) {
+      console.error("Error getting story stream:", error);
+      throw error;
+    }
+  }
+
+  window.deleteStoryStream = async (npoZuid, streamZuid) => {
+    const options = {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/npos/${npoZuid}/story-stream/${streamZuid}`, options);
+      return await response.json();
+    } catch (error) {
+      console.error("Error deleting story stream:", error);
+      throw error;
+    }
+  }
+
+  window.clickNpoDonate = async (zuid) => {
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/npos/${zuid}/stats/click/donate`, options);
+      return await response.text();
+    } catch (error) {
+      console.error("Error clicking donate:", error);
+      throw error;
+    }
+  }
+
+  window.clickNpoFollow = async (zuid) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/npos/${zuid}/follow`, options);
+      return await response.text();
+    } catch (error) {
+      console.error("Error clicking follow:", error);
+      throw error;
+    }
+  }
+
+  window.clickNpoShare = async (zuid) => {
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/npos/${zuid}/stats/click/share`, options);
+      return await response.text();
+    } catch (error) {
+      console.error("Error clicking share:", error);
+      throw error;
+    }
+  }
+
+  window.viewNpoProfile = async (zuid) => {
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/npos/${zuid}/stats/view/profile`, options);
+      return await response.text();
+    } catch (error) {
+      console.error("Error viewing NPO profile:", error);
+      throw error;
+    }
+  }
+</script>

@@ -1,0 +1,715 @@
+<style>
+  .carousel-control-prev-icon {
+    background-color: #575757;
+    border-radius: 5px;
+  }
+  .carousel-control-next-icon {
+    background-color: #575757;
+    border-radius: 5px;
+  }
+  
+  /* Custom Carousel Control Buttons for home feed */
+  .story-carousel .carousel-control-prev,
+  .story-carousel .carousel-control-next {
+    opacity: 0.9;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #FFFFFF; /* White background */
+    top: 50%;
+    transform: translateY(-50%);
+    transition: background-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  }
+
+  .story-carousel .carousel-control-prev:hover,
+  .story-carousel .carousel-control-next:hover {
+    opacity: 1;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+  }
+
+  /* Override Bootstrap's default styling for the icons */
+  .story-carousel .carousel-control-prev-icon,
+  .story-carousel .carousel-control-next-icon {
+    background-image: none !important;
+    color: #575757; /* Gray icon color */
+    font-size: 1.5rem;
+    line-height: 1;
+    font-weight: bold;
+    width: auto;
+    height: auto;
+    display: inline-block;
+    background-color: transparent; /* Remove background color from icon */
+    border-radius: 0;
+  }
+  
+  /* Remove any ::before content */
+  .story-carousel .carousel-control-prev-icon::before,
+  .story-carousel .carousel-control-next-icon::before {
+    display: none !important;
+    content: none !important;
+  }
+
+  .story-carousel .carousel-control-prev {
+    left: 10px;
+  }
+
+  .story-carousel .carousel-control-next {
+    right: 10px;
+  }
+  
+  .story-carousel {
+    border-radius: 0;
+    overflow: hidden;
+    background-color: #000; /* Black background for letterboxing */
+    max-height: 480px; /* Increased max height */
+  }
+  
+  /* Image container style for maintaining aspect ratio */
+  .story-carousel .carousel-item {
+    position: relative;
+    overflow: hidden;
+    max-height: 480px; /* Increased max height */
+  }
+  
+  /* Style for contained images that maintain aspect ratio */
+  .story-carousel .post-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Maintain aspect ratio */
+    background-color: #000; /* Black background */
+    max-height: 480px; /* Increased max height */
+  }
+  
+  /* Style for carousel indicators */
+  .story-carousel .carousel-indicators {
+    bottom: 15px;
+  }
+  
+  .story-carousel .carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+  }
+  
+  /* Post header hover effect for NPO name */
+  .post-header:hover .npo-name {
+    color: var(--bs-primary) !important;
+    transition: color 0.2s ease;
+  }
+  
+  .story-carousel .carousel-indicators .active {
+    background-color: white;
+  }
+  
+  /* Video player styling for home feed */
+  .story-carousel .carousel-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: #000;
+    display: block;
+  }
+  
+  .story-carousel .video-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    background-color: #000;
+    overflow: hidden;
+  }
+  
+  .story-carousel .video-container iframe,
+  .story-carousel .video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  /* Different aspect ratios for video containers in home feed */
+  .story-carousel .video-container.aspect-16-9 {
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  }
+  
+  .story-carousel .video-container.aspect-4-3 {
+    padding-bottom: 75%; /* 4:3 aspect ratio */
+  }
+  
+  .story-carousel .video-container.aspect-1-1 {
+    padding-bottom: 100%; /* 1:1 square aspect ratio */
+  }
+  
+  /* Responsive video container adjustments for home feed */
+  @media (max-width: 768px) {
+    .story-carousel .video-container {
+      padding-bottom: 75% !important; /* 4:3 aspect ratio on mobile for better viewing */
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    .story-carousel .video-container {
+      max-height: 500px; /* Limit maximum height on large screens */
+    }
+  }
+  
+  /* Apply aspect ratio to image carousel items only */
+  .story-carousel .carousel-item.image-item {
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio for images */
+  }
+  
+  /* Video carousel items use the video-container for sizing */
+  .story-carousel .carousel-item.video-item {
+    height: auto;
+  }
+  
+  /* Action Buttons Styling */
+  .post-actions {
+    background-color: #ffffff;
+    border-radius: 0 0 10px 10px;
+  }
+  
+  .action-btn {
+    padding: 12px 8px;
+    color: #636363;
+    font-weight: 400;
+    transition: background-color 0.2s;
+    border: none;
+    background-color: transparent;
+    font-size: 0.9rem;
+  }
+  
+  .action-btn:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .action-btn i {
+    margin-right: 6px;
+  }
+  
+  /* Liked button state */
+  .action-btn.liked {
+    color: #7b3fee; /* Primary purple */
+    font-weight: 500;
+  }
+  
+  .action-btn.liked i {
+    color: #7b3fee; /* Primary purple */
+  }
+  
+  /* Comment section styling */
+  .story-comments {
+    padding: 0;
+    background-color: #fff;
+  }
+  
+  .comment-container {
+    display: flex;
+    padding: 10px 16px;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .comment-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .comment-content {
+    flex: 1;
+    background-color: #F5F7FA;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  
+  .comment-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  
+  .comment-author {
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  
+  .comment-time {
+    color: #6c757d;
+    font-size: 0.8rem;
+  }
+  
+  .comment-text {
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  
+  .comment-input-container {
+    border-top: 1px solid #e1e4ea;
+    padding: 10px 16px;
+  }
+  
+  .comment-input {
+    width: 100%;
+    border-radius: 18px;
+    padding: 8px 16px;
+    border: 1px solid #ced4da;
+    background-color: #f8f9fa;
+    font-size: 0.9rem;
+  }
+  
+  .comment-input:focus {
+    outline: none;
+    border-color: #ced4da;
+    box-shadow: none;
+  }
+  
+  .comment-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .comment-options-btn {
+    background: none;
+    border: none;
+    color: #6c757d;
+    padding: 0;
+    margin-left: auto;
+  }
+  
+  .view-comments-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    color: #6c757d;
+    font-size: 0.85rem;
+    text-decoration: none;
+    cursor: pointer;
+    gap: 4px;
+  }
+  
+  .view-comments-link:hover {
+    text-decoration: underline;
+  }
+  
+  .view-comments-link i {
+    font-size: 0.75rem;
+  }
+  
+  /* Share Modal Styling */
+  .modal-content {
+    padding: 1.5rem;
+  }
+  .modal-header {
+    padding-bottom: 1.5rem;
+  }
+  .modal-title {
+    font-weight: 600;
+    color: #373d46;
+    opacity: 0.88;
+  }
+  .icon_holder {
+    width: 4.5em;
+    height: 4.5em;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .social__logo {
+    width: 2em;
+    height: 2em;
+  }
+  .list__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    gap: 0.5rem; /* Added gap between elements */
+  }
+  [data-icon="twitter"] {
+    background-color: #e8f6fe;
+  }
+  [data-icon="twitter"] img {
+    filter: invert(47%) sepia(95%) saturate(1887%) hue-rotate(177deg)
+      brightness(98%) contrast(93%);
+  }
+  [data-icon="facebook"] {
+    background-color: #e8f1fe;
+  }
+  [data-icon="facebook"] img {
+    filter: invert(23%) sepia(92%) saturate(1645%) hue-rotate(204deg)
+      brightness(97%) contrast(95%);
+  }
+  [data-icon="linkedin"] {
+    background-color: #e1eaf7;
+  }
+  [data-icon="linkedin"] img {
+    filter: invert(29%) sepia(98%) saturate(1161%) hue-rotate(178deg)
+      brightness(95%) contrast(96%);
+  }
+  [data-icon="whatsapp"] {
+    background-color: #e9fbf0;
+  }
+  [data-icon="whatsapp"] img {
+    filter: invert(55%) sepia(64%) saturate(489%) hue-rotate(93deg)
+      brightness(97%) contrast(94%);
+  }
+  [data-icon="reddit"] {
+    background-color: #ffece6;
+  }
+  [data-icon="reddit"] img {
+    filter: invert(37%) sepia(93%) saturate(1372%) hue-rotate(356deg)
+      brightness(95%) contrast(105%);
+  }
+  [data-icon="telegram"] {
+    background-color: #e6f3fa;
+  }
+  [data-icon="telegram"] img {
+    filter: invert(40%) sepia(52%) saturate(845%) hue-rotate(165deg)
+      brightness(100%) contrast(93%);
+  }
+  [data-icon="pinterest"] {
+    background-color: #ffeaeb;
+  }
+  [data-icon="pinterest"] img {
+    filter: invert(13%) sepia(89%) saturate(5618%) hue-rotate(343deg)
+      brightness(78%) contrast(96%);
+  }
+  [data-icon="email"] {
+    background-color: #f1f3f4;
+  }
+  [data-icon="email"] img {
+    filter: invert(20%) sepia(10%) saturate(2076%) hue-rotate(176deg)
+      brightness(92%) contrast(86%);
+  }
+  .share__modal_input input {
+    background-color: #f8f9fa;
+    border: none;
+  }
+  .share__modal_input input:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  .share__modal_input .btn {
+    border: none;
+    background-color: #f8f9fa;
+    color: #373d46;
+    transition: background-color 0.3s ease;
+  }
+  .share__modal_input .btn:hover {
+    background-color: #e9ecef;
+  }
+  .share__modal_input .btn:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  .copied-message {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .btn.copied .copied-message {
+    opacity: 1;
+    animation: fadeInOut 1.5s ease;
+  }
+  @keyframes fadeInOut {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    20%,
+    80% {
+      opacity: 1;
+    }
+  }
+
+  /* Styles for the scrollable comments container */
+  .all-comments-container {
+    max-height: 250px; /* Adjust as needed */
+    overflow-y: auto;
+    /* border-top: 1px solid #e1e4ea; */ /* Removed border */
+    /* margin-top: 10px; */ /* Removed margin */
+    /* padding-top: 5px; */ /* Removed padding */
+  }
+  
+  /* Renamed from view-comments-btn */
+  .toggle-comments-btn {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    color: #6c757d;
+    font-size: 0.85rem;
+    text-decoration: none;
+    cursor: pointer;
+    gap: 4px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    border-top: 1px solid #e1e4ea; /* Add separator line above button */
+    margin-top: 5px; /* Add some space above button */
+  }
+
+  .toggle-comments-btn:hover {
+    text-decoration: underline;
+    background-color: #f8f9fa; /* Subtle hover */
+  }
+
+  .toggle-comments-btn i {
+    font-size: 0.75rem;
+    transition: transform 0.2s ease-in-out; /* Add transition for icon rotation */
+  }
+
+  /* Style for when comments are expanded */
+  .toggle-comments-btn.expanded i {
+     transform: rotate(180deg);
+  }
+  
+  /* Optional: Loading spinner style */
+  .comments-loading {
+    text-align: center;
+    padding: 15px;
+    color: #6c757d;
+  }
+  .comments-loading .spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: .2em;
+    vertical-align: -0.125em;
+    margin-right: 0.5em;
+  }
+
+  /* Basic styling for story placeholders */
+  .story-placeholder {
+    min-height: 200px; /* Adjust as needed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e1e4ea; /* Subtle border */
+    border-radius: 10px; /* Match card radius */
+    margin-bottom: 1rem; /* Spacing like cards */
+    background-color: #f8f9fa; /* Light background */
+    color: #6c757d; /* Text color for loading message */
+    font-size: 0.9rem;
+  }
+
+  /* Hashtag styles for home feed */
+  .hashtag-item {
+    color: #7b3fee;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  
+  .hashtag-item:hover {
+    text-decoration: underline;
+    color: #5a2bb8;
+  }
+
+  .hashtags-container {
+    line-height: 1.4;
+    margin-top: 8px;
+  }
+
+  /* Home Feed Onboarding Modal Styles */
+  #homeFeedOnboardingModal .modal-content {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    max-width: 600px;
+    width: 90vw;
+    background: white;
+    position: relative;
+  }
+
+  #homeFeedOnboardingModal .modal-header-custom {
+    background: #7b3fee;
+    padding: 30px 40px 20px;
+    text-align: center;
+  }
+
+  #homeFeedOnboardingModal .slide-image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    margin: 0 auto 20px;
+    display: block;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(123, 63, 238, 0.2);
+  }
+
+  #homeFeedOnboardingModal .slide-content {
+    background: white;
+    padding: 30px 40px 40px;
+    text-align: center;
+  }
+
+  #homeFeedOnboardingModal .slide-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 15px;
+    line-height: 1.3;
+  }
+
+  #homeFeedOnboardingModal .slide-description {
+    font-size: 1.1rem;
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #homeFeedOnboardingModal .modal-footer-custom {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 40px 30px;
+    background: white;
+    position: relative;
+  }
+
+  #homeFeedOnboardingModal .pagination-dots {
+    display: flex;
+    gap: 8px;
+  }
+
+  #homeFeedOnboardingModal .pagination-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(123, 63, 238, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  #homeFeedOnboardingModal .pagination-dot.active {
+    background: #7b3fee;
+    transform: scale(1.2);
+  }
+
+  #homeFeedOnboardingModal .btn-action,
+  #homeFeedOnboardingModal #homeFeedNextSlideBtn {
+    background: #7b3fee;
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    min-width: 100px;
+    position: absolute;
+    right: 40px;
+  }
+
+  #homeFeedOnboardingModal .btn-action:hover,
+  #homeFeedOnboardingModal #homeFeedNextSlideBtn:hover {
+    background: #6b2fd6;
+    color: white;
+  }
+
+  #homeFeedOnboardingModal .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    z-index: 10;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #homeFeedOnboardingModal .close-btn:hover {
+    color: white;
+  }
+
+  #homeFeedOnboardingModal .onboarding-slide {
+    display: none;
+  }
+
+  #homeFeedOnboardingModal .onboarding-slide.active {
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    #homeFeedOnboardingModal .modal-content {
+      margin: 20px;
+      width: calc(100vw - 40px);
+    }
+    
+    #homeFeedOnboardingModal .modal-header-custom,
+    #homeFeedOnboardingModal .slide-content,
+    #homeFeedOnboardingModal .modal-footer-custom {
+      padding-left: 25px;
+      padding-right: 25px;
+    }
+    
+    #homeFeedOnboardingModal .slide-title {
+      font-size: 1.5rem;
+    }
+    
+    #homeFeedOnboardingModal .slide-description {
+      font-size: 1rem;
+    }
+
+    #homeFeedOnboardingModal .slide-image {
+      max-width: 250px;
+    }
+
+    #homeFeedOnboardingModal .btn-action,
+    #homeFeedOnboardingModal #homeFeedNextSlideBtn {
+      right: 25px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #homeFeedOnboardingModal .modal-header-custom,
+    #homeFeedOnboardingModal .slide-content,
+    #homeFeedOnboardingModal .modal-footer-custom {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    #homeFeedOnboardingModal .slide-image {
+      max-width: 200px;
+    }
+
+    #homeFeedOnboardingModal .btn-action,
+    #homeFeedOnboardingModal #homeFeedNextSlideBtn {
+      right: 20px;
+    }
+  }
+</style>

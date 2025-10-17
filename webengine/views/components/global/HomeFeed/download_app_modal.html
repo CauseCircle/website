@@ -19,6 +19,15 @@
   .store-button:hover {
     transform: scale(1.05);
   }
+
+  .loading-spinner {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .content-container {
+    display: none;
+  }
 </style>
 
 <div
@@ -30,12 +39,7 @@
 >
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content rounded-4">
-      <div class="modal-header border-0 pb-0">
-        <img
-          src="https://4xxglxlj.media.zestyio.com/Asset-2--1-.png"
-          alt="CauseCircle Logo"
-          class="logo-img"
-        />
+      <div class="modal-header border-0 p-0">
         <button
           type="button"
           class="btn-close"
@@ -43,43 +47,148 @@
           aria-label="Close"
         ></button>
       </div>
-      <div class="modal-body text-center px-4">
-        <img
-          src="https://4xxglxlj.media.zestyio.com/download_hero.png"
-          alt="CauseCircle App Screenshots"
-          class="hero-img my-3"
-        />
-        <h2 class="fs-3 fw-bold mb-2">
-          Download the CauseCircle app to share even more stories.
-        </h2>
-        <p class="text-muted mb-4">
-          Your journey begins here. Come make a difference.
-        </p>
-        <div class="d-flex justify-content-center gap-3 mt-4">
-          <a
-            href="https://play.google.com/store/apps/details?id=causecircle.org&pcampaignid=web_share"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img
-              src="https://4xxglxlj.media.zestyio.com/google_download.png"
-              alt="Get it on Google Play"
-              class="store-button"
-            />
-          </a>
-          <a
-            href="https://apps.apple.com/us/app/causecircle/id6593386907"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img
-              src="https://4xxglxlj.media.zestyio.com/apple_download.png"
-              alt="Download on the App Store"
-              class="store-button"
-            />
-          </a>
+      <div class="modal-body text-center p-0">
+        <!-- Loading spinner -->
+        <div id="loading-container" class="d-flex justify-content-center align-items-center py-5">
+          <div class="spinner-border loading-spinner text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        
+        <!-- Content (hidden until loaded) -->
+        <div id="content-container" class="d-none">
+          <img
+            src="https://4xxglxlj.media.zestyio.com/download_modal_hero.PNG"
+            alt="CauseCircle App Screenshots"
+            class="hero-img my-3"
+          />
+          <h2 id="user-npo-name" class="fs-5 fw-bold my-3">
+            Congrats, you are following NPO_Name!
+          </h2>
+          
+          <div class="d-flex flex-column align-items-center gap-3">
+            <a id="create-story-button" href="#" class="btn btn-primary mb-2">Create a Story for NPO_Name</a>
+            <a id="go-to-npo-page-button" href="#" class="btn btn-primary mb-4">Go to NPO_Name Page</a>
+          </div>
+
+          <p class="text-muted mb-2 small">
+            Get the free mobile app to upload photos easily:
+          </p>
+          <div class="d-flex justify-content-center gap-3 mt-2 mb-3">
+            <a
+              href="https://play.google.com/store/apps/details?id=causecircle.org&pcampaignid=web_share"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/google_download.png"
+                alt="Get it on Google Play"
+                class="store-button"
+              />
+            </a>
+            <a
+              href="https://apps.apple.com/us/app/causecircle/id6593386907"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/apple_download.png"
+                alt="Download on the App Store"
+                class="store-button"
+              />
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script type="module">
+  const getNpo = async (npoZuid) => {
+    try {
+      // Use TanStack Query for NPO profile
+      const npoProfileQuery = window.createNPOProfileQuery(npoZuid);
+      
+      const result = await new Promise((resolve) => {
+        const unsubscribe = npoProfileQuery.subscribe((result) => {
+          if (result.status === 'success' || result.status === 'error') {
+            unsubscribe();
+            resolve(result);
+          }
+        });
+      });
+
+      if (result.status === 'success' && result.data) {
+        return result.data.data[0];
+      } else {
+        console.error("Error loading NPO profile:", result.error);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error loading NPO profile:", error);
+      return null;
+    }
+  }
+
+  // Function to remove query parameter from URL
+  const removeQueryParam = (paramName) => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete(paramName);
+    window.history.replaceState({}, document.title, url);
+  };
+
+  $(document).ready(function() {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem("user"));
+      const firstName = currentUser.firstName;
+
+      const npoZuid = window.location.search.split("followed-npo=")[1];
+      if (!npoZuid) {
+          $("#user-npo-name").text(`Congrats ${firstName}!`);
+          const currentUrl = window.location.href;
+          $("#create-story-button").addClass("d-none");
+          $("#create-story-button").text(`Create a Story`);
+          $("#go-to-npo-page-button").addClass("d-none");
+          
+          // Hide loading spinner and show content
+          $("#loading-container").addClass("d-none");
+          $("#content-container").removeClass("d-none");
+        return;
+      }
+
+      // Use TanStack Query for NPO profile
+      const npoProfileQuery = window.createNPOProfileQuery(npoZuid);
+      
+      // Subscribe to query state changes
+      const unsubscribe = npoProfileQuery.subscribe((result) => {
+        if (result.status === 'success' && result.data) {
+          const npo = result.data.data[0];
+          
+          $("#user-npo-name").text(`Congrats ${firstName}! You are following ${npo?.name}!`);
+          $("#create-story-button").attr("href", `${npo?.meta?.web?.uri}create-story`);
+          $("#create-story-button").text(`Create a Story for ${npo?.name}`);
+          $("#go-to-npo-page-button").attr("href", `${npo?.meta?.web?.uri}`);
+          $("#go-to-npo-page-button").text(`Go to ${npo?.name} Page`);
+          
+          // Hide loading spinner and show content
+          $("#loading-container").addClass("d-none");
+          $("#content-container").removeClass("d-none");
+          unsubscribe();
+        } else if (result.status === 'error') {
+          console.error("Error loading NPO data:", result.error);
+          $("#loading-container").html('<p class="text-danger">Error loading data. Please try again.</p>');
+          unsubscribe();
+        }
+      });
+    } catch (error) {
+      console.error("Error loading NPO data:", error);
+      $("#loading-container").html('<p class="text-danger">Error loading data. Please try again.</p>');
+    }
+  });
+
+  // Remove query param when modal is closed
+  $('#downloadModal').on('hidden.bs.modal', function () {
+    removeQueryParam('followed-npo');
+  });
+</script>

@@ -10,10 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- Add required stylesheets -->
     <link href="/styles/bootstrap.css" rel="stylesheet" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -21,72 +19,11 @@
       rel="stylesheet"
     />
 
-    <style>
-      .left-side {
-        width: 600px;
-        background-color: #fff;
-        transition: width 0.3s ease;
-      }
-      @media (max-width: 767.98px) {
-        .left-side {
-          width: 100%;
-        }
-      }
-      .right-side {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4rem;
-      }
-      .login-btn {
-        width: 7.625rem;
-        height: 2.5rem;
-        border-radius: 10px;
-        border: 1px solid #e1e4ea;
-        box-shadow: 0px 1px 2px 0px #0a0d1408;
-        background-color: #fff;
-        transition: box-shadow 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .login-btn:hover {
-        box-shadow: 0px 4px 8px 0px #0a0d1420;
-        background-color: #f5f7fa;
-      }
 
-      @media (max-width: 1199px) {
-        .left-side {
-          width: 100%;
-        }
-      }
-
-      .section-title p,
-      .section-title {
-        font-size: 2rem;
-        font-weight: 500;
-        text-align: center;
-      }
-      .hero-description p,
-      .hero-description {
-        font-size: 1.125rem;
-        font-weight: 400;
-        text-align: center;
-        color: var(--bs-gray-500);
-        max-width: 53.125rem;
-      }
-
-      .left-side-full {
-        width: 100% !important;
-      }
-    </style>
-
-<script>
-  <!-- prettier-ignore -->
-  {{include /auth/facebook.js}}
-</script>
+    <script>
+      <!-- prettier-ignore -->
+      {{include /auth/facebook.js}}
+    </script>
 
     <!-- Firebase Scripts -->
     <script
@@ -111,263 +48,445 @@
       crossorigin="anonymous"
     ></script>
 
-    <!-- Include base auth -->
-    {{include /auth/base.html}}
-  </head>
-  <body>
-    <div class="d-flex flex-column flex-md-row" style="height: 100vh; background-color: #f5f7fa">
-      <div class="left-side">
-        <div id="login-section" class="d-none d-flex flex-column h-100 pt-5 pt-md-0 min-vh-100">
-          <div
-            class="d-flex flex-column justify-content-center align-items-center flex-grow-1 px-3"
-          >
-            <div>
-              <img
-                src="{{npo.logo.getImage()}}"
-                alt="{{npo.name}}"
-                style="max-width: 200px"
-              />
-            </div>
-            <div>
-              <p id="login-title" class="text-center fs-4 fw-medium mb-0 mt-4">
-                Get Started with {{npo.name}}
-              </p>
-              <div id="login-description" class="text-center fs-6 text-muted">
-                Continue by selecting your preferred login method.
-              </div>
-            </div>
-            <div class="login-button-container d-flex gap-2 mt-4">
-              <button
-            type="button"
-            class="login-btn btn btn-light"
-            id="google-signin-btn"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24">
-              <path
-                fill="#EA4335"
-                d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27006974,0 3.1977497,2.69829785 1.23999023,6.65002441 L5.26620003,9.76452941 Z"
-              />
-              <path
-                fill="#34A853"
-                d="M16.0407269,18.0125889 C14.9509167,18.7163016 13.5660892,19.0909091 12,19.0909091 C8.86648613,19.0909091 6.21911939,17.076871 5.27698177,14.2678769 L1.23746264,17.3349879 C3.19279051,21.2936293 7.26500293,24 12,24 C14.9328362,24 17.7353462,22.9573905 19.834192,20.9995801 L16.0407269,18.0125889 Z"
-              />
-              <path
-                fill="#4A90E2"
-                d="M19.834192,20.9995801 C22.0291676,18.9520994 23.4545455,15.903663 23.4545455,12 C23.4545455,11.2909091 23.3454545,10.5272727 23.1818182,9.81818182 L12,9.81818182 L12,14.4545455 L18.4363636,14.4545455 C18.1187732,16.013626 17.2662994,17.2212117 16.0407269,18.0125889 L19.834192,20.9995801 Z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.27698177,14.2678769 C5.03832634,13.556323 4.90909091,12.7937589 4.90909091,12 C4.90909091,11.2182781 5.03443647,10.4668121 5.26620003,9.76452941 L1.23999023,6.65002441 C0.43658717,8.26043162 0,10.0753848 0,12 C0,13.9195484 0.444780743,15.7301709 1.23746264,17.3349879 L5.27698177,14.2678769 Z"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            class="login-btn btn btn-light"
-            id="continue-with-fb-btn"
-          >
-            <i
-              class="bi bi-facebook"
-              style="font-size: 20px; color: #448afd"
-            ></i>
-          </button>
-            </div>
-          </div>
-          <div class="d-flex justify-content-between align-items-center p-4">
-            <p class="fs-6 text-muted mb-0">© 2024 CauseCircle</p>
-            <span class="text-muted">
-              <i class="bi bi-globe text-muted" style="font-size: 20px"></i>
-              ENG
-            </span>
-          </div>
-        </div>
-
-        <div id="accept-invite-section" class="d-flex flex-column h-100 pt-5 pt-md-0">
-          <div
-            class="d-flex flex-column justify-content-center align-items-center flex-grow-1 px-3 px-md-5"
-          >
-            <div>
-              <img
-                src="{{npo.logo.getImage()}}"
-                alt="{{npo.name}}"
-                style="max-width: 200px"
-              />
-            </div>
-            <div>
-              <p id="login-title" class="text-center fs-4 fw-medium mb-0 mt-4">
-                {{npo.name}} has invited you to join CauseCircle
-              </p>
-              <div id="login-description" class="text-center fs-6 text-muted">
-                CauseCircle is a platform where you can share and amplify
-                stories about causes you care about to a community that cares.
-              </div>
-              <button class="btn btn-primary w-100 mt-4">Accept Invite</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!--Use Cases section-->
-      <section
-        id="use-cases-section"
-        class="right-side d-flex p-lg-3 container py-5"
-      >
-        <div class="d-flex flex-column gap-3">
-          <p class="section-title mb-0">What is CauseCircle?</p>
-          <div class="hero-description mx-auto">
-            <p>Empower your community with stories that inspire action.</p>
-          </div>
-          <div class="row pt-3 row-gap-5">
-            <!--prettier-ignore-->
-            {{ $home_use_cases = {homepage.first().use_cases} }}
-            <!--prettier-ignore-->
-            {{each use_cases as use_case where FIND_IN_SET (use_case.zuid, '{$home_use_cases}') }}
-            <div class="col-12 col-sm-6 col-md-4">
-              <!--prettier-ignore-->
-              {{ include /components/global/usecases_card.html }}
-            </div>
-            {{/each}}
-          </div>
-          <div class="d-flex justify-content-center pt-3 d-none">
-            <button class="btn btn-primary mx-auto">Accept Invite</button>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- Include login prompt modal with updated content -->
-    <div class="modal fade" id="loginPromptModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-sm" style="border-radius: 16px;">
-          <div class="modal-body p-5">
-            <div class="d-flex flex-column align-items-center text-center">
-              <!-- Loading spinner -->
-              <div class="spinner-border text-primary mb-4" role="status" style="width: 3rem; height: 3rem;">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-              <!-- Message -->
-              <h5 class="mb-3" style="color: #2C3E50; font-weight: 500;">Please wait</h5>
-              <p class="text-muted mb-0" style="font-size: 1rem;">
-                Your account is being created...
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <style>
-      #loginPromptModal .modal-content {
-        background-color: #ffffff;
-        border: none;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      }
-
-      #loginPromptModal .spinner-border {
-        color: #0d6efd;
-      }
-
-      #loginPromptModal .modal-body { 
-        padding: 2.5rem !important;
-      }
-
-      /* Fade in animation for the modal content */
-      #loginPromptModal .modal-content {
-        animation: fadeIn 0.3s ease-out;
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    </style>
-
-    <!-- Add required scripts -->
     <script
+      defer
       src="https://code.jquery.com/jquery-3.7.1.min.js"
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"
     ></script>
 
+    <!-- Include base auth -->
+    {{include /auth/base.html}}
 
-    
+    <style>
+      .section-title p,
+      .section-title {
+        font-size: 2rem;
+        font-weight: 500;
+        text-align: center;
+      }
+      .hero-description p,
+      .hero-description {
+        font-size: 1.125rem;
+        font-weight: 400;
+        text-align: center;
+        color: var(--bs-gray-500);
+        max-width: 53.125rem;
+      }
+      .role-card,
+      .cause-card,
+      .npo-card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        cursor: pointer;
+      }
+      .role-card:hover,
+      .cause-card:hover,
+      .npo-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+      .role-card.selected,
+      .cause-card.selected,
+      .npo-card.selected {
+        border: 2px solid #7b3fee;
+        background-color: #f8f4ff;
+      }
+      .search-input {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+        background-repeat: no-repeat;
+        background-position: 10px center;
+        padding-left: 35px;
+      }
+      #stepsIndicator {
+        font-size: 0.875rem;
+      }
+      .step-item {
+        display: flex;
+        align-items: center;
+        color: var(--bs-gray-600);
+      }
+      .step-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: var(--bs-gray-300);
+        color: var(--bs-white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 8px;
+      }
+      .step-separator {
+        width: 16px;
+        height: 2px;
+        background-color: var(--bs-gray-300);
+        margin: 0 8px;
+      }
+      .step-item.active {
+        color: var(--bs-primary);
+      }
+      .step-item.active .step-icon {
+        background-color: var(--bs-primary);
+      }
+      .step-item.completed .step-icon {
+        background-color: var(--bs-success);
+      }
+      .modal-fullscreen .modal-header {
+        padding: 1rem 2rem;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+      }
+      .modal-fullscreen .modal-body {
+        padding: 2rem;
+      }
+      .close-button {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: #000;
+        opacity: 0.5;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+      }
+      .close-button:hover {
+        opacity: 0.75;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="createStory" class="pt-4">
+      <div class="w-100">
+        <div class="row w-100 mx-0">
+          <div
+            class="col-2 d-flex justify-content-start align-items-center d-none d-md-flex"
+          >
+            <img
+              src="{{ globals.logo.getImage() }}"
+              style="max-width: 160px"
+              alt="cause circle brand logo"
+            />
+          </div>
+          <div
+            class="col-10 col-md-8 d-flex justify-content-center align-items-center"
+          >
+            <!-- Steps indicator -->
+            <div
+              id="stepsIndicator"
+              class="d-flex align-items-center justify-content-center"
+            >
+              <!-- <div class="step-item" data-step="1">
+                <span class="step-icon">1</span>
+                <span class="step-text">Hero Image</span>
+              </div> -->
+              <!-- <div class="step-separator"></div> -->
+              <div class="step-item" data-step="1">
+                <span class="step-icon">1</span>
+                <span class="step-text">Story Information</span>
+              </div>
+              <!-- <div class="step-separator"></div> -->
+              <!-- <div class="step-item" data-step="2">
+                <span class="step-icon">2</span>
+                <span class="step-text">Add Content</span>
+              </div> -->
+              <div class="step-separator"></div>
+              <div class="step-item" data-step="2">
+                <span class="step-icon">2</span>
+                <span class="step-text">Share</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-2 d-flex justify-content-end align-items-center">
+          </div>
+        </div>
+      </div>
+      <div class="p-3 p-md-4">
+        <div class="container-fluid">
+          <div>
+            <button id="backBtn" class="btn btn-secondary">
+              <i class="bi bi-arrow-left"></i>
+              Back
+            </button>
+          </div>
+          <!-- Content sections -->
+          <div class="row">
+            <div class="col-12">
+              <!-- prettier-ignore -->
+              (** {{ include /components/global/HomeFeed/Create Story Steps/upload_hero.html }} **)
+              <!-- prettier-ignore -->
+              {{ include /components/global/Nonprofits/CreateStory/story_information.html }}
+              <!-- prettier-ignore -->
+              (** {{ include /components/global/HomeFeed/Create Story Steps/add_content.html }} **)
+              <!-- prettier-ignore -->
+              {{ include /components/global/HomeFeed/Create Story Steps/share_story.html }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <!-- Move these event listeners inside the DOMContentLoaded event -->
+    <!-- Add required scripts -->
+
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        document
-          .getElementById("google-signin-btn")
-          .addEventListener("click", function () {
-            localStorage.setItem("npoZuidToFollow", "{{$zuid}}");
-            // Show modal before sign in
-            const loginModal = new bootstrap.Modal(
-              document.getElementById("loginPromptModal")
-            );
-            loginModal.show();
-            signInWithGoogle();
-          });
-        document
-          .getElementById("continue-with-fb-btn")
-          .addEventListener("click", function () {
-            localStorage.setItem("npoZuidToFollow", "{{$zuid}}");
-            // Show modal before sign in
-            const loginModal = new bootstrap.Modal(
-              document.getElementById("loginPromptModal")
-            );
-            loginModal.show();
-            console.log('from custom, ', localStorage.getItem('npoZuidToFollow'))
-            signInWithFacebook();
+      async function getStory(zuid) {
+        const apiUrl = "{{ $base_url }}mobileapp/story.json";
+
+        try {
+          const response = await $.ajax({
+            url: apiUrl,
+            method: "GET",
+            data: { zuid: zuid, zpw: "causecircle" },
+            dataType: "json",
           });
 
-        // Add check for modal state
-        const shouldShowModal = localStorage.getItem("showModalAfterSignIn");
-        if (shouldShowModal) {
-          const loginModal = new bootstrap.Modal(
-            document.getElementById("loginPromptModal")
-          );
-          loginModal.show();
-          localStorage.removeItem("showModalAfterSignIn");
+          // console.log("Story data:", response);
+          return response.data;
+        } catch (error) {
+          console.error("Error fetching story:", error);
+          throw error;
         }
-
-        // Clear modal state when page is closed
-        window.addEventListener("beforeunload", function() {
-          localStorage.removeItem("showModalAfterSignIn");
-        });
-      });
-    </script>
-
-    <script>
-      const zuid = "{{$zuid}}";
-
-      // Update the handleAcceptInvite function
-      function handleAcceptInvite() {
-        document
-          .getElementById("accept-invite-section")
-          .classList.add("d-none");
-        document.getElementById("login-section").classList.remove("d-none");
-
-        // Add full width class to left side
-        document.querySelector(".left-side").classList.add("left-side-full");
-
-        // Update the right side section classes to be hidden on all screen sizes
-        const useCasesSection = document.getElementById("use-cases-section");
-        useCasesSection.classList.remove("d-lg-flex");
-        useCasesSection.classList.add("d-none");
       }
 
-      // Add click event listeners to both Accept Invite buttons
-      document.addEventListener("DOMContentLoaded", function () {
-        const acceptInviteButtons = document.querySelectorAll(".btn-primary");
-        acceptInviteButtons.forEach((button) => {
-          button.addEventListener("click", handleAcceptInvite);
+      const selectionHeaderTexts = [
+        {
+          title: "Create Story",
+          description: "Write a story for a cause you care about",
+          icon: "https://4xxglxlj.media.zestyio.com/upload_icon.png",
+        },
+        {
+          title: "Your Story is Published!",
+          description: "Almost done! Choose how you want to share your story.",
+          icon: "https://4xxglxlj.media.zestyio.com/finish_icon.png",
+        },
+      ];
+
+
+      //states
+      window.npo_data;
+      window.category_data;
+      window.hero_image = [];
+      window.story_title;
+      window.story_description;
+      window.story_content;
+      window.story_location;
+      window.story_npo;
+      window.story_category;
+      window.story_data;
+
+      $(document).ready(function () {
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        const printStates = () => {
+          console.log(window.hero_image);
+          console.log(window.story_title);
+          console.log(window.story_description);
+          console.log(window.story_content);
+          console.log(window.story_location);
+          console.log(window.story_npo);
+          console.log(window.story_category);
+        };
+
+        const resetStates = () => {
+          window.hero_image = [];
+          window.story_title = "";
+          window.story_description = "";
+          window.story_content = "";
+          window.story_location = "";
+          window.story_npo = "";
+          window.story_category = "";
+
+          $("#uploadArea").val("");
+          $("#fileInput").val(""); // Reset file input
+          $("#storyTitle").val("");
+          $("#storyDescription").val("");
+          $("#npoSearchInput").val("");
+          $("#categorySearchInput").val("");
+          $("#location").val("");
+          $("#storyContent").val("");
+        };
+
+        // Centralized next button click handler
+        $("#nextBtn").on("click", async function () {
+          console.log("Next button clicked");
+          const $nextBtn = $(this);
+          const $spinner = $nextBtn.find(".spinner-border");
+
+          // Show spinner and disable button
+          $spinner.removeClass("d-none");
+          $nextBtn.prop("disabled", true);
+
+          try {
+            // Call the appropriate function based on the current step
+            switch (currentStep) {
+              case 1:
+                // Handle story information submission
+                window.story_description = $("#storyDescription").val();
+
+                // Find the NPO object and get its zuid
+                const npoId = $("#selectedNPO").val();
+                window.story_npo = npoId ? npoId : null;
+
+                if (window.story_npo == "") {
+                  alert("Please select an NPO");
+                  return;
+                }
+
+                // Remove category validation check
+                // Find the Category object and get its zuid
+                const categoryId = $("#selectedCategory").val();
+                window.story_category = categoryId ? categoryId : null;
+
+                if (window.story_category == "") {
+                  alert("Please select a category");
+                  return;
+                }
+
+                window.story_location = $("#location").val();
+                // console.log(currentStep);
+                //   break;
+                // case 2:
+                // Handle content addition
+                window.story_content = $("#storyContent").val();
+                printStates();
+
+                try {
+                  const uploadedHeroImages = await uploadImages(window.hero_image);
+                  // console.log("All images uploaded:", uploadedHeroImages);
+
+                  const imageIds = uploadedHeroImages.map((img) => img.data[0].id);
+
+                  const userData = JSON.parse(localStorage.getItem("user"));
+                  const storyData = {
+                    title: window.story_title,
+                    story: window.story_content || window.story_description,
+                    images: imageIds.join(","),
+                    cause_category: window.story_category,
+                    // cause_category: "7-80c2e0edba-ltxdkc",
+                    npo: window.story_npo,
+                    author: userData.zuid,
+                    date_published: new Date().toISOString(),
+                    description: window.story_description,
+                  };
+                  const story = await createStory(storyData);
+
+                  if (story.data.length === 0) {
+                    alert(
+                      `Failed to upload story. Your story is deemed inappropriate. Please try again.`
+                    );
+                    return; // Prevent moving to the next step if uploads failed
+                  }
+
+                  window.story_data = await getStory(story?.meta?.story_zuid);
+                  $("#shareLink").val(`${window.story_data[0]?.meta?.web?.url}`);
+                } catch (error) {
+                  console.error("Error uploading story:", error);
+                  alert("Failed to upload story. Please try again.");
+                  return; // Prevent moving to the next step if uploads failed
+                }
+
+                $("#backBtn").addClass("d-none");
+                break;
+              case 2:
+                // Handle completion (e.g., close modal or submit form)
+                $("#createStoryModal").modal("hide");
+
+                break;
+            }
+
+            if (currentStep < totalSteps) {
+              currentStep++;
+              showSection(currentStep);
+            }
+          } catch (error) {
+            console.error("Error in next button handler:", error);
+            alert("An error occurred. Please try again.");
+          } finally {
+            // Hide spinner and restore button state
+            $spinner.addClass("d-none");
+            $nextBtn.prop("disabled", false);
+          }
+        });
+
+        function updateNextButtonState(enable) {
+          const $nextBtn = $("#nextBtn");
+          $nextBtn.prop("disabled", enable);
+          if (!enable) {
+            $nextBtn.find(".spinner-border").addClass("d-none");
+          }
+        }
+
+        function updateStepIndicator() {
+          $(".step-item").removeClass("active completed");
+          for (let i = 1; i <= totalSteps; i++) {
+            if (i < currentStep) {
+              $(`.step-item[data-step="${i}"]`).addClass("completed");
+            } else if (i === currentStep) {
+              $(`.step-item[data-step="${i}"]`).addClass("active");
+            }
+          }
+        }
+
+        function showSection(step) {
+          $(".section-container").addClass("d-none");
+          $(`#${getSectionId(step)}`).removeClass("d-none");
+
+          // Update section content
+          const content = selectionHeaderTexts[step - 1];
+          $(`#${getSectionId(step)} .section-title`).text(content.title);
+          $(`#${getSectionId(step)} .section-description`).text(
+            content.description
+          );
+          $(`#${getSectionId(step)} .section-icon`).attr("src", content.icon);
+
+          // Show/hide back button
+          $("#backBtn").toggle(step > 1);
+
+          // Enable Next button for all steps except the first one
+          $("#nextBtn").prop("disabled", step === 1);
+
+          updateStepIndicator();
+        }
+
+        function getSectionId(step) {
+          const sections = [
+            // "uploadHeroImageSelection",
+            "storyInformationSelection",
+            // "addContentSelection",
+            "shareSelection",
+          ];
+          return sections[step - 1];
+        }
+
+        // Initialize first step
+        showSection(currentStep);
+
+        // Handle back button clicks
+        $(document).on("click", "#backBtn", function () {
+          // console.log("Back button clicked");
+          $("#nextBtn").prop("disabled", false);
+          if (currentStep > 1) {
+            currentStep--;
+            showSection(currentStep);
+          }
+        });
+
+        // Reset modal state when it's hidden
+        $("#createStoryModal").on("hidden.bs.modal", function () {
+          currentStep = 1;
+          showSection(currentStep);
+        });
+
+        // Log when the modal is shown
+        $("#createStoryModal").on("shown.bs.modal", function () {
+          resetAllStates();
+          // Initialize first step
+          showSection(currentStep);
         });
       });
     </script>
+    
   </body>
 </html>
 {{/each}}

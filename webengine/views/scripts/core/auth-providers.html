@@ -1,0 +1,30 @@
+<script type="module">
+  // ==================== AUTH ====================
+  window.auth = firebase.auth();
+  const googleProvider = new firebase.auth.GoogleAuthProvider();
+  const facebookProvider = new firebase.auth.FacebookAuthProvider();
+  const appleProvider = new firebase.auth.OAuthProvider("apple.com");
+  const microsoftProvider = new firebase.auth.OAuthProvider("microsoft.com");
+
+  facebookProvider.addScope("email");
+  facebookProvider.setCustomParameters({
+    display: "popup",
+  });
+
+  googleProvider.addScope("email");
+  googleProvider.setCustomParameters({
+    prompt: "consent",
+    display: "popup",
+  });
+
+  appleProvider.addScope("email");
+  appleProvider.addScope("name");
+
+  microsoftProvider.addScope("user.read");
+  microsoftProvider.addScope("email");
+  microsoftProvider.addScope("openid");
+  microsoftProvider.addScope("profile");
+  microsoftProvider.setCustomParameters({
+    prompt: "consent"
+  });
+</script>

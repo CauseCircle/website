@@ -90,6 +90,51 @@
     max-height: 300px;
     overflow-y: auto;
   }
+
+  .search-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 480px;
+    width: 100%;
+  }
+  
+  .search-options {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 5px;
+  }
+  
+  .form-check-label {
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+  }
+  
+  .npo-location {
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .location-icon {
+    font-size: 12px;
+    color: #999;
+  }
+  
+  /* Custom checkbox styling */
+  .form-check-input {
+    cursor: pointer;
+  }
+  
+  .form-check-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+  }
 </style>
 
 <style>
@@ -112,6 +157,7 @@
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    line-clamp: 2;
     overflow: hidden;
     text-overflow: ellipsis;
     max-height: 2.8em; /* Adjust this value based on your line-height */
@@ -135,13 +181,14 @@
   .npo-date {
     font-size: 12px;
   }
-  .npo-npo-logo {
+  .npo-npo-logo { 
     width: 24px;
     height: 24px;
     border: 1px solid #aeaeae;
     border-radius: 3px;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center;
+    background-color: white;
   }
   .npo-btn {
     font-size: 12px;
@@ -175,23 +222,28 @@
     <p class="fs-5 text-muted text-center" style="max-width: 45rem">
       {{ this.hero_description }}
     </p>
-    <div class="search-bar">
+    <div class="search-controls">
       <input
         type="text"
         id="npo-search"
         class="search-input form-control w-100 mb-2 mb-md-0 py-2 my-4 w-100"
-        placeholder="Search Nonprofits by name..."
+        placeholder="Search Nonprofits..."
         aria-label="Search"
       />
-      <div class="d-flex align-items-end d-none">
-        <select
-          id="cause-filter"
-          class="filter-dropdown form-control"
-          style="height: 48px"
-        >
-          <option value="all">All Causes</option>
-        </select>
+      <div class="search-options d-none">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="location-filter-toggle">
+          <label class="form-check-label" for="location-filter-toggle">
+            Filter by location
+          </label>
+        </div>
       </div>
+    </div>
+    <!-- Re-add the cause filter but keep it hidden -->
+    <div class="d-none">
+      <select id="cause-filter" class="filter-dropdown form-control">
+        <option value="all">All Causes</option>
+      </select>
     </div>
   </div>
 </section>
@@ -200,16 +252,52 @@
   <hr class="my-0" style="border-top: 1px solid #bdbdbd" />
 </section>
 
-<section id="search-results" class="container py-4 flex-column gap-4">
-  <div class="d-flex justify-content-between">
-    <p class="fs-5 fw-bold py-4">Explore Nonprofits</p>
-  </div>
-  <div id="search-npos-container" class="row row-gap-4">
-    <!-- Search results will be dynamically inserted here -->
+<section id="search-results" class="container py-4">
+  <div class="row">
+    <aside class="col-12 col-lg-3 mb-4" id="filters-sidebar">
+      <div class="card p-3">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-funnel"></i>
+          <span class="fw-semibold">Filters</span>
+        </div>
+
+        <div class="mb-3">
+          <div class="fw-semibold mb-2">Causes</div>
+          <div id="cause-checkboxes" class="d-flex flex-column gap-2" style="max-height: 240px; overflow: auto;"></div>
+        </div>
+
+        <div class="mb-2">
+          <div class="fw-semibold mb-2">Location</div>
+          <select id="country-select" class="form-select mb-3">
+            <option value="">Select Country</option>
+          </select>
+          <select id="state-select" class="form-select mb-3">
+            <option value="">Select State</option>
+          </select>
+          <select id="city-select" class="form-select mb-3">
+            <option value="">Select City</option>
+          </select>
+          <select id="zip-select" class="form-select mb-4">
+            <option value="">Select ZIP Code</option>
+          </select>
+        </div>
+        <button id="reset-filters" class="btn btn-secondary w-100">Reset Filters</button>
+      </div>
+    </aside>
+
+    <div class="col-12 col-lg-9">
+      <div class="d-flex justify-content-between align-items-center">
+        <p class="fs-5 fw-bold py-4 mb-0">Explore Nonprofits</p>
+        <span id="results-count" class="text-muted small">0 results found</span>
+      </div>
+      <div id="search-npos-container" class="row row-gap-4">
+        <!-- Search results will be dynamically inserted here -->
+      </div>
+    </div>
   </div>
 </section>
 
-<section class="py-2">
+<section class="py-2 d-none">
   <hr class="my-0" style="border-top: 1px solid #bdbdbd" />
 </section>
 
@@ -219,12 +307,11 @@
     <div
       class="d-flex flex-column gap-3 align-items-center justify-content-center"
     >
-      <p class="section-title text-center">Got questions? We'd love to chat.</p>
-      <div class="hero-description mx-auto">
-        Discover how you can claim your profile, access Beta benefits, onboard
-        your community of volunteers and staff, and more.
+      <p class="section-title text-center d-none">Couldn't find your nonprofit? Need a hand? Let's connect.</p>
+      <div class="hero-description mx-auto d-none">
+        We're here to help you get listed, access features, and onboard your team of volunteers and staff.
       </div>
-      <div class="py-3">
+      <div class="py-3 d-none">
         <a href="{{ demo_page.first().path_full }}" class="btn btn-primary">
           Contact Us
         </a>
@@ -238,60 +325,121 @@
   </div>
 </section>
 
-<script>
+<script type="module">
   $(document).ready(function () {
     const $npoSearch = $(".search-input");
     const $causeFilter = $("#cause-filter");
     const $searchNposContainer = $("#search-npos-container");
+    const $locationFilterToggle = $("#location-filter-toggle");
+    const $causeCheckboxes = $("#cause-checkboxes");
+    const $countrySelect = $("#country-select");
+    const $stateSelect = $("#state-select");
+    const $citySelect = $("#city-select");
+    const $zipSelect = $("#zip-select");
+    const $resetFilters = $("#reset-filters");
     const $loadingIndicator = $(
       '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>'
     );
     const $noResultsMessage = $(`
       <div class="text-center py-6">
-        <img src="https://4xxglxlj.media.zestyio.com/Empty-States--Finance---Banking---1.0-.png" alt="NPO Not Found" style="height: 12.375rem; object-fit: contain" class="mb-4"/>
-        <h2 class="mb-3">NPO Not Found</h2>
-        <p class="text-muted">We couldn't find any NPO matching your search criteria.</p>
-        <p class="text-muted py-4">Is your NPO missing from our directory?</p>
-        <a href="https://causecircle.org/claim-listing/" class="btn btn-primary">Register Your NPO</a>
+        <h2 class="mb-3">Couldn't find your nonprofit? Need a hand? Let's connect.</h2>
+        <p class="hero-description mx-auto mb-4">We're here to help you get listed, access features, and onboard your team of volunteers and staff.</p>
+        <div class="d-flex justify-content-center gap-2">
+          <a href="{{ $base_url }}claim-listing/" class="btn btn-primary">Register My Nonprofit</a>
+          <a href="{{ $base_url }}demo/" class="btn btn-secondary">Suggest a Nonprofit</a>
+        </div>
       </div>
     `);
     const $exploreNPOsText = $(".fs-5.fw-bold.py-4");
+    const $resultsCount = $("#results-count");
     let currentPage = 1;
     let isSearching = false;
     let npoData = [];
-    let hasLoadMoreBeenClicked = false; // Add this new variable
+    let hasLoadMoreBeenClicked = false;
+    let isLocationSearch = false;
+    let selectedCauses = new Set();
 
-    // Fetch cause categories
+    // Show skeleton placeholders for causes while loading
+    function showCausesLoading() {
+      const placeholders = Array.from({ length: 6 })
+        .map(() => `
+          <div class="d-flex align-items-center gap-2 mb-2 placeholder-glow">
+            <span class="placeholder rounded" style="width:16px;height:16px;"></span>
+            <span class="placeholder col-8"></span>
+          </div>
+        `)
+        .join("");
+      $causeCheckboxes.html(placeholders);
+    }
+
+    showCausesLoading();
+
+    // Update placeholder text based on search mode
+    function updatePlaceholder() {
+      $npoSearch.attr("placeholder", "Search nonprofits by name, country, state, city, zip, or cause...");
+    }
+
+    // Toggle between name and location search
+    $locationFilterToggle.on("change", function() {
+      isLocationSearch = $(this).is(":checked");
+      updatePlaceholder();
+      
+      // Reset search if there's text in the input
+      if ($npoSearch.val()) {
+        currentPage = 1;
+        hasLoadMoreBeenClicked = false;
+        searchNpos();
+        updateUrlParam();
+      }
+    });
+
+    // Fetch causes list to render checkboxes (using causes.json endpoint)
     $.ajax({
-      url: "https://causecircle.org/mobileapp/causes.json",
+      url: "{{ $base_url }}mobileapp/causes.json?zpw=causecircle",
       method: "GET",
-      data: { limit: 999 },
+      data: { limit: 999, featured: false },
       success: function (data) {
         if (data.data && data.data.length > 0) {
-          // Sort causes alphabetically
-          data.data.sort((a, b) => a.title.localeCompare(b.title));
-          data.data.forEach((cause) => {
-            $causeFilter.append(
-              `<option value="${cause.title}">${cause.title}</option>`
-            );
+          $causeCheckboxes.empty();
+          const uniqueTitles = Array.from(new Set(data.data.map(c => c.title))).sort((a,b)=>a.localeCompare(b));
+          uniqueTitles.forEach((title) => {
+            const id = `cause-${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
+            const checkbox = `
+              <div class="form-check">
+                <input class="form-check-input cause-check" type="checkbox" value="${title}" id="${id}" />
+                <label class="form-check-label" for="${id}">${title}</label>
+              </div>`;
+            $causeCheckboxes.append(checkbox);
           });
+        } else {
+          $causeCheckboxes.html('<div class="text-muted small">No causes found</div>');
         }
       },
       error: function (error) {
-        console.error("Error fetching cause categories:", error);
-      },
+        console.error("Error fetching causes:", error);
+        $causeCheckboxes.html('<div class="text-muted small">Failed to load causes</div>');
+      }
     });
 
     // Get the filter parameter from the URL
     const urlParams = new URLSearchParams(window.location.search);
     const searchParam = urlParams.get("filter");
+    const locationParam = urlParams.get("location");
 
-    // Set the initial value of the search input if filter parameter exists
-    if (searchParam) {
+    // Set up initial search state based on URL parameters
+    if (locationParam) {
+      $locationFilterToggle.prop("checked", true);
+      isLocationSearch = true;
+      $npoSearch.val(locationParam);
+    } else if (searchParam) {
+      $locationFilterToggle.prop("checked", false);
+      isLocationSearch = false;
       $npoSearch.val(searchParam);
     }
+    
+    updatePlaceholder();
 
-    // Perform initial search with the filter or display featured NPOs
+    // Perform initial search
     searchNpos();
 
     function debounce(func, wait) {
@@ -312,7 +460,70 @@
       }, 300)
     );
 
-    $causeFilter.on("change", () => {
+    // Cause checkbox change
+    $(document).on("change", ".cause-check", function() {
+      const value = $(this).val();
+      if ($(this).is(":checked")) {
+        selectedCauses.add(value);
+      } else {
+        selectedCauses.delete(value);
+      }
+      currentPage = 1;
+      filterNpos();
+    });
+
+    // Populate simple Country/State/City from available data dynamically after fetch
+    function populateLocationsFromData(allNpos) {
+      const countries = new Set();
+      const states = new Set();
+      const cities = new Set();
+      const zips = new Set();
+
+      allNpos.forEach(npo => {
+        const addr = (npo.headquarters_address || "").split(",").map(s=>s.trim());
+        if (addr.length) {
+          const maybeCity = addr[1] || addr[0];
+          const maybeState = addr[2] || "";
+          const maybeZip = addr[3] || "";
+          const maybeCountry = addr[4] || addr[addr.length-1] || "";
+          if (maybeCountry) countries.add(maybeCountry);
+          if (maybeState) states.add(maybeState);
+          if (maybeCity) cities.add(maybeCity);
+          if (maybeZip) zips.add(maybeZip);
+        }
+      });
+
+      function setOptions($select, values, placeholder) {
+        const current = $select.val();
+        $select.empty().append(`<option value="">${placeholder}</option>`);
+        Array.from(values).sort((a,b)=>a.localeCompare(b)).forEach(v=>{
+          $select.append(`<option value="${v}">${v}</option>`);
+        });
+        if (current && values.has(current)) $select.val(current);
+      }
+
+      setOptions($countrySelect, countries, "Select Country");
+      setOptions($stateSelect, states, "Select State");
+      setOptions($citySelect, cities, "Select City");
+      setOptions($zipSelect, zips, "Select ZIP Code");
+    }
+
+    $countrySelect.on("change", filterNpos);
+    $stateSelect.on("change", filterNpos);
+    $citySelect.on("change", filterNpos);
+    $zipSelect.on("change", filterNpos);
+
+    // Reset filters handler
+    $resetFilters.on("click", function() {
+      // Clear causes
+      selectedCauses.clear();
+      $(".cause-check").prop("checked", false);
+      // Reset location selects
+      $countrySelect.val("");
+      $stateSelect.val("");
+      $citySelect.val("");
+      $zipSelect.val("");
+      // Reset search input mode filters (keep search text as-is)
       currentPage = 1;
       filterNpos();
     });
@@ -320,11 +531,10 @@
     // Update URL parameter function
     function updateUrlParam() {
       const searchValue = $npoSearch.val();
-      const newUrl = searchValue
-        ? `${window.location.pathname}?filter=${encodeURIComponent(
-            searchValue
-          )}`
-        : window.location.pathname;
+      let newUrl = window.location.pathname;
+      if (searchValue) {
+        newUrl += `?filter=${encodeURIComponent(searchValue)}`;
+      }
       history.pushState(null, "", newUrl);
     }
 
@@ -337,36 +547,138 @@
         $searchNposContainer.empty().append($loadingIndicator);
       }
 
-      $.ajax({
-        url: `https://causecircle.org/mobileapp/npos.json`,
+      const baseParams = { limit: limit, page: currentPage };
+      if (!searchInput) baseParams.featured = isFeatured;
+
+      // If there's no search input, do a single request (featured or general)
+      if (!searchInput) {
+        $.ajax({
+          url: `{{ $base_url }}mobileapp/npos.json?zpw=causecircle`,
+          method: "GET",
+          data: baseParams,
+          success: function (data) {
+            if (currentPage === 1) {
+              $searchNposContainer.empty();
+              npoData = [];
+            }
+            if (data.data && data.data.length > 0) {
+              const existingZuids = new Set(npoData.map(n => n.meta?.zuid));
+              const newNpos = data.data.filter(n => !existingZuids.has(n.meta?.zuid));
+              npoData = [...npoData, ...newNpos];
+              displayResults(npoData);
+              if (currentPage === 1) populateLocationsFromData(npoData);
+              if ((data.data.length >= limit) || !hasLoadMoreBeenClicked) {
+                addLoadMoreButton();
+              } else {
+                removeLoadMoreButton();
+              }
+            } else if (currentPage === 1) {
+              $exploreNPOsText.hide();
+              removeLoadMoreButton();
+              $searchNposContainer.append($noResultsMessage);
+            }
+            isSearching = false;
+          },
+          error: function (error) {
+            console.error("Error fetching search results:", error);
+            if (currentPage === 1) {
+              $exploreNPOsText.hide();
+              removeLoadMoreButton();
+              $searchNposContainer.empty().append($(
+                '<div class="text-center py-4">An error occurred. Please try again.</div>'
+              ));
+            }
+            isSearching = false;
+          }
+        });
+        return;
+      }
+
+      // With search input, perform three parallel requests: name, address, and causes
+      const nameSearchParams = { ...baseParams, search: searchInput, headquarters_address: "" };
+      const addrSearchParams = { ...baseParams, headquarters_address: searchInput, search: "" };
+      const causesSearchParams = { filter: searchInput, limit: 25 };
+
+      const nameReq = $.ajax({
+        url: `{{ $base_url }}mobileapp/npos.json?zpw=causecircle`,
         method: "GET",
-        data: {
-          limit: limit,
-          search: searchInput,
-          page: currentPage,
-          featured: isFeatured,
-        },
-        success: function (data) {
+        data: nameSearchParams
+      });
+      const addrReq = $.ajax({
+        url: `{{ $base_url }}mobileapp/npos.json?zpw=causecircle`,
+        method: "GET",
+        data: addrSearchParams
+      });
+      const causesReq = $.ajax({
+        url: `{{ $base_url }}mobileapp/causes.json?zpw=causecircle`,
+        method: "GET",
+        data: causesSearchParams
+      });
+
+      $.when(nameReq, addrReq, causesReq).done(function(nameRes, addrRes, causesRes) {
+        const nameData = nameRes && nameRes[0] ? nameRes[0] : { data: [] };
+        const addrData = addrRes && addrRes[0] ? addrRes[0] : { data: [] };
+        const causesData = causesRes && causesRes[0] ? causesRes[0] : { data: [] };
+
+        // Extract cause zuids (support meta.zuid or zuid)
+        const causeZuids = Array.isArray(causesData.data)
+          ? causesData.data.map(c => (c.meta?.zuid || c.zuid)).filter(Boolean)
+          : [];
+
+        // Limit number of parallel cause requests to avoid overload
+        const MAX_CAUSE_REQUESTS = 8;
+        const limitedCauseZuids = causeZuids.slice(0, MAX_CAUSE_REQUESTS);
+
+        // Prepare NPO requests for each cause zuid
+        const causeNpoReqs = limitedCauseZuids.map(zuid => $.ajax({
+          url: `{{ $base_url }}mobileapp/npos.json?zpw=causecircle`,
+          method: "GET",
+          data: { ...baseParams, cause_zuid: zuid, search: "", headquarters_address: "" }
+        }));
+
+        const afterCauseRequests = function(allCauseResponses) {
           if (currentPage === 1) {
             $searchNposContainer.empty();
-            npoData = []; // Reset data only when starting a new search
+            npoData = [];
           }
 
-          if (data.data && data.data.length > 0) {
-            // Merge new data with existing data, avoiding duplicates
-            const newNpos = data.data.filter(
-              (newNpo) =>
-                !npoData.some(
-                  (existingNpo) => existingNpo.meta.zuid === newNpo.meta.zuid
-                )
-            );
-            npoData = [...npoData, ...newNpos];
-            filterNpos();
+          const combined = [];
+          if (Array.isArray(nameData.data)) combined.push(...nameData.data);
+          if (Array.isArray(addrData.data)) combined.push(...addrData.data);
 
-            if (
-              (data.data.length > 0 && data.data.length >= limit) ||
-              !hasLoadMoreBeenClicked
-            ) {
+          // Merge NPOs from causes responses
+          if (Array.isArray(allCauseResponses)) {
+            allCauseResponses.forEach(res => {
+              const payload = Array.isArray(res) ? res[0] : res; // jQuery when returns [data, status, jqXHR]
+              if (payload && Array.isArray(payload.data)) combined.push(...payload.data);
+            });
+          }
+
+          if (combined.length > 0) {
+            const existingZuids = new Set(npoData.map(n => n.meta?.zuid));
+            const dedupedNew = [];
+            for (const n of combined) {
+              const zuid = n.meta?.zuid;
+              if (!existingZuids.has(zuid)) {
+                existingZuids.add(zuid);
+                dedupedNew.push(n);
+              }
+            }
+            npoData = [...npoData, ...dedupedNew];
+
+            displayResults(npoData);
+            if (currentPage === 1) populateLocationsFromData(npoData);
+
+            const hasMoreName = Array.isArray(nameData.data) && nameData.data.length >= limit;
+            const hasMoreAddr = Array.isArray(addrData.data) && addrData.data.length >= limit;
+            let hasMoreCause = false;
+            if (Array.isArray(allCauseResponses)) {
+              hasMoreCause = allCauseResponses.some(r => {
+                const payload = Array.isArray(r) ? r[0] : r;
+                return payload && Array.isArray(payload.data) && payload.data.length >= limit;
+              });
+            }
+            if ((hasMoreName || hasMoreAddr || hasMoreCause) || !hasLoadMoreBeenClicked) {
               addLoadMoreButton();
             } else {
               removeLoadMoreButton();
@@ -377,48 +689,80 @@
             $searchNposContainer.append($noResultsMessage);
           }
           isSearching = false;
-        },
-        error: function (error) {
-          console.error("Error fetching search results:", error);
-          if (currentPage === 1) {
-            $exploreNPOsText.hide();
-            removeLoadMoreButton();
-            $searchNposContainer
-              .empty()
-              .append(
-                $(
-                  '<div class="text-center py-4">An error occurred. Please try again.</div>'
-                )
-              );
-          }
-          isSearching = false;
-        },
+        };
+
+        if (causeNpoReqs.length > 0) {
+          $.when.apply($, causeNpoReqs).done(function() {
+            const responses = Array.prototype.slice.call(arguments);
+            afterCauseRequests(responses);
+          }).fail(function(error) {
+            console.error("Error fetching NPOs by causes:", error);
+            afterCauseRequests([]);
+          });
+        } else {
+          afterCauseRequests([]);
+        }
+      }).fail(function(error) {
+        console.error("Error fetching combined search results:", error);
+        if (currentPage === 1) {
+          $exploreNPOsText.hide();
+          removeLoadMoreButton();
+          $searchNposContainer.empty().append($(
+            '<div class="text-center py-4">An error occurred. Please try again.</div>'
+          ));
+        }
+        isSearching = false;
       });
     }
 
     function filterNpos() {
-      const selectedCause = $causeFilter.val();
+      const selectedCountry = $countrySelect.val();
+      const selectedState = $stateSelect.val();
+      const selectedCity = $citySelect.val();
+      const selectedZip = $zipSelect.val();
+
+      const hasCauseFilter = selectedCauses.size > 0;
+      const hasLocationFilter = selectedCountry || selectedState || selectedCity || selectedZip;
+
+      if (!hasCauseFilter && !hasLocationFilter) {
+        displayResults(npoData);
+        return;
+      }
+
       const filteredNpos = npoData.filter((npo) => {
-        return (
-          selectedCause === "all" ||
-          (npo.category &&
-            npo.category.data.some((cause) => cause.title === selectedCause))
-        );
+        let causeMatch = true;
+        let locationMatch = true;
+
+        if (hasCauseFilter) {
+          const titles = (npo.category?.data || []).map(c => c.title);
+          causeMatch = Array.from(selectedCauses).every(c => titles.includes(c));
+        }
+
+        if (hasLocationFilter) {
+          const address = (npo.headquarters_address || "").toLowerCase();
+          if (selectedCountry && !address.includes(selectedCountry.toLowerCase())) locationMatch = false;
+          if (selectedState && !address.includes(selectedState.toLowerCase())) locationMatch = false;
+          if (selectedCity && !address.includes(selectedCity.toLowerCase())) locationMatch = false;
+          if (selectedZip && !address.includes(selectedZip.toLowerCase())) locationMatch = false;
+        }
+
+        return causeMatch && locationMatch;
       });
 
+      displayResults(filteredNpos);
+    }
+    
+    function displayResults(npos) {
       $searchNposContainer.empty();
-      if (filteredNpos.length > 0) {
+      
+      $resultsCount.text(`${npos?.length || 0} results found`);
+      if (npos && npos.length > 0) {
         $exploreNPOsText.show();
-        $searchNposContainer.empty();
-        filteredNpos.forEach((npo) => {
+        
+        npos.forEach((npo) => {
           const $npoCard = createNpoCard(npo);
           $searchNposContainer.append($npoCard);
         });
-        if (filteredNpos.length === 20) {
-          addLoadMoreButton();
-        } else {
-          removeLoadMoreButton();
-        }
       } else {
         $exploreNPOsText.hide();
         removeLoadMoreButton();
@@ -430,36 +774,44 @@
       let npoImage =
         typeof npo.hero_image === "string"
           ? npo.hero_image
-          : npo.hero_image?.data[0]?.url || "";
+          : npo.hero_image?.data?.[0]?.url || "";
 
-      if (npoImage.includes("https://placehold.co/")) {
+      if (!npoImage || npoImage.includes("https://placehold.co/")) {
         npoImage = "{{globals.npo_placeholder_image.getImage()}}";
       }
+      
+      // Get the headquarters address or show "Location not available"
+      const locationDisplay = npo.headquarters_address 
+        ? `<div class="npo-location"><i class="bi bi-geo-alt location-icon"></i> ${npo.headquarters_address}</div>` 
+        : '';
 
       return `
       <div class="col-12 col-sm-6 col-md-3">
-        <div class="card d-flex flex-column h-100 p-3 gap-2 npo-card" data-story-url="${
+        <a href="${
           npo.meta?.web?.uri || "#"
-        }">
-          <img src="${npoImage}" class="npo-image" />
-          <div class="d-flex flex-column gap-2 h-100">
-            <div class="d-flex flex-grow-1 align-items-center gap-2 d-none">
-              <img src="${
-                typeof npo.logo === "string"
-                  ? npo.logo
-                  : npo.logo?.data[0]?.url || ""
-              }" class="npo-npo-logo" />
-              <p class="npo-name my-auto">${npo.name || "Unknown NPO"}</p>
+        }" class="text-decoration-none">
+          <div class="card d-flex flex-column h-100 p-3 gap-2 npo-card" data-story-url="${
+            npo.meta?.web?.uri || "#"
+          }">
+            <img src="${npoImage}?width=150" class="npo-image" alt="NPO cover image"/>
+            <div class="d-flex flex-column gap-2 h-100">
+              <div class="d-flex flex-grow-1 align-items-center gap-2 d-none">
+                <img src="${
+                  typeof npo.logo === "string"
+                    ? npo.logo
+                    : npo.logo?.data?.[0]?.url || ""
+                }" class="npo-npo-logo" alt="NPO logo"/>
+                <p class="npo-name my-auto">${npo.name || "Unknown NPO"}</p>
+              </div>
+              <p class="npo-title">${npo.name || "Unknown NPO"}</p>
+              <div class="npo-subtitle">${
+                npo.cause_description || "No description available"
+              }</div>
+              ${locationDisplay}
+              <div class="btn btn-secondary npo-btn card-btn mt-auto">View Profile</div>
             </div>
-            <p class="npo-title">${npo.name || "Unknown NPO"}</p>
-            <div class="npo-subtitle">${
-              npo.cause_description || "No description available"
-            }</div>
-            <a href="${
-              npo.meta?.web?.uri || "#"
-            }" class="btn btn-secondary npo-btn card-btn">View Profile</a>
           </div>
-        </div>
+        </a>
       </div>
     `;
     }

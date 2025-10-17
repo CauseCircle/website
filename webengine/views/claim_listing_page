@@ -181,7 +181,7 @@
           <input
             type="hidden"
             name="zf_redirect_url"
-            value="https://causecircle.org/about/confirmation-page/"
+            value="{{ $base_url }}about/confirmation-page/"
           /><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
           <input
             type="hidden"
@@ -243,7 +243,7 @@
                   class="form-input"
                   type="text"
                   name="SingleLine"
-                  value="{{ request.queryParam(org_name) }} ({{ request.queryParam(org_url) }})"
+                  value="{{ request.queryParam(org_name) }} {{ request.queryParam(org_url) }}"
                   fieldType="1"
                   maxlength="255"
                   placeholder=""
@@ -312,7 +312,7 @@
 <!-- prettier-ignore -->
 {{include /components/global/faqs_section.html}}
 
-<script>
+<script type="module">
   $(document).ready(function () {
     // Get the current URL hash
     var hash = window.location.hash;
@@ -333,7 +333,7 @@
   });
 </script>
 
-<script>
+<script type="module">
   function validateForm() {
     let isValid = true;
     let firstNameError = document.getElementById("firstNameError");

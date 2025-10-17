@@ -78,7 +78,7 @@
             <a href="{{ cause.getUrl() }}" style="text-decoration: none">
               <div
                 class="card mb-3 text-white position-relative category-card"
-                style="background-image: url({{ $imgURL }});"
+                style="background-image: url({{ $imgURL }}?width=300);"
               >
                 <div
                   class="position-absolute start-0 end-0 top-0 bottom-0 gradient-overlay"
@@ -150,7 +150,7 @@
   </div>
 </div>
 
-<script>
+<script type="module">
   // Function to handle the layout based on screen size
   function handleLayout() {
     // No need to do anything here, the CSS media query will handle the layout

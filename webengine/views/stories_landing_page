@@ -9,7 +9,7 @@
     font-size: 14px;
     color: #666;
   }
-  .search-bar {
+  .search-bar { 
     display: flex;
     gap: 10px;
   }
@@ -42,6 +42,119 @@
     width: 3rem;
     height: 3rem;
   }
+  /* Dropdown filter styles */
+  .filter-dropdown-menu {
+    width: 320px;
+    max-height: 360px;
+    overflow: auto;
+  }
+  .filter-dropdown-header {
+    font-weight: 600;
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+  }
+  .filter-badge {
+    margin-left: 6px;
+  }
+</style>
+
+
+<style>
+  .story-image {
+    height: 100%;
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+    background-color: #000000;
+  }
+  .story-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #0e121b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .story-subtitle {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em; /* Adjust this value based on your line-height */
+    line-height: 1.4em; /* Adjust this value as needed */
+  }
+  .story-subtitle,
+  .npo-name {
+    font-size: 14px;
+    font-weight: 400;
+    color: #0e121b;
+  }
+  .story-cause {
+    padding: 0 10px;
+    /* height: 28px; */
+    border-radius: 14px;
+    background-color: #eceff3;
+    text-transform: uppercase;
+    font-size: 12px;
+    /* font-weight: bold; */
+  }
+  .story-date {
+    font-size: 12px;
+  }
+  .story-npo-logo {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #aeaeae;
+    border-radius: 3px;
+    object-fit: cover;
+    object-position: center;
+  }
+  .story-btn {
+    font-size: 12px;
+    font-weight: 500;
+    color: #0e121b;
+  }
+  .story-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+  .story-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .story-btn {
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  .story-card:hover .story-btn {
+    background-color: #7b3fee;
+    color: white;
+  }
+  .card-btn {
+    height: 36px;
+  }
+  .npo-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Hashtag styles */
+  .hashtag-item {
+    color: #7b3fee;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  
+  .hashtag-item:hover {
+    text-decoration: underline;
+    color: #5a2bb8;
+  }
+
+  .hashtags-container {
+    line-height: 1.4;
+  }
 </style>
 
 <div class="container">
@@ -64,12 +177,41 @@
             placeholder="Search stories..."
             aria-label="Search"
           />
-          <select class="filter-dropdown w-100 w-md-auto">
-            <option>All Causes</option>
-          </select>
-          <select class="filter-dropdown w-100 w-md-auto">
-            <option>Worldwide</option>
-          </select>
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle w-100 w-md-auto" type="button" id="causeFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              Causes <span id="cause-selected-count" class="badge text-bg-secondary filter-badge d-none">0</span>
+            </button>
+            <div class="dropdown-menu p-2 filter-dropdown-menu" aria-labelledby="causeFilterDropdown">
+              <div class="filter-dropdown-header d-flex justify-content-between align-items-center">
+                <span>Select causes</span>
+                <button id="clear-cause-filters" class="btn btn-sm btn-link">Clear</button>
+              </div>
+              <div id="cause-checkboxes" class="d-flex flex-column gap-2 p-2"></div>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle w-100 w-md-auto" type="button" id="locationFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              Location
+            </button>
+            <div class="dropdown-menu p-3 filter-dropdown-menu" aria-labelledby="locationFilterDropdown" style="min-width: 320px;">
+              <div class="filter-dropdown-header d-flex justify-content-between align-items-center">
+                <span>Filter by location</span>
+                <button id="reset-location-filters" class="btn btn-sm btn-link">Clear</button>
+              </div>
+              <select id="country-select" class="form-select my-2">
+                <option value="">Select Country</option>
+              </select>
+              <select id="state-select" class="form-select my-2">
+                <option value="">Select State</option>
+              </select>
+              <select id="city-select" class="form-select my-2">
+                <option value="">Select City</option>
+              </select>
+              <select id="zip-select" class="form-select my-2 mb-3">
+                <option value="">Select ZIP Code</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -105,13 +247,13 @@
         <i class="bi bi-arrow-right"></i>
       </a>
     </div>
-    <div class="row">
-      {{each {this.featured_stories} as story limit 4}}
-      <div class="col-12 col-sm-6 col-md-3">
-        <!--prettier-ignore-->
-        {{ include /components/global/story_card.html }}
+    <div id="featured-stories-container" class="row">
+      <!-- Featured stories will be loaded here dynamically -->
+      <div class="col-12 text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
       </div>
-      {{/each}}
     </div>
   </section>
 
@@ -125,13 +267,13 @@
         <i class="bi bi-arrow-right"></i>
       </a>
     </div>
-    <div class="row">
-      {{each stories as story sort_by published_date desc limit 4}}
-      <div class="col-12 col-sm-6 col-md-3">
-        <!--prettier-ignore-->
-        {{ include /components/global/story_card.html }}
+    <div id="latest-stories-container" class="row">
+      <!-- Latest stories will be loaded here dynamically -->
+      <div class="col-12 text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
       </div>
-      {{/each}}
     </div>
   </section>
 
@@ -145,19 +287,51 @@
   </section>
 </div>
 
-<script>
+<script type="module">
   $(document).ready(function () {
     const $storySearch = $("#story-search");
     const $featuredStories = $("#featured-stories");
     const $latestStories = $("#latest-stories");
     const $searchResults = $("#search-results");
     const $searchStoriesContainer = $("#search-stories-container");
+    const $causeCheckboxes = $("#cause-checkboxes");
+    const $clearCauseFilters = $("#clear-cause-filters");
+    const $causeSelectedCount = $("#cause-selected-count");
+    const $countrySelect = $("#country-select");
+    const $stateSelect = $("#state-select");
+    const $citySelect = $("#city-select");
+    const $zipSelect = $("#zip-select");
+    const $resetLocationFilters = $("#reset-location-filters");
     const $loadingIndicator = $(
       '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>'
     );
     const $noResultsMessage = $(
       '<div class="text-center py-4">No results found</div>'
     );
+    let selectedCauses = new Set();
+    let allStories = [];
+    
+    function setFiltersEnabled(enabled) {
+      const $causeBtn = $("#causeFilterDropdown");
+      const $locationBtn = $("#locationFilterDropdown");
+      $causeBtn.prop("disabled", !enabled).toggleClass("disabled", !enabled);
+      $locationBtn.prop("disabled", !enabled).toggleClass("disabled", !enabled);
+      $(".cause-check").prop("disabled", !enabled);
+      $countrySelect.prop("disabled", !enabled);
+      $stateSelect.prop("disabled", !enabled);
+      $citySelect.prop("disabled", !enabled);
+      $zipSelect.prop("disabled", !enabled);
+      if (!enabled) {
+        // Clear selections when disabling
+        selectedCauses.clear();
+        $(".cause-check").prop("checked", false);
+        $countrySelect.val("");
+        $stateSelect.val("");
+        $citySelect.val("");
+        $zipSelect.val("");
+        updateCauseBadge();
+      }
+    }
 
     // Debounce function
     function debounce(func, wait) {
@@ -181,15 +355,23 @@
     }
 
     // Initial search on page load
+    fetchCauses();
+    setFiltersEnabled(false);
     searchStories();
 
-    function searchStories() {
+    // Load featured and latest stories on page load
+    loadFeaturedStories();
+    loadLatestStories();
+
+    async function searchStories() {
       const searchInput = $storySearch.val();
 
       if (searchInput.trim() === "") {
         $featuredStories.removeClass("d-none").addClass("d-flex");
         $latestStories.removeClass("d-none").addClass("d-flex");
         $searchResults.addClass("d-none").removeClass("d-flex");
+        allStories = [];
+        setFiltersEnabled(false);
         return;
       }
 
@@ -200,48 +382,335 @@
       // Show loading indicator
       $searchStoriesContainer.empty().append($loadingIndicator);
 
-      // Fetch search results from API
-      $.ajax({
-        url: `https://causecircle.org/mobileapp/stories.json`,
-        method: "GET",
-        data: {
-          limit: 12,
-          search: searchInput,
-        },
-        success: function (data) {
-          $searchStoriesContainer.empty();
-          if (data.data && data.data.length > 0) {
-            $.each(data.data, function (index, story) {
-              const $storyCard = createStoryCard(story);
-              $searchStoriesContainer.append($storyCard);
-            });
-          } else {
-            $searchStoriesContainer.append($noResultsMessage);
-          }
-        },
-        error: function (error) {
-          console.error("Error fetching search results:", error);
-          $searchStoriesContainer
-            .empty()
-            .append(
-              $(
-                '<div class="text-center py-4">An error occurred. Please try again.</div>'
-              )
-            );
-        },
-      });
+      try {
+        if (!window.getStories) {
+          throw new Error("window.getStories not available");
+        }
+
+        const response = await window.getStories({
+          limit: "12",
+          status: "approved",
+          search: String(searchInput),
+        });
+
+        $searchStoriesContainer.empty();
+        allStories = Array.isArray(response?.data) ? response.data : [];
+        populateLocationsFromData(allStories);
+        filterAndRender();
+        setFiltersEnabled(true);
+
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        $searchStoriesContainer
+          .empty()
+          .append(
+            $(
+              '<div class="text-center py-4">An error occurred. Please try again.</div>'
+            )
+          );
+      }
     }
 
+    async function loadFeaturedStories() {
+      const $featuredContainer = $("#featured-stories-container");
+      
+      try {
+        if (!window.getStories) {
+          throw new Error("window.getStories not available");
+        }
+
+        const response = await window.getStories({
+          limit: 4,
+          featured: "1",
+          approved: 1,
+          status: "approved"
+        });
+
+        $featuredContainer.empty();
+        if (response?.data && response.data.length > 0) {
+          $.each(response.data.slice(0, 4), function (index, story) {
+            const $storyCard = createStoryCard(story);
+            $featuredContainer.append($storyCard);
+          });
+        } else {
+          $featuredContainer.html('<div class="col-12"><p class="text-muted text-center">No featured stories available.</p></div>');
+        }
+      } catch (error) {
+        console.error("Error fetching featured stories:", error);
+        $featuredContainer.html('<div class="col-12"><p class="text-danger text-center">Error loading featured stories.</p></div>');
+      }
+    }
+
+    async function loadLatestStories() {
+      const $latestContainer = $("#latest-stories-container");
+      
+      try {
+        if (!window.getStories) {
+          throw new Error("window.getStories not available");
+        }
+
+        const response = await window.getStories({
+          limit: "4",
+          approved: "1",
+          status: "approved",
+          sort: "created_at",
+          order: "desc"
+        });
+
+        $latestContainer.empty();
+        if (response?.data && response.data.length > 0) {
+          $.each(response.data.slice(0, 4), function (index, story) {
+            const $storyCard = createStoryCard(story);
+            $latestContainer.append($storyCard);
+          });
+        } else {
+          $latestContainer.html('<div class="col-12"><p class="text-muted text-center">No stories available.</p></div>');
+        }
+      } catch (error) {
+        console.error("Error fetching latest stories:", error);
+        $latestContainer.html('<div class="col-12"><p class="text-danger text-center">Error loading latest stories.</p></div>');
+      }
+    }
+
+      // Function to format a date in a human-readable time-ago format
+  function formatUTCTimeAgo(dateString) {
+    if (!dateString) return '';
+    
+    try {
+      let date;
+      
+      // Check if dateString is already in ISO format (includes 'T' and ends with 'Z' or timezone)
+      if (dateString.includes('T') && (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-'))) {
+        // ISO format with timezone info - parse directly
+        date = new Date(dateString);
+      } else {
+        // Legacy format without timezone - treat as UTC
+        date = new Date(dateString + ' UTC');
+      }
+      
+      // Validate the date
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date');
+      }
+      
+      const now = new Date();
+      const diffInMilliseconds = now - date;
+      const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+      const diffInMinutes = Math.floor(diffInSeconds / 60);
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      const diffInDays = Math.floor(diffInHours / 24);
+      const diffInMonths = Math.floor(diffInDays / 30);
+      const diffInYears = Math.floor(diffInDays / 365);
+      
+      if (diffInSeconds < 60) {
+        return diffInSeconds <= 1 ? 'just now' : `${diffInSeconds}s ago`;
+      } else if (diffInMinutes < 60) {
+        return `${diffInMinutes}m ago`;
+      } else if (diffInHours < 24) {
+        return `${diffInHours}h ago`;
+      } else if (diffInDays < 30) {
+        return `${diffInDays}d ago`;
+      } else if (diffInMonths < 12) {
+        return `${diffInMonths}mo ago`;
+      } else {
+        return `${diffInYears}y ago`;
+      }
+    } catch (error) {
+      console.error('Error formatting time:', error, 'Input:', dateString);
+      return '';
+    }
+  }
+
+  // Function to decode HTML entities
+  function decodeHtmlEntities(text) {
+    if (!text) return '';
+    
+    // Create a temporary div element to decode HTML entities
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = text;
+    return tempDiv.textContent || tempDiv.innerText || '';
+  }
+
+  // Function to extract hashtags from story text
+  function extractHashtagsFromText(text) {
+    if (!text) return [];
+    
+    // First decode HTML entities (like &#39; &#32; etc.)
+    const decodedText = decodeHtmlEntities(text);
+    
+    // Regular expression to find hashtags (#word)
+    const hashtagRegex = /#[a-zA-Z0-9_]+/g;
+    const hashtags = decodedText.match(hashtagRegex);
+    
+    if (!hashtags || hashtags.length === 0) return [];
+    
+    // Remove duplicates and clean up
+    const uniqueHashtags = [...new Set(hashtags.map(tag => tag.toLowerCase()))];
+    
+    return uniqueHashtags;
+  }
+
+  // Function to generate hashtag HTML for story cards
+  function generateHashtagsHtml(storyText) {
+    const hashtags = extractHashtagsFromText(storyText);
+    
+    if (hashtags.length === 0) return '';
+    
+    // Create hashtag HTML with proper links
+    const hashtagsHtml = hashtags.map(hashtag => {
+      const encodedHashtag = encodeURIComponent(hashtag);
+      return `<a href="/stories/?search=${encodedHashtag}" class="hashtag-item" target="_blank" rel="noopener noreferrer">${hashtag}</a>`;
+    }).join('');
+    
+    return `<div class="hashtags-container">${hashtagsHtml}</div>`;
+  }
+
+  // Function to detect if a URL is a video
+  function isVideoUrl(url) {
+    if (!url) return false;
+    const videoPatterns = [
+      /vimeo\.com\/video\/\d+/i,
+      /vimeo\.com\/\d+/i,
+      /player\.vimeo\.com\/video\/\d+/i,
+      /youtube\.com\/watch\?v=/i,
+      /youtu\.be\//i,
+      /\.mp4$/i,
+      /\.webm$/i,
+      /\.ogg$/i,
+      /\.mov$/i,
+      /\.avi$/i
+    ];
+    return videoPatterns.some(pattern => pattern.test(url));
+  }
+
+    // Function to get video embed URL
+    function getVideoEmbedUrl(url) {
+      if (!url) return null;
+      
+      
+      // Check if it's already a Vimeo player URL
+      if (url.includes('player.vimeo.com/video/')) {
+        return url.includes('?') ? url : `${url}?autoplay=0&loop=0&muted=0`;
+      }
+      
+          // Vimeo regular URLs - handles both /video/ID and direct /ID formats
+    const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+    if (vimeoMatch) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+      
+      // YouTube
+      const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i);
+      if (youtubeMatch) {
+        return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=0&loop=0&muted=0`;
+      }
+      
+      // Direct video files
+      if (/\.(mp4|webm|ogg|mov|avi)$/i.test(url)) {
+        return url;
+      }
+      
+      return null;
+    }
+
+    // Function to get video thumbnail URL
+    function getVideoThumbnailUrl(url) {
+      if (!url) return null;
+      
+      // YouTube thumbnail
+      const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i);
+      if (youtubeMatch) {
+        const videoId = youtubeMatch[1];
+        // Try maxresdefault first (high quality), fallback to hqdefault if needed
+        return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+      }
+      
+      // Vimeo thumbnail - we'll use a placeholder for now since Vimeo requires API call
+      const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+      if (vimeoMatch) {
+        // For Vimeo, we'll use a placeholder since getting thumbnails requires API
+        return `https://placehold.co/600x400/7b3fee/white?text=Vimeo+Video`;
+      }
+      
+      // For direct video files, return null to show video element with poster
+      return null;
+    }
+
+    // Function to create media element (image or video) for story cards
+    function createCardMediaElement(mediaUrl, storyTitle) {
+      if (!mediaUrl) {
+        return `<img src="https://placehold.co/600x400?text=No+Image" class="story-image" alt="${storyTitle}">`;
+      }
+
+      const isVideo = isVideoUrl(mediaUrl);
+      
+      if (isVideo) {
+        const embedUrl = getVideoEmbedUrl(mediaUrl);
+        
+        if (embedUrl && (embedUrl.includes('youtube.com') || embedUrl.includes('vimeo.com'))) {
+          // Embedded video (YouTube/Vimeo) - show iframe with same dimensions
+          return `
+            <iframe 
+              src="${embedUrl}" 
+              class="story-image" 
+              style="border: none; border-radius: 10px; object-fit: cover;" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen
+              title="${storyTitle}">
+            </iframe>
+          `;
+        } else {
+          // Direct video file - show video element with same dimensions
+          return `
+            <video 
+              class="story-image" 
+              style="object-fit: cover; border-radius: 10px;" 
+              controls 
+              preload="metadata"
+              title="${storyTitle}">
+              <source src="${mediaUrl}" type="video/mp4">
+              <source src="${mediaUrl}" type="video/webm">
+              <source src="${mediaUrl}" type="video/ogg">
+              Your browser does not support the video tag.
+            </video>
+          `;
+        }
+      }
+      
+      // Default to image
+      return `<img src="${mediaUrl}" class="story-image" alt="${storyTitle}">`;
+    }
+
+    function escapeHtml(unsafe) {
+      if (!unsafe) return '';
+      return unsafe
+           .replace(/&/g, "&amp;")
+           .replace(/</g, "&lt;")
+           .replace(/>/g, "&gt;")
+           .replace(/"/g, "&quot;")
+           .replace(/'/g, "&#039;");
+  }
+
     function createStoryCard(story) {
+      // Determine media URL - handle both string and object formats
+      let mediaUrl = '';
+      if (typeof story?.story_image === 'string') {
+        mediaUrl = story.story_image || '';
+      } else if (story?.story_image?.data && story.story_image.data.length > 0) {
+        mediaUrl = story.story_image.data[0]?.url || '';
+      }
+
+      // Create media element (image or video preview)
+      const mediaElement = createCardMediaElement(mediaUrl, story?.title || '');
+
       return `
       <div class="col-12 col-sm-6 col-md-3">
         <div class="card d-flex flex-column h-100 p-3 gap-2 story-card">
-          <img src="${
-            story.story_image
-          }" class="story-image" alt="${story.title}" />
+          ${mediaElement}
           <div class="d-flex flex-column gap-2 h-100">
             <div class="d-flex justify-content-between">
-              <p class="story-date">${story.date_published}</p>
+              <p class="story-date d-none">${formatUTCTimeAgo(story.meta?.createdAt)}</p>
               ${
                 story.related_causes && story.related_causes.length > 0
                   ? `<div class="story-cause d-flex align-items-center">
@@ -253,20 +722,23 @@
               }
             </div>
             <p class="story-title">${story.title}</p>
-            <div class="story-subtitle">${story.description}</div>
+            <div class="story-subtitle d-none">${story.description}</div>
+            ${generateHashtagsHtml(story.story_body || story.description || '')}
             <div class="d-flex flex-grow-1 align-items-end gap-2">
-              <img src="${
-                story.related_npos && story.related_npos.data.length > 0
-                  ? story.related_npos.data[0]?.logo?.data
-                    ? story.related_npos.data[0]?.logo?.data[0]?.url
-                    : story.related_npos.data[0]?.logo || ""
-                  : ""
-              }" class="story-npo-logo" alt="" />
-              <p class="npo-name my-auto">${
-                story.related_npos && story.related_npos.data.length > 0
-                  ? story.related_npos.data[0]?.name || ""
-                  : ""
-              }</p>
+              <div class="d-flex gap-2 align-items-center w-100">
+                <img src="${
+                  story.related_npos && story.related_npos.data.length > 0
+                    ? story.related_npos.data[0]?.logo?.data
+                      ? story.related_npos.data[0]?.logo?.data[0]?.url
+                      : story.related_npos.data[0]?.logo || ""
+                    : ""
+                }" class="story-npo-logo" alt="" />
+                <p class="npo-name my-auto text-truncate">${
+                  story.related_npos && story.related_npos.data.length > 0
+                    ? story.related_npos.data[0]?.name || ""
+                    : ""
+                }</p>
+              </div>
             </div>
             <a href="${
               story.meta.web.uri
@@ -277,6 +749,170 @@
         </div>
       </div>
     `;
+    }
+    
+    // ----- Filters (Causes + Location) -----
+    function showCausesLoading() {
+      const placeholders = Array.from({ length: 6 })
+        .map(() => `
+          <div class="d-flex align-items-center gap-2 mb-2 placeholder-glow">
+            <span class="placeholder rounded" style="width:16px;height:16px;"></span>
+            <span class="placeholder col-8"></span>
+          </div>
+        `)
+        .join("");
+      $causeCheckboxes.html(placeholders);
+    }
+
+    function fetchCauses() {
+      showCausesLoading();
+      $.ajax({
+        url: "{{ $base_url }}mobileapp/causes.json?zpw=causecircle",
+        method: "GET",
+        data: { limit: 999, featured: false },
+        success: function (data) {
+          if (data.data && data.data.length > 0) {
+            $causeCheckboxes.empty();
+            const uniqueTitles = Array.from(new Set(data.data.map(c => c.title))).sort((a,b)=>a.localeCompare(b));
+            uniqueTitles.forEach((title) => {
+              const id = `cause-${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
+              const checkbox = `
+                <div class="form-check">
+                  <input class="form-check-input cause-check" type="checkbox" value="${title}" id="${id}" />
+                  <label class="form-check-label" for="${id}">${title}</label>
+                </div>`;
+              $causeCheckboxes.append(checkbox);
+            });
+          } else {
+            $causeCheckboxes.html('<div class="text-muted small">No causes found</div>');
+          }
+        },
+        error: function (error) {
+          console.error("Error fetching causes:", error);
+          $causeCheckboxes.html('<div class="text-muted small">Failed to load causes</div>');
+        }
+      });
+    }
+
+    // Cause checkbox change
+    $(document).on("change", ".cause-check", function() {
+      const value = $(this).val();
+      if ($(this).is(":checked")) {
+        selectedCauses.add(value);
+      } else {
+        selectedCauses.delete(value);
+      }
+      updateCauseBadge();
+      filterAndRender();
+    });
+
+    $clearCauseFilters.on("click", function(e) {
+      e.preventDefault();
+      selectedCauses.clear();
+      $(".cause-check").prop("checked", false);
+      updateCauseBadge();
+      filterAndRender();
+    });
+
+    function updateCauseBadge() {
+      const count = selectedCauses.size;
+      if (count > 0) {
+        $causeSelectedCount.text(count).removeClass("d-none");
+      } else {
+        $causeSelectedCount.addClass("d-none");
+      }
+    }
+
+    // Populate Country/State/City/ZIP from stories data
+    function populateLocationsFromData(stories) {
+      const countries = new Set();
+      const states = new Set();
+      const cities = new Set();
+      const zips = new Set();
+
+      (stories || []).forEach(story => {
+        const npo = story?.related_npos?.data?.[0];
+        const addrRaw = npo?.headquarters_address || "";
+        const addr = addrRaw.split(",").map(s=>s.trim());
+        if (addr.length) {
+          const maybeCity = addr[1] || addr[0];
+          const maybeState = addr[2] || "";
+          const maybeZip = addr[3] || "";
+          const maybeCountry = addr[4] || addr[addr.length-1] || "";
+          if (maybeCountry) countries.add(maybeCountry);
+          if (maybeState) states.add(maybeState);
+          if (maybeCity) cities.add(maybeCity);
+          if (maybeZip) zips.add(maybeZip);
+        }
+      });
+
+      function setOptions($select, values, placeholder) {
+        const current = $select.val();
+        $select.empty().append(`<option value="">${placeholder}</option>`);
+        Array.from(values).sort((a,b)=>a.localeCompare(b)).forEach(v=>{
+          $select.append(`<option value="${v}">${v}</option>`);
+        });
+        if (current && values.has(current)) $select.val(current);
+      }
+
+      setOptions($countrySelect, countries, "Select Country");
+      setOptions($stateSelect, states, "Select State");
+      setOptions($citySelect, cities, "Select City");
+      setOptions($zipSelect, zips, "Select ZIP Code");
+    }
+
+    $countrySelect.on("change", filterAndRender);
+    $stateSelect.on("change", filterAndRender);
+    $citySelect.on("change", filterAndRender);
+    $zipSelect.on("change", filterAndRender);
+
+    $resetLocationFilters.on("click", function() {
+      $countrySelect.val("");
+      $stateSelect.val("");
+      $citySelect.val("");
+      $zipSelect.val("");
+      filterAndRender();
+    });
+
+    function filterAndRender() {
+      const selectedCountry = $countrySelect.val();
+      const selectedState = $stateSelect.val();
+      const selectedCity = $citySelect.val();
+      const selectedZip = $zipSelect.val();
+
+      let filtered = allStories.slice();
+
+      // Filter by causes
+      if (selectedCauses.size > 0) {
+        filtered = filtered.filter(story => {
+          const titles = (story?.related_causes?.data || []).map(c => c.title);
+          return Array.from(selectedCauses).every(c => titles.includes(c));
+        });
+      }
+
+      // Filter by location (based on related NPO's headquarters_address)
+      const hasLocationFilter = selectedCountry || selectedState || selectedCity || selectedZip;
+      if (hasLocationFilter) {
+        filtered = filtered.filter(story => {
+          const npo = story?.related_npos?.data?.[0];
+          const address = (npo?.headquarters_address || "").toLowerCase();
+          if (selectedCountry && !address.includes(String(selectedCountry).toLowerCase())) return false;
+          if (selectedState && !address.includes(String(selectedState).toLowerCase())) return false;
+          if (selectedCity && !address.includes(String(selectedCity).toLowerCase())) return false;
+          if (selectedZip && !address.includes(String(selectedZip).toLowerCase())) return false;
+          return true;
+        });
+      }
+
+      $searchStoriesContainer.empty();
+      if (filtered.length > 0) {
+        filtered.forEach(story => {
+          const $storyCard = createStoryCard(story);
+          $searchStoriesContainer.append($storyCard);
+        });
+      } else {
+        $searchStoriesContainer.append($noResultsMessage);
+      }
     }
   });
 </script>

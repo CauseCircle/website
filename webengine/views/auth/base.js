@@ -1,13 +1,21 @@
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 const facebookProvider = new firebase.auth.FacebookAuthProvider();
+import { getAuth, signInWithPopup, OAuthProvider } from "firebase/auth";
+
+
+const appleProvider = new OAuthProvider('apple.com');
 
 // TARGET THE BUTTONS
 const googleBtn = document.getElementById("google-signin-btn");
 const fbBtn = document.getElementById("continue-with-fb-btn");
+const appleBtn = document.getElementById("apple-signin-btn");
+
 
 googleBtn.addEventListener("click", continueWithGoogle);
 fbBtn.addEventListener("click", continueWithFB);
+appleBtn.addEventListener("click", continueWithApple);
+
 
 // CONTINUE WITH GOOGLE function
 
@@ -74,6 +82,38 @@ async function continueWithFB() {
     .catch(error => {
       console.error("Error during Facebook sign-in:", error);
     });
+}
+
+
+appleProvider.addScope('email');
+appleProvider.addScope('name');
+
+async function continueWithApple() {
+  const auth = getAuth();
+signInWithPopup(auth, provider)
+  .then((result) => {
+    // The signed-in user info.
+    const user = result.user;
+
+    // Apple credential
+    const credential = OAuthProvider.credentialFromResult(result);
+    const accessToken = credential.accessToken;
+    const idToken = credential.idToken;
+
+    // IdP data available using getAdditionalUserInfo(result)
+    // ...
+  })
+  .catch((error) => {
+    // Handle Errors here.
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // The email of the user's account used.
+    const email = error.customData.email;
+    // The credential that was used.
+    const credential = OAuthProvider.credentialFromError(error);
+
+    // ...
+  });
 }
 
 // Sign-Out Function

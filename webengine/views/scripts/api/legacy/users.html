@@ -1,0 +1,302 @@
+<script type="module">
+  // ==================== BASE URL ====================
+  const BASE_URL = "https://api.causecircle.org";
+  // const BASE_URL = "http://localhost:8080";
+
+  // ==================== USER MANAGEMENT ====================
+  const db = firebase.firestore();
+
+  async function createFirebaseUser(user, userZuid = null) {
+    try {
+      if (!user || !user.uid) {
+        throw new Error("Invalid user object");
+      }
+
+      const userData = {
+        name: user.displayName || "Unknown",
+        firstName: (user.displayName || "").split(" ")[0] || "Unknown",
+        lastName:
+          (user.displayName || "").split(" ").slice(1).join(" ") || "Unknown",
+        email: user?.providerData[0]?.email || "No email available",
+        phone:
+          user?.providerData[0]?.phoneNumber || "No phone number available",
+        profilePhoto: user.photoURL || "",
+        zuid: userZuid || null,
+      };
+
+      await db.collection("Users").doc(user.uid).set(userData);
+      return userData;
+    } catch (error) {
+      console.error("Error creating Firebase user:", error);
+      throw new Error("Failed to create user in Firebase: " + error.message);
+    }
+  }
+
+  async function checkUserExists(uid) {
+    const userDoc = await db.collection("Users").doc(uid).get();
+    return userDoc;
+  }
+
+  async function getUserData(searchTerm = "", searchType = "uid") {
+    try {
+      let userDoc;
+
+      if (searchType === "uid") {
+        userDoc = await db.collection("Users").doc(searchTerm).get();
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          if (Object.keys(userData).length === 0) {
+            console.warn("User document exists but is empty");
+            return null;
+          }
+          return userData;
+        } else {
+          console.warn("User document does not exist");
+        }
+      } else {
+        const querySnapshot = await db
+          .collection("Users")
+          .where(searchType, "==", searchTerm)
+          .limit(1)
+          .get();
+
+        if (!querySnapshot.empty) {
+          userDoc = querySnapshot.docs[0];
+          const userData = userDoc.data();
+          if (Object.keys(userData).length === 0) {
+            console.warn("User document exists but is empty");
+            return null;
+          }
+          return userData;
+        } else {
+          console.warn("No user found with the given email");
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
+  }
+
+  async function getAllUsers() {
+    try {
+      const usersSnapshot = await db.collection("Users").get();
+      const usersList = usersSnapshot.docs.map((doc) => doc.data());
+      return usersList;
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      return [];
+    }
+  }
+
+  window.deleteUser = async (zuid) => {
+    const url = `${BASE_URL}/users/${zuid}`;
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    try {
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${userId}`,
+        },
+      });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return false;
+    }
+  }
+
+  window.createZestyUser = async (data) => {
+    const {
+      email,
+      user_name,
+      profile_image = "",
+      user_type = "",
+      causes = [],
+      npos = [],
+      favorite_npos,
+    } = data;
+
+    const [first_name, ...lastNameParts] = user_name.split(" ");
+    const last_name = lastNameParts.join(" ");
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${CONFIG.CLOUD_FUNCTIONS_KEY}`,
+      },
+      body: JSON.stringify({
+        first_name,
+        last_name,
+        user_type,
+        image: profile_image,
+        email,
+        favorite_npos,
+      }),
+    };
+
+    try {
+      const response = await fetch(
+        CONFIG.CLOUD_FUNCTIONS_URL["create-profile"],
+        options
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error creating Zesty user:", error);
+      throw error;
+    }
+  };
+
+  window.getZestyUser = async (zuid) => {
+    try {
+      const url = new URL(CONFIG.CLOUD_FUNCTIONS_URL["get-profile"]);
+      url.searchParams.append("zuid", zuid);
+
+      const options = {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${CONFIG.CLOUD_FUNCTIONS_KEY}`,
+        },
+      };
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error getting Zesty user:", error);
+      throw error;
+    }
+  };
+
+  window.followUser = async (zuid) => {
+    try {
+      const url = `${BASE_URL}/users/follow`;
+      const user = firebase.auth().currentUser;
+      const userId = user.uid;
+
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userId}`,
+        },
+        body: JSON.stringify({
+          author_zuid: zuid,
+        }),
+      };
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error following user:", error);
+      throw error;
+    }
+  }
+
+  window.unfollowUser = async (zuid) => {
+    try {
+      const url = `${BASE_URL}/users/unfollow`;
+      const user = firebase.auth().currentUser;
+      const userId = user.uid;
+
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userId}`,
+        },
+        body: JSON.stringify({
+          author_zuid: zuid,
+        }),
+      };
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      throw error;
+    }
+  }
+
+  window.getUserProfile = async (zuid) => {
+    try {
+      const url = `${BASE_URL}/users/${zuid}`;
+      const user = firebase.auth().currentUser;
+      const userId = user?.uid;
+
+      const options = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userId}`,
+        },
+      };
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error("Error getting user profile:", error);
+      throw error;
+    }
+  }
+
+  window.updateZestyUser = async (zuid, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    // Only include properties that are provided in the data object
+    const processedData = {
+      ...data,
+      uid: userId
+    };
+
+    // Only process favorite_npos if it exists in the data
+    if (data.favorite_npos !== undefined) {
+      processedData.favorite_npos = Array.isArray(data.favorite_npos)
+        ? data.favorite_npos.join(",")
+        : data.favorite_npos.split(",")
+    }
+
+    // Only process favorite_causes if it exists in the data
+    if (data.favorite_causes !== undefined) {
+      processedData.favorite_causes = Array.isArray(data.favorite_causes)
+        ? data.favorite_causes.join(",")
+        : data.favorite_causes.split(",")
+    }
+
+    // Map profile_image to image if it exists
+    if (data.profile_image) {
+      processedData.image = data.profile_image;
+    }
+
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(processedData),
+    };
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/users/${zuid}`,
+        options
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error updating user:", error);
+      throw error;
+    }
+  };
+</script>

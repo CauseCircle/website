@@ -1,0 +1,514 @@
+<script type="module">
+  // ==================== AUTHENTICATION HANDLERS ====================
+  const BASE_URL = "https://api.causecircle.org";
+  // const BASE_URL = "http://localhost:8080";
+
+  // ==================== AUTH PROVIDERS ====================
+  window.auth = firebase.auth();
+  const googleProvider = new firebase.auth.GoogleAuthProvider();
+  const facebookProvider = new firebase.auth.FacebookAuthProvider();
+  const appleProvider = new firebase.auth.OAuthProvider("apple.com");
+  const microsoftProvider = new firebase.auth.OAuthProvider("microsoft.com");
+
+  facebookProvider.addScope("email");
+  facebookProvider.setCustomParameters({
+    display: "popup",
+  });
+
+  googleProvider.addScope("email");
+  googleProvider.setCustomParameters({
+    prompt: "consent",
+    display: "popup",
+  });
+
+  appleProvider.addScope("email");
+  appleProvider.addScope("name");
+
+  microsoftProvider.addScope("user.read");
+  microsoftProvider.addScope("email");
+  microsoftProvider.addScope("openid");
+  microsoftProvider.addScope("profile");
+  microsoftProvider.setCustomParameters({
+    prompt: "consent"
+  });
+
+  // ==================== SIGN-IN METHODS ====================
+  const signInWithGoogle = async () => {
+    // const users = await getAllUsers();
+    // await deleteUserByEmail("sethgofredo@gmail.com");
+    // return;
+    const npoZuid = localStorage.getItem("npoZuidToFollow");
+
+    try {
+      // Initialize Google client
+      const googleClient = google.accounts.oauth2.initTokenClient({
+        client_id: '150409629176-uo1esfhvritlt5mk19bltnnh5l7mum2a.apps.googleusercontent.com',
+        scope: 'email profile openid',
+        callback: async (response) => {
+          if (response.access_token) {
+            const credential = firebase.auth.GoogleAuthProvider.credential(
+              null,
+              response.access_token
+            );
+
+            const result = await auth.signInWithCredential(credential);
+            await handleAuthResult(result.user, npoZuid);
+          } else if (response.error) {
+            console.error("Google OAuth error:", response.error);
+            let errorMessage = "Sign-in was cancelled or failed. Please try again.";
+            if (response.error === 'popup_closed_by_user') {
+              errorMessage = "Sign-in window was closed. Please try again.";
+            } else if (response.error === 'access_denied') {
+              errorMessage = "Permissions were denied. Please approve the required permissions to continue.";
+            }
+            await window.deauthenticateUser();
+          }
+        },
+        error_callback: (error) => {
+          console.error("Google OAuth error callback:", error);
+          window.deauthenticateUser();
+        }
+      });
+
+      // Request access token
+      googleClient.requestAccessToken();
+
+    } catch (error) {
+      console.error("Error during Google sign-in:", {
+        code: error.code,
+        message: error.message,
+        email: error.email,
+        credential: error.credential,
+      });
+
+      let errorMessage = "An error occurred during authentication. Please try again.";
+      switch (error.code) {
+        case 'auth/account-exists-with-different-credential':
+          errorMessage = "An account already exists with the same email address but different sign-in credentials.";
+          break;
+        case 'auth/cancelled-popup-request':
+        case 'auth/popup-closed-by-user':
+          errorMessage = "Sign-in was cancelled. Please try again.";
+          break;
+      }
+      // alert(errorMessage);
+      await window.deauthenticateUser();
+    }
+  }
+
+  const signInWithFacebook = async () => {
+    const npoZuid = localStorage.getItem("npoZuidToFollow");
+    try {
+
+      // Create a new Promise to handle FB.login
+      const fbLoginResult = await new Promise((resolve, reject) => {
+        FB.login(
+          (response) => {
+
+            if (response.authResponse) {
+              resolve(response);
+            } else {
+              reject(
+                new Error("User cancelled login or did not fully authorize.")
+              );
+            }
+          },
+          {
+            scope: "email,public_profile",
+            auth_type: "rerequest",
+          }
+        );
+      });
+
+      if (fbLoginResult.authResponse) {
+        // Get the access token from Facebook
+        const accessToken = fbLoginResult.authResponse.accessToken;
+
+        // Create a Facebook credential with the token
+        const credential =
+          firebase.auth.FacebookAuthProvider.credential(accessToken);
+
+        // Sign in with the credential
+        const result = await auth.signInWithCredential(credential);
+
+        // Handle the auth result
+        await handleAuthResult(result.user, npoZuid);
+      }
+    } catch (error) {
+      console.error("Error during Facebook sign-in:", {
+        code: error.code,
+        message: error.message,
+        email: error.email,
+        credential: error.credential,
+      });
+
+      // Handle specific Facebook auth errors
+      let errorMessage =
+        "An error occurred during authentication. Please try again.";
+
+      switch (error.code) {
+        case "auth/account-exists-with-different-credential":
+          errorMessage =
+            "An account already exists with the same email address but different sign-in credentials. Please sign in using the original method.";
+          break;
+        case "auth/cancelled-popup-request":
+        case "auth/popup-closed-by-user":
+          errorMessage = "Sign-in was cancelled. Please try again.";
+          break;
+        case "auth/popup-blocked":
+          errorMessage =
+            "Pop-up was blocked by your browser. Please enable pop-ups and try again.";
+          break;
+        default:
+          errorMessage = error.message;
+      }
+
+      // alert(errorMessage);
+      await window.deauthenticateUser();
+    }
+  }
+
+  const signInWithApple = async () => {
+    const npoZuid = localStorage.getItem("npoZuidToFollow");
+
+    try {
+      const result = await auth.signInWithPopup(appleProvider);
+      await handleAuthResult(result.user, npoZuid);
+    } catch (error) {
+      console.error("Error during Apple sign-in:", error);
+    }
+  }
+
+  const signInWithMicrosoft = async () => {
+    const npoZuid = localStorage.getItem("npoZuidToFollow");
+    try {
+      const result = await auth.signInWithPopup(microsoftProvider);
+      await handleAuthResult(result.user, npoZuid);
+    } catch (error) {
+      console.error("Error during Microsoft sign-in:", {
+        code: error.code,
+        message: error.message,
+        email: error.email,
+        credential: error.credential,
+      });
+
+      await window.deauthenticateUser();
+    }
+  }
+
+  // ==================== AUTH RESULT HANDLER ====================
+  window.isAuthenticating = false;
+
+  window.handleAuthResult = async (user, npoZuid = "") => {
+    window.isAuthenticating = true;
+
+    // Show loading overlay
+    if (typeof window.showAuthLoadingOverlay === 'function') {
+      window.showAuthLoadingOverlay("Verifying your account...");
+    }
+
+    try {
+      let newUser = false;
+
+      const claimListingRedirectUrl = localStorage.getItem(
+        "claimListingRedirectUrl"
+      );
+      const loginRedirectUrl = localStorage.getItem("loginRedirectUrl");
+      const followUserRedirectUrl = localStorage.getItem("followUserRedirectUrl");
+      const followNpo = localStorage.getItem("followNpo");
+      const inviteType = localStorage.getItem("invite_type");
+      const npoSlug = localStorage.getItem("npoSlug");
+
+      const db = firebase.firestore();
+      const FBuserDoc = await db.collection("Users").doc(user.uid).get();
+      const FBuserExists = FBuserDoc.exists;
+      const FBuserData = FBuserExists ? FBuserDoc.data() : null;
+
+      if (typeof window.updateAuthLoadingMessage === 'function') {
+        window.updateAuthLoadingMessage("Setting up your profile...");
+      }
+
+      let zestyUser = null;
+      const zestyUserExists = FBuserExists && FBuserData?.zuid && FBuserData.zuid !== "";
+
+      if(zestyUserExists) {
+        zestyUser = await window.getUserProfile(FBuserData.zuid);
+        localStorage.setItem("zestyUser", JSON.stringify(zestyUser?.data[0]));
+      }
+
+      if (!FBuserExists && !zestyUserExists) {
+        // Case 1: Neither Firebase nor Zesty user exists
+        if (typeof window.updateAuthLoadingMessage === 'function') {
+          window.updateAuthLoadingMessage("Creating your account...");
+        }
+        newUser = npoZuid === "" ? false : true;
+        newUser = await createNewUser(user, npoZuid);
+        if (npoZuid !== "" && inviteType === "admin-invite") {
+          if (typeof window.updateAuthLoadingMessage === 'function') {
+            window.updateAuthLoadingMessage("Setting up admin access...");
+          }
+          await window.createNpoAdmin(npoZuid, {
+            email: user?.providerData[0]?.email || "",
+          });
+        }
+
+        localStorage.removeItem("npoZuidToFollow");
+        localStorage.removeItem("invite_type");
+        localStorage.removeItem("npoSlug");
+      } else if (FBuserExists && zestyUserExists && npoZuid !== "" && inviteType === "admin-invite") {
+        if (typeof window.updateAuthLoadingMessage === 'function') {
+          window.updateAuthLoadingMessage("Setting up admin access...");
+        }
+
+        await Promise.all([
+          updateExistingUser(user, FBuserData, zestyUser),
+          window.createNpoAdmin(npoZuid, {
+            email: user?.providerData[0]?.email || "",
+          })
+        ]);
+        localStorage.removeItem("npoZuidToFollow");
+        localStorage.removeItem("invite_type");
+        localStorage.removeItem("npoSlug");
+      } else if (FBuserExists && zestyUserExists && npoZuid !== "") {
+        if (typeof window.updateAuthLoadingMessage === 'function') {
+          window.updateAuthLoadingMessage("Connecting you to the organization...");
+        }
+        try {
+          await window.createNpoFollower(npoZuid, {
+            email: zestyUser?.data[0]?.email || "",
+            ...(inviteType !== "admin-invite" && inviteType !== "follow-invite" ? {
+              qr: true
+            } : {})
+          });
+        } catch (error) {
+          console.error("Error creating NPO follower:", error);
+          throw error;
+        }
+        localStorage.removeItem("npoZuidToFollow");
+        localStorage.removeItem("invite_type");
+        localStorage.removeItem("npoSlug");
+      }
+
+      if (typeof window.updateAuthLoadingMessage === 'function') {
+        window.updateAuthLoadingMessage("Finalizing setup...");
+      }
+      await window.updateUserDataInLocalStorage(user.uid);
+
+      if (newUser) {
+        if (npoZuid === "") {
+          window.location.replace("{{onboarding.first().getUrl()}}");
+        } else {
+          localStorage.removeItem("npoZuidToFollow");
+          localStorage.removeItem("invite_type");
+          localStorage.removeItem("npoSlug");
+          window.location.replace(
+            `{{home_feed.first().getUrl()}}${
+              npoZuid !== null && npoZuid  !== "" ? `?followed-npo=${npoZuid}` : ""
+            }`
+          );
+        }
+      } else if (claimListingRedirectUrl) {
+        localStorage.removeItem("claimListingRedirectUrl");
+
+        window.location.replace(
+          claimListingRedirectUrl
+            ? claimListingRedirectUrl + "?claim-listing-redirect=true"
+            : "{{home_feed.first().getUrl()}}"
+        );
+      } else if (loginRedirectUrl) {
+        localStorage.removeItem("loginRedirectUrl");
+        window.location.replace(loginRedirectUrl);
+      } else if (followUserRedirectUrl) {
+        localStorage.removeItem("followUserRedirectUrl");
+        window.location.replace(followUserRedirectUrl);
+      } else if (followNpo) {
+        localStorage.removeItem("followNpo");
+
+        window.location.replace("{{$url}}/?follow");
+      } else {
+        localStorage.removeItem("npoZuidToFollow");
+        localStorage.removeItem("invite_type");
+        localStorage.removeItem("npoSlug");
+
+        if (typeof window.updateAuthLoadingMessage === 'function') {
+          window.updateAuthLoadingMessage("Loading your dashboard...");
+        }
+        const managedNpos = await window.getUserManagedNpos(FBuserData.zuid);
+
+        if(managedNpos.data.length > 0) {
+          const firstNpo = managedNpos.data.sort((a, b) => a.name.localeCompare(b.name))[0];
+          window.location.replace(`${firstNpo?.meta?.web?.url}/admin`);
+        }else{
+          window.location.replace(
+            inviteType === "admin-invite" ? `{{non_profits_landing_page.first().getUrl()}}/${npoSlug}/admin` : `{{home_feed.first().getUrl()}}${
+              npoZuid !== null && npoZuid !== "" && (inviteType === "follow-invite" || inviteType === "" || inviteType === null || inviteType === undefined) ? `?followed-npo=${npoZuid}` : ""
+            }`
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error in handleAuthResult:", error);
+      if (typeof window.hideAuthLoadingOverlay === 'function') {
+        window.hideAuthLoadingOverlay();
+      }
+      await window.deauthenticateUser(user);
+      alert(
+        error.message ||
+          "An error occurred during authentication. Please try again."
+      );
+    } finally {
+      window.isAuthenticating = false;
+      if (typeof window.hideAuthLoadingOverlay === 'function') {
+        window.hideAuthLoadingOverlay();
+      }
+    }
+  }
+
+  // ==================== USER CREATION HELPERS ====================
+  async function createNewUser(user, npoZuid = "") {
+    const displayName = user.displayName || "User Name";
+    const nameParts = displayName.split(" ");
+    const lastName = nameParts.length > 1 ? nameParts.pop() : "";
+    const firstName = nameParts.join(" ") || displayName;
+
+    // Upload the profile image first if photoURL exists
+    let uploadedImageId = null;
+    try {
+      // Convert photoURL to a file object or fetch it
+      const response = await fetch(user?.photoURL && user?.photoURL !== "" ? user?.photoURL : "https://www.gravatar.com/avatar/?d=mp");
+      const blob = await response.blob();
+      const file = new File([blob], 'profile-image.jpg', { type: blob.type });
+
+      const uploadedImages = await window.newUploadImages([file]);
+      if (uploadedImages && uploadedImages.length > 0) {
+        uploadedImageId = uploadedImages[0].data[0].id;
+      }
+    } catch (error) {
+      console.error("Error uploading profile image:", error);
+      // Continue without the image if upload fails
+    }
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        first_name: firstName,
+        last_name: lastName,
+        user_type: "volunteer",
+        ...(uploadedImageId && { image: uploadedImageId }),
+        email: user?.providerData[0]?.email || "",
+        favorite_npos: [npoZuid] || undefined,
+        uid: user.uid,
+      }),
+    };
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/users`,
+        options
+      );
+      const data = await response.json();
+
+      if (npoZuid !== "") {
+        return data;
+      }
+
+      window.location.replace("{{onboarding.first().getUrl()}}");
+      return data;
+    } catch (error) {
+      console.error("Error creating Zesty user:", error);
+      throw error;
+    }
+  }
+
+  async function createZestyUserForExistingFirebase(user, FBuserData) {
+    const zestyUserData = await window.createZestyUser({
+      email: user?.providerData[0]?.email || "",
+      user_name: user.displayName,
+      profile_image: user.photoURL,
+      user_type: FBuserData.userRole || "volunteer",
+      npos: FBuserData?.npos || [],
+      causes: FBuserData?.causes || [],
+    });
+
+    if (!zestyUserData || !zestyUserData.user_zuid) {
+      throw new Error(
+        "Zesty user creation failed or didn't return a user_zuid"
+      );
+    }
+
+    // Update Firebase user with new Zesty ID
+    const db = firebase.firestore();
+    await db
+      .collection("Users")
+      .doc(user.uid)
+      .update({ zuid: zestyUserData.user_zuid });
+  }
+
+  async function createFirebaseUserForExistingZesty(user, zestyUser) {
+    const db = firebase.firestore();
+
+    async function createFirebaseUser(user, userZuid = null) {
+      try {
+        if (!user || !user.uid) {
+          throw new Error("Invalid user object");
+        }
+
+        const userData = {
+          name: user.displayName || "Unknown",
+          firstName: (user.displayName || "").split(" ")[0] || "Unknown",
+          lastName:
+            (user.displayName || "").split(" ").slice(1).join(" ") || "Unknown",
+          email: user?.providerData[0]?.email || "No email available",
+          phone:
+            user?.providerData[0]?.phoneNumber || "No phone number available",
+          profilePhoto: user.photoURL || "",
+          zuid: userZuid || null,
+        };
+
+        await db.collection("Users").doc(user.uid).set(userData);
+        return userData;
+      } catch (error) {
+        console.error("Error creating Firebase user:", error);
+        throw new Error("Failed to create user in Firebase: " + error.message);
+      }
+    }
+
+    await createFirebaseUser(user, zestyUser.user_zuid);
+  }
+
+  async function updateExistingUser(user, FBuserData, zestyUser) {
+    const npoZuid = localStorage.getItem("npoZuidToFollow");
+    const userData = zestyUser;
+
+    if (npoZuid) {
+      const favoriteNpos = userData.data.favorite_npos
+        ? `${userData.data.favorite_npos},${npoZuid}`
+        : npoZuid;
+
+      return await window.updateZestyUser(userData.meta.ZUID, {
+        favorite_npos: favoriteNpos
+          .split(",")
+          .filter((value, index, self) => self.indexOf(value) === index)
+          .join(","),
+        ...(userData.data.favorite_causes
+          ? {
+              favorite_causes: userData.data.favorite_causes
+                .split(",")
+                .filter((value, index, self) => self.indexOf(value) === index)
+                .join(","),
+            }
+          : {}),
+        uid: user.uid,
+      });
+    }
+  }
+
+  // Expose functions to window
+  window.signInWithGoogle = signInWithGoogle;
+  window.signInWithFacebook = signInWithFacebook;
+  window.signInWithApple = signInWithApple;
+  window.signInWithMicrosoft = signInWithMicrosoft;
+</script>

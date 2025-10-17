@@ -1,0 +1,78 @@
+<script type="module">
+  // ==================== APP INITIALIZATION ====================
+
+  // Initialize the app
+  function initializeApp() {
+    try {
+      // Helper function to safely add event listener
+      function addEventListenerIfExists(elementId, eventType, handler) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.addEventListener(eventType, handler);
+        }
+      }
+
+      // Google sign-in button
+      addEventListenerIfExists("google-signin-btn", "click", () => {
+        localStorage.setItem("npoZuidToFollow", "{{$zuid}}");
+        localStorage.setItem("invite_type", "{{$invite_type}}");
+        localStorage.setItem("npoSlug", "{{$slug}}");
+        window.signInWithGoogle();
+      });
+
+      // Facebook sign-in button
+      addEventListenerIfExists("continue-with-fb-btn", "click", () => {
+        localStorage.setItem("npoZuidToFollow", "{{$zuid}}");
+        localStorage.setItem("invite_type", "{{$invite_type}}");
+        localStorage.setItem("npoSlug", "{{$slug}}");
+        window.signInWithFacebook();
+      });
+
+      // Microsoft sign-in button
+      addEventListenerIfExists("microsoft-signin-btn", "click", () => {
+        localStorage.setItem("npoZuidToFollow", "{{$zuid}}");
+        localStorage.setItem("invite_type", "{{$invite_type}}");
+        localStorage.setItem("npoSlug", "{{$slug}}");
+        window.signInWithMicrosoft();
+      });
+
+      // Apple sign-in button
+      addEventListenerIfExists("apple-signin-btn", "click", () => {
+        localStorage.setItem("npoZuidToFollow", "{{$zuid}}");
+        localStorage.setItem("invite_type", "{{$invite_type}}");
+        localStorage.setItem("npoSlug", "{{$slug}}");
+        window.signInWithApple();
+      });
+    } catch (error) {
+      console.error("Error initializing app:", error);
+    }
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        await window.updateUserDataInLocalStorage(user.uid);
+        // Initialize FCM for authenticated users
+        setTimeout(() => {
+          window.syncFCMToken();
+        }, 2000); // Wait 2 seconds for Firebase messaging to be fully loaded
+      } else {
+        localStorage.removeItem("user");
+        localStorage.removeItem("zestyUser");
+        localStorage.removeItem("fcm_token_registered");
+        localStorage.removeItem("fcm_device_id");
+      }
+      window.updateUIBasedOnAuthState(user);
+
+      if (window.location.pathname !== "{{login_page.first().getUrl()}}" && !window.isAuthenticating) {
+        window.handleRouting(user);
+      } else if (
+        window.location.pathname === "{{login_page.first().getUrl()}}" &&
+        user &&
+        !window.isAuthenticating
+      ) {
+        window.handleRouting(user);
+      }
+    });
+  }
+
+  $(document).ready(initializeApp);
+</script>

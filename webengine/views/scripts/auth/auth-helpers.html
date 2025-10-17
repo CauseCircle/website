@@ -1,0 +1,145 @@
+<script type="module">
+  // ==================== ROUTING ====================
+  function handleRouting(user) {
+    const currentPath = window.location.pathname;
+
+    // Helper function to check route patterns
+    const routeMatches = (patterns) => patterns.some(pattern => {
+      // Convert route pattern to regex
+      const regexPattern = pattern
+        .replace(/\//g, '\\/')  // Escape slashes
+        .replace(/\*/g, '.*');  // Convert * to any character match
+
+      const regex = new RegExp(`^${regexPattern}$`);
+      return regex.test(currentPath);
+    });
+
+    if (user) {
+      if (routeMatches(window.CONFIG.UNAUTHENTICATED_ROUTES)) {
+        window.location.replace("{{home_feed.first().getUrl()}}");
+      }
+    } else {
+      if (routeMatches(window.CONFIG.AUTHENTICATED_ROUTES)) {
+        window.location.replace("/login");
+      }
+    }
+  }
+
+  // ==================== SIGN OUT ====================
+  async function signOut() {
+    try {
+      await firebase.auth().signOut();
+      localStorage.removeItem("user");
+      localStorage.removeItem("zestyUser");
+      document.cookie =
+        "uid=; path=/; domain=.causecircle.org; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; samesite=strict";
+      updateUIBasedOnAuthState(null);
+      window.location.replace("{{login_page.first().getUrl()}}");
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
+  }
+
+  // ==================== UI UPDATES ====================
+  function updateUIBasedOnAuthState(user) {
+    if (user) {
+      $("#contact-us-btn").addClass("d-none");
+      $(".signout-btn").each(function () {
+        $(this).on("click", signOut);
+      });
+      $("#profileDropdown").removeClass("d-none");
+      $("#home-btn").removeClass("d-none");
+      $(".signin-btn").each(function () {
+        $(this).addClass("d-none");
+      });
+      $("#feedback-btn").removeClass("d-none");
+
+    } else {
+      $("#contact-us-btn").removeClass("d-none");
+      $(".signout-btn").each(function () {
+        $(this).off("click");
+      });
+      $("#profileDropdown").addClass("d-none");
+      $("#home-btn").addClass("d-none");
+      $(".signin-btn").each(function () {
+        $(this).removeClass("d-none");
+      });
+      $("#feedback-btn").addClass("d-none");
+    }
+  }
+
+  // ==================== DEAUTHENTICATION ====================
+  async function deauthenticateUser(user) {
+    try {
+      await firebase.auth().signOut();
+    } catch (error) {
+      console.error("Error during deauthentication:", error);
+    }
+  }
+
+  // ==================== USER DATA UPDATE ====================
+  async function updateUserDataInLocalStorage(uid) {
+    const db = firebase.firestore();
+
+    async function getUserData(searchTerm = "", searchType = "uid") {
+      try {
+        let userDoc;
+
+        if (searchType === "uid") {
+          userDoc = await db.collection("Users").doc(searchTerm).get();
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            if (Object.keys(userData).length === 0) {
+              console.warn("User document exists but is empty");
+              return null;
+            }
+            return userData;
+          } else {
+            console.warn("User document does not exist");
+          }
+        } else {
+          const querySnapshot = await db
+            .collection("Users")
+            .where(searchType, "==", searchTerm)
+            .limit(1)
+            .get();
+
+          if (!querySnapshot.empty) {
+            userDoc = querySnapshot.docs[0];
+            const userData = userDoc.data();
+            if (Object.keys(userData).length === 0) {
+              console.warn("User document exists but is empty");
+              return null;
+            }
+            return userData;
+          } else {
+            console.warn("No user found with the given email");
+          }
+        }
+
+        return null;
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        return null;
+      }
+    }
+
+    const userData = await getUserData(uid);
+
+    if (userData) {
+      localStorage.setItem("user", JSON.stringify(userData));
+      document.cookie = `uid=${userData.uid}; path=/; domain=.causecircle.org; secure; samesite=strict`;
+      return userData;
+    } else {
+      console.warn("No user data found to update in local storage");
+      return null;
+    }
+  }
+
+  // Expose functions to window
+  window.handleRouting = handleRouting;
+  window.signOut = signOut;
+  window.updateUIBasedOnAuthState = updateUIBasedOnAuthState;
+  window.deauthenticateUser = deauthenticateUser;
+  window.updateUserDataInLocalStorage = updateUserDataInLocalStorage;
+</script>

@@ -1,6 +1,9 @@
 {{$page = 1}}
 {{$limit = 25}}
+{{$created_at = desc}}
 {{$filter = }}
+{{$sort = }}
+{{$npo_status = approved}}
 {{if {get_var.page} }}
 {{$page = {get_var.page} }}
 {{/if}}
@@ -8,24 +11,39 @@
 {{$limit = {get_var.limit} }}
 {{/if}}
 
-{{if {get_var.npo} }}
-    {{$filter = WHERE FIND_IN_SET(story.related_npos, '{get_var.npo}') AND story.npo_approved = '{get_var.approved}' }}
-    {{if {get_var.status} }}
-        {{$status = {get_var.status} }}
-        {{if {$status} == "null" }}
-            {{$filter = {$filter} AND story.npo_approval_status = 'pending' }}
-        {{else}}
-            {{$filter = {$filter} AND story.npo_approval_status = '{get_var.status}' }}
-        {{/if}}
-    {{/if}}
-{{else-if {get_var.npo} }}
-    {{$filter = WHERE story.related_npos='{get_var.npo}'  }}
-{{else-if {get_var.search} }}
-    {{$filter = WHERE story.title LIKE '%{get_var.search}%'  }}
-{{else-if {get_var.author} }}
-    {{$filter = WHERE story.author = '{get_var.author}' }}
+{{if {get_var.status} }}
+    {{$npo_status = {get_var.status} }}
 {{/if}}
 
+{{if {get_var.npo} }}
+    {{$filter = WHERE FIND_IN_SET (story.related_npos, '{get_var.npo}') }}
+{{else-if {get_var.author} }}
+    {{$filter = WHERE story.author = '{get_var.author}' }}
+
+    {{if {get_var.featured} }}
+        {{$filter = {$filter} AND story.featured = '{get_var.featured}' }}
+    {{/if}}
+{{else-if {get_var.featured} }}
+    {{$filter = WHERE story.featured = {get_var.featured} }}
+{{/if}}
+
+{{if {get_var.created-at} }}
+   {{$created_at = {get_var.created-at} }}
+{{/if}}
+
+{{if {$filter} == ""}}
+    {{$filter = WHERE story.npo_approval_status = '{$npo_status}'}}
+{{else-if {$npo_status} == "all"}}
+    {{$filter = {$filter} }}
+{{else}}
+    {{$filter = {$filter} AND story.npo_approval_status = '{$npo_status}'}}
+{{/if}}
+
+{{if {get_var.search} }}
+    {{$filter = {$filter} AND (story.title LIKE '%{get_var.search}%' OR story.story_body LIKE '%{get_var.search}%') }}
+{{/if}}
+
+{{$filter = {$filter} SORT BY story.created_at {$created_at} }}
 
 
 
@@ -43,6 +61,7 @@
     "meta" : {
         "page" : {{$page}},
         "start" : {{$start}},
-        "limit" : {{$limit}}
+        "limit" : {{$limit}},
+        "filter": "{{$filter}}"
     }
 }

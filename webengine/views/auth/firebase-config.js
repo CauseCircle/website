@@ -9,3 +9,28 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
+// Initialize Firebase Cloud Messaging
+let messaging = null;
+try{
+  if (firebase.messaging.isSupported()) {
+    messaging = firebase.messaging();
+    
+    // Configure the service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('{{$base_url}}/auth/firebase-messaging-sw.js?zpw=causecircle')
+        .then((registration) => {
+          messaging.useServiceWorker(registration);
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error);
+        });
+    }
+  }
+}catch(error){
+  
+}
+
+
+// Make messaging available globally
+window.firebaseMessaging = messaging;

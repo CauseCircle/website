@@ -1,0 +1,649 @@
+<style>
+  #npoDropdown,
+  #categoryDropdown {
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+  }
+  #npoDropdown .dropdown-item,
+  #categoryDropdown .dropdown-item {
+    white-space: normal;
+  }
+  #useCurrentLocation {
+    min-width: 140px;
+  }
+  .image-upload-container {
+    width: 100%;
+  }
+  .image-preview {
+    width: 100%;
+    height: 270px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: #f8f9fa;
+  }
+  .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  .preview-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  .preview-item.video-preview::before {
+    content: "▶";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: white;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    z-index: 5;
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 3px;
+  }
+  .custom-file-input {
+    display: none;
+  }
+  #removeImageBtn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  #removeImageBtn i {
+    font-size: 14px;
+  }
+  .upload-message {
+    text-align: center;
+    padding: 20px;
+  }
+  .upload-area {
+    border: 2px dashed #ced4da;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .upload-area:hover {
+    background-color: #f8f9fa;
+  }
+  .preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .preview-item {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+  }
+  .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  .remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  .add-more {
+    width: 100px;
+    height: 100px;
+    border: 2px dashed #ced4da;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    transition: background-color 0.3s;
+  }
+  .add-more:hover {
+    background-color: #e9ecef;
+  }
+  .extra-images-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .preview-item.dragging {
+    opacity: 0.5;
+    border: 2px dashed #007bff; /* Using a Bootstrap primary color for consistency */
+  }
+</style>
+
+<section id="storyInformationSelection" class="section-container d-none">
+  <div class="py-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img class="section-icon" src="" style="max-width: 160px" alt="Step icon" />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="section-title fs-1 fw-normal mb-0"></p>
+        <p class="section-description fs-5 text-muted mb-0 text-center"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="max-width: 480px; width: 100%">
+      <form id="storyDetailsForm" novalidate>
+        <div class="mb-4">
+          <label for="storyImages" class="form-label">
+            Story Media <span class="text-danger">*</span>
+          </label>
+          <div id="uploadArea" class="upload-area mt-3">
+            <p class="mb-1">Choose images or videos, or drag & drop them here.</p>
+            <p class="text-muted small">
+              JPEG, PNG, MP4 and other formats, up to 30 MB each. Maximum 5 media files allowed.
+            </p>
+            <button
+              id="browseButton"
+              class="btn btn-secondary mt-2"
+              type="button"
+            >
+              Browse Files
+            </button>
+          </div>
+          <input
+            type="file"
+            id="fileInput"
+            style="display: none"
+            multiple
+            accept="image/jpeg,image/png,image/jpg,image/webp,image/heic,image/heif,video/mp4,video/x-flv,video/quicktime"
+          />
+          <div id="previewContainer" class="preview-container"></div>
+        </div>
+
+        <div class="mb-4">
+          <label for="storyDescription" class="form-label">
+            Description <span class="text-danger">*</span>
+          </label>
+          <textarea
+            class="form-control"
+            id="storyDescription"
+            rows="3"
+            required
+          ></textarea>
+          <div class="invalid-feedback">Please enter a story description.</div>
+        </div>
+
+        <div class="mb-4">
+          <label for="selectedNPO" class="form-label">
+            Nonprofit Organization <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="selectedNPOInput"
+            value="{{npo.name}}"
+            disabled
+          />
+          <input
+            type="hidden"
+            id="selectedNPO"
+            name="selectedNPO"
+            value="{{npo._zuid}}"
+            required
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="selectCategory" class="form-label"> Select Cause (Optional) </label>
+          <div class="dropdown">
+            <input
+              type="text"
+              class="form-control"
+              id="categorySearchInput"
+              placeholder="Search Categories..."
+              autocomplete="off"
+            />
+            <ul
+              class="dropdown-menu w-100"
+              id="categoryDropdown"
+              style="max-height: 300px; overflow-y: auto"
+            >
+              <!-- Category options will be dynamically added here -->
+            </ul>
+          </div>
+          <input type="hidden" id="selectedCategory" name="selectedCategory" />
+          <div class="invalid-feedback d-none"></div>
+        </div>
+      </form>
+      <button id="nextBtn" class="btn btn-primary w-100 mt-4" disabled>
+        <span
+          class="spinner-border spinner-border-sm me-2 d-none"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        Next
+      </button>
+    </div>
+  </div>
+</section>
+
+<script type="module">
+  function updateNextButtonState(enable) {
+    $("#nextBtn").prop("disabled", enable);
+  }
+
+  const npoData = {
+        data: {{npo.toJSON(2)}} // this is a custom parser, dont change this
+      };
+
+  $(document).ready(async function () {
+    // Add debounce utility function
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    const localUser = localStorage.getItem("user");
+    if (!localUser) {
+      return;
+    }
+    const userData = await getZestyUser(JSON.parse(localUser).zuid);
+
+    const heroImageInput = $("#heroImageInput");
+    const imagePreview = $("#imagePreview");
+    const previewImage = $("#previewImage");
+    const removeImageBtn = $("#removeImageBtn");
+    const uploadMessage = $("#uploadMessage");
+    const categorySearchInput = $("#categorySearchInput");
+    const categoryDropdown = $("#categoryDropdown");
+    const selectedCategory = $("#selectedCategory");
+    const nextBtn = $("#nextBtn");
+    const storyDescription = $("#storyDescription");
+
+    // Initialize with the preset NPO data
+    window.npo_data = [{{npo.toJSON(2)}}];
+    window.story_npo = "{{npo._zuid}}";
+
+    // Load categories for the preset NPO
+    searchCategories("", {{npo.toJSON(2)}}, false);
+    categorySearchInput.prop("disabled", false);
+
+    // Update validationState to remove category and location
+    window.validationState = {
+      storyMedia: false,
+      storyDescription: false
+    };
+
+    // Update checkAllValid to only check required fields
+    function checkAllValid() {
+      const allValid = Object.values(validationState).every(Boolean);
+      updateNextButtonState(!allValid);
+    }
+
+    // Remove NPO-related validation function
+    function validateStoryDescription() {
+      const value = storyDescription.val().trim();
+      if (value === "") {
+        storyDescription.addClass("is-invalid");
+        validationState.storyDescription = false;
+      } else {
+        storyDescription.removeClass("is-invalid").addClass("is-valid");
+        validationState.storyDescription = true;
+      }
+      checkAllValid();
+    }
+
+    // Update event listeners to remove NPO-related ones
+    storyDescription.on("input focus", validateStoryDescription);
+
+    // Keep category search functionality but make it required
+    const debouncedSearchCategory = debounce(function () {
+      const searchTerm = categorySearchInput.val().trim();
+      searchCategories(searchTerm, {{npo.toJSON(2)}});
+    }, 300);
+
+    categorySearchInput.on("input", debouncedSearchCategory);
+
+    // Initial validation check
+    updateNextButtonState(true);
+
+    const uploadArea = document.getElementById("uploadArea");
+    const fileInput = document.getElementById("fileInput");
+    const browseButton = document.getElementById("browseButton");
+    const previewContainer = document.getElementById("previewContainer");
+    let uploadedFiles = [];
+    let draggedItemIndex = null;
+
+    function handleDragStart(event, index) {
+      draggedItemIndex = index;
+      event.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => {
+        event.target.classList.add('dragging');
+      }, 0);
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleDrop(event, targetIndex) {
+      event.preventDefault();
+      if (draggedItemIndex === null || draggedItemIndex === targetIndex) {
+        if (draggedItemIndex !== null) {
+            const draggedElement = previewContainer.children[draggedItemIndex + (uploadedFiles.length > 0 && uploadedFiles.length < 5 ? 1 : 0)]; // Adjust index if "add more" is present
+            if (draggedElement) draggedElement.classList.remove('dragging');
+        }
+        draggedItemIndex = null;
+        return;
+      }
+
+      const itemToMove = uploadedFiles.splice(draggedItemIndex, 1)[0];
+      uploadedFiles.splice(targetIndex, 0, itemToMove);
+
+      window.hero_image = [...uploadedFiles];
+      
+      draggedItemIndex = null;
+      updatePreviews();
+    }
+
+    function handleDragEnd(event) {
+      event.target.classList.remove('dragging');
+      if (draggedItemIndex !== null) {
+          draggedItemIndex = null;
+      }
+    }
+
+    uploadArea.addEventListener("click", () => fileInput.click());
+
+    browseButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    uploadArea.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadArea.style.backgroundColor = "#f8f9fa";
+    });
+
+    uploadArea.addEventListener("dragleave", () => {
+      uploadArea.style.backgroundColor = "";
+    });
+
+    uploadArea.addEventListener("drop", (e) => {
+      e.preventDefault();
+      uploadArea.style.backgroundColor = "";
+      handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener("change", () => {
+      handleFiles(fileInput.files);
+    });
+
+    function handleFiles(files) {
+      // Convert FileList to Array and filter for images and videos
+      const newFiles = Array.from(files).filter(file => 
+        file.type.startsWith("image/") || 
+        file.type === "video/mp4" || 
+        file.type === "video/x-flv" || 
+        file.type === "video/quicktime"
+      );
+      
+      // Check if adding these files would exceed the 5-image limit
+      if (uploadedFiles.length + newFiles.length > 5) {
+        // If we exceed the limit, only take what we can fit
+        const availableSlots = 5 - uploadedFiles.length;
+        if (availableSlots > 0) {
+          // Add only the number of files that fit within the limit
+          const filesToAdd = newFiles.slice(0, availableSlots);
+          uploadedFiles = [...uploadedFiles, ...filesToAdd];
+          window.hero_image = uploadedFiles;
+          alert(`You can only upload up to 5 media files. Added ${filesToAdd.length} of ${newFiles.length} selected files.`);
+        } else {
+          alert("Maximum of 5 media files allowed. Please remove some files before adding more.");
+        }
+      } else if (newFiles.length > 0) {
+        // If we're within the limit, add all the new files
+        uploadedFiles = [...uploadedFiles, ...newFiles];
+        window.hero_image = uploadedFiles;
+      }
+      
+      updatePreviews();
+      fileInput.value = null;
+    }
+
+    function updatePreviews() {
+      previewContainer.innerHTML = "";
+
+      // Only add the "add more" button if we have at least one image but fewer than 5
+      if (uploadedFiles.length > 0 && uploadedFiles.length < 5) {
+        const addMore = document.createElement("div");
+        addMore.classList.add("add-more");
+        addMore.innerHTML =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-image" viewBox="0 0 16 16"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/><path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/></svg>';
+        addMore.addEventListener("click", () => fileInput.click());
+        previewContainer.appendChild(addMore);
+      }
+
+      uploadedFiles.forEach((file, index) => {
+        const previewItem = document.createElement("div");
+        previewItem.classList.add("preview-item");
+        previewItem.draggable = true; // Make the item draggable
+
+        // Attach drag and drop event listeners
+        previewItem.addEventListener('dragstart', (event) => handleDragStart(event, index));
+        previewItem.addEventListener('dragover', handleDragOver);
+        previewItem.addEventListener('drop', (event) => handleDrop(event, index));
+        previewItem.addEventListener('dragend', handleDragEnd);
+
+        let mediaElement;
+        
+        if (file.type === "video/mp4" || file.type === "video/x-flv" || file.type === "video/quicktime") {
+          // Create video element for video files
+          mediaElement = document.createElement("video");
+          mediaElement.classList.add("preview-image"); // Reuse the same CSS class for consistency
+          mediaElement.controls = false; // Disable controls in preview
+          mediaElement.muted = true;
+          mediaElement.preload = "metadata";
+          
+          // Add video-preview class to the preview item for the play icon overlay
+          previewItem.classList.add("video-preview");
+          
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            mediaElement.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          // Create image element for image files
+          mediaElement = document.createElement("img");
+          mediaElement.classList.add("preview-image");
+          
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            mediaElement.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+
+        const removeBtn = document.createElement("button");
+        removeBtn.classList.add("remove-btn");
+        removeBtn.innerHTML = "&times;";
+        removeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          removeFile(index);
+        });
+
+        previewItem.appendChild(mediaElement);
+        previewItem.appendChild(removeBtn);
+
+        previewContainer.appendChild(previewItem);
+      });
+
+      updateUploadArea();
+      validationState.storyMedia = uploadedFiles.length > 0;
+      checkAllValid();
+    }
+
+    function removeFile(index) {
+      uploadedFiles.splice(index, 1);
+      window.hero_image = uploadedFiles;
+      updatePreviews();
+    }
+
+    function updateUploadArea() {
+      if (uploadedFiles.length === 0) {
+        // No images, show the main upload area
+        uploadArea.style.display = "block";
+      } else {
+        // Hide the main upload area if we have images
+        uploadArea.style.display = "none";
+      }
+    }
+
+    window.resetAllStates = function() {
+      validationState = {
+        storyMedia: false,
+        storyDescription: false
+      };
+      
+      // Reset uploaded files
+      uploadedFiles = [];
+      window.hero_image = [];
+      
+      // Reset category fields
+      $("#selectedCategory").val("");
+      $("#categorySearchInput").val("").removeClass("is-valid is-invalid");
+      
+      // Show upload area and clear preview container
+      uploadArea.style.display = "block";
+      previewContainer.innerHTML = "";
+
+      // Reload initial categories
+      searchCategories("", {{npo.toJSON(2)}}, false);
+    };
+
+    // Add this function definition in the document ready callback
+    function searchCategories(searchTerm = "", npo, shouldShowDropdown = true) {
+      categoryDropdown.empty();
+      if (!npo || !npo.category || !npo.category.data) {
+        categoryDropdown.append(
+          '<li><span class="dropdown-item">No categories available</span></li>'
+        );
+        categoryDropdown.show();
+        return;
+      }
+
+      let categories = npo.category.data;
+
+      if (searchTerm) {
+        const searchTermLower = searchTerm.toLowerCase();
+        categories = categories.filter((category) =>
+          category.title.toLowerCase().includes(searchTermLower)
+        );
+      }
+
+      if (categories.length > 0) {
+        categories.sort((a, b) => a.title.localeCompare(b.title));
+        window.category_data = categories;
+        categories.forEach((category) => {
+          categoryDropdown.append(
+            `<li><a class="dropdown-item" href="#" data-category-id="${category.meta.zuid}">${category.title}</a></li>`
+          );
+        });
+      } else {
+        categoryDropdown.append(
+          '<li><span class="dropdown-item">No categories found</span></li>'
+        );
+      }
+      if (shouldShowDropdown) {
+        categoryDropdown.show();
+      }
+    }
+
+    // Add this event listener for category input focus
+    categorySearchInput.on('focus', function() {
+      if (!categoryDropdown.children().length) {
+        searchCategories("", {{npo.toJSON(2)}}, true);
+      } else {
+        categoryDropdown.show();
+      }
+    });
+
+    // Update the document click handler
+    $(document).on('click', function(e) {
+      const $target = $(e.target);
+      if (!$target.closest('#categoryDropdown').length &&
+          !$target.closest('#categorySearchInput').length) {
+        categoryDropdown.hide();
+      }
+    });
+
+    // Add this to keep dropdown open when clicking in the search input
+    categorySearchInput.on('click', function(e) {
+      e.stopPropagation();
+      if (categoryDropdown.children().length > 0) {
+        categoryDropdown.show();
+      }
+    });
+
+    // Add back the category selection handler
+    categoryDropdown.on("click", "a.dropdown-item", function (e) {
+      e.preventDefault();
+      const categoryId = $(this).data("category-id");
+      const categoryName = $(this).text();
+      selectedCategory.val(categoryId);
+      categorySearchInput.val(categoryName);
+      categoryDropdown.hide();
+    });
+  });
+</script>

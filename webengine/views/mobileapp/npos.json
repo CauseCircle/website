@@ -1,6 +1,7 @@
 {{$page = 1}}
 {{$limit = 25}}
 {{$search =  }}
+{{$sort = npo.updated_at DESC }}
 {{if {get_var.page} }}
 {{$page = {get_var.page} }}
 {{/if}}
@@ -9,8 +10,10 @@
 {{/if}}
 {{if {get_var.exact_name} }}
 {{$search = WHERE npo.name = '{get_var.exact_name}'  }}
+{{$sort =  npo.name ASC }}
 {{else-if {get_var.search} }}
 {{$search = WHERE npo.name LIKE '%{get_var.search}%'  }}
+{{$sort =  npo.name ASC }}
 {{else-if {get_var.followed} }}
 {{$search = WHERE FIND_IN_SET (npo._zuid, '{get_var.followed}')  }}
 {{else-if {get_var.featured} }}
@@ -19,12 +22,16 @@
 {{$search = WHERE npo.zuid = '{get_var.zuid}' }}
 {{else-if {get_var.admin_zuid} }}
 {{$search = WHERE FIND_IN_SET ('{get_var.admin_zuid}', npo.admins) }}
+{{else-if {get_var.headquarters_address} }}
+{{$search = WHERE npo.headquarters_address LIKE '%{get_var.headquarters_address}%' }}
+{{else-if {get_var.cause_zuid} }}
+{{$search = WHERE FIND_IN_SET ('{get_var.cause_zuid}', npo.category) }}
 {{/if}}
 {{$start = {math(({$page} - 1) * {$limit})} }} 
 {
     "data" :
     [
-        {{each non_profits as npo {$search} limit {$start}, {$limit} }}
+        {{each non_profits as npo {$search} limit {$start}, {$limit} sort by {$sort} }}
         {{npo.toJSON(2)}}
         {{npo._arraycomma}}
         {{/each}}

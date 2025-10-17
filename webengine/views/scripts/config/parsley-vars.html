@@ -1,0 +1,13 @@
+<!-- this first parsley logic is necessary for determining the base url -->
+<!--prettier-ignore-->
+{{ $url = {home_feed.first().getUrl()} }}
+{{if {get_var.follow_npo} }}
+  {{$url = {non_profits.filter({get_var.follow_npo}).getUrl()} }}
+{{end-if}}
+
+{{$base_url = }}
+{{if {instance.env} = live }}
+{{$base_url = https://{instance.host_live}/ }}
+{{else if {instance.env} = dev }}
+{{$base_url = https://{instance.host_env}/ }}
+{{end-if}}

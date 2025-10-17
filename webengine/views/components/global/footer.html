@@ -1,4 +1,17 @@
 <style>
+  html, body {
+    height: 100%;
+  }
+  
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #footer-container {
+    margin-top: auto;
+  }
+
   .footer-section {
     min-height: 396px;
   }
@@ -40,7 +53,7 @@
           <a class="navbar-brand" href="/">
             <img
               class="mb-4"
-              src="{{globals.site_logo_light.getImage()}}"
+              src="{{globals.site_logo_light.getImage()}}?width=160"
               style="max-width: 160px"
               alt="cause circle brand logo"
             />
@@ -112,6 +125,9 @@
             <li>
               <a class="text-white text-decoration-none" href="{{partner_page.first().getUrl()}}">Partners</a>
             </li>
+            <li>
+              <a class="text-white text-decoration-none" href="/docs">Help Center</a>
+            </li>
           </ul>
         </div>
         <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
@@ -141,7 +157,7 @@
     <div
       class="container-lg d-flex justify-content-between align-content-center p-0"
     >
-      <p class="text-white">Copyright© 2024, All rights reserved.</p>
+      <p class="text-white">Copyright© 2025, All rights reserved.</p>
       <div class="d-flex gap-4">
         <a
           class="text-white text-decoration-none"

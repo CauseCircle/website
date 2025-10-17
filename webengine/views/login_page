@@ -12,7 +12,7 @@
     gap: 4rem;
   }
   .login-btn {
-    width: 7.625rem;
+    min-width: 7.625rem;
     height: 2.5rem;
     border-radius: 10px;
     border: 1px solid #e1e4ea;
@@ -42,10 +42,17 @@
         <div>
           <a href="/"
             ><img
-              src="{{ globals.logo.getImage() }}"
+              src="{{ globals.logo.getImage() }}?width=160&quality=60&format=webp"
+              srcset="
+                {{ globals.logo.getImage() }}?width=160&quality=60&format=webp 160w,
+                {{ globals.logo.getImage() }}?width=140&quality=60&format=webp 140w"
+              sizes="160px"
               style="max-width: 160px"
+              width="160"
+              decoding="async"
+              fetchpriority="high"
               alt="cause circle brand logo"
-          /></a>
+            /></a>
         </div>
 
         <div class="d-flex gap-2 align-items-center">
@@ -58,7 +65,14 @@
       >
         <div>
           <img
-            src="https://4xxglxlj.media.zestyio.com/Custom-Icon.png"
+            src="https://4xxglxlj.media.zestyio.com/Custom-Icon.png?width=64&quality=60&format=webp"
+            srcset="
+              https://4xxglxlj.media.zestyio.com/Custom-Icon.png?width=64&quality=60&format=webp 64w, 
+              https://4xxglxlj.media.zestyio.com/Custom-Icon.png?width=128&quality=60&format=webp 128w"
+            sizes="64px"
+            width="64"
+            loading="lazy"
+            decoding="async"
             alt="Logo"
           />
         </div>
@@ -70,10 +84,13 @@
             {{ this.description }}
           </div>
         </div>
-        <div class="login-button-container d-flex gap-2 mt-4">
+        <div
+          class="login-button-container d-flex flex-column gap-2 mt-4 flex-wrap align-items-center justify-content-center w-100"
+          style="max-width: 300px"
+        >
           <button
             type="button"
-            class="login-btn btn btn-light"
+            class="login-btn btn btn-light w-100"
             id="google-signin-btn"
           >
             <svg width="20" height="20" viewBox="0 0 24 24">
@@ -94,22 +111,46 @@
                 d="M5.27698177,14.2678769 C5.03832634,13.556323 4.90909091,12.7937589 4.90909091,12 C4.90909091,11.2182781 5.03443647,10.4668121 5.26620003,9.76452941 L1.23999023,6.65002441 C0.43658717,8.26043162 0,10.0753848 0,12 C0,13.9195484 0.444780743,15.7301709 1.23746264,17.3349879 L5.27698177,14.2678769 Z"
               />
             </svg>
+            <span class="ms-2">Sign in with Google</span>
           </button>
           <button
             type="button"
-            class="login-btn btn btn-light"
+            class="login-btn btn btn-light w-100"
             id="continue-with-fb-btn"
           >
             <i
               class="bi bi-facebook"
               style="font-size: 20px; color: #448afd"
             ></i>
+            <span class="ms-2">Sign in with Facebook</span>
+          </button>
+          <button
+            type="button"
+            class="login-btn btn btn-light w-100"
+            id="microsoft-signin-btn"
+          >
+            <svg width="20" height="20" viewBox="0 0 23 23">
+              <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
+              <path fill="#f35325" d="M1 1h10v10H1z"></path>
+              <path fill="#81bc06" d="M12 1h10v10H12z"></path>
+              <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
+              <path fill="#ffba08" d="M12 12h10v10H12z"></path>
+            </svg>
+            <span class="ms-2">Sign in with Microsoft</span>
+          </button>
+          <button
+            type="button"
+            class="login-btn btn btn-light w-100"
+            id="apple-signin-btn"
+          >
+            <i class="bi bi-apple" style="font-size: 20px"></i>
+            <span class="ms-2">Sign in with Apple</span>
           </button>
         </div>
       </div>
       <div class="d-flex justify-content-between align-items-center p-4">
-        <p class="fs-6 text-muted mb-0">© 2024 CauseCircle</p>
-        <span class="text-muted">
+        <p class="fs-6 text-muted mb-0">© 2025 CauseCircle</p>
+        <span class="text-muted d-none">
           <i class="bi bi-globe text-muted" style="font-size: 20px"></i>
           ENG</span
         >
@@ -117,8 +158,18 @@
     </div>
   </div>
   <div class="right-side d-none d-lg-flex p-lg-3">
-    <div class="hero_image">
-      <img src="{{ this.hero_image.getImage() }}" alt="Hero Image" />
+    <div id="login-hero-image" class="hero_image">
+      <img
+        id="hero-img"
+        src="{{ this.hero_image.getImage() }}?width=800&quality=60&format=webp"
+        srcset="
+          {{ this.hero_image.getImage() }}?width=400&quality=60&format=webp 400w, 
+          {{ this.hero_image.getImage() }}?width=800&quality=60&format=webp 800w"
+        sizes="(max-width: 600px) 400px, (max-width: 1200px) 800px, 1200px"
+        alt="Hero Image"
+        class="img-fluid"
+        decoding="async"
+      />
     </div>
     <div class="d-none">
       <p class="fs-4 fw-medium text-center mb-0">Empower Your Impact</p>
@@ -133,7 +184,28 @@
 <!-- prettier-ignore -->
 {{include /components/global/Login/LoginPromptModal/login_prompt_modal.html}}
 
-<script>
+<script type="module">
+  // Toggle hero image loading/fetch priority for mobile vs desktop
+  (function () {
+    try {
+      const heroImg = document.getElementById("hero-img");
+      if (!heroImg) return;
+
+      const setLoadingHints = () => {
+        const isMobile = window.matchMedia("(max-width: 991.98px)").matches;
+        if (isMobile) {
+          heroImg.setAttribute("loading", "lazy");
+          heroImg.removeAttribute("fetchpriority");
+        } else {
+          heroImg.removeAttribute("loading");
+          heroImg.setAttribute("fetchpriority", "high");
+        }
+      };
+
+      setLoadingHints();
+      window.addEventListener("resize", setLoadingHints);
+    } catch (_) {}
+  })();
   const claimListingRedirectUrl = localStorage.getItem(
     "claimListingRedirectUrl"
   );
@@ -141,7 +213,7 @@
   if (claimListingRedirectUrl) {
     $("#login-title").text("Sign Up to Claim Your Listing");
     $("#login-description").text(
-      "This will allow you to manage and edit your NPO, invite admins and followers, and review stories."
+      "This will allow you to manage and edit your Nonprofit, invite admins and followers, and review stories."
     );
 
     // Clear the localStorage item when the page is unloaded
@@ -154,7 +226,6 @@
     "follow_npo"
   );
   if (followNpo) {
-    // console.log(followNpo);
     const loginModal = new bootstrap.Modal(
       document.getElementById("loginPromptModal")
     );

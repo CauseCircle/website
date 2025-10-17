@@ -1,0 +1,884 @@
+<script type="module">
+  // Story Rendering Module for Home Feed
+  // Handles story fetching, rendering, and infinite scroll functionality
+
+  // Comment-related functions (moved here to avoid dependency issues)
+  const authorCache = {}; // Simple cache for author details
+
+  // Function to get author details using TanStack Query (fetches if not in cache)
+  async function getCommentAuthorDetails(authorId) {
+    if (authorCache[authorId]) {
+      return authorCache[authorId];
+    }
+    
+    if (!authorId) {
+        return { name: "Unknown User", avatar: "https://placehold.co/100x100?text=?" };
+    }
+
+    try {
+      
+      // Use TanStack Query for user profile
+      const userProfileQuery = window.createUserProfileQuery(authorId);
+      
+      const result = await new Promise((resolve) => {
+        let resolved = false;
+        
+        const unsubscribe = userProfileQuery.subscribe((result) => {
+          if (result.status === 'success' || result.status === 'error') {
+            if (!resolved) {
+              resolved = true;
+              unsubscribe();
+              resolve(result);
+            }
+          }
+        });
+      });
+
+      if (result.status === 'success' && result.data) {
+        const userResponse = result.data;
+        const userData = userResponse.data[0];
+        
+        const authorDetails = {
+          name: userData?.first_name && userData?.last_name
+            ? `${userData?.first_name} ${userData?.last_name}`
+            : "User",
+          avatar: userData?.profile_image ? typeof userData?.profile_image === 'string' ? userData?.profile_image : userData?.profile_image?.data[0]?.url : "https://placehold.co/100x100?text=User"
+        };
+        
+        authorCache[authorId] = authorDetails; // Store in cache
+        return authorDetails;
+      } else {
+        console.error("Error getting comment author info:", result.error);
+        // Return fallback immediately without caching errors
+        return { name: "User", avatar: "https://placehold.co/100x100?text=User" };
+      }
+      
+    } catch (error) {
+      console.error("Error getting comment author info:", error);
+      // Return fallback details but don't cache errors permanently
+      return { name: "User", avatar: "https://placehold.co/100x100?text=User" };
+    }
+  }
+
+  // Function to generate HTML for a single comment
+  function generateCommentHtml(comment, authorDetails) {
+      const commentTimeAgo = comment.createdAt ? window.formatTimeAgo(comment.createdAt) : "";
+      return `
+        <div class="comment-container">
+          <img src="${authorDetails.avatar}" alt="${authorDetails.name}" class="comment-avatar">
+          <div class="comment-content">
+            <div class="comment-header">
+              <p class="comment-author">${authorDetails.name}</p>
+              <span class="comment-time">${commentTimeAgo}</span>
+               <button class="comment-options-btn" onclick="event.stopPropagation(); /* TODO: Implement options */">
+                 <i class="bi bi-three-dots"></i>
+               </button>
+            </div>
+            <p class="comment-text">${window.escapeHtml(comment.content)}</p>
+          </div>
+        </div>
+      `;
+  }
+
+  // Function to fetch all data for a single story using TanStack Query
+  async function fetchAllDataForStory(story) {
+    let storyStats = { likedBy: [], sharedBy: [], views: 0 };
+    let initialCommentsData = { data: [] };
+    let latestCommentAuthorDetails = null;
+
+    try {
+      // Use TanStack Query for story stats
+      const storyStatsQuery = window.createStoryStatsQuery(story.meta.zuid);
+      const statsResult = await new Promise((resolve) => {
+        const unsubscribe = storyStatsQuery.subscribe((result) => {
+          if (result.status === 'success' || result.status === 'error') {
+            unsubscribe();
+            resolve(result);
+          }
+        });
+      });
+
+      if (statsResult.status === 'success' && statsResult.data) {
+        const stats = statsResult.data;
+        if (stats && stats.data) {
+          const d = stats.data;
+          const likedBy = d?.likedBy?.map(user => user.user_zuid || user.id) || [];
+          const sharedBy = d?.sharedBy?.map(user => user.user_zuid || user.id) || [];
+          storyStats = {
+            likedBy: likedBy,
+            sharedBy: sharedBy,
+          };
+        }
+      }
+    } catch (error) {
+      console.error(`Error fetching stats for story ${story.meta.zuid}:`, error);
+    }
+
+    try {
+      // Use TanStack Query for story comments
+      const storyCommentsQuery = window.createStoryCommentsQuery(story.meta.zuid);
+      const commentsResult = await new Promise((resolve) => {
+        const unsubscribe = storyCommentsQuery.subscribe((result) => {
+          if (result.status === 'success' || result.status === 'error') {
+            unsubscribe();
+            resolve(result);
+          }
+        });
+      });
+
+      if (commentsResult.status === 'success' && commentsResult.data) {
+        initialCommentsData = commentsResult.data;
+      } else {
+        console.error(`Failed to fetch comments for story ${story.meta.zuid}:`, commentsResult.error);
+      }
+    } catch (error) {
+      console.error(`Error fetching initial comments for story ${story.meta.zuid}:`, error);
+    }
+    
+    const storyComments = initialCommentsData.data || [];
+    if (storyComments.length > 0) {
+      
+      const sortedComments = [...storyComments].sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+        return dateB - dateA; // newest first
+      });
+      
+      const latestComment = sortedComments[0];
+      
+      if (latestComment && latestComment.authorId) { // Ensure authorId exists
+          try {
+            latestCommentAuthorDetails = await getCommentAuthorDetails(latestComment.authorId);
+          } catch (authorError) {
+            console.error(`Error fetching author details for comment by ${latestComment.authorId}:`, authorError);
+            latestCommentAuthorDetails = await getCommentAuthorDetails(null); // Fallback for preview
+          }
+      } else if (latestComment) {
+        latestCommentAuthorDetails = await getCommentAuthorDetails(null); // Fallback if no authorId
+      } else {
+        latestCommentAuthorDetails = await getCommentAuthorDetails(null);
+      }
+    } else {
+    }
+
+    return {
+      ...story, // Spread the original story properties
+      _fetchedData: { // Nest all fetched data under this key
+        storyStats,
+        storyComments, // These are all comments for this story
+        latestCommentAuthorDetails // Details for the author of the latest comment for preview
+      }
+    };
+  }
+
+  // Function to render a single story card with reactive subscriptions
+  async function renderStoryCard(storyWithAllData, placeholderId) {
+    try {
+      const story = storyWithAllData; // Original story data
+      const { storyStats, storyComments, latestCommentAuthorDetails } = story._fetchedData; // Destructure pre-fetched data
+      
+    const commentCount = storyComments.length;
+
+    const storyAuthorDetails = story?.author?.data[0] || {};
+    const storyAuthorType = storyAuthorDetails?.meta?.model_name;
+
+    const relatedNPO = story.related_npos?.data?.[0] || {};
+    const relatedCauses = story.related_causes?.data || [];
+
+    const npoLogo = relatedNPO.logo && (typeof relatedNPO.logo === "string"
+      ? relatedNPO.logo
+      : relatedNPO.logo?.data && relatedNPO.logo?.data[0] && relatedNPO.logo?.data[0]?.url);
+    
+    // Handle story_image - could be string or object with data array
+    const storyImage = story.story_image;
+
+    // Extract hashtags from story body instead of using related_causes
+    const hashtagsHtml = window.generateHashtagsHtml(story.story_body || story.description || '');
+
+    const createdAt = story.meta?.createdAt || story.date_published || '';
+    const timeAgo = createdAt ? window.formatTimeAgo(createdAt) : '';
+    
+    // Check for multiple media items (images or videos)
+    let hasMultipleMedia = false;
+    if (story.story_image?.data && story.story_image.data.length > 1) {
+      // Count valid media items
+      const validMediaCount = story.story_image.data.filter(item => {
+        const mediaUrl = item.url || item.zuid;
+        return mediaUrl; // Only count items with valid URLs
+      }).length;
+      hasMultipleMedia = validMediaCount > 1;
+    }
+    
+    const likeCount = storyStats.likedBy.length;
+    const likeText = likeCount > 0 ? likeCount.toString() : 'Like';
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const isLiked = currentUser && storyStats.likedBy.some(like => like.user_zuid === currentUser?.zuid);
+    const commentedByCurrentUser = currentUser && storyComments.some(comment => comment.authorId === currentUser?.zuid);
+    const likedClass = isLiked ? 'liked' : '';
+    const thumbsUpIcon = isLiked ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up';
+    const iconStyle = isLiked ? 'style="color: #7b3fee;"' : '';
+
+    let donateLink = '';
+    if (relatedNPO && relatedNPO?.donate_link) {
+      donateLink = relatedNPO?.donate_link;
+    }
+
+    const commentButtonText = commentCount > 0 ? commentCount.toString() : "Comment";
+    
+    // Prepare HTML for the latest comment preview
+    let latestCommentHtml = '';
+    if (commentCount > 0) {
+      const latestCommentToPreview = storyComments[0]; // Assuming server sends them in a useful order or fetchAllData sorts them
+      if (latestCommentToPreview && latestCommentAuthorDetails) { // Ensure we have details for the preview
+          latestCommentHtml = generateCommentHtml(latestCommentToPreview, latestCommentAuthorDetails);
+      } else if (latestCommentToPreview) { // Fallback if author details failed but comment exists
+          const fallbackAuthorDetails = await getCommentAuthorDetails(latestCommentToPreview.authorId); // Try fetching again or use fallback
+          latestCommentHtml = generateCommentHtml(latestCommentToPreview, fallbackAuthorDetails);
+      }
+    }
+
+    // Determine if the toggle button should be shown
+    const showToggleBtn = commentCount > 1;
+
+    const storyCardHtml = `
+      <div class="post-card mb-3" data-story-zuid="${story.meta.zuid}" data-npo-zuid="${relatedNPO.meta?.zuid || ''}" data-created-at="${createdAt || ''}" onclick="window.location.href='{{ $base_url }}${story.meta.web.uri}'" style="cursor: pointer">
+        <div class="post-header" style="cursor: pointer;">
+          <img
+            src="${`${npoLogo}?width=48&quality=60&format=webp` || 'https://placehold.co/48x48?text=Logo'}"
+            alt="${relatedNPO.name || 'Organization'}"
+            class="profile-img"
+          />
+          <div class="post-meta d-flex flex-wrap gap-1">
+            ${storyAuthorType !== 'users' ? `
+              <h5 class="mb-0 npo-name"><a class="text-decoration-none" href="{{ $base_url }}${relatedNPO.meta?.web?.uri || '#'}" target="_blank" onclick="event.stopPropagation()">${relatedNPO.name || "Organization"}</a></h5>
+            ` : `
+              <h5 class="mb-0 npo-name"><a class="text-decoration-none" href="{{ $base_url }}${relatedNPO.meta?.web?.uri || '#'}" target="_blank" onclick="event.stopPropagation()">${relatedNPO.name || "Organization"}</a> <span class="text-muted">posted by</span> <a class="text-decoration-none" href="{{ $base_url }}${storyAuthorDetails?.meta?.web?.uri || '#'}" target="_blank" onclick="event.stopPropagation()">${(storyAuthorDetails.first_name + " " + storyAuthorDetails.last_name) || "User"}</a></h5>
+            `}
+            <small class="text-muted">${timeAgo}</small>
+          </div>
+        </div>
+        <div class="pb-3 px-3">
+          <div id="carousel-${story.meta.zuid}" class="carousel slide story-carousel rounded-4" data-bs-touch="true" onclick="event.stopPropagation()">
+            ${window.getCarouselIndicators(story.story_image, story.meta.zuid)}
+            <div class="carousel-inner">
+              ${window.getCarouselItems(story.story_image)}
+            </div>
+            ${hasMultipleMedia ? `
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel-${story.meta.zuid}" data-bs-slide="prev" onclick="event.stopPropagation()">
+                <span class="carousel-control-prev-icon p-1" aria-hidden="true"><i class="bi bi-chevron-left" style="color: #575757; font-size: 1.5rem;"></i></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel-${story.meta.zuid}" data-bs-slide="next" onclick="event.stopPropagation()">
+                <span class="carousel-control-next-icon p-1" aria-hidden="true"><i class="bi bi-chevron-right" style="color: #575757; font-size: 1.5rem;"></i></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+        <div class="post-content">
+          <h4 class="story-title">${window.escapeHtml(story.title)}</h4>
+          <div class="story-subtitle" style="white-space: pre-wrap;">${window.escapeHtml(story.description || story.story_body || '')}</div>
+          ${hashtagsHtml}
+          ${relatedCauses.length > 0 ? `
+            <div class="my-2 d-flex gap-2" style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
+              ${relatedCauses.map(cause => `<span class="badge bg-primary bg-opacity-10 text-primary" style="flex-shrink: 0;">${cause?.title}</span>`).join(' ')}
+            </div>
+          ` : ''}
+        </div>
+        <div class="post-actions d-flex" onclick="event.stopPropagation()">
+          <button class="btn flex-grow-1 action-btn ${likedClass}" onclick="window.handleLikeClick('${story.meta.zuid}', event)">
+            <i class="bi ${thumbsUpIcon}" ${iconStyle}></i> ${likeText}
+          </button>
+          <button class="btn flex-grow-1 action-btn" style="border-radius: 0;" onclick="window.handleDonateClick('${relatedNPO.meta?.zuid || ''}', '${donateLink}', event)">
+            <i class="bi bi-heart"></i> Donate
+          </button>
+          <button class="btn flex-grow-1 action-btn ${commentedByCurrentUser ? 'liked' : ''}" style="border-radius: 0;" onclick="window.toggleCommentSection && window.toggleCommentSection('${story.meta.zuid}', event)">
+            <i class="${commentedByCurrentUser ? 'bi bi-chat-fill text-primary' : 'bi bi-chat'}"></i> ${commentButtonText}
+          </button>
+          <button class="btn flex-grow-1 action-btn" onclick="window.openShareModal('{{ $base_url }}${story.meta.web.uri}', '${story.meta.zuid}', event)">
+            <i class="bi bi-share"></i> Share
+          </button>
+        </div>
+        
+        <!-- Comments Section (initially shown if comments exist) -->
+        <div class="story-comments" id="comments-${story.meta.zuid}" onclick="event.stopPropagation()" data-visible="${commentCount > 0 ? 'true' : 'false'}" style="${commentCount > 0 ? '' : 'display: none;'}">
+          <div class="comment-input-container">
+            <input type="text" class="comment-input" placeholder="Add a Comment..." onkeydown="if(event.key === 'Enter' && window.handleCommentSubmit) window.handleCommentSubmit('${story.meta.zuid}', this, event)">
+          </div>
+          
+          <!-- Container for the latest comment preview (always shown if comments exist) -->
+          <div class="latest-comment-container" style="${commentCount > 0 ? '' : 'display: none;'}">
+            ${latestCommentHtml}
+          </div>
+
+          <!-- Container for all comments (initially hidden and empty) -->
+          <div class="all-comments-container" style="display: none;">
+             <!-- All comments will be loaded here -->
+          </div>
+
+          <!-- Toggle Comments Button (only shown if > 1 comment) -->
+          ${showToggleBtn ? `
+            <button class="toggle-comments-btn" data-loaded="false" data-count="${commentCount}" onclick="window.toggleAllComments && window.toggleAllComments('${story.meta.zuid}', this, event)">
+              <i class="bi bi-chevron-down"></i> View All ${commentCount} Comments
+            </button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+
+    // Append the card and apply post-render logic (carousel, images)
+    const placeholderElement = $(`#${placeholderId}`);
+    if (placeholderElement.length === 0) {
+        console.error(`Placeholder ${placeholderId} not found for story ${story.meta.zuid}`);
+        return;
+    }
+
+    // Replace the placeholder with the actual card content
+    placeholderElement.replaceWith(storyCardHtml);
+    
+    // IMPORTANT: After replacing, re-select the newly inserted card to initialize plugins.
+    // Ensure your storyCardHtml's root element has data-story-zuid attribute.
+    const newCard = $(`.post-card[data-story-zuid='${story.meta.zuid}']`);
+
+    if (newCard.length === 0) {
+      console.error(`Failed to find new card for story ${story.meta.zuid} after replacing placeholder.`);
+      return;
+    }
+    
+    // Initialize carousel for the new card
+    const carouselElement = newCard.find('.story-carousel')[0];
+    if (carouselElement) {
+         const carouselInstance = new bootstrap.Carousel(carouselElement, {
+            interval: false, // Don't auto-rotate
+            touch: true,     // Enable touch swiping
+            wrap: false      // Don't loop back
+         });
+         
+        // Apply initial arrow visibility based on slide count
+        const totalSlidesInit = $(carouselElement).find('.carousel-item').length;
+        const prevControlInit = $(carouselElement).find('.carousel-control-prev');
+        const nextControlInit = $(carouselElement).find('.carousel-control-next');
+
+        if (totalSlidesInit <= 1) {
+           prevControlInit.hide();
+           nextControlInit.hide();
+        } else {
+           prevControlInit.hide(); // Hide prev on first load (index 0)
+           nextControlInit.show();
+        }
+
+         // Attach slide event listener for dynamic arrow visibility and video handling
+         carouselElement.addEventListener('slide.bs.carousel', function (e) {
+            const totalSlides = $(this).find('.carousel-item').length;
+            const currentIndex = e.to;
+            const prevControl = $(this).find('.carousel-control-prev');
+            const nextControl = $(this).find('.carousel-control-next');
+
+            if (totalSlides <= 1) {
+                prevControl.hide();
+                nextControl.hide();
+            } else if (currentIndex === 0) {
+                prevControl.hide();
+                nextControl.show();
+            } else if (currentIndex === totalSlides - 1) {
+                prevControl.show();
+                nextControl.hide();
+            } else {
+                prevControl.show();
+                nextControl.show();
+            }
+            
+            // Handle video pause when sliding away from video slides
+            const fromSlide = $(this).find('.carousel-item').eq(e.from);
+            const video = fromSlide.find('video')[0];
+            if (video && !video.paused) {
+              video.pause();
+            }
+        });
+    }
+
+    // Apply image optimizations to the new card
+    newCard.find('.post-image, .profile-img').each(function() {
+        window.addWidthParamToImage($(this));
+    });
+
+    // Update local index for refresh diffs
+    try {
+      if (!window.homeFeedStoryIndex) window.homeFeedStoryIndex = {};
+      const hash = window.computeStoryHash(story);
+      window.homeFeedStoryIndex[story.meta.zuid] = { createdAt: createdAt || '', hash: hash };
+    } catch (e) {
+      console.warn('Failed to update homeFeedStoryIndex for', story.meta.zuid, e);
+    }
+
+    // Set up reactive subscriptions for story stats and comments
+    setupReactiveSubscriptions(story.meta.zuid, newCard);
+    
+    } catch (error) {
+      console.error(`Error rendering story card for ${storyWithAllData.meta.zuid}:`, error);
+      // Replace placeholder with error message
+      const placeholderElement = $(`#${placeholderId}`);
+      if (placeholderElement.length > 0) {
+        placeholderElement.replaceWith(`<div class="text-danger p-3">Error loading story: ${error.message}</div>`);
+      }
+    }
+  }
+
+  // Function to set up reactive subscriptions for story cards
+  function setupReactiveSubscriptions(storyZuid, storyCard) {
+    // Subscribe to story stats changes
+    const storyStatsQuery = window.createStoryStatsQuery(storyZuid);
+    const statsUnsubscribe = storyStatsQuery.subscribe((result) => {
+      if (result.status === 'success' && result.data) {
+        const stats = result.data;
+        if (stats && stats.data) {
+          const d = stats.data;
+          const likedByArr = Array.isArray(d.likedBy) ? d.likedBy : [];
+          const likeCount = d?.totalLikes || likedByArr?.length;
+          const likeText = likeCount > 0 ? likeCount.toString() : 'Like';
+          
+          const currentUser = JSON.parse(localStorage.getItem('user'));
+          const isLiked = currentUser && d?.likedBy?.map(user => user.user_zuid || user.id).includes(currentUser?.zuid);
+          
+          // Update like button
+          const likeButton = storyCard.find('.action-btn').first();
+          likeButton.html(`<i class="bi ${isLiked ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up'}"></i> ${likeText}`);
+          if (isLiked) {
+            likeButton.addClass('liked');
+            likeButton.find('i').css('color', '#7b3fee');
+          } else {
+            likeButton.removeClass('liked');
+            likeButton.find('i').css('color', '');
+          }
+        }
+      }
+    });
+
+    // Subscribe to story comments changes
+    const storyCommentsQuery = window.createStoryCommentsQuery(storyZuid);
+    const commentsUnsubscribe = storyCommentsQuery.subscribe((result) => {
+      if (result.status === 'success' && result.data) {
+        const commentsData = result.data;
+        const storyComments = commentsData.data || [];
+        const commentCount = storyComments.length;
+        
+        // Update comment button
+        const commentButton = storyCard.find('.action-btn').filter((i, btn) => $(btn).find('.bi-chat').length > 0);
+        const commentButtonText = commentCount > 0 ? commentCount.toString() : "Comment";
+        commentButton.html(`<i class="bi bi-chat"></i> ${commentButtonText}`);
+        
+        // Update comment section visibility
+        const commentsSection = storyCard.find(`#comments-${storyZuid}`);
+        if (commentCount > 0) {
+          commentsSection.show().attr('data-visible', 'true');
+        } else {
+          commentsSection.hide().attr('data-visible', 'false');
+        }
+      }
+    });
+
+    // Store unsubscribe functions for cleanup
+    storyCard.data('subscriptions', {
+      stats: statsUnsubscribe,
+      comments: commentsUnsubscribe
+    });
+  }
+
+  // Modified function to fetch stories for NPOs and render incrementally while maintaining order using TanStack Query
+  async function getStoriesForNPOs(npoZuids) {
+      const bigStoryCardContainer = $("#big-stories-container");
+      bigStoryCardContainer.empty();
+      
+      if (npoZuids.length === 0) {
+        bigStoryCardContainer.html(`
+          <div class="text-center py-5">
+            <h4 class="text-muted">No stories available</h4>
+            <p>Follow some nonprofits to see their stories here</p>
+            <a href="{{non_profits_search_page.first().path_full}}" class="btn btn-primary mt-3">Browse Nonprofits</a>
+          </div>
+        `);
+        return;
+      }
+
+      // 1) Fetch story lists for all NPOs in parallel using TanStack Query
+      const allStoriesByNpoResults = await Promise.all(
+        npoZuids.map(async (npoZuid) => {
+          try {
+            const storiesQuery = window.createStoriesQuery({
+                npo: npoZuid,
+                approved: "1",
+                status: "approved"
+            });
+            
+            const result = await new Promise((resolve) => {
+              const unsubscribe = storiesQuery.subscribe((result) => {
+                if (result.status === 'success' || result.status === 'error') {
+                  unsubscribe();
+                  resolve(result);
+                }
+              });
+            });
+
+            if (result.status === 'success' && result.data) {
+              const stories = result.data.data || [];
+              return stories;
+            } else {
+              console.error(`Error fetching story list for NPO ${npoZuid}:`, result.error);
+              return [];
+            }
+          } catch (err) {
+            console.error(`Error fetching story list for NPO ${npoZuid}:`, err);
+            return [];
+          }
+        })
+      );
+
+      // 2) Flatten and globally sort by created date (newest first)
+      const allStories = allStoriesByNpoResults.flat();
+
+      if (!allStories.length) {
+        bigStoryCardContainer.html(`
+          <div class="text-center py-5">
+            <h4 class="text-muted">No stories available</h4>
+            <p>Follow some nonprofits to see their stories here</p>
+            <a href="{{non_profits_search_page.first().path_full}}" class="btn btn-primary mt-3">Browse Nonprofits</a>
+          </div>
+        `);
+        return;
+      }
+
+      function getStoryDateValue(story) {
+        const d = story?.meta?.createdAt || story?.date_published || 0;
+        return new Date(d).getTime() || 0;
+      }
+
+      const globallySortedStories = allStories.sort((a, b) => getStoryDateValue(b) - getStoryDateValue(a));
+
+      // 3) Create placeholders in the final desired order
+      const zuidToPlaceholderId = new Map();
+      for (const story of globallySortedStories) {
+                    const placeholderId = `story-placeholder-${story.meta.zuid}`;
+        zuidToPlaceholderId.set(story.meta.zuid, placeholderId);
+                    const skeletonHtml = `
+                      <div id="${placeholderId}" class="story-skeleton skeleton-pulse mb-3">
+                        <div class="skeleton-author">
+                          <div class="skeleton-circle"></div>
+                          <div class="d-flex flex-column" style="width: 70%;">
+                            <div class="skeleton-line skeleton-line-short"></div>
+                          </div>
+                        </div>
+                        <div class="skeleton-content">
+                          <div class="skeleton-line skeleton-line-medium"></div>
+                          <div class="skeleton-line skeleton-line-long"></div>
+                          <div class="skeleton-line skeleton-line-long"></div>
+                        </div>
+                        <div class="skeleton-image"></div>
+                      </div>
+                    `;
+                    bigStoryCardContainer.append(skeletonHtml);
+      }
+                    
+      // 4) Fetch details and render each story (in parallel) into its placeholder
+      await Promise.all(
+        globallySortedStories.map(async (story) => {
+          const placeholderId = zuidToPlaceholderId.get(story.meta.zuid);
+          try {
+            const storyWithAllData = await fetchAllDataForStory(story);
+            await renderStoryCard(storyWithAllData, placeholderId);
+          } catch (storyError) {
+            console.error(`Error processing individual story ${story.meta.zuid}:`, storyError);
+            $(`#${placeholderId}`).html(`<div class=\"text-danger p-3\">Error loading this story.</div>`);
+          }
+        })
+      );
+  }
+
+  // Compute a lightweight hash of a story to detect changes (title, description, images, etc.)
+  function computeStoryHash(story) {
+    try {
+      const payload = {
+        title: story.title,
+        description: story.description,
+        body: story.story_body,
+        date: story?.meta?.createdAt || story?.date_published || '',
+        media: Array.isArray(story?.story_image?.data)
+          ? story.story_image.data.map(function (x) { return x.url || x.zuid; })
+          : (typeof story.story_image === 'string' ? [story.story_image] : []),
+      };
+      const json = JSON.stringify(payload);
+      let hash = 0;
+      for (let i = 0; i < json.length; i++) {
+        const chr = json.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0;
+      }
+      return hash;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // Refresh logic: fetch latest stories from followed NPOs and apply diffs (add/update/delete/reorder) using TanStack Query
+  async function refreshStoriesFeed(npoZuids) {
+    const container = $("#big-stories-container");
+    if (!container.length) return;
+
+    // Gather latest lists using TanStack Query
+    const results = await Promise.all(
+      npoZuids.map(async function (npoZuid) {
+        try {
+          const storiesQuery = window.createStoriesQuery({ npo: npoZuid, approved: '1', status: 'approved' });
+          
+          const result = await new Promise((resolve) => {
+            const unsubscribe = storiesQuery.subscribe((result) => {
+              if (result.status === 'success' || result.status === 'error') {
+                unsubscribe();
+                resolve(result);
+              }
+            });
+          });
+
+          if (result.status === 'success' && result.data) {
+            return result.data.data || [];
+          } else {
+            console.error('refreshStoriesFeed getStories error for', npoZuid, result.error);
+            return [];
+          }
+        } catch (err) {
+          console.error('refreshStoriesFeed getStories error for', npoZuid, err);
+          return [];
+        }
+      })
+    );
+
+    const latestStories = results.flat();
+
+    // Build maps and compute hashes
+    if (!window.homeFeedStoryIndex) window.homeFeedStoryIndex = {};
+    const currentIndex = window.homeFeedStoryIndex;
+
+    // Detect deletions: stories present in DOM but not in latest
+    const existingZuidsInDom = container.find('.post-card').map(function(){ return $(this).data('story-zuid'); }).get();
+    const latestZuids = latestStories.map(function(s){ return s.meta.zuid; });
+    const toDelete = existingZuidsInDom.filter(function(z){ return !latestZuids.includes(z); });
+
+    // Remove deleted stories and cleanup subscriptions
+    toDelete.forEach(function(zuid){
+      const storyCard = container.find(`.post-card[data-story-zuid='${zuid}']`);
+      if (storyCard.length) {
+        // Cleanup subscriptions before removing
+        const subscriptions = storyCard.data('subscriptions');
+        if (subscriptions) {
+          subscriptions.stats();
+          subscriptions.comments();
+        }
+        storyCard.remove();
+      }
+      delete currentIndex[zuid];
+    });
+
+    // Prepare globally sorted order
+    function getDateVal(s){ return new Date(s?.meta?.createdAt || s?.date_published || 0).getTime() || 0; }
+    const sorted = latestStories.sort(function(a,b){ return getDateVal(b) - getDateVal(a); });
+
+    // Walk sorted list, insert/update in correct place
+    for (const story of sorted) {
+      const zuid = story.meta.zuid;
+      const createdAt = story?.meta?.createdAt || story?.date_published || '';
+      const newHash = computeStoryHash(story);
+      const existingCard = container.find(`.post-card[data-story-zuid='${zuid}']`);
+
+      const desiredPreviousZuid = (function(){
+        // Find the story that should be immediately before this one in sorted order
+        const idx = sorted.findIndex(function(s){ return s.meta.zuid === zuid; });
+        if (idx > 0) return sorted[idx-1].meta.zuid; 
+        return null;
+      })();
+
+      if (!existingCard.length) {
+        // New story: create placeholder at the correct position then render
+        const placeholderId = `story-placeholder-${zuid}`;
+        const skeletonHtml = `
+          <div id="${placeholderId}" class="story-skeleton skeleton-pulse mb-3"></div>
+        `;
+        if (desiredPreviousZuid) {
+          const prevCard = container.find(`.post-card[data-story-zuid='${desiredPreviousZuid}']`);
+          if (prevCard.length) {
+            $(skeletonHtml).insertAfter(prevCard);
+          } else {
+            container.prepend(skeletonHtml); // fallback
+          }
+        } else {
+          container.prepend(skeletonHtml); // should be the newest
+        }
+        try {
+          const storyWithAllData = await fetchAllDataForStory(story);
+          await renderStoryCard(storyWithAllData, placeholderId);
+        } catch (err) {
+          console.error('refreshStoriesFeed render new story error', zuid, err);
+          $(`#${placeholderId}`).html('<div class="text-danger p-3">Error loading this story.</div>');
+        }
+        continue;
+      }
+
+      // Existing story: check for update or reorder (createdAt changed)
+      const prevIndex = currentIndex[zuid] || { createdAt: existingCard.data('created-at') || '', hash: 0 };
+      const existingCreatedAt = existingCard.attr('data-created-at') || prevIndex.createdAt || '';
+
+      const needsUpdate = newHash !== prevIndex.hash;
+      const needsReorder = (existingCreatedAt || '') !== (createdAt || '');
+
+      if (needsReorder) {
+        existingCard.attr('data-created-at', createdAt || '');
+        // Move to correct position based on desiredPreviousZuid
+        if (desiredPreviousZuid) {
+          const prevCard = container.find(`.post-card[data-story-zuid='${desiredPreviousZuid}']`);
+          if (prevCard.length) existingCard.insertAfter(prevCard);
+          else container.prepend(existingCard);
+        } else {
+          container.prepend(existingCard);
+        }
+      }
+
+      if (needsUpdate) {
+        const placeholderId = `story-placeholder-${zuid}-update`;
+        existingCard.before(`<div id="${placeholderId}" class="story-skeleton skeleton-pulse mb-3"></div>`);
+        
+        // Cleanup subscriptions before removing
+        const subscriptions = existingCard.data('subscriptions');
+        if (subscriptions) {
+          subscriptions.stats();
+          subscriptions.comments();
+        }
+        
+        existingCard.remove();
+        try {
+          const storyWithAllData = await fetchAllDataForStory(story);
+          await renderStoryCard(storyWithAllData, placeholderId);
+        } catch (err) {
+          console.error('refreshStoriesFeed update story error', zuid, err);
+          $(`#${placeholderId}`).html('<div class="text-danger p-3">Error updating this story.</div>');
+        }
+      } else {
+        // Update index even if not re-rendered
+        currentIndex[zuid] = { createdAt: createdAt || existingCreatedAt || '', hash: newHash };
+      }
+    }
+  }
+
+  // Infinite scroll: when the last story comes into view, trigger a refresh
+  function setupInfiniteScroll(npoZuids) {
+    const container = $("#big-stories-container");
+    if (!('IntersectionObserver' in window) || !container.length) return;
+
+    let refreshing = false;
+    const observer = new IntersectionObserver(async function(entries){
+      for (const entry of entries) {
+        if (entry.isIntersecting && !refreshing) {
+          refreshing = true;
+          try {
+            await refreshStoriesFeed(npoZuids);
+          } finally {
+            // Debounce successive triggers
+            setTimeout(function(){ refreshing = false; }, 800);
+          }
+        }
+      }
+    }, { root: null, rootMargin: '0px', threshold: 0.1 });
+
+    function observeLastCard() {
+      observer.disconnect();
+      const cards = container.find('.post-card');
+      if (cards.length) {
+        observer.observe(cards.last()[0]);
+      }
+    }
+
+    // Observe now and also after any DOM changes
+    const mutationObserver = new MutationObserver(function(){ observeLastCard(); });
+    mutationObserver.observe(container[0], { childList: true });
+    observeLastCard();
+  }
+
+  // Function to populate NPO slider
+  function populateNPOSlider(npos) {
+    const npoCardsContainer = $("#npoCards");
+    npoCardsContainer.empty(); // Clear existing content
+
+    // Determine the number of NPOs per slide based on screen size
+    const nposPerSlide = window.innerWidth < 768 ? 1 : 3;
+
+    // Create carousel items
+    let carouselItem;
+    npos.forEach((npo, index) => {
+      if (index % nposPerSlide === 0) {
+        // Start a new carousel item for every nposPerSlide NPOs
+        if (carouselItem) {
+          npoCardsContainer.append(carouselItem); // Append the previous carousel item
+        }
+        carouselItem = $(
+          `<div class="carousel-item"><div class="row"></div></div>`
+        );
+        if (index === 0) {
+          carouselItem.addClass("active"); // Make the first item active
+        }
+      }
+
+      const npoCard = `
+        <div class="col-md-4 mb-3">
+          <div
+            class="card d-flex flex-column h-100 p-3 gap-2 npo-card"
+            data-story-url="${npo.meta.web.url}"
+          >
+            <img src="${
+              npo.hero_image && (typeof npo.hero_image === "string"
+                ? npo.hero_image
+                : npo.hero_image?.data && npo.hero_image?.data[0] && npo.hero_image?.data[0]?.url)
+            }?width=150" class="npo-image" alt="NPO cover image"/>
+            <div class="d-flex flex-column gap-2 h-100">
+              <div class="d-flex flex-grow-1 align-items-center gap-2">
+                <img
+                  src="${
+                    npo.logo && (typeof npo.logo === "string"
+                      ? npo.logo
+                      : npo.logo?.data && npo.logo?.data[0] && npo.logo?.data[0]?.url)
+                  }?width=24"
+                  class="npo-npo-logo" 
+                  alt="NPO logo"/>
+                <p class="npo-name my-auto">${npo.name}</p>
+              </div>
+              <div class="npo-subtitle">${npo.cause_description}</div>
+              <a
+                href="{{ $base_url }}${npo.meta.web.uri}"
+                class="btn btn-secondary npo-btn card-btn"
+                >View Profile</a
+              >
+            </div>
+          </div>
+        </div>
+      `;
+      carouselItem.find(".row").append(npoCard);
+
+      // In mobile view, remove the col-md-4 class to take full width
+      if (window.innerWidth < 768) {
+        carouselItem.find(".col-md-4").removeClass("col-md-4");
+      }
+    });
+
+    // Append the last carousel item if it has any content
+    if (carouselItem) {
+      npoCardsContainer.append(carouselItem);
+    }
+  }
+
+  // Export functions to window for global access
+  window.fetchAllDataForStory = fetchAllDataForStory;
+  window.renderStoryCard = renderStoryCard;
+  window.getStoriesForNPOs = getStoriesForNPOs;
+  window.computeStoryHash = computeStoryHash;
+  window.refreshStoriesFeed = refreshStoriesFeed;
+  window.setupInfiniteScroll = setupInfiniteScroll;
+  window.populateNPOSlider = populateNPOSlider;
+  window.getCommentAuthorDetails = getCommentAuthorDetails;
+  window.generateCommentHtml = generateCommentHtml;
+</script>

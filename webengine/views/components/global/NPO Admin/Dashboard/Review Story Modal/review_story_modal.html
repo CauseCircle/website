@@ -1,5 +1,13 @@
 <!-- Review Stories Modal -->
 <style>
+  .review-carousel-control-prev-icon {
+    background-color: #575757;
+    border-radius: 5px;
+  }
+  .review-carousel-control-next-icon {
+    background-color: #575757;
+    border-radius: 5px;
+  }
   /* Custom Modal Classes */
   .review-modal-content {
     height: 100vh;
@@ -16,6 +24,12 @@
   .review-stories-header {
     position: relative;
     padding-bottom: 1rem;
+  }
+
+  /* Author name hover effect */
+  #author-name:hover {
+    color: #7b3fee !important;
+    transition: color 0.2s ease;
   }
 
   .review-stories-header::after {
@@ -46,40 +60,77 @@
 
   /* Story Content */
   #story-content {
-    max-width: 900px;
+    max-width: 640px;
     margin: 0 auto;
   }
 
   .story-container {
-    max-height: none;
-    overflow-y: visible;
-    padding: 1rem;
-    background-color: #f8f9fa;
-    border-radius: 0.5rem;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    text-align: justify;
+    white-space: normal;
+  }
+  
+  .story-container p {
+    text-align: justify;
+    white-space: normal;
   }
 
-  .story-container p {
+  .story-container img {
     max-width: 100%;
-    margin-bottom: 1rem;
-    line-height: 1.6;
+    max-height: auto;
+    padding: 20px 0;
+  }
+
+  /* Card styles */
+  .card {
+    border-radius: 10px;
+    /* overflow: hidden; */
   }
 
   /* Media Elements */
-  .story-image {
-    max-height: 400px;
-    object-fit: cover;
+  .card-img-bottom {
     width: 100%;
-    border-radius: 0.5rem;
+    border-radius: 0 0 10px 10px;
+    object-fit: cover;
+  }
+  
+  /* New classes for aspect ratio handling */
+  .card-img-wide {
+    height: 400px;
+    object-fit: contain;
+    background-color: #F5F7FA;
+  }
+  
+  .card-img-tall {
+    max-height: 800px;
+    object-fit: contain;
+    background-color: #F5F7FA;
   }
 
   .author-img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
     object-fit: cover;
+  }
+
+  .story-description p,
+  .npo-description p,
+  .npo-description,
+  .story-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .one-line-text,
+  .one-line-text p {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* Custom Scrollbar for review modal */
@@ -100,6 +151,341 @@
   .review-modal-body::-webkit-scrollbar-thumb:hover {
     background: #555;
   }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+    flex-wrap: nowrap; /* Prevent wrapping */
+    padding-bottom: 0; /* Space for scroll */
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  /* Hide scrollbar for Chrome/Safari/Edge */
+  .action-buttons::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Add minimum width to buttons for better mobile appearance */
+  .action-buttons button {
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+    min-width: fit-content;
+    border-radius: 10px;
+  }
+
+  /* Media query for mobile-specific adjustments */
+  @media (max-width: 768px) {
+    .action-buttons {
+      gap: 0.5rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      margin-left: -1rem;
+      margin-right: -1rem;
+      padding-top: 1rem;
+      padding-bottom: 0.5rem;
+    }
+    
+    .action-buttons button {
+      padding: 0.5rem 1rem;
+    }
+  }
+
+  .action-buttons .secondary-button {
+    background-color: #F5F7FA;
+    border: none;
+  }
+
+  .action-buttons .secondary-button:hover {
+    background-color: #fff;
+    border: 1px solid #E1E4EA;
+  }
+  
+  .story-hashtag {
+    color: #7b3fee;
+    text-decoration: none;
+  }
+  
+  .story-hashtag:hover {
+    text-decoration: underline;
+  }
+
+  /* Hashtag styles */
+  .hashtag-item {
+    color: #7b3fee;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  
+  .hashtag-item:hover {
+    text-decoration: underline;
+    color: #5a2bb8;
+  }
+
+  .hashtags-container {
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+  
+  /* Loading Indicator Styles */
+  .story-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    width: 100%;
+  }
+  
+  .story-loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #7b3fee;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .story-loading-text {
+    font-size: 18px;
+    color: #666;
+    text-align: center;
+  }
+  
+  .story-skeleton {
+    background: #f5f7fa;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  
+  .skeleton-pulse {
+    animation: pulse 1.5s infinite ease-in-out;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+  
+  .skeleton-author {
+    display: flex;
+    padding: 15px;
+    align-items: center;
+  }
+  
+  .skeleton-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: #e0e0e0;
+    margin-right: 15px;
+  }
+  
+  .skeleton-line {
+    height: 15px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  
+  .skeleton-line-short {
+    width: 40%;
+  }
+  
+  .skeleton-line-medium {
+    width: 60%;
+  }
+  
+  .skeleton-line-long {
+    width: 90%;
+  }
+  
+  .skeleton-content {
+    padding: 0 15px 15px;
+  }
+  
+  .skeleton-image {
+    height: 300px;
+    background: #e0e0e0;
+  }
+  
+  /* Custom Carousel Control Buttons */
+  #storyImageCarousel .carousel-control-prev,
+  #storyImageCarousel .carousel-control-next {
+    opacity: 0.9;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #FFFFFF; /* White background */
+    top: 50%;
+    transform: translateY(-50%);
+    transition: background-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  }
+
+  #storyImageCarousel .carousel-control-prev:hover,
+  #storyImageCarousel .carousel-control-next:hover {
+    opacity: 1;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+  }
+
+  /* Override Bootstrap's default styling for the icons */
+  #storyImageCarousel .review-carousel-control-prev-icon,
+  #storyImageCarousel .review-carousel-control-next-icon {
+    background-image: none !important;
+    color: #575757; /* Gray icon color */
+    font-size: 1.5rem;
+    line-height: 1;
+    font-weight: bold;
+    width: auto;
+    height: auto;
+    display: inline-block;
+    background-color: transparent; /* Remove background color from icon */
+    border-radius: 0;
+  }
+  
+  /* Remove any ::before content */
+  #storyImageCarousel .review-carousel-control-prev-icon::before,
+  #storyImageCarousel .review-carousel-control-next-icon::before {
+    display: none !important;
+    content: none !important;
+  }
+  
+  #storyImageCarousel .carousel-control-prev {
+    left: 15px;
+  }
+
+  #storyImageCarousel .carousel-control-next {
+    right: 15px;
+  }
+  
+  /* Story image carousel container styling */
+  #storyImageCarousel {
+    background-color: #000; /* Black background for letterboxing */
+    overflow: hidden;
+    border-radius: 0 0 10px 10px;
+    max-height: 480px; /* Increased max height */
+  }
+  
+  /* Image container style for maintaining aspect ratio */
+  #storyImageCarousel .carousel-item {
+    position: relative;
+    overflow: hidden;
+    max-height: 480px; /* Increased max height */
+  }
+  
+  /* Style for contained images that maintain aspect ratio */
+  #storyImageCarousel .carousel-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Maintain aspect ratio */
+    background-color: #000; /* Black background */
+    max-height: 480px; /* Increased max height */
+  }
+  
+  /* Style for carousel indicators */
+  #storyImageCarousel .carousel-indicators {
+    bottom: 15px;
+  }
+  
+  #storyImageCarousel .carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    border: none;
+    margin: 0 4px;
+  }
+  
+  #storyImageCarousel .carousel-indicators .active {
+    background-color: white;
+  }
+  
+  /* Video player styling for review modal */
+  #storyImageCarousel .carousel-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: #000;
+    display: block;
+  }
+  
+  #storyImageCarousel .video-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    background-color: #000;
+    overflow: hidden;
+  }
+  
+  #storyImageCarousel .video-container iframe,
+  #storyImageCarousel .video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  /* Different aspect ratios for video containers in review modal */
+  #storyImageCarousel .video-container.aspect-16-9 {
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  }
+  
+  #storyImageCarousel .video-container.aspect-4-3 {
+    padding-bottom: 75%; /* 4:3 aspect ratio */
+  }
+  
+  #storyImageCarousel .video-container.aspect-1-1 {
+    padding-bottom: 100%; /* 1:1 square aspect ratio */
+  }
+  
+  /* Responsive video container adjustments for review modal */
+  @media (max-width: 768px) {
+    #storyImageCarousel .video-container {
+      padding-bottom: 75% !important; /* 4:3 aspect ratio on mobile for better viewing */
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    #storyImageCarousel .video-container {
+      max-height: 500px; /* Limit maximum height on large screens */
+    }
+  }
+  
+  /* Apply aspect ratio to image carousel items only */
+  #storyImageCarousel .carousel-item.image-item {
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio for images */
+  }
+  
+  /* Video carousel items use the video-container for sizing */
+  #storyImageCarousel .carousel-item.video-item {
+    height: auto;
+  }
 </style>
 
 <div
@@ -111,7 +497,7 @@
 >
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content review-modal-content">
-      <div class="modal-header border-0 d-flex justify-content-between review-stories-header">
+      <div class="modal-header border-0 d-flex justify-content-between review-stories-header flex-wrap">
         <div class="d-flex align-items-center gap-2">
           <button class="btn btn-transparent" data-bs-dismiss="modal">
             <i class="bi bi-arrow-left fs-4"></i>
@@ -120,35 +506,33 @@
         </div>
         <div class="action-buttons ms-3">
           <button
-            class="btn btn-secondary border-0"
+            class="btn btn-secondary d-flex align-items-center gap-2 secondary-button"
             id="report-story"
             title="Report"
           >
-            <i class="bi bi-flag"></i>
+            <i class="bi bi-flag fs-5"></i>
           </button>
           <button
-            class="btn btn-secondary border-0"
+            class="btn btn-secondary d-flex align-items-center gap-2 secondary-button"
             id="reject-story"
             title="Reject"
           >
-            <span class="icon-container">
-              <i class="bi bi-x"></i>
-              <span class="spinner-border spinner-border-sm d-none" role="status"></span>
-            </span>
-            Reject
+            <i class="bi bi-x fs-5"></i>
+            <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+             Reject
           </button>
           <button
-            class="btn btn-secondary border-0"
+            class="btn btn-secondary d-flex align-items-center gap-2 secondary-button"
             id="request-changes"
             title="Request Changes"
           >
-            <i class="bi bi-pencil"></i> Request Changes
+            <i class="bi bi-chat-left-dots fs-5"></i>
+            <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+            Request Changes
           </button>
-          <button id="approve-story" class="btn btn-primary" title="Approve">
-            <span class="icon-container">
-              <i class="bi bi-check"></i>
-              <span class="spinner-border spinner-border-sm d-none" role="status"></span>
-            </span>
+          <button id="approve-story" class="btn btn-primary d-flex align-items-center gap-2" title="Approve">
+            <i class="bi bi-check fs-5"></i>
+            <span class="spinner-border spinner-border-sm d-none" role="status"></span>
             Approve
           </button>
         </div>
@@ -179,27 +563,196 @@
   </div>
 </div>
 
-<!-- prettier-ignore -->
-{{include /components/global/NPO Admin/Dashboard/Review Story Modal/report_modal.html}}
+<script type="module">
+  // ==================== TANSTACK QUERY SETUP ====================
+  const approveStoryMutation = window.createApproveStoryMutation();
 
-<!-- prettier-ignore -->
-{{include /components/global/NPO Admin/Dashboard/Review Story Modal/request_changes.html}}
-
-
-
-<script>
   let currentStoryIndex = 0;
   let stories = [];
 
-  async function loadStories(zuid) {
-    stories = await getStories(zuid, 0, "null");
-    const actionButtons = $(".action-buttons button"); // Get all action buttons
+  // Function to decode HTML entities (strips all HTML tags - for plain text conversion)
+  function decodeHtmlEntities(text) {
+    if (!text) return '';
+    
+    // Create a temporary div element to decode HTML entities
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = text;
+    let decodedText = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // Additional manual decoding for common entities that might not be handled
+    decodedText = decodedText.replace(/&nbsp;/g, ' ');
+    decodedText = decodedText.replace(/&amp;/g, '&');
+    decodedText = decodedText.replace(/&lt;/g, '<');
+    decodedText = decodedText.replace(/&gt;/g, '>');
+    decodedText = decodedText.replace(/&quot;/g, '"');
+    decodedText = decodedText.replace(/&#039;/g, "'");
+    decodedText = decodedText.replace(/&#39;/g, "'");
+    
+    return decodedText;
+  }
+
+  // Function to decode HTML entities while preserving HTML tags
+  function decodeHtmlEntitiesPreserveTags(text) {
+    if (!text) return '';
+    
+    // Manual decoding for common entities without stripping HTML tags
+    let decodedText = text;
+    decodedText = decodedText.replace(/&nbsp;/g, ' ');
+    decodedText = decodedText.replace(/&amp;/g, '&');
+    decodedText = decodedText.replace(/&lt;/g, '<');
+    decodedText = decodedText.replace(/&gt;/g, '>');
+    decodedText = decodedText.replace(/&quot;/g, '"');
+    decodedText = decodedText.replace(/&#039;/g, "'");
+    decodedText = decodedText.replace(/&#39;/g, "'");
+    
+    return decodedText;
+  }
+
+  // Function to extract hashtags from story text
+  function extractHashtagsFromText(text) {
+    if (!text) return [];
+    
+    // Use the HTML-stripping version for hashtag extraction since we only need plain text
+    const decodedText = decodeHtmlEntities(text);
+    
+    // Regular expression to find hashtags (#word)
+    const hashtagRegex = /#[a-zA-Z0-9_]+/g;
+    const hashtags = decodedText.match(hashtagRegex);
+    
+    if (!hashtags || hashtags.length === 0) return [];
+    
+    // Remove duplicates and clean up
+    const uniqueHashtags = [...new Set(hashtags.map(tag => tag.toLowerCase()))];
+    
+    return uniqueHashtags;
+  }
+
+  // Function to generate hashtag HTML for story cards
+  function generateHashtagsHtml(storyText) {
+    const hashtags = extractHashtagsFromText(storyText);
+    
+    if (hashtags.length === 0) return '';
+    
+    // Create hashtag HTML with proper links
+    const hashtagsHtml = hashtags.map(hashtag => {
+      const encodedHashtag = encodeURIComponent(hashtag);
+      return `<a href="/stories/?search=${encodedHashtag}" class="hashtag-item" target="_blank" rel="noopener noreferrer">${hashtag}</a>`;
+    }).join('');
+    
+    return `<div class="hashtags-container">${hashtagsHtml}</div>`;
+  }
+
+  // Function to detect if a URL is a video
+  function isVideoUrl(url) {
+    if (!url) return false;
+    const videoPatterns = [
+      /vimeo\.com\/video\/\d+/i,
+      /vimeo\.com\/\d+/i,
+      /player\.vimeo\.com\/video\/\d+/i,
+      /youtube\.com\/watch\?v=/i,
+      /youtu\.be\//i,
+      /\.mp4$/i,
+      /\.webm$/i,
+      /\.ogg$/i,
+      /\.mov$/i,
+      /\.avi$/i
+    ];
+    return videoPatterns.some(pattern => pattern.test(url));
+  }
+
+  // Function to get video embed URL
+  function getVideoEmbedUrl(url) {
+    if (!url) return null;
+    
+    
+    // Check if it's already a Vimeo player URL
+    if (url.includes('player.vimeo.com/video/')) {
+      return url.includes('?') ? url : `${url}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // Vimeo regular URLs - handles both /video/ID and direct /ID formats
+    const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+    if (vimeoMatch) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // YouTube
+    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i);
+    if (youtubeMatch) {
+      return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // Direct video files
+    if (/\.(mp4|webm|ogg|mov|avi)$/i.test(url)) {
+      return url;
+    }
+    
+    return null;
+  }
+
+  // Create a query for pending stories in the modal
+  const npoZuid = "{{$zuid}}";
+  const modalPendingStoriesQuery = window.createStoriesQuery({
+    npo: npoZuid,
+    approved: '0',
+    status: 'pending',
+    limit: 9999
+  });
+
+  // Subscribe to the query to reactively update the modal when data changes
+  // This automatically updates the UI whenever the query refetches (e.g., after story approval)
+  let isWaitingForRefetch = false;
+
+  modalPendingStoriesQuery.subscribe((result) => {
+    // Only auto-update if we're waiting for a refetch (after mutation)
+    if (isWaitingForRefetch && result.status === 'success' && !result.isFetching) {
+      isWaitingForRefetch = false;
+
+      // Update local stories array with fresh data
+      const pendingStories = result.data?.data || [];
+      stories = pendingStories;
+
+      // If we still have stories to review, show them
+      if (stories.length > 0) {
+        // Keep index if possible, or reset to 0
+        if (currentStoryIndex >= stories.length) {
+          currentStoryIndex = Math.max(0, stories.length - 1);
+        }
+        renderCurrentStory();
+        updateNavigationButtons();
+
+        // Clean and restructure content after DOM has been updated
+        setTimeout(cleanAndRestructureContent, 100);
+      } else {
+        // No more stories to review
+        $("#story-content").html(`
+          <div class="text-center py-5">
+            <h4 class="text-muted">No more stories to review</h4>
+            <p class="text-muted">Great job! All stories have been reviewed.</p>
+          </div>
+        `);
+        // Disable action buttons
+        $(".action-buttons button").prop("disabled", true);
+      }
+    }
+  });
+
+  function loadStories(zuid) {
+    // Show loading indicator
+    showLoadingIndicator();
+
+    // Disable action buttons while loading
+    const actionButtons = $(".action-buttons button");
+    actionButtons.prop("disabled", true);
+
+    // Get stories from TanStack Query cache (shared with dashboard)
+    const currentResult = modalPendingStoriesQuery.getCurrentResult();
+    stories = currentResult.data?.data || [];
 
     if (stories?.length > 0) {
       currentStoryIndex = 0;
       renderCurrentStory();
       updateNavigationButtons();
-      getApprovedStories(zuid);
       // Enable action buttons since we have stories
       actionButtons.prop("disabled", false);
     } else {
@@ -229,49 +782,160 @@
     // Enable all action buttons since we have a story
     actionButtons.prop("disabled", false);
 
+    // Handle story_image - can be either a string or an object with data array
+    let mediaData = [];
+    if (typeof story.story_image === 'string') {
+      // story_image is a simple string URL
+      mediaData = [{ url: story.story_image }];
+    } else if (story.story_image?.data && Array.isArray(story.story_image.data)) {
+      // story_image is an object with data array
+      mediaData = story.story_image.data;
+    }
+    
+    // Get the author profile image
+    const authorProfileImage = typeof story.author?.data[0]?.profile_image === 'string' 
+      ? story.author?.data[0]?.profile_image 
+      : story.author?.data[0]?.profile_image?.data[0].url;
+
+    // Get author profile URL
+    const authorProfileUrl = `{{ $base_url }}${story.author?.data[0]?.meta?.web?.uri}` || '#';
+
+    // Extract hashtags from story body instead of using related_causes
+    const hashtagsHtml = generateHashtagsHtml(story.story_body || '');
+
+    // Check for multiple media items (images or videos)
+    let hasMultipleMedia = false;
+    if (mediaData.length > 1) {
+      // Count valid media items
+      const validMediaCount = mediaData.filter(item => {
+        const mediaUrl = item.url || item.zuid || item;
+        return mediaUrl; // Only count items with valid URLs
+      }).length;
+      hasMultipleMedia = validMediaCount > 1;
+    }
+    
+    // Format human-readable time since creation - prioritize createdAt
+    const createdAt = story.createdAt || story.meta?.createdAt || story.date_published || '';
+    const timeAgo = createdAt ? formatTimeAgo(createdAt) : '';
+
     storyContent.html(`
-    <div id="active-story" class="w-100 d-flex flex-column gap-2" data-zuid="${
-      story?.meta?.zuid
-    }">
-      <img class="story-image" src="${story.story_image.data[0].url}" alt="${story.title}" />
-
-      <!-- Story title and description -->
-      <h2 class="fs-4 fw-normal story-title mt-3">${escapeHtml(story.title)}</h2>
-      <div class="fs-5 text-muted story-description">
-        ${escapeHtml(story.description || "")}
-      </div>
-
-      <!-- Author card -->
-      <div class="card my-2">
-        <div class="card-body">
-          <div class="d-flex justify-content-between">
-            <div class="d-flex gap-2">
+    <div class="w-100 d-flex flex-column gap-3">
+      <!-- Single card for author, content, and image -->
+      <div class="card p-0">
+        <div class="card-body p-0">
+          <div class="m-3">
+            <!-- Author info -->
+            <div class="d-flex gap-3 mb-3">
               <div>
-                <img 
-                  class="author-img" 
-                  src="${typeof story.author.data[0].profile_image === 'string' ? story.author.data[0].profile_image : "https://placehold.co/600x400?text=Profile"}" 
-                  alt="Author profile"
-                />
+                <img class="author-img" src="${authorProfileImage}?width=40" alt="Author profile" />
               </div>
               <div class="d-flex flex-column justify-content-center">
-                <p class="fs-5 fw-medium mb-0">${escapeHtml(story.author.data[0].first_name)} ${escapeHtml(story.author.data[0].last_name)}</p>
-                <p class="fs-6 text-muted mb-0">${formatDate(story.date_published) || ""}</p>
+                <a href="${authorProfileUrl}" id="author-name" class="fs-6 fw-medium mb-0 text-decoration-none text-reset">
+                  ${escapeHtml(story.author.data[0].first_name)} ${escapeHtml(story.author.data[0].last_name)}
+                </a>
+                <!-- Time ago display -->
+                <p class="fs-6 text-muted mb-0">${timeAgo}</p>
               </div>
             </div>
-            <div class="d-flex gap-3 align-items-center">
-              <a href="https://causecircle.org${story.author.data[0]?.meta?.web?.uri}" class="btn btn-secondary">
-                View Profile
-              </a>
-            </div>
+
+            <!-- Story title and content -->
+            <h2 class="fs-5 fw-medium mb-0">${escapeHtml(story.title)}</h2>
+            <div class="story-container text-muted">${formatStoryBody(story.story_body)}</div>
+            
+            <!-- Hashtags from story body -->
+            ${hashtagsHtml}
+            
           </div>
+
+          <!-- Image/Video Carousel -->
+          ${mediaData && mediaData.length > 0 ? `
+          <div id="storyImageCarousel" class="carousel slide" data-bs-touch="true">
+            ${hasMultipleMedia ? `
+            <div class="carousel-indicators">
+              ${mediaData.filter(item => item.url || item.zuid || item).map((item, index) => `
+                <button type="button" 
+                  data-bs-target="#storyImageCarousel" 
+                  data-bs-slide-to="${index}" 
+                  ${index === 0 ? 'class="active" aria-current="true"' : ''} 
+                  aria-label="Slide ${index + 1}">
+                </button>
+              `).join('')}
+            </div>` : ''}
+            <div class="carousel-inner">
+              ${mediaData.map((item, index) => {
+                // Handle different formats: object with url/zuid, or direct string
+                const mediaUrl = item.url || item.zuid || (typeof item === 'string' ? item : '');
+                if (!mediaUrl) return ''; // Skip invalid items
+                
+                const isVideo = isVideoUrl(mediaUrl);
+                const isActive = index === 0 ? 'active' : '';
+                
+                if (isVideo) {
+                  const embedUrl = getVideoEmbedUrl(mediaUrl);
+                  if (embedUrl) {
+                    if (embedUrl.includes('youtube.com') || embedUrl.includes('vimeo.com')) {
+                      return `
+                        <div class="carousel-item video-item ${isActive}">
+                          <div class="video-container aspect-16-9">
+                            <iframe id="${index === 0 ? 'active-story' : ''}" class="carousel-video" src="${embedUrl}" 
+                                    frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
+                                    title="Video ${index + 1}"
+                                    ${index === 0 ? `data-zuid="${story?.meta?.zuid}"` : ''}></iframe>
+                          </div>
+                        </div>
+                      `;
+                    } else {
+                      return `
+                        <div class="carousel-item video-item ${isActive}">
+                          <div class="video-container aspect-16-9">
+                            <video id="${index === 0 ? 'active-story' : ''}" class="carousel-video" controls preload="metadata" controlsList="nodownload"
+                                   ${index === 0 ? `data-zuid="${story?.meta?.zuid}"` : ''}>
+                              <source src="${embedUrl}" type="video/mp4">
+                              Your browser does not support the video tag.
+                            </video>
+                          </div>
+                        </div>
+                      `;
+                    }
+                  }
+                }
+                
+                return `
+                  <div class="carousel-item image-item ${isActive}">
+                    <img id="${index === 0 ? 'active-story' : ''}" class="d-block w-100 carousel-image" 
+                        src="${mediaUrl}?width=500" 
+                        alt="${escapeHtml(story.title)} - Slide ${index + 1}"
+                        ${index === 0 ? `data-zuid="${story?.meta?.zuid}"` : ''}>
+                  </div>
+                `;
+              }).filter(item => item).join('')}
+            </div>
+            ${hasMultipleMedia ? `
+              <button class="carousel-control-prev" type="button" data-bs-target="#storyImageCarousel" data-bs-slide="prev">
+                <span class="review-carousel-control-prev-icon p-1" aria-hidden="true">
+                  <i class="bi bi-chevron-left" style="color: #575757; font-size: 1.5rem;"></i>
+                </span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#storyImageCarousel" data-bs-slide="next">
+                <span class="review-carousel-control-next-icon p-1" aria-hidden="true">
+                  <i class="bi bi-chevron-right" style="color: #575757; font-size: 1.5rem;"></i>
+                </span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            ` : ''}
+          </div>
+          ` : ''}
         </div>
       </div>
-
-      <!-- Story content -->
-      <h3 class="fs-4 fw-normal">Story</h3>
-      <div class="story-container">${formatStoryBody(story.story_body)}</div>
     </div>
   `);
+
+    // Apply aspect ratio handling after rendering
+    handleImageAspectRatio();
+    
+    // Initialize carousel with navigation behavior
+    initializeStoryCarousel();
   }
 
   function updateNavigationButtons() {
@@ -279,81 +943,352 @@
     $("#next-story").prop("disabled", currentStoryIndex === stories.length - 1);
   }
 
-  async function handleStoryAction(action, changeRequest = null) {
-    const zuid = $("#active-story").data("zuid");
+  // Function to initialize carousel with navigation behavior
+  function initializeStoryCarousel() {
+    const carousel = $('#storyImageCarousel');
+    const totalSlides = carousel.find('.carousel-item').length;
     
-    // Only handle loading states for approve/reject buttons here
-    const button = action === "approved" ? $("#approve-story") : 
-                  action === "rejected" ? $("#reject-story") : null;
+    // Only run if carousel exists
+    if (!carousel.length) return;
     
-    if (button) {
-      const icon = button.find(".bi");
-      const spinner = button.find(".spinner-border");
+    // Initialize Bootstrap carousel with touch support
+    const carouselInstance = new bootstrap.Carousel(carousel[0], {
+      interval: false, // Don't auto-rotate
+      touch: true,     // Enable touch swiping
+      wrap: false      // Don't loop back to the beginning
+    });
+    
+    // Set up navigation arrows based on slide count and position
+    carousel.on('slide.bs.carousel', function(e) {
+      const currentIndex = e.to;
+      const prevControl = carousel.find('.carousel-control-prev');
+      const nextControl = carousel.find('.carousel-control-next');
       
-      try {
-        // Disable button and show loading
-        button.prop("disabled", true);
-        icon.addClass("d-none");
-        spinner.removeClass("d-none");
-        
-        await window.approveStory(zuid, action, changeRequest);
+      // Pause video when sliding away from video slides
+      const fromSlide = carousel.find('.carousel-item').eq(e.from);
+      const video = fromSlide.find('video')[0];
+      if (video && !video.paused) {
+        video.pause();
+      }
+      
+      // Show/hide navigation arrows based on position
+      if (totalSlides <= 1) {
+        // Hide both arrows if only one item
+        prevControl.hide();
+        nextControl.hide();
+      } else if (currentIndex === 0) {
+        // First item - hide prev, show next
+        prevControl.hide();
+        nextControl.show();
+      } else if (currentIndex === totalSlides - 1) {
+        // Last item - show prev, hide next
+        prevControl.show();
+        nextControl.hide();
+      } else {
+        // Middle items - show both
+        prevControl.show();
+        nextControl.show();
+      }
+    });
+    
+    // Set initial arrow visibility
+    if (totalSlides <= 1) {
+      carousel.find('.carousel-control-prev, .carousel-control-next').hide();
+    } else {
+      // On the first slide, hide the prev button
+      carousel.find('.carousel-control-prev').hide();
+    }
+  }
 
-        await window.loadStories("{{get_var.zuid}}");
-        await window.getNewStoriesCount("{{get_var.zuid}}");
-        await window.getApprovedStories("{{get_var.zuid}}");
-        renderCurrentStory();
-        updateNavigationButtons();
-      } catch (error) {
-        console.error(`Error ${action} story:`, error);
-        // Show error toast or feedback here
-      } finally {
-        // Reset button state
+  // Handle image aspect ratio for story images
+  function handleImageAspectRatio() {
+    // Process all images with card-img-bottom class (including carousel images)
+    $('.card-img-bottom, .carousel-image').each(function() {
+      const img = $(this);
+      
+      // Create a new Image object to get the natural dimensions
+      const tempImg = new Image();
+      tempImg.src = img.attr('src');
+      
+      // When the image loads, calculate aspect ratio and apply appropriate styling
+      tempImg.onload = function() {
+        const aspectRatio = this.width / this.height;
+        
+        // Remove any previously applied classes
+        img.removeClass('card-img-wide card-img-tall');
+        
+        if (aspectRatio > 2) {
+          // Very wide image
+          img.addClass('card-img-wide');
+        } else if (aspectRatio < 0.8) {
+          // Very tall image
+          img.addClass('card-img-tall');
+        }
+        // Normal aspect ratio (0.8-2) uses default styling
+      };
+      
+      // Handle cases where the image might already be cached
+      if (tempImg.complete) {
+        $(tempImg).trigger('load');
+      }
+    });
+    
+    // Also handle images within the story content
+    $('.story-container img').each(function() {
+      const img = $(this);
+      
+      // Create a new Image object to get the natural dimensions
+      const tempImg = new Image();
+      tempImg.src = img.attr('src');
+      
+      // When the image loads, calculate aspect ratio and apply appropriate styling
+      tempImg.onload = function() {
+        const aspectRatio = this.width / this.height;
+        
+        // Remove any previously applied classes
+        img.removeClass('card-img-wide card-img-tall');
+        
+        if (aspectRatio > 2) {
+          // Very wide image
+          img.css({
+            'height': '400px',
+            'object-fit': 'contain',
+            'background-color': '#F5F7FA',
+            'width': '100%'
+          });
+        } else if (aspectRatio < 0.8) {
+          // Very tall image
+          img.css({
+            'max-height': '800px',
+            'object-fit': 'contain',
+            'background-color': '#F5F7FA',
+            'width': '100%'
+          });
+        } else {
+          // Normal aspect ratio (0.8-2)
+          img.css({
+            'width': '100%',
+            'object-fit': 'cover'
+          });
+        }
+      };
+      
+      // Handle cases where the image might already be cached
+      if (tempImg.complete) {
+        $(tempImg).trigger('load');
+      }
+    });
+  }
+
+  // Clean HTML entities and restructure content
+  function cleanAndRestructureContent() {
+    // Note: HTML entity cleaning is now handled by processStoryContentForDisplay()
+    // during the initial story rendering, which preserves <br> tags and other HTML formatting
+    
+    // Restructure paragraphs with embedded images
+    $(".story-container p span").each(function () {
+      const $span = $(this);
+      const $img = $span.find("img");
+
+      if ($img.length) {
+        const [textBefore, textAfter] = $span
+          .html()
+          .split($img[0].outerHTML)
+          .map((text) => text.trim());
+
+        $span
+          .closest("p")
+          .before($("<p>").append($("<span>").text(textBefore)));
+        $span.closest("p").before($img);
+        $span.closest("p").before($("<p>").append($("<span>").text(textAfter)));
+
+        $span.closest("p").remove();
+      }
+    });
+  }
+
+  // Function to handle switching between steps in request changes modal
+  function showRequestStep(stepNumber) {
+    $(".request-step").addClass("d-none");
+    $(`#requestStep${stepNumber}`).removeClass("d-none");
+  }
+
+  // Make handleStoryAction globally accessible for request_changes.html
+  window.handleStoryAction = function(action, changeRequest = null) {
+    const zuid = $("#active-story").data("zuid");
+
+    // Determine which button to manage based on action type
+    const button = action === "approved" ? $("#approve-story") :
+                  action === "rejected" ? $("#reject-story") :
+                  action === "changes_requested" ? $("#submitChanges") : null;
+
+    // Helper function to reset button state
+    const resetButtonState = () => {
+      if (button) {
+        const icon = button.find(".bi");
+        const spinner = button.find(".spinner-border");
+
         button.prop("disabled", false);
         icon.removeClass("d-none");
         spinner.addClass("d-none");
       }
-    } else {
-      // For changes_requested, just make the API call
-      try {
-        await window.approveStory(zuid, action, changeRequest);
-        await window.loadStories("{{get_var.zuid}}");
-        await window.getNewStoriesCount("{{get_var.zuid}}");
-        await window.getApprovedStories("{{get_var.zuid}}");
-        renderCurrentStory();
-        updateNavigationButtons();
-      } catch (error) {
-        console.error(`Error ${action} story:`, error);
-        throw error; // Propagate error to be handled by the calling function
+    };
+
+    // Helper function to set button loading state
+    const setButtonLoading = () => {
+      if (button) {
+        const icon = button.find(".bi");
+        const spinner = button.find(".spinner-border");
+
+        button.prop("disabled", true);
+        icon.addClass("d-none");
+        spinner.removeClass("d-none");
       }
+    };
+
+    // Set button loading state
+    setButtonLoading();
+
+    // Show loading indicator in the story content area
+    showLoadingIndicator();
+
+    // Handle special case for changes_requested - show modal immediately
+    if (action === "changes_requested") {
+      // Show confirmation step in the modal
+      showRequestStep(2);
+
+      // Auto close after 5 seconds
+      setTimeout(() => {
+        $("#requestChangesModal").modal("hide");
+        showRequestStep(1);
+        // Reset form
+        $("#changeDetails").val("");
+      }, 5000);
     }
+
+    // Set flag to enable reactive updates when query refetches
+    isWaitingForRefetch = true;
+
+    // Subscribe to mutation state for error handling and button state management
+    const unsubscribe = approveStoryMutation.subscribe((result) => {
+      if (result.status === 'success') {
+        // Success! The mutation's onSuccess (with 5s delay) will invalidate queries
+        // The query subscription above will automatically update UI when refetch completes
+
+        resetButtonState();
+        unsubscribe();
+      } else if (result.status === 'error') {
+        console.error(`Error ${action} story:`, result.error);
+        isWaitingForRefetch = false; // Cancel waiting for refetch
+
+        // Handle errors for changes_requested specially
+        if (action === "changes_requested") {
+          alert("Failed to submit change request. Please try again.");
+        } else {
+          // Show error message in the story content area for other actions
+          $("#story-content").html(`
+            <div class="text-center py-5">
+              <h4 class="text-danger">Error ${action} story</h4>
+              <p class="text-muted">Please try again later</p>
+            </div>
+          `);
+        }
+
+        // Reset button state
+        resetButtonState();
+
+        // Unsubscribe after handling error
+        unsubscribe();
+      }
+    });
+
+    // Trigger the mutation
+    approveStoryMutation.mutate({
+      zuid: zuid,
+      status: action,
+      changeRequest: changeRequest
+    });
   }
 
   $(document).ready(function () {
     // Event Handlers
-    $("#reviewStoriesModal").on("show.bs.modal", async function () {
-      await loadStories("{{get_var.zuid}}");
+    $("#reviewStoriesModal").on("show.bs.modal", function () {
+      loadStories("{{$zuid}}");
+
+      // Clean and restructure content after loading stories
+      setTimeout(cleanAndRestructureContent, 500);
     });
 
     $("#next-story").click(function () {
       if (currentStoryIndex < stories.length - 1) {
-        currentStoryIndex++;
-        renderCurrentStory();
-        updateNavigationButtons();
+        // Show loading indicator
+        showLoadingIndicator();
+        
+        // Disable navigation buttons while loading
+        $("#prev-story, #next-story").prop("disabled", true);
+        
+        // Use setTimeout to simulate loading and allow UI to update
+        setTimeout(() => {
+          currentStoryIndex++;
+          renderCurrentStory();
+          updateNavigationButtons();
+          
+          // Clean and restructure content after navigation
+          setTimeout(cleanAndRestructureContent, 300);
+        }, 300);
       }
     });
 
     $("#prev-story").click(function () {
       if (currentStoryIndex > 0) {
-        currentStoryIndex--;
-        renderCurrentStory();
-        updateNavigationButtons();
+        // Show loading indicator
+        showLoadingIndicator();
+        
+        // Disable navigation buttons while loading
+        $("#prev-story, #next-story").prop("disabled", true);
+        
+        // Use setTimeout to simulate loading and allow UI to update
+        setTimeout(() => {
+          currentStoryIndex--;
+          renderCurrentStory();
+          updateNavigationButtons();
+          
+          // Clean and restructure content after navigation
+          setTimeout(cleanAndRestructureContent, 300);
+        }, 300);
       }
     });
 
-    $("#approve-story").click(async () => await handleStoryAction("approved"));
-    $("#reject-story").click(async () => await handleStoryAction("rejected"));
-    $("#request-changes").click(async () => {
+    $("#approve-story").click(() => handleStoryAction("approved"));
+    $("#reject-story").click(() => handleStoryAction("rejected"));
+    $("#request-changes").click(() => {
       $("#requestChangesModal").modal("show");
+    });
+    
+    // Handle report story button in the modal
+    $(document).on("click", "#modal-report-story", function() {
+      $("#reportModal").modal("show");
+    });
+    
+    // Prevent propagation when clicking carousel navigation
+    $(document).on("click", "#storyImageCarousel .carousel-control-prev, #storyImageCarousel .carousel-control-next", function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Manually trigger the carousel slide
+      const carousel = $('#storyImageCarousel');
+      const direction = $(this).hasClass('carousel-control-prev') ? 'prev' : 'next';
+      const carouselInstance = bootstrap.Carousel.getInstance(carousel[0]);
+      
+      if (carouselInstance) {
+        if (direction === 'prev') {
+          carouselInstance.prev();
+        } else {
+          carouselInstance.next();
+        }
+      }
+      
+      return false;
     });
   });
 
@@ -367,14 +1302,50 @@
       .replace(/'/g, "&#039;");
   }
 
+  // Function to process story content for proper HTML display
+  function processStoryContentForDisplay(rawContent) {
+    if (!rawContent) return '';
+    
+    let processedContent = rawContent;
+    
+    // Check if content appears to already be properly formatted HTML
+    const hasHTMLTags = /<[^>]+>/i.test(processedContent);
+    const hasExistingBrTags = /<br\s*\/?>/i.test(processedContent);
+    
+    if (hasHTMLTags && hasExistingBrTags) {
+      // Content already has HTML formatting - decode entities while preserving HTML tags
+      processedContent = decodeHtmlEntitiesPreserveTags(processedContent);
+      // Clean up excessive consecutive <br> tags only
+      processedContent = processedContent.replace(/(<br\s*\/?>\s*){3,}/gi, '<br /><br />');
+      return processedContent;
+    }
+    
+    // Content appears to be raw text - process it fully
+    // First decode HTML entities like &nbsp; to regular spaces
+    // Use the tag-preserving version in case there are some HTML tags mixed in
+    processedContent = decodeHtmlEntitiesPreserveTags(processedContent);
+    
+    // Convert actual newlines (\n) to HTML line breaks for display
+    processedContent = processedContent.replace(/\n/g, '<br />');
+    
+    // Clean up multiple consecutive <br> tags (max 2 for paragraph breaks)
+    processedContent = processedContent.replace(/(<br\s*\/?>\s*){3,}/gi, '<br /><br />');
+    
+    // Clean up multiple spaces (but preserve single spaces)
+    processedContent = processedContent.replace(/\s{2,}/g, ' ');
+    
+    return processedContent;
+  }
+
   function formatStoryBody(storyBody) {
     if (!storyBody) return '';
     
-    // Convert newlines to <br> tags and preserve paragraphs
-    return storyBody
-      .split('\n\n')
-      .map(paragraph => `<p class="mb-4">${paragraph.trim().replace(/\n/g, '<br>')}</p>`)
-      .join('');
+    // Debug logging for story content processing
+    
+    // Use the new processing function that handles both raw and HTML content
+    const processedContent = processStoryContentForDisplay(storyBody);
+    
+    return processedContent;
   }
 
   function formatDate(dateString) {
@@ -385,6 +1356,88 @@
       day: 'numeric'
     });
   }
+
+  // Function to format a date in a human-readable time-ago format
+  function formatTimeAgo(dateString) {
+    if (!dateString) return '';
+    
+    try {
+      let date;
+      
+      // Check if dateString is already in ISO format (includes 'T' and ends with 'Z' or timezone)
+      if (dateString.includes('T') && (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-'))) {
+        // ISO format with timezone info - parse directly
+        date = new Date(dateString);
+      } else {
+        // Legacy format without timezone - treat as UTC
+        date = new Date(dateString + ' UTC');
+      }
+      
+      // Validate the date
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date');
+      }
+      
+      const now = new Date();
+      const diffInMilliseconds = now - date;
+      const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+      const diffInMinutes = Math.floor(diffInSeconds / 60);
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      const diffInDays = Math.floor(diffInHours / 24);
+      const diffInMonths = Math.floor(diffInDays / 30);
+      const diffInYears = Math.floor(diffInDays / 365);
+      
+      if (diffInSeconds < 60) {
+        return diffInSeconds <= 1 ? 'just now' : `${diffInSeconds}s ago`;
+      } else if (diffInMinutes < 60) {
+        return `${diffInMinutes}m ago`;
+      } else if (diffInHours < 24) {
+        return `${diffInHours}h ago`;
+      } else if (diffInDays < 30) {
+        return `${diffInDays}d ago`;
+      } else if (diffInMonths < 12) {
+        return `${diffInMonths}mo ago`;
+      } else {
+        return `${diffInYears}y ago`;
+      }
+    } catch (error) {
+      console.error('Error formatting time:', error, 'Input:', dateString);
+      return '';
+    }
+  }
+
+  // Function to show loading indicator with skeleton UI
+  function showLoadingIndicator() {
+    $("#story-content").html(`
+      <div class="w-100 d-flex flex-column gap-3">
+        <!-- Skeleton UI for story card -->
+        <div class="story-skeleton skeleton-pulse">
+          <div class="skeleton-author">
+            <div class="skeleton-circle"></div>
+            <div class="d-flex flex-column" style="width: 70%;">
+              <div class="skeleton-line skeleton-line-short"></div>
+              <div class="skeleton-line skeleton-line-short"></div>
+            </div>
+          </div>
+          <div class="skeleton-content">
+            <div class="skeleton-line skeleton-line-medium"></div>
+            <div class="skeleton-line skeleton-line-short mt-1 mb-2" style="width: 30%;"></div>
+            <div class="skeleton-line skeleton-line-long"></div>
+            <div class="skeleton-line skeleton-line-long"></div>
+            <div class="skeleton-line skeleton-line-medium"></div>
+          </div>
+          <div class="skeleton-image"></div>
+        </div>
+      </div>
+    `);
+  }
 </script>
 
+<!-- prettier-ignore -->
+{{include /components/global/NPO Admin/Dashboard/Review Story Modal/report_modal.html}}
+
+<!-- prettier-ignore -->
+{{include /components/global/NPO Admin/Dashboard/Review Story Modal/request_changes.html}}
+
 {{include /components/global/Report Modal/report_modal.html}}
+

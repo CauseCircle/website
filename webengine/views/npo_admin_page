@@ -1,6 +1,6 @@
 <style>
   .sidebar {
-    height: auto;
+    height: 680px;
     margin: 20px 0px 0px 0px;
   }
 
@@ -319,7 +319,7 @@
   <div class="row mb-3">
     <!-- Sidebar -->
     <div class="col-12 col-md-3 col-lg-3 sidebar">
-      <div class="card mb-0 min-vh-100 p-0 d-flex flex-column justify-content-between">
+      <div class="card mb-0 p-0 d-flex flex-column justify-content-between h-100">
         <div class="p-3">
           <a href="{{ non_profits.filter({get_var.zuid}).getUrl() }}" class="d-flex align-items-center mb-3 text-decoration-none text-dark">
             <img
@@ -333,16 +333,16 @@
             </h5>
           </a >
           <div class="nav flex-md-column">
-            <a class="nav-link active" href="#" data-tab="dashboard">
+            <a class="nav-link active" href="#dashboard" data-bs-toggle="tab">
               <i class="bi bi-grid"></i> <span>Dashboard</span>
             </a>
-            <a class="nav-link" href="#" data-tab="followers">
+            <a class="nav-link" href="#followers" data-bs-toggle="tab">
               <i class="bi bi-people"></i> Followers
             </a>
-            <a class="nav-link" href="#" data-tab="story-stream">
+            <a class="nav-link" href="#story-stream" data-bs-toggle="tab">
               <i class="bi bi-collection"></i> Story Stream
             </a>
-            <a class="nav-link" href="#" data-tab="profile">
+            <a class="nav-link" href="#profile" data-bs-toggle="tab">
               <i class="bi bi-person"></i> Profile Details
             </a>
             <a class="nav-link d-none" href="#" data-tab="settings">
@@ -368,13 +368,9 @@
     <!-- Main Content -->
     <div class="col-12 col-md-9 col-lg-9">
       <div class="tab-content">
-        <!-- Dashboard Tab -->
         {{include /components/global/NPO Admin/Dashboard/npo_admin_dashboard.html}}
-        <!--Followers Tab-->
         {{include /components/global/NPO Admin/Followers/npo_admin_followers.html}}
-        <!--Story Stream Tab-->
         {{include /components/global/NPO Admin/Story Stream/npo_admin_story_stream.html}}
-        <!--Profile Details Tab-->
         {{include /components/global/NPO Admin/Profile/npo_admin_profile.html}}
       </div>
     </div>
@@ -384,29 +380,28 @@
 <!--prettier-ignore-->
 {{include /components/global/NPO Admin/Dashboard/Review Story Modal/review_story_modal.html}}
 
-<script>
-  $(document).ready(function () {
-    // Tab functionality
-    $("#npo-admin-page .nav-link").click(function (e) {
-      e.preventDefault();
-      $("#npo-admin-page .nav-link").removeClass("active");
-      $(this).addClass("active");
-
-      const tabId = $(this).data("tab");
-      $("#npo-admin-page .tab-pane").removeClass("active");
-      $(`#${tabId}`).addClass("active");
-    });
-
-    $("#approve-story").click(async function (e) {
-      e.preventDefault();
-      const zuid = $("#active-story").data("zuid");
-      const status = "approved";
-      const changeRequest = null;
-      const data = await window.approveStory(zuid, status, changeRequest);
-
-      if (data) {
-        $("#reviewStoriesModal").modal("hide");
+<script type="module">
+  $(document).ready(function() {
+    // Update URL hash when a tab is shown
+    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+      const target = $(e.target).attr('href');
+      if (target && target.startsWith('#')) {
+        const newHash = target.substring(1);
+        if (history.pushState) {
+          history.pushState(null, null, '#' + newHash);
+        } else {
+          location.hash = '#' + newHash;
+        }
       }
     });
+
+    // Activate tab based on URL hash on page load
+    const initialHash = window.location.hash.substring(1);
+    if (initialHash) {
+      const targetTab = $(`a[href="#${initialHash}"]`);
+      if (targetTab.length) {
+        new bootstrap.Tab(targetTab[0]).show();
+      }
+    }
   });
 </script>

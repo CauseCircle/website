@@ -14,6 +14,8 @@
 
   .article-img img {
     transition: transform 0.3s ease-in-out;
+    max-height: 200px;
+    object-fit: cover;
   }
 
   .article-card:hover .article-img img {
@@ -73,16 +75,56 @@
   </nav>
 </div>
 
-<script>
+<script type="module">
   $(document).ready(function () {
-    const addLimit = (limit) => {
+    const fetchData = async (url) => {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return await response.json();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        return { data: [] };
+      }
+    };
+    
+    const parseArticleDate = (dateString) => {
+      if (!dateString || typeof dateString !== "string") return new Date(0);
+      const [dayStr, monthName, yearStr] = dateString.split(" ");
+      const monthIndexMap = {
+        January: 0,
+        February: 1,
+        March: 2,
+        April: 3,
+        May: 4,
+        June: 5,
+        July: 6,
+        August: 7,
+        September: 8,
+        October: 9,
+        November: 10,
+        December: 11,
+      };
+      const day = parseInt(dayStr, 10) || 1;
+      const month = monthIndexMap[monthName] ?? 0;
+      const year = parseInt(yearStr, 10) || 1970;
+      return new Date(year, month, day);
+    };
+    
+    const setQueryParam = (key, value) => {
       const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set("limit", limit);
-
-      window.history.pushState(
+      if (value === undefined || value === null || value === "") {
+        urlParams.delete(key);
+      } else {
+        urlParams.set(key, value);
+      }
+      const queryString = urlParams.toString();
+      window.history.replaceState(
         {},
         "",
-        `${window.location.pathname}?${urlParams}`
+        `${window.location.pathname}${queryString ? `?${queryString}` : ""}`
       );
     };
     const loadData = async (limitToAdd = 0) => {
@@ -94,13 +136,16 @@
       }
 
       const newLimit = parseInt(limitParam) + limitToAdd;
-      addLimit(newLimit);
+      const effectiveLimit = newLimit > 0 ? newLimit : 24;
+      if (limitToAdd > 0) {
+        setQueryParam("limit", effectiveLimit);
+      }
 
       const searchResultContainer = document.getElementById(
         "search-result-container"
       );
 
-      const filter = document.getElementById("search").value;
+      const filter = document.getElementById("search").value.trim();
 
       searchResultContainer.innerHTML = `
           <div class="d-flex justify-content-center">
@@ -110,13 +155,18 @@
           </div>
           `;
 
-      const result = await fetchData(
-        window.location.origin +
-          "/datasets/articles.json?filter=" +
-          filter +
-          "&limit=" +
-          newLimit
-      );
+      // Sync filter param in URL: set when non-empty, remove when empty
+      setQueryParam("filter", filter || undefined);
+
+      let dataUrl =
+        window.location.origin + "/datasets/articles.json";
+      const fetchParams = new URLSearchParams();
+      if (filter) fetchParams.set("filter", filter);
+      fetchParams.set("limit", effectiveLimit);
+      const qs = fetchParams.toString();
+      if (qs) dataUrl += `?${qs}`;
+
+      const result = await fetchData(dataUrl);
 
       if (!result || result?.data.length < 1) {
         searchResultContainer.innerHTML = `
@@ -130,25 +180,27 @@
       }
 
       searchResultContainer.innerHTML = "";
-      result.data.forEach(async (item) => {
+      // Sort by item.date (e.g., "03 September 2025") descending so latest first
+      result.data.sort((a, b) => parseArticleDate(b.date) - parseArticleDate(a.date));
+      result.data.forEach(async (item, index) => {
         const authorData = await fetchData(
           window.location.origin +
             "/datasets/authors.json?filter=" +
             item.author
         );
-        if (item.index === "0") {
+        if (index === 0) {
           searchResultContainer.innerHTML += `
             <a href="${item.href}" class="text-decoration-none" style="color: inherit">
               <div class="col-12 pb-4 pb-xl-7 article-card">
                 <div class="row">
                   <div class="col-12 d-block d-xl-none ">
                     <div class="article-img">
-                      <img src="${item.hero_image}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
+                      <img src="${item.hero_image && item.hero_image !== "" ? item.hero_image : "https://4xxglxlj.media.zestyio.com/cause-circle-icon-color.png"}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
                     </div>
                   </div>
                   <div class="col-12 col-xl-6 pt-4 pt-xl-0">
                     <div class="d-flex flex-column gap-2 p-2 justify-content-center h-100">
-                      <p class="article-category">PRODUCT</p>
+                      <p class="article-category text-uppercase">${item.tags}</p>
                       <h2>${item.title}</h2>
                       <p>${item.description}</p>
                       <div class="d-flex gap-2">
@@ -163,8 +215,8 @@
                     </div>
                   </div>
                   <div class="col-6 d-none d-xl-block">
-                    <div class="article-img">
-                      <img src="${item.hero_image}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
+                    <div class="article-img" style="height: 100%; width: 100%;">
+                      <img src="${item.hero_image && item.hero_image !== "" ? item.hero_image : "https://4xxglxlj.media.zestyio.com/cause-circle-icon-color.png"}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
                     </div>
                   </div>
                 </div>
@@ -177,10 +229,10 @@
             <a href="${item.href}" class="text-decoration-none" style="color: inherit">
               <div class="d-flex flex-column gap-4 h-100 article-card">
                 <div class="article-img">
-                  <img src="${item.hero_image}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
+                  <img src="${item.hero_image && item.hero_image !== "" ? item.hero_image : "https://4xxglxlj.media.zestyio.com/cause-circle-icon-color.png"}" alt="" style="height: 100%; width: 100%; border-radius: 10px; object-fit: cover;" >
                 </div>
                 <div class="d-flex flex-column gap-2 p-2 justify-content-center h-100 article-details">
-                  <p class="article-category">PRODUCT</p>
+                  <p class="article-category text-uppercase">${item.tags}</p>
                   <h4 class="article-title">${item.title}</h4>
                   <p>${item.description}</p>
                   <div class="d-flex gap-2 mt-auto">
@@ -238,16 +290,6 @@
 
       paginationContainer.innerHTML = paginationHTML;
     };
-
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set("limit", 24);
-    urlParams.set("filter", "");
-
-    window.history.replaceState(
-      {},
-      "",
-      `${window.location.pathname}?${urlParams}`
-    );
 
     loadData();
 

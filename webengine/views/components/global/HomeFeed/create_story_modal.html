@@ -95,6 +95,51 @@
   }
 </style>
 
+<!-- Follow Any NPO First Modal (when user has no followed NPOs) -->
+<div class="modal fade" id="followAnyNpoModal" tabindex="-1" aria-labelledby="followAnyNpoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="mb-4">
+          <i class="bi bi-heart text-primary" style="font-size: 3rem;"></i>
+        </div>
+        <h5 class="modal-title mb-3" id="followAnyNpoModalLabel">Follow a Nonprofit First</h5>
+        <p class="text-muted mb-4">
+          To create posts, you need to follow at least one nonprofit. Find nonprofits that align with your values and start following them!
+        </p>
+        <div class="pb-4">
+          <button type="button" class="btn btn-primary" id="exploreNposBtn">
+            Explore Nonprofits
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Follow This NPO Modal (when user is on NPO page but not following this NPO) -->
+<div class="modal fade" id="followThisNpoModal" tabindex="-1" aria-labelledby="followThisNpoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="mb-4">
+          <i class="bi bi-person-heart text-primary" style="font-size: 3rem;"></i>
+        </div>
+        <h5 class="modal-title mb-3" id="followThisNpoModalLabel">Follow This Nonprofit First</h5>
+        <p class="text-muted mb-4">
+          To post about this nonprofit, you need to follow them first! Click the follow button on this page to get started.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal -->
 <div
   class="modal fade"
@@ -104,7 +149,7 @@
   aria-hidden="true"
 >
   <div class="modal-dialog modal-fullscreen">
-    <div class="modal-content">
+    <div class="modal-content" style="padding: 0px;">
       <div class="modal-header w-100">
         <div class="row w-100 mx-0">
           <div
@@ -184,30 +229,11 @@
   </div>
 </div>
 
-<script>
-  async function getStory(zuid) {
-    const apiUrl = "https://causecircle.org/mobileapp/story.json";
-
-    try {
-      const response = await $.ajax({
-        url: apiUrl,
-        method: "GET",
-        data: { zuid: zuid, zpw: "causecircle" },
-        dataType: "json",
-      });
-
-      // console.log("Story data:", response);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching story:", error);
-      throw error;
-    }
-  }
-
-  const selectionHeaderTexts = [
+<script type="module">
+  const selectionHeaderTextsForCreateStoryModal = [
     {
-      title: "Create Story",
-      description: "Write a story for a cause you care about",
+      title: "Create Post",
+      description: "Share a photo or video and write a caption",
       icon: "https://4xxglxlj.media.zestyio.com/upload_icon.png",
     },
     {
@@ -229,19 +255,134 @@
   window.story_category;
   window.story_data;
 
+  // TanStack Query observers
+  let userProfileQuery;
+
+  // Initialize queries when user is available
+  function initializeQueries() {
+    const localUser = localStorage.getItem("user");
+    if (!localUser) return;
+    
+    const userData = JSON.parse(localUser);
+    userProfileQuery = window.createUserProfileQuery(userData.zuid);
+  }
+
+  // Reactive user profile subscription
+  function subscribeToUserProfile() {
+    if (!userProfileQuery) return;
+    
+    userProfileQuery.subscribe((result) => {
+      if (result.isLoading) {
+        // Show loading state if needed
+      } else if (result.isSuccess) {
+        const userProfile = result.data?.data?.[0];
+        if (userProfile) {
+          // Update UI with user data when available
+          window.currentUserProfile = userProfile;
+        }
+      } else if (result.isError) {
+        console.error("Failed to load user profile:", result.error);
+      }
+    });
+  }
+
+  // Reactive NPO following check using query data
+  async function checkUserFollowingNpos() {
+    if (!userProfileQuery) return { following: false, userNpos: [] };
+    
+    const result = userProfileQuery.getCurrentResult();
+    if (!result.isSuccess) return { following: false, userNpos: [] };
+    
+    const user = result.data?.data?.[0];
+    if (!user) return { following: false, userNpos: [] };
+    
+    let userNpos = [];
+    
+    // Check if favorite_npos is a relationship object
+    if (user.favorite_npos?.data && Array.isArray(user.favorite_npos.data)) {
+      userNpos = user.favorite_npos.data;
+    } 
+    // Fallback for legacy string format
+    else if (typeof user.favorite_npos === 'string' && user.favorite_npos.trim() !== '') {
+      const npoIds = user.favorite_npos.split(",");
+      // Fetch NPO details for legacy format using TanStack Query
+      const npoQueries = npoIds.map(npoId => window.createNPOProfileQuery(npoId.trim()));
+      const npoResults = npoQueries.map(q => q.getCurrentResult());
+      userNpos = npoResults
+        .filter(result => result.isSuccess && result.data?.data?.[0])
+        .map(result => result.data.data[0]);
+    }
+
+    return { 
+      following: userNpos.length > 0, 
+      userNpos: userNpos,
+      userProfile: user
+    };
+  }
+
+  // Function to check if user is following a specific NPO (for NPO page check)
+  async function checkUserFollowingSpecificNpo(npoZuid) {
+    try {
+      const followingStatus = await checkUserFollowingNpos();
+      if (!followingStatus.following) {
+        return false;
+      }
+
+      return followingStatus.userNpos.some(npo => npo.meta.zuid === npoZuid);
+    } catch (error) {
+      console.error("Error checking specific NPO following status:", error);
+      return false;
+    }
+  }
+
+  // Global function to handle create story modal with reactive NPO following checks
+  window.showCreateStoryModal = async function() {
+    try {
+      // Check if user is logged in
+      const localUser = localStorage.getItem("user");
+      if (!localUser) {
+        // User not logged in, let the login modal handle this
+        $("#loginModal").modal("show");
+        return;
+      }
+
+      // Get NPO page ZUID if we're on an NPO page
+      const npoPageZuid = window.npoPageZuid || "{{ $npoZuid }}";
+      
+      if (npoPageZuid && npoPageZuid.trim() !== "") {
+        // Check if user follows this specific NPO reactively
+        const isFollowingThisNpo = await checkUserFollowingSpecificNpo(npoPageZuid.trim());
+        
+        if (!isFollowingThisNpo) {
+          $("#followThisNpoModal").modal("show");
+          return;
+        }
+      } else {
+        // Check if user follows any NPOs reactively
+        const followingStatus = await checkUserFollowingNpos();
+        
+        if (!followingStatus.following) {
+          $("#followAnyNpoModal").modal("show");
+          return;
+        }
+      }
+
+      // All checks passed, show the create story modal
+      $("#createStoryModal").modal("show");
+      
+    } catch (error) {
+      console.error("Error in showCreateStoryModal:", error);
+      $("#createStoryModal").modal("show");
+    }
+  };
+
   $(document).ready(function () {
+    // Initialize TanStack Query observers
+    initializeQueries();
+    subscribeToUserProfile();
+    
     let currentStep = 1;
     const totalSteps = 4;
-
-    const printStates = () => {
-      console.log(window.hero_image);
-      console.log(window.story_title);
-      console.log(window.story_description);
-      console.log(window.story_content);
-      console.log(window.story_location);
-      console.log(window.story_npo);
-      console.log(window.story_category);
-    };
 
     const resetStates = () => {
       window.hero_image = [];
@@ -262,9 +403,17 @@
       $("#storyContent").val("");
     };
 
+    $("#createStoryModal .close-button").on("click", function () {
+      //remove params from url
+      if (window.location.search.includes("create-story")) {
+        $("#downloadModal").modal("show");
+      }
+      window.history.replaceState({}, document.title, window.location.pathname);
+      $("#createStoryModal").modal("hide");
+    });
+
     // Centralized next button click handler
     $("#createStoryModal #nextBtn").on("click", async function () {
-      console.log("Next button clicked");
       const $nextBtn = $(this);
       const $spinner = $nextBtn.find(".spinner-border");
 
@@ -299,40 +448,81 @@
             }
 
             window.story_location = $("#location").val();
-            // console.log(currentStep);
-            //   break;
-            // case 2:
             // Handle content addition
             window.story_content = $("#storyContent").val();
-            printStates();
 
             try {
-              const uploadedHeroImages = await uploadImages(window.hero_image);
-              // console.log("All images uploaded:", uploadedHeroImages);
-
-              const imageIds = uploadedHeroImages.map((img) => img.data[0].id);
-
               const userData = JSON.parse(localStorage.getItem("user"));
+
+              // Step 1: Upload media using TanStack Query mutation
+              const uploadMediaMutation = window.createUploadMediaMutation();
+              
+              const uploadedImages = await new Promise((resolve, reject) => {
+                const unsubscribe = uploadMediaMutation.subscribe((result) => {
+                  if (result.status === 'success') {
+                    resolve(result.data);
+                    unsubscribe();
+                  } else if (result.status === 'error') {
+                    reject(result.error);
+                    unsubscribe();
+                  }
+                });
+                uploadMediaMutation.mutate(window.hero_image);
+              });
+
+              const imageIds = uploadedImages.map((img) => img.data[0].id || img.data[0].url);
+
               const storyData = {
                 title: window.story_title,
                 story: window.story_content || window.story_description,
                 images: imageIds.join(","),
                 cause_category: window.story_category,
-                // cause_category: "7-80c2e0edba-ltxdkc",
                 npo: window.story_npo,
                 author: userData.zuid,
                 date_published: new Date().toISOString(),
                 description: window.story_description,
+                ...(window.story_post_as_npo_zuid ? { npo_author: window.story_post_as_npo_zuid } : {}),
               };
-              const story = await createStory(storyData);
+
+              // Step 2: Create story using TanStack Query mutation
+              const createStoryMutation = window.createCreateStoryMutation();
+              
+              const story = await new Promise((resolve, reject) => {
+                const unsubscribe = createStoryMutation.subscribe((result) => {
+                  if (result.status === 'success') {
+                    resolve(result.data);
+                    unsubscribe();
+                  } else if (result.status === 'error') {
+                    reject(result.error);
+                    unsubscribe();
+                  }
+                });
+                createStoryMutation.mutate(storyData);
+              });
 
               if (story.data.length === 0) {
-                alert(`Failed to upload story. Your story is deemed inappropriate. Please try again.`);
+                alert(
+                  `${story?.meta?.message || "Failed to upload story. Please try again."}`
+                );
                 return; // Prevent moving to the next step if uploads failed
               }
 
-              window.story_data = await getStory(story?.meta?.story_zuid);
-              $("#shareLink").val(`${window.story_data[0]?.meta?.web?.url}`);
+              // Step 3: Get created story data reactively
+              const storyZuid = story?.meta?.story_zuid;
+              if (storyZuid) {
+                const storyQuery = window.createStoryQuery(storyZuid);
+                
+                // Subscribe to story data changes
+                storyQuery.subscribe((result) => {
+                  if (result.isSuccess) {
+                    window.story_data = result.data;
+                    $("#shareLink").val(`{{ $base_url }}${result.data?.data[0]?.meta?.web?.uri}`);
+                  }
+                });
+                
+                // Trigger initial fetch
+                storyQuery.refetch();
+              }
             } catch (error) {
               console.error("Error uploading story:", error);
               alert("Failed to upload story. Please try again.");
@@ -362,7 +552,7 @@
       }
     });
 
-    function updateNextButtonState(enable) {
+    window.updateNextButtonState = function(enable) {
       const $nextBtn = $("#createStoryModal #nextBtn");
       $nextBtn.prop("disabled", enable);
       if (!enable) {
@@ -386,7 +576,7 @@
       $(`#${getSectionId(step)}`).removeClass("d-none");
 
       // Update section content
-      const content = selectionHeaderTexts[step - 1];
+      const content = selectionHeaderTextsForCreateStoryModal[step - 1];
       $(`#${getSectionId(step)} .section-title`).text(content.title);
       $(`#${getSectionId(step)} .section-description`).text(
         content.description
@@ -417,7 +607,6 @@
 
     // Handle back button clicks
     $(document).on("click", "#backBtn", function () {
-      // console.log("Back button clicked");
       $("#createStoryModal #nextBtn").prop("disabled", false);
       if (currentStep > 1) {
         currentStep--;
@@ -433,9 +622,32 @@
 
     // Log when the modal is shown
     $("#createStoryModal").on("shown.bs.modal", function () {
-      resetAllStates();
+      if (window.resetAllStates) {
+        window.resetAllStates();
+      }
       // Initialize first step
       showSection(currentStep);
+    });
+
+    // Handle "Explore Nonprofits" button click in the general follow modal
+    $("#exploreNposBtn").on("click", function() {
+      $("#followAnyNpoModal").modal("hide");
+      
+      // Redirect to nonprofits directory page
+      const nonprofitsUrl = "{{non_profits_search_page.first().getUrl()}}"; 
+      if (nonprofitsUrl && nonprofitsUrl !== "") {
+        window.location.href = nonprofitsUrl;
+      } else {
+        // Fallback URL
+        window.location.href = "/nonprofits";
+      }
+    });
+
+    // Handle "Got It, I'll Follow Them" button click in the NPO-specific follow modal
+    $("#stayOnNpoPageBtn").on("click", function() {
+      $("#followThisNpoModal").modal("hide");
+      // User stays on the current NPO page to follow the nonprofit
+      // The modal just closes, no redirect needed
     });
   });
 </script>

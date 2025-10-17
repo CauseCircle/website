@@ -40,6 +40,30 @@
   #stepsIndicator {
     font-size: 0.875rem;
   }
+  
+  /* Hide stepsIndicator on mobile devices */
+  @media (max-width: 768px) {
+    #stepsIndicator {
+      display: none !important;
+    }
+    
+    /* Hide horizontal rule on mobile */
+    hr {
+      display: none !important;
+    }
+    
+    /* Center logo on mobile */
+    header .position-absolute {
+      position: static !important;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    
+    header .d-flex {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
   .step-item {
     display: flex;
     align-items: center;
@@ -106,21 +130,26 @@
       <div id="stepsIndicator" class="d-flex align-items-center">
         <div class="step-item" data-step="1">
           <span class="step-icon">1</span>
-          <span class="step-text">Role</span>
+          <span class="step-text">Personal Info</span>
         </div>
         <div class="step-separator"></div>
         <div class="step-item" data-step="2">
           <span class="step-icon">2</span>
-          <span class="step-text">Select Cause</span>
+          <span class="step-text">Role</span>
         </div>
         <div class="step-separator"></div>
         <div class="step-item" data-step="3">
           <span class="step-icon">3</span>
-          <span class="step-text">Select NPO</span>
+          <span class="step-text">Select Cause</span>
         </div>
         <div class="step-separator"></div>
         <div class="step-item" data-step="4">
           <span class="step-icon">4</span>
+          <span class="step-text">Select NPO</span>
+        </div>
+        <div class="step-separator"></div>
+        <div class="step-item" data-step="5">
+          <span class="step-icon">5</span>
           <span class="step-text">Summary</span>
         </div>
       </div>
@@ -132,12 +161,68 @@
 
 <div class="container">
   <div style="height: 38px" class="mt-4">
-    <button class="prevBtn btn btn-secondary">Back</button>
+    <button class="prevBtn btn btn-link p-0 border-0"><i class="bi bi-arrow-left fs-3"></i></button>
   </div>
 </div>
 
-<section id="roleSelection" class="container">
-  <div class="pt-8 pb-4">
+<section id="personalInfo" class="container">
+  <div class="py-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img
+        src="https://4xxglxlj.media.zestyio.com/role.png"
+        style="max-width: 160px"
+      />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="fs-1 fw-normal mb-0">Tell Us About Yourself</p>
+        <p class="fs-5 text-muted mb-0">
+          We'd like to know a bit more about you.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="width: 380px">
+      <div class="d-flex flex-column gap-3">
+        <div class="form-group">
+          <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            id="firstName"
+            placeholder="Enter your first name"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            id="lastName"
+            placeholder="Enter your last name"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            placeholder="Enter your email address"
+            required
+          />
+        </div>
+      </div>
+      <button class="nextBtn btn btn-primary w-100 mt-4">Next</button>
+    </div>
+  </div>
+</section>
+
+<section id="roleSelection" class="container d-none">
+  <div class="py-4">
     <div
       class="d-flex flex-column gap-2 justify-content-center align-items-center"
     >
@@ -244,7 +329,7 @@
 </section>
 
 <section id="causeSelection" class="container d-none">
-  <div class="pt-8 pb-4">
+  <div class="py-4">
     <div
       class="d-flex flex-column gap-2 justify-content-center align-items-center"
     >
@@ -254,7 +339,7 @@
       />
       <div class="d-flex flex-column gap-2 align-items-center">
         <p class="fs-1 fw-normal mb-0">Select a Cause</p>
-        <p class="fs-5 text-muted mb-0">
+        <p class="fs-5 text-muted mb-0 text-center">
           Pick a cause that you are passionate about.
         </p>
       </div>
@@ -284,7 +369,7 @@
 </section>
 
 <section id="npoSelection" class="container d-none">
-  <div class="pt-8 pb-4">
+  <div class="py-4">
     <div
       class="d-flex flex-column gap-2 justify-content-center align-items-center"
     >
@@ -294,7 +379,7 @@
       />
       <div class="d-flex flex-column gap-2 align-items-center">
         <p class="fs-1 fw-normal mb-0">Follow Nonprofits</p>
-        <p class="fs-5 text-muted mb-0">
+        <p class="fs-5 text-muted mb-0 text-center">
           Choose Nonprofits to follow and engage with.
         </p>
       </div>
@@ -327,7 +412,7 @@
   id="summary"
   class="container d-none h-100 d-flex align-items-center justify-content-center flex-column"
 >
-  <div class="pt-8 pb-4">
+  <div class="py-4">
     <div
       class="d-flex flex-column gap-2 justify-content-center align-items-center"
     >
@@ -363,26 +448,101 @@
   </div>
 </section>
 
-<script>
-  $(document).ready(function () {
-    async function updateUserProfile(zuid) {
-      let userData = await getZestyUser(zuid);
-      if (!userData?.user) return;
+<script type="module">
+  $(document).ready(async function () {
+    // Function to check for ZUID availability
+    async function waitForZuid(maxAttempts = 30, interval = 1000) {
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        const userData = JSON.parse(localStorage.getItem("user"));
+        const zuid = userData?.zuid;
+        
+        if (zuid) {
+          console.log(`ZUID found after ${attempt} attempts`);
+          return zuid;
+        }
+        
+        console.log(`ZUID not available yet, attempt ${attempt}/${maxAttempts}`);
+        
+        if (attempt < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, interval));
+        }
+      }
+      
+      console.error('ZUID not available after maximum attempts');
+      return null;
+    }
 
-      const userZuid = userData.user.meta.ZUID;
+    // Wait for ZUID to become available
+    const zuid = await waitForZuid();
+    
+    if (!zuid) {
+      console.error('Unable to proceed without ZUID');
+      return;
+    }
+
+    let userData = await window.getUserProfile(zuid); //first_name, last_name
+
+    // Pre-populate personal info fields if user data exists
+    if (userData?.data[0]) {
+      const user = userData.data[0];
+      if (user.first_name) $("#firstName").val(user.first_name);
+      if (user.last_name) $("#lastName").val(user.last_name);
+      if (user.email) $("#email").val(user.email);
+    }
+
+    async function updateUserProfile(zuid) {
+      if (!userData?.data[0]) return;
+
+      const currentUser = userData.data[0];
+      const userZuid = zuid;
 
       // Edit the user data
-      userData.user.data.user_type = selectedRole;
-      userData.user.data.favorite_causes = selectedCauses.join(",");
-      userData.user.data.favorite_npos = selectedNPOs.join(",");
+      currentUser.user_type = selectedRole;
+      
+      // Handle existing favorite_causes if it's a relationship object
+      if (currentUser.favorite_causes?.data && Array.isArray(currentUser.favorite_causes.data)) {
+        // Extract existing ZUIDs that aren't in the selected list to preserve them
+        const existingCauseZuids = currentUser.favorite_causes.data.map(cause => cause.meta.zuid);
+        const preservedCauseZuids = existingCauseZuids.filter(zuid => !selectedCauses.includes(zuid));
+        
+        // Combine preserved ZUIDs with newly selected ones
+        currentUser.favorite_causes = [...preservedCauseZuids, ...selectedCauses].join(",");
+      } else {
+        // If it's not a relationship object or doesn't exist, simply set the new value
+        currentUser.favorite_causes = selectedCauses.join(",");
+      }
+      
+      // Handle existing favorite_npos if it's a relationship object
+      if (currentUser.favorite_npos?.data && Array.isArray(currentUser.favorite_npos.data)) {
+        // Extract existing ZUIDs that aren't in the selected list to preserve them
+        const existingNpoZuids = currentUser.favorite_npos.data.map(npo => npo.meta.zuid);
+        const preservedNpoZuids = existingNpoZuids.filter(zuid => !selectedNPOs.includes(zuid));
+        
+        // Combine preserved ZUIDs with newly selected ones
+        currentUser.favorite_npos = [...preservedNpoZuids, ...selectedNPOs].join(",");
+      } else {
+        // If it's not a relationship object or doesn't exist, simply set the new value
+        currentUser.favorite_npos = selectedNPOs.join(",");
+      }
 
-      // Update only the 'data' part of the user object
-      const updatedUser = await updateZestyUser(userZuid, userData.user.data);
-
-      // console.log("User profile updated:", updatedUser);
+      // Update user with the new data
+      const updatedUser = await window.updateZestyUser(userZuid, {
+        "first_name": personalInfo.firstName,
+        "last_name": personalInfo.lastName,
+        "email": personalInfo.email,
+        "favorite_causes": currentUser.favorite_causes,
+        "favorite_npos": currentUser.favorite_npos,
+        "user_type": currentUser.user_type,
+        "isOnboarded": true
+      });
     }
 
     let currentStep = 1;
+    let personalInfo = {
+      firstName: '',
+      lastName: '',
+      email: ''
+    };
     let selectedRole,
       selectedCauses = [],
       selectedNPOs = [];
@@ -391,19 +551,19 @@
       $(".step").removeClass("active");
       $(`#step${currentStep}`).addClass("active");
 
-      $("#roleSelection, #causeSelection, #npoSelection, #summary").addClass(
+      $("#personalInfo, #roleSelection, #causeSelection, #npoSelection, #summary").addClass(
         "d-none"
       );
       $(
         `#${
-          ["roleSelection", "causeSelection", "npoSelection", "summary"][
+          ["personalInfo", "roleSelection", "causeSelection", "npoSelection", "summary"][
             currentStep - 1
           ]
         }`
       ).removeClass("d-none");
 
       $("#prevBtn").toggleClass("d-none", currentStep === 1);
-      $("#nextBtn").text(currentStep === 3 ? "Complete" : "Next");
+      $("#nextBtn").text(currentStep === 5 ? "Complete" : "Next");
 
       // Update steps indicator
       $("#stepsIndicator .step-item").each(function () {
@@ -424,9 +584,9 @@
       } else {
         $(".prevBtn").removeClass("d-none");
       }
-      if (currentStep === 2) loadCauses();
-      if (currentStep === 3) loadNPOs();
-      if (currentStep === 4) {
+      if (currentStep === 3) loadCauses();
+      if (currentStep === 4) loadNPOs();
+      if (currentStep === 5) {
         const localUser = localStorage.getItem("user");
 
         if (localUser) {
@@ -442,15 +602,44 @@
     });
 
     $(".nextBtn").click(function () {
-      if (currentStep === 1 && !selectedRole) {
+      if (currentStep === 1) {
+        // Validate personal info
+        const firstName = $("#firstName").val().trim();
+        const lastName = $("#lastName").val().trim();
+        const email = $("#email").val().trim();
+        
+        if (!firstName || !lastName || !email) {
+          alert("Please fill in all personal information fields");
+          return;
+        }
+        
+        if (!isValidEmail(email)) {
+          alert("Please enter a valid email address");
+          return;
+        }
+        
+        // Store personal info
+        personalInfo.firstName = firstName;
+        personalInfo.lastName = lastName;
+        personalInfo.email = email;
+      }
+      
+      if (currentStep === 2 && !selectedRole) {
         alert("Please select a role");
         return;
       }
-      if (currentStep < 4) {
+      
+      if (currentStep < 5) {
         currentStep++;
         updateStepUI();
       }
     });
+
+    // Email validation function
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
 
     $(".prevBtn").click(function () {
       currentStep--;
@@ -461,7 +650,7 @@
       const limit = searchTerm ? 5 : 100;
 
       $.ajax({
-        url: "https://causecircle.org/mobileapp/npos.json",
+        url: "{{ $base_url }}mobileapp/npos.json",
         method: "GET",
         data: {
           limit: limit,
@@ -478,14 +667,14 @@
     }
 
     function loadCauses(searchTerm) {
-      const limit = searchTerm ? 5 : 100;
+      const limit = searchTerm ? 5 : 25;
 
       // Show loading indicator
       $("#cause-loading").removeClass("d-none");
       $("#cause-container").addClass("d-none");
 
       $.ajax({
-        url: "https://causecircle.org/mobileapp/causes.json",
+        url: "{{ $base_url }}mobileapp/causes.json",
         method: "GET",
         data: {
           limit: limit,
@@ -498,16 +687,18 @@
           causeContainer.empty();
 
           causes.forEach((cause) => {
-            const imageUrl =
-              cause.image && cause.image.data && cause.image.data[0]
-                ? cause.image.data[0].url
-                : "https://placehold.co/100x100";
+            const imageUrl = 
+              typeof cause.image === 'string' && cause.image.trim() !== ''
+                ? cause.image
+                : (cause.image && cause.image.data && cause.image.data[0]
+                    ? cause.image.data[0].url
+                    : "https://placehold.co/100x100");
             const description = cause.description
               ? cause.description.substring(0, 100) + "..."
               : "No description available";
 
             const causeCard = `
-              <div class="card cause-card" data-cause-id="${cause.meta.zuid}">
+              <div class="card cause-card" data-cause-id="${cause.zuid}">
                 <div class="d-flex gap-2 align-items-center p-3">
                   <img src="${imageUrl}" alt="${cause.title}" style="width: 60px; height: 60px; object-fit: cover;">
                   <div class="flex-grow-1">
@@ -526,7 +717,6 @@
             $(this).toggleClass("selected"); // Toggle selection on click
             if ($(this).hasClass("selected")) {
               selectedCauses.push(causeId); // Add to selected causes
-              // console.log("Selected causes:", selectedCauses);
             } else {
               selectedCauses = selectedCauses.filter((id) => id !== causeId); // Remove from selected causes
             }
@@ -555,14 +745,14 @@
     }
 
     function loadNPOs(searchTerm) {
-      const limit = searchTerm ? 5 : 100;
+      const limit = searchTerm ? 5 : 25;
 
       // Show loading indicator
       $("#npo-loading").removeClass("d-none");
       $("#npo-container").addClass("d-none");
 
       $.ajax({
-        url: "https://causecircle.org/mobileapp/npos.json",
+        url: "{{ $base_url }}mobileapp/npos.json",
         method: "GET",
         data: {
           limit: limit,
@@ -606,7 +796,6 @@
             } else {
               selectedNPOs = selectedNPOs.filter((id) => id !== npoId);
             }
-            // console.log("Selected NPOs:", selectedNPOs);
           });
 
           // Hide loading indicator and show results
@@ -677,16 +866,13 @@
     // Add a click handler for the complete button
     $(".completeBtn").click(function () {
       // Handle completion
-      // console.log("Onboarding completed:", {
-      //   selectedRole,
-      //   selectedCauses,
-      //   selectedNPOs,
-      // });
-      // Redirect or show completion message
     });
 
     // Initial UI update
     updateStepUI();
+    
+    // Load initial causes
+    loadCauses();
 
     const claimListingRedirectUrl = localStorage.getItem(
       "claimListingRedirectUrl"

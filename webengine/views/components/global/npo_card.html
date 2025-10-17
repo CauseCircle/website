@@ -41,13 +41,14 @@
   .npo-date {
     font-size: 12px;
   }
-  .npo-npo-logo {
+  .npo-npo-logo { 
     width: 24px;
     height: 24px;
     border: 1px solid #aeaeae;
     border-radius: 3px;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center;
+    background-color: white;
   }
   .npo-btn {
     font-size: 12px;
@@ -77,12 +78,13 @@
   class="card d-flex flex-column h-100 p-3 gap-2 npo-card"
   data-story-url="{{ npo.getUrl() }}"
 >
-  <img src="{{ npo.hero_image.getImage() }}" class="npo-image" />
+  <img src="{{ npo.hero_image.getImage() }}?width=150" class="npo-image" alt="NPO cover image" />
   <div class="d-flex flex-column gap-2 h-100">
     <div class="d-flex flex-grow-1 align-items-center gap-2">
       <img
         src="{{ npo.logo.getImage('w_24,h_24,c_fill') }}"
         class="npo-npo-logo"
+        alt="NPO logo"
       />
       <p class="npo-name my-auto">{{ npo.name }}</p>
     </div>

@@ -1,0 +1,227 @@
+<script type="module">
+  // Media Handling Module for Home Feed
+  // Handles video detection, carousel generation, and image optimization
+
+  // Function to detect if a URL is a video
+  function isVideoUrl(url) {
+    if (!url) return false;
+    const videoPatterns = [
+      /vimeo\.com\/video\/\d+/i,
+      /vimeo\.com\/\d+/i,
+      /player\.vimeo\.com\/video\/\d+/i,
+      /youtube\.com\/watch\?v=/i,
+      /youtu\.be\//i,
+      /\.mp4$/i,
+      /\.webm$/i,
+      /\.ogg$/i,
+      /\.mov$/i,
+      /\.avi$/i
+    ];
+    return videoPatterns.some(pattern => pattern.test(url));
+  }
+
+  // Function to get video embed URL
+  function getVideoEmbedUrl(url) {
+    if (!url) return null;
+    
+    // Check if it's already a Vimeo player URL
+    if (url.includes('player.vimeo.com/video/')) {
+      return url.includes('?') ? url : `${url}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // Vimeo regular URLs - handles both /video/ID and direct /ID formats
+    const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+    if (vimeoMatch) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // YouTube
+    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i);
+    if (youtubeMatch) {
+      return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // Direct video files
+    if (/\.(mp4|webm|ogg|mov|avi)$/i.test(url)) {
+      return url;
+    }
+
+    return null;
+  }
+
+  // Function to add width parameter to a single image element
+  function addWidthParamToImage(imgElement) {
+      const src = imgElement.attr('src');
+      let width = 300; // Default for post images
+
+      if (imgElement.hasClass('profile-img')) {
+          width = 100;
+      } else if (imgElement.hasClass('npo-image') || imgElement.hasClass('npo-npo-logo')) {
+          width = 150;
+      }
+
+      if (src && src.includes('https://4xxglxlj.media.zestyio.com')) {
+          if (src.includes('?')) {
+              if (!src.includes('width=')) {
+                  imgElement.attr('src', src + '&optimize=high&quality=80&auto=webp&width=' + width);
+                  imgElement.attr('fetchpriority', 'high');
+                  //add lower width srcset
+                  imgElement.attr('srcset', src + '&optimize=high&quality=80&auto=webp&width=' + (width - 50) + ' 1x, ' + src + '&optimize=high&quality=80&auto=webp&width=' + (width - 25) + ' 2x');
+              }
+          } else {
+              imgElement.attr('src', src + '?optimize=high&quality=80&auto=webp&width=' + width);
+              imgElement.attr('fetchpriority', 'high');
+              //add lower width srcset
+              imgElement.attr('srcset', src + '?optimize=high&quality=80&auto=webp&width=' + (width - 50) + ' 1x, ' + src + '?optimize=high&quality=80&auto=webp&width=' + (width - 25) + ' 2x');
+          }
+      }
+  }
+
+  // Update the addWidthParamToImages function to use the single image helper
+  function addWidthParamToImages() {
+      $('.post-image, .profile-img, .npo-image, .npo-npo-logo').each(function() {
+          addWidthParamToImage($(this));
+      });
+  }
+
+  // Function to generate carousel items with mixed media support
+  function getCarouselItems(storyImage) {
+    if (!storyImage) {
+      return `<div class="carousel-item image-item active">
+                <img src="https://placehold.co/800x400?text=No+Image" alt="No Image" class="post-image">
+              </div>`;
+    }
+    
+    // Handle both string and object/array formats
+    if (typeof storyImage === "string") {
+      const isVideo = isVideoUrl(storyImage);
+      
+      if (isVideo) {
+        const embedUrl = getVideoEmbedUrl(storyImage);
+        if (embedUrl) {
+          if (embedUrl.includes('youtube.com') || embedUrl.includes('vimeo.com')) {
+            return `<div class="carousel-item video-item active">
+                      <div class="video-container aspect-16-9">
+                        <iframe class="carousel-video" src="${embedUrl}" 
+                                frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
+                                title="Video"></iframe>
+                      </div>
+                    </div>`;
+          } else {
+            return `<div class="carousel-item video-item active">
+                      <div class="video-container aspect-16-9">
+                        <video class="carousel-video" controls preload="metadata" controlsList="nodownload">
+                          <source src="${embedUrl}" type="video/mp4">
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    </div>`;
+          }
+        }
+      }
+      
+      return `<div class="carousel-item image-item active">
+                <img src="${storyImage}" alt="Story Image" class="post-image">
+              </div>`;
+    }
+    
+    if (storyImage.data && storyImage.data.length > 0) {
+      return storyImage.data.map((item, index) => {
+        const mediaUrl = item.url || item.zuid;
+        const isVideo = isVideoUrl(mediaUrl);
+        const isActive = index === 0 ? 'active' : '';
+        
+        if (isVideo) {
+          const embedUrl = getVideoEmbedUrl(mediaUrl);
+          if (embedUrl) {
+            if (embedUrl.includes('youtube.com') || embedUrl.includes('vimeo.com')) {
+              return `<div class="carousel-item video-item ${isActive}">
+                        <div class="video-container aspect-16-9">
+                          <iframe class="carousel-video" src="${embedUrl}" 
+                                  frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen
+                                  title="Video ${index + 1}"></iframe>
+                        </div>
+                      </div>`;
+            } else {
+              return `<div class="carousel-item video-item ${isActive}">
+                        <div class="video-container aspect-16-9">
+                          <video class="carousel-video" controls preload="metadata" controlsList="nodownload">
+                            <source src="${embedUrl}" type="video/mp4">
+                            Your browser does not support the video tag.
+                          </video>
+                        </div>
+                      </div>`;
+            }
+          }
+        }
+        
+        return `<div class="carousel-item image-item ${isActive}">
+                  <img src="${mediaUrl}" alt="Story Image ${index + 1}" class="post-image">
+                </div>`;
+      }).join('');
+    }
+    
+    return `<div class="carousel-item image-item active">
+              <img src="https://placehold.co/800x400?text=No+Image" alt="No Image" class="post-image">
+            </div>`;
+  }
+
+  // Get carousel indicators HTML (updated for mixed media)
+  function getCarouselIndicators(storyImage, storyId) {
+    let mediaCount = 0;
+    
+    if (!storyImage) {
+      return ''; // No indicators for no media
+    }
+    
+    if (typeof storyImage === "string") {
+      return ''; // No indicators for single media item
+    }
+    
+    if (storyImage.data && storyImage.data.length > 1) {
+      // Count valid media items
+      mediaCount = storyImage.data.filter(item => {
+        const mediaUrl = item.url || item.zuid;
+        return mediaUrl; // Only count items with valid URLs
+      }).length;
+      
+      if (mediaCount <= 1) {
+        return ''; // No indicators for single valid item
+      }
+    } else {
+      return ''; // No indicators for single or no items
+    }
+    
+    let indicators = '<div class="carousel-indicators">';
+    
+    for (let i = 0; i < mediaCount; i++) {
+      indicators += `
+        <button type="button" 
+                data-bs-target="#carousel-${storyId}" 
+                data-bs-slide-to="${i}" 
+                ${i === 0 ? 'class="active"' : ''} 
+                aria-current="${i === 0 ? 'true' : 'false'}" 
+                aria-label="Slide ${i + 1}">
+        </button>`;
+    }
+    
+    indicators += '</div>';
+    return indicators;
+  }
+
+  // Function to handle carousel click events
+  function handleCarouselClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+  }
+
+  // Export functions to window for global access
+  window.isVideoUrl = isVideoUrl;
+  window.getVideoEmbedUrl = getVideoEmbedUrl;
+  window.addWidthParamToImage = addWidthParamToImage;
+  window.addWidthParamToImages = addWidthParamToImages;
+  window.getCarouselItems = getCarouselItems;
+  window.getCarouselIndicators = getCarouselIndicators;
+  window.handleCarouselClick = handleCarouselClick;
+</script>

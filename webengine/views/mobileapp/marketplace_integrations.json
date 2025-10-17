@@ -1,0 +1,8 @@
+{
+  "integrations": [
+      {{ each marketplace_integrations as integration }}
+      {{ integration.toJSON(2) }}
+      {{ integration._arraycomma }}
+      {{ /each }}
+  ]
+}

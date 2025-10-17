@@ -1,0 +1,8 @@
+{
+  "faqs": [
+    {{each faqs as faq sort by sort_order}}
+    {{faq.toJSON(2)}}
+    {{faq._arraycomma}}
+    {{/each}}
+  ]
+}

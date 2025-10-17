@@ -1,0 +1,1569 @@
+<style>
+  .stats-container {
+    padding: 20px 0;
+  }
+
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .metric-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .metric-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 8px;
+  }
+
+  .metric-label {
+    color: #718096;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+
+  .metric-description {
+    color: #a0aec0;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .chart-container {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    margin-bottom: 25px;
+  }
+
+  .chart-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 20px;
+  }
+
+  .time-period-tabs .nav-link {
+    color: #718096;
+    border: none;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  .time-period-tabs .nav-link.active {
+    background-color: #7b3fee;
+    color: white;
+  }
+
+  .time-period-tabs .nav-link:hover:not(.active) {
+    background-color: #f7fafc;
+    color: #7b3fee;
+  }
+
+  .progress-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .progress-metrics {
+    display: flex;
+    gap: 30px;
+    text-align: center;
+  }
+
+  .progress-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .progress-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2d3748;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: #718096;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .followers-list-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+    max-height: 300px;
+  }
+
+  .follower-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+  }
+
+  .follower-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .follower-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .follower-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #2d3748;
+    margin: 0;
+  }
+
+  .follower-email {
+    font-size: 12px;
+    color: #718096;
+    margin: 0;
+  }
+
+  .engagement-metrics {
+    display: flex;
+    gap: 20px;
+    padding: 0 20px;
+    margin-bottom: 20px;
+  }
+
+  .engagement-metric {
+    text-align: center;
+  }
+
+  .engagement-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2d3748;
+    margin-top: 5px;
+  }
+
+  .engagement-label {
+    font-size: 12px;
+    color: #718096;
+  }
+
+  @media (max-width: 768px) {
+    .metrics-row {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .metric-card {
+      padding: 20px;
+    }
+
+    .metric-value {
+      font-size: 28px;
+    }
+
+    .chart-container {
+      padding: 20px;
+    }
+
+    .progress-metrics {
+      flex-direction: column;
+      gap: 15px;
+    }
+  }
+
+  /* Skeleton loader styles */
+  .skeleton {
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+  }
+
+  @keyframes skeleton-loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+</style>
+
+<div class="tab-pane fade" id="npo-stats">
+  <div class="stats-container">
+    <!-- Header with Time Period Tabs -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="mb-0">NPO Stats</h3>
+      <ul class="nav time-period-tabs">
+        <li class="nav-item">
+          <button class="nav-link active" data-period="daily">Daily</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-period="weekly">Weekly</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-period="monthly">Monthly</button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Metrics Cards Row -->
+    <div class="metrics-row" id="metricsContainer">
+      <div class="metric-card">
+        <div class="metric-label">Total Followers</div>
+        <div class="metric-value skeleton" style="height: 40px; border-radius: 4px;"></div>
+        <div class="metric-description">Number of users who follow your NPO.</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Total Views</div>
+        <div class="metric-value skeleton" style="height: 40px; border-radius: 4px;"></div>
+        <div class="metric-description">Total profile views across all your pages.</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Total Stories</div>
+        <div class="metric-value skeleton" style="height: 40px; border-radius: 4px;"></div>
+        <div class="metric-description">Create stories shared by your organization.</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Total Donate Clicks</div>
+        <div class="metric-value skeleton" style="height: 40px; border-radius: 4px;"></div>
+        <div class="metric-description">Number of times users clicked the donate button.</div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row">
+      <!-- Stories Creation Chart -->
+      <div class="col-lg-6 col-12 mb-4">
+        <div class="chart-container">
+          <div class="chart-title">Stories Creation</div>
+          <div id="storiesChart" style="height: 300px;">
+            <div class="skeleton" style="height: 100%; border-radius: 8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story Weekly Goal -->
+      <div class="col-lg-6 col-12 mb-4">
+        <div class="chart-container">
+          <div class="chart-title">Story Weekly Goal</div>
+          <div class="progress-section">
+            <div id="progressChart" style="height: 200px; width: 200px;">
+              <div class="skeleton" style="height: 100%; width: 100%; border-radius: 50%;"></div>
+            </div>
+            <div class="progress-metrics">
+              <div class="progress-metric">
+                <div class="progress-value skeleton" style="height: 30px; width: 40px; border-radius: 4px;"></div>
+                <div class="progress-label">Goal</div>
+              </div>
+              <div class="progress-metric">
+                <div class="progress-value skeleton" style="height: 30px; width: 40px; border-radius: 4px;"></div>
+                <div class="progress-label">Approved</div>
+              </div>
+              <div class="progress-metric">
+                <div class="progress-value skeleton" style="height: 30px; width: 40px; border-radius: 4px;"></div>
+                <div class="progress-label">Pending</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Charts Row -->
+    <div class="row">
+      <!-- Followers Chart -->
+      <div class="col-lg-6 col-12 mb-4">
+        <div class="chart-container">
+          <div class="chart-title">Followers</div>
+          <div id="followersChart" style="height: 300px;">
+            <div class="skeleton" style="height: 100%; border-radius: 8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Followers Section -->
+      <div class="col-lg-6 col-12 mb-4">
+        <div class="chart-container">
+          <div class="chart-title">Followers</div>
+          <div class="followers-list-stats" id="followersList">
+            <!-- Skeleton loaders for follower items -->
+            <div class="follower-item">
+              <div class="skeleton follower-avatar"></div>
+              <div class="follower-info">
+                <div class="skeleton" style="height: 16px; width: 120px; margin-bottom: 5px;"></div>
+                <div class="skeleton" style="height: 12px; width: 150px;"></div>
+              </div>
+            </div>
+            <div class="follower-item">
+              <div class="skeleton follower-avatar"></div>
+              <div class="follower-info">
+                <div class="skeleton" style="height: 16px; width: 100px; margin-bottom: 5px;"></div>
+                <div class="skeleton" style="height: 12px; width: 140px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Engagement Section -->
+    <div class="chart-container">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="chart-title mb-0">Engagement</div>
+      </div>
+      <div class="engagement-metrics mt-3">
+        <div class="engagement-metric">
+          <div class="engagement-label">Donation Clicks</div>
+          <div class="engagement-value skeleton" style="height: 24px; width: 30px; border-radius: 4px;"></div>
+        </div>
+        <div class="engagement-metric">
+          <div class="engagement-label">Share Clicks</div>
+          <div class="engagement-value skeleton" style="height: 24px; width: 30px; border-radius: 4px;"></div>
+        </div>
+        <div class="engagement-metric">
+          <div class="engagement-label">Profile Visit</div>
+          <div class="engagement-value skeleton" style="height: 24px; width: 40px; border-radius: 4px;"></div>
+        </div>
+      </div>
+      <div id="engagementChart" style="height: 300px; margin-top: -20px">
+        <div class="skeleton" style="height: 100%; border-radius: 8px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include ApexCharts -->
+<script defer src="https://cdn.jsdelivr.net/npm/apexcharts"></script> 
+
+<script type="module">
+  // Get NPO ZUID from Parsley template
+  const npoZuid = '{{$zuid}}';
+  
+  // Helper function to get current week's start and end dates
+  function getCurrentWeekDates() {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const startOfWeek = new Date(now);
+    
+    // Calculate days since Monday (Monday = 1, so we want to subtract (dayOfWeek - 1))
+    // If it's Sunday (0), we want to go back 6 days to get to Monday
+    const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    startOfWeek.setDate(now.getDate() - daysToSubtract);
+    
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    
+    // Format as YYYY-MM-DD
+    const formatDate = (date) => {
+      return date.toISOString().split('T')[0];
+    };
+    
+    return {
+      start: formatDate(startOfWeek),
+      end: formatDate(endOfWeek)
+    };
+  }
+  
+  // Create TanStack Query observers for total stats
+  const npoTotalStatsQuery = window.createNpoTotalStatsQuery(npoZuid);
+  const npoAdminProfileQuery = window.createNPOProfileQuery(npoZuid);
+  const storiesQuery = window.createStoriesQuery({
+    npo: npoZuid,
+    status: "all",
+    limit: 9999
+  });
+
+  // Get current week dates for weekly goal stats
+  const weekDates = getCurrentWeekDates();
+  const npoStoriesStatsQuery = window.createNpoStoriesStatsQuery(npoZuid, weekDates.start, weekDates.end);
+
+  // Reactive subscription for total stats UI updates
+  npoTotalStatsQuery.subscribe((result) => {
+    if (result.isLoading) {
+      // Show skeleton loaders
+      showTotalStatsLoading();
+    } else if (result.isSuccess) {
+      // Get current data from other queries
+      const adminProfileResult = npoAdminProfileQuery.getCurrentResult();
+      const storiesResult = storiesQuery.getCurrentResult();
+      const weeklyStatsResult = npoStoriesStatsQuery.getCurrentResult();
+      
+      // Update UI with data
+      updateTotalStatsUI(
+        result.data, 
+        storiesResult.data, 
+        adminProfileResult.data, 
+        weeklyStatsResult.data
+      );
+    } else if (result.isError) {
+      console.error('Error loading total stats:', result.error);
+      showTotalStatsError();
+    }
+  });
+
+  // Reactive subscription for admin profile updates
+  npoAdminProfileQuery.subscribe((result) => {
+    if (result.isSuccess) {
+      // Re-trigger total stats update when admin profile changes
+      const totalStatsResult = npoTotalStatsQuery.getCurrentResult();
+      const storiesResult = storiesQuery.getCurrentResult();
+      const weeklyStatsResult = npoStoriesStatsQuery.getCurrentResult();
+      
+      if (totalStatsResult.isSuccess) {
+        updateTotalStatsUI(
+          totalStatsResult.data, 
+          storiesResult.data, 
+          result.data, 
+          weeklyStatsResult.data
+        );
+      }
+    }
+  });
+
+  // Reactive subscription for stories updates
+  storiesQuery.subscribe((result) => {
+    if (result.isSuccess) {
+      // Re-trigger total stats update when stories change
+      const totalStatsResult = npoTotalStatsQuery.getCurrentResult();
+      const adminProfileResult = npoAdminProfileQuery.getCurrentResult();
+      const weeklyStatsResult = npoStoriesStatsQuery.getCurrentResult();
+      
+      if (totalStatsResult.isSuccess) {
+        updateTotalStatsUI(
+          totalStatsResult.data, 
+          result.data, 
+          adminProfileResult.data, 
+          weeklyStatsResult.data
+        );
+      }
+    }
+  });
+
+  // Reactive subscription for weekly stats updates
+  npoStoriesStatsQuery.subscribe((result) => {
+    if (result.isSuccess) {
+      // Re-trigger total stats update when weekly stats change
+      const totalStatsResult = npoTotalStatsQuery.getCurrentResult();
+      const adminProfileResult = npoAdminProfileQuery.getCurrentResult();
+      const storiesResult = storiesQuery.getCurrentResult();
+      
+      if (totalStatsResult.isSuccess) {
+        updateTotalStatsUI(
+          totalStatsResult.data, 
+          storiesResult.data, 
+          adminProfileResult.data, 
+          result.data
+        );
+      }
+    }
+  });
+  // Function to show total stats loading state
+  function showTotalStatsLoading() {
+    const metricsContainer = $('#metricsContainer');
+    
+    // Show skeleton loaders for metric cards
+    metricsContainer.find('.metric-value').addClass('skeleton').text('');
+    
+    // Show skeleton for followers list
+    $('#followersList').html(`
+      <div class="follower-item">
+        <div class="skeleton follower-avatar"></div>
+        <div class="follower-info">
+          <div class="skeleton" style="height: 16px; width: 120px; margin-bottom: 5px;"></div>
+          <div class="skeleton" style="height: 12px; width: 150px;"></div>
+        </div>
+      </div>
+      <div class="follower-item">
+        <div class="skeleton follower-avatar"></div>
+        <div class="follower-info">
+          <div class="skeleton" style="height: 16px; width: 100px; margin-bottom: 5px;"></div>
+          <div class="skeleton" style="height: 12px; width: 140px;"></div>
+        </div>
+      </div>
+    `);
+  }
+  
+  // Function to update the UI with total stats data
+  function updateTotalStatsUI(stats, storiesResponse, adminProfile, weeklyStoryStats) {
+    const metricsContainer = $('#metricsContainer');
+    
+    // Update Total Followers
+    const followersCard = metricsContainer.find('.metric-card').eq(0);
+    followersCard.find('.metric-value').removeClass('skeleton').text(stats?.followerCounts || 0);
+    
+    // Update Total Views  
+    const viewsCard = metricsContainer.find('.metric-card').eq(1);
+    viewsCard.find('.metric-value').removeClass('skeleton').text(stats?.profileViews || 0);
+    
+    // Update Total Stories
+    const storiesCard = metricsContainer.find('.metric-card').eq(2);
+    const totalStories = storiesResponse?.data ? storiesResponse.data.length : 0;
+    storiesCard.find('.metric-value').removeClass('skeleton').text(totalStories);
+    
+    // Update Total Donate Clicks
+    const donateCard = metricsContainer.find('.metric-card').eq(3);
+    donateCard.find('.metric-value').removeClass('skeleton').text(stats?.donateClicks || 0);
+    
+    // Update Followers Section
+    updateFollowersList(stats);
+    
+    // Update Weekly Goal Section
+    updateWeeklyGoal(adminProfile, weeklyStoryStats);
+  }
+  
+  // Function to render followers list
+  function renderFollowers(followers) {
+    return followers.map(follower => `
+      <div class="follower-item">
+        <img src="${typeof follower.profile_image === 'string' ? follower.profile_image : follower.profile_image?.data[0]?.url || 'https://www.gravatar.com/avatar/?d=mp'}" 
+             class="follower-avatar" 
+             alt="${follower.first_name} ${follower.last_name}" />
+        <div class="follower-info">
+          <p class="follower-name">${follower.first_name} ${follower.last_name}</p>
+          <p class="follower-email">${follower.email}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Function to update the followers section
+  function updateFollowersList(stats) {
+    const followersList = $('#followersList');
+    const followers = stats?.followers || [];
+    
+    if (followers.length === 0) {
+      followersList.html(`
+        <div class="text-center py-4 text-muted">
+          <i class="bi bi-people fs-3 mb-2"></i>
+          <p class="mb-0">No followers yet</p>
+          <small>Share your NPO to get followers</small>
+        </div>
+      `);
+      return;
+    }
+    
+    // Show all followers
+    const followersHtml = renderFollowers(followers);
+    followersList.html(followersHtml);
+  }
+  // Function to update weekly goal section
+  function updateWeeklyGoal(adminProfile, weeklyStoryStats) {
+    const npoData = adminProfile?.data?.[0];
+    
+    // Get weekly goal from NPO profile data
+    let weeklyGoal = 0;
+    let hasGoalSet = false;
+    
+    if (npoData?.weekly_story_goal && parseInt(npoData.weekly_story_goal) > 0) {
+      weeklyGoal = parseInt(npoData.weekly_story_goal);
+      hasGoalSet = true;
+    }
+    
+    // Get current week stats
+    const approved = weeklyStoryStats?.storyPerStatus?.approved || 0;
+    const pending = weeklyStoryStats?.storyPerStatus?.pending || 0;
+    const total = approved + pending;
+    
+    // Update progress metrics
+    const progressMetrics = $('.progress-metrics');
+    
+    // Update Goal value
+    progressMetrics.find('.progress-metric').eq(0).find('.progress-value')
+      .removeClass('skeleton')
+      .text(hasGoalSet ? weeklyGoal : '--');
+    
+    // Update Approved value
+    progressMetrics.find('.progress-metric').eq(1).find('.progress-value')
+      .removeClass('skeleton')
+      .text(approved);
+    
+    // Update Pending value
+    progressMetrics.find('.progress-metric').eq(2).find('.progress-value')
+      .removeClass('skeleton')
+      .text(pending);
+    
+    // Update or create progress chart
+    updateProgressChart(weeklyGoal, approved, pending, hasGoalSet);
+  }
+  
+  // Function to update progress chart
+  function updateProgressChart(goal, approved, pending, hasGoalSet) {
+    const progressChartContainer = $('#progressChart');
+    
+    if (!hasGoalSet) {
+      // Show "No Goal Set" state
+      progressChartContainer.html(`
+        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+          <i class="bi bi-flag fs-1 text-muted mb-2"></i>
+          <p class="text-muted mb-0">No weekly goal set</p>
+          <small class="text-muted">Set a goal to track progress</small>
+        </div>
+      `);
+      return;
+    }
+    
+    const total = approved + pending;
+    const percentage = goal > 0 ? Math.min((total / goal) * 100, 100) : 0;
+    
+    // Create a simple CSS-based circular progress
+    progressChartContainer.html(`
+      <div class="position-relative d-flex align-items-center justify-content-center" style="width: 200px; height: 200px;">
+        <div class="progress-circle" style="
+          width: 160px; 
+          height: 160px; 
+          border-radius: 50%; 
+          background: conic-gradient(#7b3fee 0deg ${percentage * 3.6}deg, #e2e8f0 ${percentage * 3.6}deg 360deg);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">
+          <div style="
+            width: 120px; 
+            height: 120px; 
+            background: white; 
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+          ">
+            <div style="font-size: 32px; font-weight: bold; color: #2d3748;">${Math.round(percentage)}%</div>
+            <div style="font-size: 12px; color: #718096;">Complete</div>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+  
+  // Function to show error state
+  function showTotalStatsError() {
+    const metricsContainer = $('#metricsContainer');
+    const followersList = $('#followersList');
+    const progressChart = $('#progressChart');
+    const progressMetrics = $('.progress-metrics');
+    
+    // Update metric cards to show error state
+    metricsContainer.find('.metric-value.skeleton').each(function() {
+      $(this).removeClass('skeleton').text('--').css('color', '#e53e3e');
+    });
+    
+    // Update followers section to show error state
+    followersList.html(`
+      <div class="text-center py-4 text-danger">
+        <i class="bi bi-exclamation-triangle fs-3 mb-2"></i>
+        <p class="mb-0">Error loading followers data</p>
+        <small>Please try again later</small>
+      </div>
+    `);
+    
+    // Update weekly goal section to show error state
+    progressChart.html(`
+      <div class="d-flex flex-column align-items-center justify-content-center h-100">
+        <i class="bi bi-exclamation-triangle fs-1 text-danger mb-2"></i>
+        <p class="text-danger mb-0">Error loading goal data</p>
+        <small class="text-muted">Please try again later</small>
+      </div>
+    `);
+    
+    // Update progress metrics to show error state
+    progressMetrics.find('.progress-value.skeleton').each(function() {
+      $(this).removeClass('skeleton').text('--').css('color', '#e53e3e');
+    });
+  }
+  
+  // ==================== ENGAGEMENT STATS ====================
+  let currentPeriod = 'daily';
+  let engagementChart = null;
+  let followersChart = null;
+  let storiesChart = null;
+  
+  // Helper functions to calculate date ranges for different periods
+  function getDateRangeForPeriod(period) {
+    const now = new Date();
+    const formatDate = (date) => date.toISOString().split('T')[0];
+    
+    switch (period) {
+      case 'daily':
+        // Last 7 days
+        const dailyEnd = new Date(now);
+        const dailyStart = new Date(now);
+        dailyStart.setDate(now.getDate() - 6);
+        return {
+          start: formatDate(dailyStart),
+          end: formatDate(dailyEnd)
+        };
+      
+      case 'weekly':
+        // Last 7 weeks (7 * 7 = 49 days)
+        const weeklyEnd = new Date(now);
+        const weeklyStart = new Date(now);
+        weeklyStart.setDate(now.getDate() - 48);
+        return {
+          start: formatDate(weeklyStart),
+          end: formatDate(weeklyEnd)
+        };
+      
+      case 'monthly':
+        // Last 7 months (approximately 210 days)
+        const monthlyEnd = new Date(now);
+        const monthlyStart = new Date(now);
+        monthlyStart.setDate(now.getDate() - 209);
+        return {
+          start: formatDate(monthlyStart),
+          end: formatDate(monthlyEnd)
+        };
+      
+      default:
+        return getDateRangeForPeriod('daily');
+    }
+  }
+  
+// Create separate TanStack Query observers for each period to avoid cache issues
+let dailyEngagementQuery = null;
+let dailyStoriesQuery = null;
+let weeklyEngagementQuery = null;
+let weeklyStoriesQuery = null;
+let monthlyEngagementQuery = null;
+let monthlyStoriesQuery = null;
+
+let dailyEngagementUnsubscribe = null;
+let dailyStoriesUnsubscribe = null;
+let weeklyEngagementUnsubscribe = null;
+let weeklyStoriesUnsubscribe = null;
+let monthlyEngagementUnsubscribe = null;
+let monthlyStoriesUnsubscribe = null;
+
+// Function to initialize all period queries
+function initializePeriodQueries() {
+  // Daily queries
+  const dailyRange = getDateRangeForPeriod('daily');
+  dailyEngagementQuery = window.createNpoEngagementStatsQuery(npoZuid, dailyRange.start, dailyRange.end);
+  dailyStoriesQuery = window.createNpoStoriesStatsQuery(npoZuid, dailyRange.start, dailyRange.end);
+  
+  // Weekly queries
+  const weeklyRange = getDateRangeForPeriod('weekly');
+  weeklyEngagementQuery = window.createNpoEngagementStatsQuery(npoZuid, weeklyRange.start, weeklyRange.end);
+  weeklyStoriesQuery = window.createNpoStoriesStatsQuery(npoZuid, weeklyRange.start, weeklyRange.end);
+  
+  // Monthly queries
+  const monthlyRange = getDateRangeForPeriod('monthly');
+  monthlyEngagementQuery = window.createNpoEngagementStatsQuery(npoZuid, monthlyRange.start, monthlyRange.end);
+  monthlyStoriesQuery = window.createNpoStoriesStatsQuery(npoZuid, monthlyRange.start, monthlyRange.end);
+  
+  // Set up subscriptions for all periods
+  setupPeriodSubscriptions();
+}
+
+// Function to set up subscriptions for all periods
+function setupPeriodSubscriptions() {
+  // Daily subscriptions
+  dailyEngagementUnsubscribe = dailyEngagementQuery.subscribe((result) => {
+    if (result.isSuccess && currentPeriod === 'daily') {
+      const storiesResult = dailyStoriesQuery.getCurrentResult();
+      if (storiesResult.isSuccess) {
+        updateEngagementUI(result.data, 'daily');
+        updateStoriesChart(storiesResult.data, 'daily');
+      }
+    }
+  });
+  
+  dailyStoriesUnsubscribe = dailyStoriesQuery.subscribe((result) => {
+    if (result.isSuccess && currentPeriod === 'daily') {
+      const engagementResult = dailyEngagementQuery.getCurrentResult();
+      if (engagementResult.isSuccess) {
+        updateEngagementUI(engagementResult.data, 'daily');
+        updateStoriesChart(result.data, 'daily');
+      }
+    }
+  });
+  
+  // Weekly subscriptions
+  weeklyEngagementUnsubscribe = weeklyEngagementQuery.subscribe((result) => {
+    if (result.isSuccess && currentPeriod === 'weekly') {
+      const storiesResult = weeklyStoriesQuery.getCurrentResult();
+      if (storiesResult.isSuccess) {
+        updateEngagementUI(result.data, 'weekly');
+        updateStoriesChart(storiesResult.data, 'weekly');
+      }
+    }
+  });
+  
+  weeklyStoriesUnsubscribe = weeklyStoriesQuery.subscribe((result) => {
+    if (result.isSuccess && currentPeriod === 'weekly') {
+      const engagementResult = weeklyEngagementQuery.getCurrentResult();
+      if (engagementResult.isSuccess) {
+        updateEngagementUI(engagementResult.data, 'weekly');
+        updateStoriesChart(result.data, 'weekly');
+      }
+    }
+  });
+  
+  // Monthly subscriptions
+  monthlyEngagementUnsubscribe = monthlyEngagementQuery.subscribe((result) => {
+    if (result.isSuccess && currentPeriod === 'monthly') {
+      const storiesResult = monthlyStoriesQuery.getCurrentResult();
+      if (storiesResult.isSuccess) {
+        updateEngagementUI(result.data, 'monthly');
+        updateStoriesChart(storiesResult.data, 'monthly');
+      }
+    }
+  });
+  
+  monthlyStoriesUnsubscribe = monthlyStoriesQuery.subscribe((result) => {
+    if (result.isSuccess && currentPeriod === 'monthly') {
+      const engagementResult = monthlyEngagementQuery.getCurrentResult();
+      if (engagementResult.isSuccess) {
+        updateEngagementUI(engagementResult.data, 'monthly');
+        updateStoriesChart(result.data, 'monthly');
+      }
+    }
+  });
+}
+
+// Function to switch to a specific period
+function switchToPeriod(period) {
+  currentPeriod = period;
+      
+      // Show loading state
+      showEngagementLoading();
+      
+  // Force render the data for the selected period
+  let engagementResult, storiesResult;
+  
+  switch (period) {
+    case 'daily':
+      engagementResult = dailyEngagementQuery.getCurrentResult();
+      storiesResult = dailyStoriesQuery.getCurrentResult();
+      break;
+    case 'weekly':
+      engagementResult = weeklyEngagementQuery.getCurrentResult();
+      storiesResult = weeklyStoriesQuery.getCurrentResult();
+      break;
+    case 'monthly':
+      engagementResult = monthlyEngagementQuery.getCurrentResult();
+      storiesResult = monthlyStoriesQuery.getCurrentResult();
+      break;
+  }
+  
+  // Update UI if both queries have data
+  if (engagementResult.isSuccess && storiesResult.isSuccess) {
+    updateEngagementUI(engagementResult.data, period);
+    updateStoriesChart(storiesResult.data, period);
+  } else if (engagementResult.isError || storiesResult.isError) {
+      showEngagementError();
+    }
+  }
+
+// Initialize all period queries
+initializePeriodQueries();
+  
+  // Function to show engagement loading state
+  function showEngagementLoading() {
+    $('#engagementChart').html(`
+      <div class="skeleton" style="height: 100%; border-radius: 8px;"></div>
+    `);
+    
+    $('#followersChart').html(`
+      <div class="skeleton" style="height: 100%; border-radius: 8px;"></div>
+    `);
+    
+    $('#storiesChart').html(`
+      <div class="skeleton" style="height: 100%; border-radius: 8px;"></div>
+    `);
+    
+    $('.engagement-metrics .engagement-value').each(function() {
+      $(this).addClass('skeleton').text('').css('color', '');
+    });
+  }
+  // Function to show engagement error state
+  function showEngagementError() {
+    $('#engagementChart').html(`
+      <div class="d-flex flex-column align-items-center justify-content-center h-100">
+        <i class="bi bi-exclamation-triangle fs-1 text-danger mb-2"></i>
+        <p class="text-danger mb-0">Error loading engagement data</p>
+        <small class="text-muted">Please try again later</small>
+      </div>
+    `);
+    
+    $('#followersChart').html(`
+      <div class="d-flex flex-column align-items-center justify-content-center h-100">
+        <i class="bi bi-exclamation-triangle fs-1 text-danger mb-2"></i>
+        <p class="text-danger mb-0">Error loading followers data</p>
+        <small class="text-muted">Please try again later</small>
+      </div>
+    `);
+    
+    $('.engagement-metrics .engagement-value').each(function() {
+      $(this).removeClass('skeleton').text('--').css('color', '#e53e3e');
+    });
+  }
+  
+  // Function to update engagement UI
+  function updateEngagementUI(engagementData, period) {
+    // Update engagement metrics
+    const total = engagementData?.total || {};
+    
+    $('.engagement-metrics .engagement-metric').eq(0).find('.engagement-value')
+      .removeClass('skeleton').text(total.donateClicks || 0).css('color', '');
+    $('.engagement-metrics .engagement-metric').eq(1).find('.engagement-value')
+      .removeClass('skeleton').text(total.shareClicks || 0).css('color', '');
+    $('.engagement-metrics .engagement-metric').eq(2).find('.engagement-value')
+      .removeClass('skeleton').text(total.profileViews || 0).css('color', '');
+    
+    // Create/update engagement chart
+    createEngagementChart(engagementData, period);
+    
+    // Create/update followers chart
+    createFollowersChart(engagementData, period);
+  }
+  
+  // Function to create engagement chart
+  function createEngagementChart(engagementData, period) {
+    const chartContainer = document.getElementById('engagementChart');
+    
+    if (!engagementData?.data) {
+      chartContainer.innerHTML = `
+        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+          <i class="bi bi-bar-chart fs-1 text-muted mb-2"></i>
+          <p class="text-muted mb-0">No engagement data available</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Process data for chart
+    const chartData = processEngagementDataForChart(engagementData.data, period);
+    
+    // Destroy existing chart if it exists and clear container to remove skeletons
+    if (engagementChart) {
+      try { engagementChart.destroy(); } catch(e){}
+      engagementChart = null;
+    }
+    chartContainer.innerHTML = '';
+    
+    // Chart options
+    const options = {
+      series: [
+        {
+          name: 'Donation Clicks',
+          data: chartData.donateClicks
+        },
+        {
+          name: 'Share Clicks',
+          data: chartData.shareClicks
+        },
+        {
+          name: 'Profile Views',
+          data: chartData.profileViews
+        }
+      ],
+      chart: {
+        type: 'bar',
+        height: 300,
+        stacked: false,
+        toolbar: {
+          show: false
+        }
+      },
+      colors: ['#3B82F6', '#F97316', '#16A34A'],
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '55%',
+          borderRadius: 4
+        }
+      },
+      xaxis: {
+        categories: chartData.categories,
+        labels: {
+          style: {
+            fontSize: '12px',
+            colors: '#666'
+          }
+        }
+      },
+      yaxis: {
+        forceNiceScale: true,
+        labels: {
+          style: {
+            fontSize: '12px',
+            colors: '#666'
+          },
+          formatter: function(val) {
+            return Math.round(val);
+          }
+        }
+      },
+      tooltip: {
+        shared: true,
+        intersect: false,
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'right',
+        offsetY: -50
+      },
+      grid: {
+        borderColor: '#e2e8f0',
+        strokeDashArray: 4
+      },
+      dataLabels: {
+        enabled: false
+      }
+    };
+    
+    // Create new chart
+    engagementChart = new ApexCharts(chartContainer, options);
+    requestAnimationFrame(function(){ engagementChart.render(); });
+    // Nudge resize after render to fix initial layout
+    setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 50);
+  }
+  
+  // Function to create followers chart
+  function createFollowersChart(engagementData, period) {
+    const chartContainer = document.getElementById('followersChart');
+    
+    if (!engagementData?.data) {
+      chartContainer.innerHTML = `
+        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+          <i class="bi bi-people fs-1 text-muted mb-2"></i>
+          <p class="text-muted mb-0">No followers data available</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Process followers data for chart
+    const chartData = processFollowersDataForChart(engagementData.data, period);
+    
+    // Destroy existing chart if it exists and clear container
+    if (followersChart) {
+      try { followersChart.destroy(); } catch(e){}
+      followersChart = null;
+    }
+    chartContainer.innerHTML = '';
+    
+    // Chart options for followers
+    const options = {
+      series: [
+        {
+          name: 'Followers',
+          data: chartData.followerCounts
+        }
+      ],
+      chart: {
+        type: 'area',
+        height: 300,
+        toolbar: {
+          show: false
+        }
+      },
+      colors: ['#3B82F6'],
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 0.8,
+          opacityFrom: 0.6,
+          opacityTo: 0.1,
+          stops: [0, 80, 100],
+          colorStops: [
+            {
+              offset: 0,
+              color: '#3B82F6',
+              opacity: 0.6
+            },
+            {
+              offset: 100,
+              color: '#3B82F6',
+              opacity: 0.1
+            }
+          ]
+        }
+      },
+      stroke: {
+        curve: 'smooth',
+        width: 1
+      },
+      xaxis: {
+        categories: chartData.categories,
+        labels: {
+          style: {
+            fontSize: '12px',
+            colors: '#666'
+          }
+        }
+      },
+      yaxis: {
+        min: 0,
+        tickAmount: 5,
+        forceNiceScale: true,
+        labels: {
+          style: {
+            fontSize: '12px',
+            colors: '#666'
+          },
+          formatter: function(val) {
+            return Math.round(val);
+          }
+        }
+      },
+      tooltip: {
+        shared: true,
+        intersect: false,
+        y: {
+          formatter: function(value) {
+            return value + ' followers';
+          }
+        }
+      },
+      grid: {
+        borderColor: '#e2e8f0',
+        strokeDashArray: 4
+      },
+      dataLabels: {
+        enabled: false
+      }
+    };
+    
+    // Create new followers chart
+    followersChart = new ApexCharts(chartContainer, options);
+    requestAnimationFrame(function(){ followersChart.render(); });
+    setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 50);
+  }
+  
+  // ==================== STORIES CHART ====================
+  // Function to update stories chart
+  function updateStoriesChart(storiesData, period) {
+    const chartContainer = document.getElementById('storiesChart');
+    
+    if (!chartContainer) {
+      console.error('Stories chart container not found');
+      return;
+    }
+    
+    // Destroy existing chart and clear container to remove skeletons
+    if (storiesChart) {
+      try { storiesChart.destroy(); } catch(e){}
+      storiesChart = null;
+    }
+    chartContainer.innerHTML = '';
+    
+    // Check if we have data
+    if (!storiesData || !storiesData.countPerDate || !Array.isArray(storiesData.countPerDate) || storiesData.countPerDate.length === 0) {
+      chartContainer.innerHTML = `
+        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+          <i class="bi bi-file-text fs-1 text-muted mb-2"></i>
+          <p class="text-muted mb-0">No stories data available for this period</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Process data based on period
+    const chartData = processStoriesDataForChart(storiesData.countPerDate, period);
+    
+    // Create chart options
+    const options = {
+      series: [{
+        name: 'Stories Created',
+        data: chartData.values
+      }],
+      chart: {
+        type: 'area',
+        height: 300,
+        toolbar: { show: false }
+      },
+      colors: ['#3B82F6'],
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 0.8,
+          opacityFrom: 0.6,
+          opacityTo: 0.1,
+          stops: [0, 80, 100],
+          colorStops: [
+            {
+              offset: 0,
+              color: '#3B82F6',
+              opacity: 0.6
+            },
+            {
+              offset: 100,
+              color: '#3B82F6',
+              opacity: 0.1
+            }
+          ]
+        }
+      },
+      stroke: {
+        curve: 'smooth',
+        width: 1
+      },
+      xaxis: {
+        categories: chartData.labels,
+        labels: { fontSize: '12px', colors: '#666' }
+      },
+      yaxis: {
+        labels: { fontSize: '12px', colors: '#666' },
+        min: 0,
+        tickAmount: 5,
+        forceNiceScale: true,
+        formatter: function(val) {
+          return Math.round(val);
+        }
+      },
+      tooltip: {
+        y: {
+          formatter: function(value) {
+            return value + ' stories';
+          }
+        }
+      },
+      grid: {
+        borderColor: '#e2e8f0',
+        strokeDashArray: 4
+      },
+      dataLabels: { enabled: false }
+    };
+    
+    // Create and render chart
+    storiesChart = new ApexCharts(chartContainer, options);
+    requestAnimationFrame(function(){ storiesChart.render(); });
+    setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 50);
+  }
+
+  // Function to process stories data for chart based on period
+  function processStoriesDataForChart(countPerDate, period) {
+    switch (period) {
+      case 'daily':
+        return processDailyStoriesData(countPerDate);
+      case 'weekly':
+        return processWeeklyStoriesData(countPerDate);
+      case 'monthly':
+        return processMonthlyStoriesData(countPerDate);
+      default:
+        return processDailyStoriesData(countPerDate);
+    }
+  }
+  
+  // Process daily stories data
+  function processDailyStoriesData(countPerDate) {
+    const labels = countPerDate.map(item => {
+      const date = new Date(item.date);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+    
+    const values = countPerDate.map(item => item.total || 0);
+    
+    return { labels, values };
+  }
+  
+  // Process weekly stories data
+  function processWeeklyStoriesData(countPerDate) {
+    const weeklyData = {};
+    
+    // Group by week
+    countPerDate.forEach(item => {
+      const date = new Date(item.date);
+      const weekStart = new Date(date);
+      weekStart.setDate(date.getDate() - (date.getDay() === 0 ? 6 : date.getDay() - 1)); // Monday as start of week
+      weekStart.setHours(0, 0, 0, 0);
+      const weekKey = weekStart.toISOString().split('T')[0];
+      
+      if (!weeklyData[weekKey]) {
+        weeklyData[weekKey] = 0;
+      }
+      weeklyData[weekKey] += item.total || 0;
+    });
+    
+    // Convert to arrays
+    const sortedWeeks = Object.keys(weeklyData).sort();
+    const labels = sortedWeeks.map(week => {
+      const date = new Date(week);
+      return `Week of ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    });
+    const values = sortedWeeks.map(week => weeklyData[week]);
+    
+    return { labels, values };
+  }
+  
+  // Process monthly stories data
+  function processMonthlyStoriesData(countPerDate) {
+    const monthlyData = {};
+    
+    // Group by month
+    countPerDate.forEach(item => {
+      const date = new Date(item.date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
+      
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = 0;
+      }
+      monthlyData[monthKey] += item.total || 0;
+    });
+    
+    // Convert to arrays
+    const sortedMonths = Object.keys(monthlyData).sort();
+    const labels = sortedMonths.map(month => {
+      const date = new Date(month);
+      return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    });
+    const values = sortedMonths.map(month => monthlyData[month]);
+    
+    return { labels, values };
+  }
+  
+  // Function to process followers data for chart
+  function processFollowersDataForChart(data, period) {
+    const dates = Object.keys(data).sort();
+    
+    switch (period) {
+      case 'daily':
+        return processFollowersDailyData(data, dates);
+      case 'weekly':
+        return processFollowersWeeklyData(data, dates);
+      case 'monthly':
+        return processFollowersMonthlyData(data, dates);
+      default:
+        return processFollowersDailyData(data, dates);
+    }
+  }
+  
+  // Process followers data for daily view
+  function processFollowersDailyData(data, dates) {
+    const categories = dates.map(date => {
+      const d = new Date(date);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+    
+    return {
+      categories,
+      followerCounts: dates.map(date => data[date]?.followerCounts || 0)
+    };
+  }
+  
+  // Process followers data for weekly view
+  function processFollowersWeeklyData(data, dates) {
+    const weeklyData = {};
+    
+    dates.forEach(date => {
+      const d = new Date(date);
+      const weekStart = new Date(d);
+      weekStart.setDate(d.getDate() - d.getDay() + 1); // Monday
+      const weekKey = weekStart.toISOString().split('T')[0];
+      
+      if (!weeklyData[weekKey]) {
+        weeklyData[weekKey] = {
+          followerCounts: 0
+        };
+      }
+      
+      const dayData = data[date] || {};
+      weeklyData[weekKey].followerCounts += dayData.followerCounts || 0;
+    });
+    
+    const weeks = Object.keys(weeklyData).sort();
+    const categories = weeks.map(week => {
+      const d = new Date(week);
+      return `Week of ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    });
+    
+    return {
+      categories,
+      followerCounts: weeks.map(week => weeklyData[week].followerCounts)
+    };
+  }
+  
+  // Process followers data for monthly view
+  function processFollowersMonthlyData(data, dates) {
+    const monthlyData = {};
+    
+    dates.forEach(date => {
+      const d = new Date(date);
+      const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = {
+          followerCounts: 0
+        };
+      }
+      
+      const dayData = data[date] || {};
+      monthlyData[monthKey].followerCounts += dayData.followerCounts || 0;
+    });
+    
+    const months = Object.keys(monthlyData).sort();
+    const categories = months.map(month => {
+      const [year, monthNum] = month.split('-');
+      const d = new Date(year, monthNum - 1);
+      return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    });
+    
+    return {
+      categories,
+      followerCounts: months.map(month => monthlyData[month].followerCounts)
+    };
+  }
+  
+
+  
+  // Function to process engagement data for chart based on period
+  function processEngagementDataForChart(data, period) {
+    const dates = Object.keys(data).sort();
+    
+    switch (period) {
+      case 'daily':
+        return processDailyData(data, dates);
+      case 'weekly':
+        return processWeeklyData(data, dates);
+      case 'monthly':
+        return processMonthlyData(data, dates);
+      default:
+        return processDailyData(data, dates);
+    }
+  }
+  
+  // Process data for daily view (show individual days)
+  function processDailyData(data, dates) {
+    const categories = dates.map(date => {
+      const d = new Date(date);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+    
+    return {
+      categories,
+      donateClicks: dates.map(date => data[date]?.donateClicks || 0),
+      shareClicks: dates.map(date => data[date]?.shareClicks || 0),
+      profileViews: dates.map(date => data[date]?.profileViews || 0),
+      followerCounts: dates.map(date => data[date]?.followerCounts || 0)
+    };
+  }
+  
+  // Process data for weekly view (group by weeks)
+  function processWeeklyData(data, dates) {
+    const weeklyData = {};
+    
+    dates.forEach(date => {
+      const d = new Date(date);
+      const weekStart = new Date(d);
+      weekStart.setDate(d.getDate() - d.getDay() + 1); // Monday
+      const weekKey = weekStart.toISOString().split('T')[0];
+      
+      if (!weeklyData[weekKey]) {
+        weeklyData[weekKey] = {
+          donateClicks: 0,
+          shareClicks: 0,
+          profileViews: 0,
+          followerCounts: 0
+        };
+      }
+      
+      const dayData = data[date] || {};
+      weeklyData[weekKey].donateClicks += dayData.donateClicks || 0;
+      weeklyData[weekKey].shareClicks += dayData.shareClicks || 0;
+      weeklyData[weekKey].profileViews += dayData.profileViews || 0;
+      weeklyData[weekKey].followerCounts += dayData.followerCounts || 0;
+    });
+    
+    const weeks = Object.keys(weeklyData).sort();
+    const categories = weeks.map(week => {
+      const d = new Date(week);
+      return `Week of ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    });
+    
+    return {
+      categories,
+      donateClicks: weeks.map(week => weeklyData[week].donateClicks),
+      shareClicks: weeks.map(week => weeklyData[week].shareClicks),
+      profileViews: weeks.map(week => weeklyData[week].profileViews),
+      followerCounts: weeks.map(week => weeklyData[week].followerCounts)
+    };
+  }
+  
+  // Process data for monthly view (group by months)
+  function processMonthlyData(data, dates) {
+    const monthlyData = {};
+    
+    dates.forEach(date => {
+      const d = new Date(date);
+      const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = {
+          donateClicks: 0,
+          shareClicks: 0,
+          profileViews: 0,
+          followerCounts: 0
+        };
+      }
+      
+      const dayData = data[date] || {};
+      monthlyData[monthKey].donateClicks += dayData.donateClicks || 0;
+      monthlyData[monthKey].shareClicks += dayData.shareClicks || 0;
+      monthlyData[monthKey].profileViews += dayData.profileViews || 0;
+      monthlyData[monthKey].followerCounts += dayData.followerCounts || 0;
+    });
+    
+    const months = Object.keys(monthlyData).sort();
+    const categories = months.map(month => {
+      const [year, monthNum] = month.split('-');
+      const d = new Date(year, monthNum - 1);
+      return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    });
+    
+    return {
+      categories,
+      donateClicks: months.map(month => monthlyData[month].donateClicks),
+      shareClicks: months.map(month => monthlyData[month].shareClicks),
+      profileViews: months.map(month => monthlyData[month].profileViews),
+      followerCounts: months.map(month => monthlyData[month].followerCounts)
+    };
+  }
+  
+  // Event listeners for time period tabs
+  $('.time-period-tabs .nav-link').on('click', function(e) {
+    e.preventDefault();
+    
+    // Update active tab
+    $('.time-period-tabs .nav-link').removeClass('active');
+    $(this).addClass('active');
+    
+    // Get selected period
+    const period = $(this).data('period');
+    
+  // Switch to the selected period
+  switchToPeriod(period);
+  });
+  
+// Note: Initial engagement stats loading is now handled by reactive subscriptions
+</script>
+
+

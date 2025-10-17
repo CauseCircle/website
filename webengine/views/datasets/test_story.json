@@ -1,0 +1,34 @@
+{{$page = 1}}
+{{$limit = 25}}
+{{$created_at = desc}}
+{{$filter = }}
+{{$sort = }}
+
+{{if {get_var.page} }}
+{{$page = {get_var.page} }}
+{{/if}}
+{{if {get_var.limit} }}
+{{$limit = {get_var.limit} }}
+{{/if}}
+
+{{$filter = WHERE story.npo_approval_status = '{get_var.status}' }}
+
+
+{{$start = {math(({$page} - 1) * {$limit})} }}
+{{$approved = }}
+{
+    "data" :
+    [
+        {{each stories as story {$filter} limit {$start}, {$limit} }}
+        {{story.toJSON(2)}}
+        {{$approved = {story.npo_approved} }}
+        {{story._arraycomma}}
+        {{/each}}
+    ],
+    "meta" : {
+        "page" : {{$page}},
+        "start" : {{$start}},
+        "limit" : {{$limit}},
+        "filter" : "{{$filter}}"
+    }
+}

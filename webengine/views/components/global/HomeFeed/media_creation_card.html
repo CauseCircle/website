@@ -32,7 +32,9 @@
 <div class="post-creator">
   <div class="card">
     <div class="card-body">
-      <button class="create-post form-control border mb-3 post-creator-button">
+      <button
+        class="create-post form-control border mb-3 post-creator-button d-none"
+      >
         Write Post
       </button>
       <div class="content-buttons">
@@ -40,12 +42,11 @@
           <i class="bi bi-image"></i> Media
         </div>
         <button
-          class="content-button create-story"
+          class="create-story btn btn-primary w-100"
           type="button"
-          data-bs-toggle="modal"
-          data-bs-target="#createStoryModal"
+          id="makePostBtn"
         >
-          <i class="bi bi-pencil-square"></i> Write story
+          <i class="bi bi-pencil-square"></i> Make a Post
         </button>
         <button
           class="content-button create-event d-none"
@@ -58,3 +59,36 @@
     </div>
   </div>
 </div>
+
+<script type="module">
+$(document).ready(function() {
+  $("#makePostBtn").on("click", async function(e) {
+    e.preventDefault();
+    
+    const $btn = $(this);
+    const originalHtml = $btn.html();
+    
+    // Show loading state
+    $btn.prop("disabled", true).html(`
+      <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+      Checking...
+    `);
+    
+    try {
+      if (typeof window.showCreateStoryModal === 'function') {
+        await window.showCreateStoryModal();
+      } else {
+        // Fallback if function not loaded yet
+        $("#createStoryModal").modal("show");
+      }
+    } catch (error) {
+      console.error("Error showing create story modal:", error);
+      // Fallback - just show the modal
+      $("#createStoryModal").modal("show");
+    } finally {
+      // Restore button state
+      $btn.prop("disabled", false).html(originalHtml);
+    }
+  });
+});
+</script>

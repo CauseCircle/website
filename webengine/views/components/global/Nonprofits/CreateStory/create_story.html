@@ -1,0 +1,456 @@
+{{$slug = {request.pathPart(2)} }}
+<!--prettier-ignore-->
+{{$zuid = }}
+<!--prettier-ignore-->
+{{each non_profits as npo where npo._path_part like '{$slug}' }}
+{{$zuid = {npo._zuid} }}
+<html lang="en">
+  <head>
+    <title>{{npo.name}} invited you to Join their CauseCircle!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Add required stylesheets -->
+    <link href="/styles/bootstrap.css" rel="stylesheet" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- icon -->
+    <link rel="icon" href="https://4xxglxlj.media.zestyio.com/cause-circle-icon-color.png" type="image/png" sizes="196x196">
+
+
+    <script>
+      <!-- prettier-ignore -->
+      {{include /auth/facebook.js}}
+    </script>
+
+    <!-- Firebase Scripts -->
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"
+    ></script>
+
+    <script type="module" src="/auth/firebase-config.js"></script>
+
+    <!-- Bootstrap Bundle -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+
+    <script
+      defer
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Include base auth -->
+    {{include /scripts/main.html}}
+
+    <style>
+      .section-title p,
+      .section-title {
+        font-size: 2rem;
+        font-weight: 500;
+        text-align: center;
+      }
+      .hero-description p,
+      .hero-description {
+        font-size: 1.125rem;
+        font-weight: 400;
+        text-align: center;
+        color: var(--bs-gray-500);
+        max-width: 53.125rem;
+      }
+      .role-card,
+      .cause-card,
+      .npo-card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        cursor: pointer;
+      }
+      .role-card:hover,
+      .cause-card:hover,
+      .npo-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+      .role-card.selected,
+      .cause-card.selected,
+      .npo-card.selected {
+        border: 2px solid #7b3fee;
+        background-color: #f8f4ff;
+      }
+      .search-input {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+        background-repeat: no-repeat;
+        background-position: 10px center;
+        padding-left: 35px;
+      }
+      #stepsIndicator {
+        font-size: 0.875rem;
+      }
+      .step-item {
+        display: flex;
+        align-items: center;
+        color: var(--bs-gray-600);
+      }
+      .step-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: var(--bs-gray-300);
+        color: var(--bs-white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 8px;
+      }
+      .step-separator {
+        width: 16px;
+        height: 2px;
+        background-color: var(--bs-gray-300);
+        margin: 0 8px;
+      }
+      .step-item.active {
+        color: var(--bs-primary);
+      }
+      .step-item.active .step-icon {
+        background-color: var(--bs-primary);
+      }
+      .step-item.completed .step-icon {
+        background-color: var(--bs-success);
+      }
+      .modal-fullscreen .modal-header {
+        padding: 1rem 2rem;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+      }
+      .modal-fullscreen .modal-body {
+        padding: 2rem;
+      }
+      .close-button {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: #000;
+        opacity: 0.5;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+      }
+      .close-button:hover {
+        opacity: 0.75;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="createStory" class="pt-4">
+      <div class="w-100">
+        <div class="row w-100 mx-0">
+          <div
+            class="col-2 d-flex justify-content-start align-items-center d-none d-md-flex"
+          >
+            <img
+              src="{{ globals.logo.getImage() }}"
+              style="max-width: 160px"
+              alt="cause circle brand logo"
+            />
+          </div>
+          <div
+            class="col-10 col-md-8 d-flex justify-content-center align-items-center"
+          >
+            <!-- Steps indicator -->
+            <div
+              id="stepsIndicator"
+              class="d-flex align-items-center justify-content-center"
+            >
+              <!-- <div class="step-item" data-step="1">
+                <span class="step-icon">1</span>
+                <span class="step-text">Hero Image</span>
+              </div> -->
+              <!-- <div class="step-separator"></div> -->
+              <div class="step-item" data-step="1">
+                <span class="step-icon">1</span>
+                <span class="step-text">Story Information</span>
+              </div>
+              <!-- <div class="step-separator"></div> -->
+              <!-- <div class="step-item" data-step="2">
+                <span class="step-icon">2</span>
+                <span class="step-text">Add Content</span>
+              </div> -->
+              <div class="step-separator"></div>
+              <div class="step-item" data-step="2">
+                <span class="step-icon">2</span>
+                <span class="step-text">Share</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-2 d-flex justify-content-end align-items-center">
+          </div>
+        </div>
+      </div>
+      <div class="p-3 p-md-4">
+        <div class="container-fluid">
+          <div>
+            <button id="backBtn" class="btn btn-secondary">
+              <i class="bi bi-arrow-left"></i>
+              Back
+            </button>
+          </div>
+          <!-- Content sections -->
+          <div class="row">
+            <div class="col-12">
+              <!-- prettier-ignore -->
+              {{ include /components/global/Nonprofits/CreateStory/story_information.html }}
+              <!-- prettier-ignore -->
+              {{ include /components/global/Nonprofits/CreateStory/share_story.html }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add required scripts -->
+
+    <script type="module">
+      const selectionHeaderTextsForStory = [
+        {
+          title: "Create Story",
+          description: "Write a story for a cause you care about",
+          icon: "https://4xxglxlj.media.zestyio.com/upload_icon.png",
+        },
+        {
+          title: "Your Story is Published!",
+          description: "Almost done! Choose how you want to share your story.",
+          icon: "https://4xxglxlj.media.zestyio.com/finish_icon.png",
+        },
+      ];
+
+
+      //states
+      window.npo_data;
+      window.category_data;
+      window.hero_image = [];
+      window.story_title;
+      window.story_description;
+      window.story_content;
+      window.story_location;
+      window.story_npo;
+      window.story_category;
+      window.story_data;
+
+      $(document).ready(function () {
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        const resetStates = () => {
+          window.hero_image = [];
+          window.story_title = "";
+          window.story_description = "";
+          window.story_content = "";
+          window.story_location = "";
+          window.story_npo = "";
+          window.story_category = "";
+
+          $("#uploadArea").val("");
+          $("#fileInput").val(""); // Reset file input
+          $("#storyTitle").val("");
+          $("#storyDescription").val("");
+          $("#npoSearchInput").val("");
+          $("#categorySearchInput").val("");
+          $("#location").val("");
+          $("#storyContent").val("");
+        };
+
+        // Centralized next button click handler
+        $("#nextBtn").on("click", async function () {
+          const $nextBtn = $(this);
+          const $spinner = $nextBtn.find(".spinner-border");
+
+          // Show spinner and disable button
+          $spinner.removeClass("d-none");
+          $nextBtn.prop("disabled", true);
+
+          try {
+            // Call the appropriate function based on the current step
+            switch (currentStep) {
+              case 1:
+                // Handle story information submission
+                window.story_description = $("#storyDescription").val();
+
+                // Find the NPO object and get its zuid
+                const npoId = $("#selectedNPO").val();
+                window.story_npo = npoId ? npoId : null;
+
+                if (window.story_npo == "") {
+                  alert("Please select an NPO");
+                  return;
+                }
+
+                // Remove category validation check
+                // Find the Category object and get its zuid
+                const categoryId = $("#selectedCategory").val();
+                window.story_category = categoryId ? categoryId : null;
+
+                if (window.story_category == "") {
+                  alert("Please select a category");
+                  return;
+                }
+
+                window.story_location = $("#location").val();
+
+                // Handle content addition
+                window.story_content = $("#storyContent").val();
+
+                try {
+                  const uploadedHeroImages = await newUploadImages(window.hero_image);
+
+                  const imageIds = uploadedHeroImages.map((img) => img.data[0].id);
+
+                  const userData = JSON.parse(localStorage.getItem("user"));
+                  const storyData = {
+                    title: window.story_title,
+                    story: window.story_content || window.story_description,
+                    images: imageIds.join(","),
+                    cause_category: window.story_category,
+                    // cause_category: "7-80c2e0edba-ltxdkc",
+                    npo: window.story_npo,
+                    author: userData.zuid,
+                    date_published: new Date().toISOString(),
+                    description: window.story_description,
+                  };
+                  const story = await createStory(storyData);
+
+                  if (story.data.length === 0) {
+                    alert(
+                      `Failed to upload story. Your story is deemed inappropriate. Please try again.`
+                    );
+                    return; // Prevent moving to the next step if uploads failed
+                  }
+
+                  window.story_data = await window.getStory(story?.meta?.story_zuid);
+                  $("#shareLink").val(`${window.story_data[0]?.meta?.web?.url}`);
+                } catch (error) {
+                  console.error("Error uploading story:", error);
+                  alert("Failed to upload story. Please try again.");
+                  return; // Prevent moving to the next step if uploads failed
+                }
+
+                $("#backBtn").addClass("d-none");
+                break;
+              case 2:
+                // Handle completion (e.g., close modal or submit form)
+                $("#createStoryModal").modal("hide");
+
+                break;
+            }
+
+            if (currentStep < totalSteps) {
+              currentStep++;
+              showSection(currentStep);
+            }
+          } catch (error) {
+            console.error("Error in next button handler:", error);
+            alert("An error occurred. Please try again.");
+          } finally {
+            // Hide spinner and restore button state
+            $spinner.addClass("d-none");
+            $nextBtn.prop("disabled", false);
+          }
+        });
+
+        function updateNextButtonState(enable) {
+          const $nextBtn = $("#nextBtn");
+          $nextBtn.prop("disabled", enable);
+          if (!enable) {
+            $nextBtn.find(".spinner-border").addClass("d-none");
+          }
+        }
+
+        function updateStepIndicator() {
+          $(".step-item").removeClass("active completed");
+          for (let i = 1; i <= totalSteps; i++) {
+            if (i < currentStep) {
+              $(`.step-item[data-step="${i}"]`).addClass("completed");
+            } else if (i === currentStep) {
+              $(`.step-item[data-step="${i}"]`).addClass("active");
+            }
+          }
+        }
+
+        function showSection(step) {
+          $(".section-container").addClass("d-none");
+          $(`#${getSectionId(step)}`).removeClass("d-none");
+
+          // Update section content
+          const content = selectionHeaderTextsForStory[step - 1];
+          $(`#${getSectionId(step)} .section-title`).text(content.title);
+          $(`#${getSectionId(step)} .section-description`).text(
+            content.description
+          );
+          $(`#${getSectionId(step)} .section-icon`).attr("src", content.icon);
+
+          // Show/hide back button
+          $("#backBtn").toggle(step > 1);
+
+          // Enable Next button for all steps except the first one
+          $("#nextBtn").prop("disabled", step === 1);
+
+          updateStepIndicator();
+        }
+
+        function getSectionId(step) {
+          const sections = [
+            // "uploadHeroImageSelection",
+            "storyInformationSelection",
+            // "addContentSelection",
+            "shareSelection",
+          ];
+          return sections[step - 1];
+        }
+
+        // Initialize first step
+        showSection(currentStep);
+
+        // Handle back button clicks
+        $(document).on("click", "#backBtn", function () {
+          $("#nextBtn").prop("disabled", false);
+          if (currentStep > 1) {
+            currentStep--;
+            showSection(currentStep);
+          }
+        });
+
+        // Reset modal state when it's hidden
+        $("#createStoryModal").on("hidden.bs.modal", function () {
+          currentStep = 1;
+          showSection(currentStep);
+        });
+
+        // Log when the modal is shown
+        $("#createStoryModal").on("shown.bs.modal", function () {
+          resetAllStates();
+          // Initialize first step
+          showSection(currentStep);
+        });
+      });
+    </script>
+    
+  </body>
+</html>
+{{/each}}

@@ -1,0 +1,337 @@
+<script type="module">
+  import { QueryObserver, MutationObserver } from 'https://esm.sh/@tanstack/query-core@5.90.2';
+
+  // ==================== NPO QUERIES & MUTATIONS ====================
+  // TanStack Query wrappers for NPO operations
+
+  // ==================== QUERIES (GET) ====================
+
+  /**
+   * Query for getting NPO profile
+   * @param {string} zuid - NPO ZUID
+   * @returns {QueryObserver}
+   */
+  window.createNPOProfileQuery = (zuid) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['npo', zuid, 'profile'],
+      queryFn: () => window.getNPOAdminProfile(zuid),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      enabled: !!zuid, // Only fetch if zuid exists
+    });
+  };
+
+  /**
+   * Query for getting NPO admins
+   * @param {string} zuid - NPO ZUID
+   * @returns {QueryObserver}
+   */
+  window.createNpoAdminsQuery = (zuid) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['npo', zuid, 'admins'],
+      queryFn: () => window.getNpoAdmins(zuid),
+      staleTime: 2 * 60 * 1000, // 2 minutes
+      enabled: !!zuid,
+    });
+  };
+
+  /**
+   * Query for getting NPO followers
+   * @param {string} zuid - NPO ZUID
+   * @returns {QueryObserver}
+   */
+  window.createNpoFollowersQuery = (zuid) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['npo', zuid, 'followers'],
+      queryFn: () => window.getNpoFollowers(zuid),
+      staleTime: 2 * 60 * 1000,
+      enabled: !!zuid,
+    });
+  };
+
+  /**
+   * Query for getting NPO total stats
+   * @param {string} zuid - NPO ZUID
+   * @returns {QueryObserver}
+   */
+  window.createNpoTotalStatsQuery = (zuid) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['npo', zuid, 'stats', 'total'],
+      queryFn: () => window.npoTotalStats(zuid),
+      staleTime: 5 * 60 * 1000,
+      enabled: !!zuid,
+    });
+  };
+
+  /**
+   * Query for getting NPO engagement stats
+   * @param {string} zuid - NPO ZUID
+   * @param {string} start - Start date
+   * @param {string} end - End date
+   * @returns {QueryObserver}
+   */
+  window.createNpoEngagementStatsQuery = (zuid, start, end) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['npo', zuid, 'stats', 'engagement', start, end],
+      queryFn: () => window.npoEngagementStats(zuid, start, end),
+      staleTime: 5 * 60 * 1000,
+      enabled: !!(zuid && start && end),
+    });
+  };
+
+  /**
+   * Query for getting NPO stories stats
+   * @param {string} zuid - NPO ZUID
+   * @param {string} start - Start date
+   * @param {string} end - End date
+   * @returns {QueryObserver}
+   */
+  window.createNpoStoriesStatsQuery = (zuid, start, end) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['npo', zuid, 'stats', 'stories', start, end],
+      queryFn: () => window.npoStoriesStats(zuid, start, end),
+      staleTime: 5 * 60 * 1000,
+      enabled: !!(zuid && start && end),
+    });
+  };
+
+  /**
+   * Query for getting user's managed NPOs
+   * @param {string} zuid - User ZUID
+   * @returns {QueryObserver}
+   */
+  window.createUserManagedNposQuery = (zuid) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['users', zuid, 'managed-npos'],
+      queryFn: () => window.getUserManagedNpos(zuid),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      enabled: !!zuid,
+    });
+  };
+
+  // ==================== MUTATIONS (POST/PATCH/DELETE) ====================
+
+  /**
+   * Mutation for creating a new NPO admin
+   * @returns {MutationObserver}
+   */
+  window.createCreateNpoAdminMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ zuid, data }) => window.createNpoAdmin(zuid, data),
+      onSuccess: (data, variables) => {
+        // Invalidate NPO admins list
+        window.queryClient.invalidateQueries({ queryKey: ['npo', variables.zuid, 'admins'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to create NPO admin:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for creating a new NPO follower
+   * @returns {MutationObserver}
+   */
+  window.createCreateNpoFollowerMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ zuid, data }) => window.createNpoFollower(zuid, data),
+      onSuccess: (data, variables) => {
+        // Invalidate NPO followers list
+        window.queryClient.invalidateQueries({ queryKey: ['npo', variables.zuid, 'followers'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to create NPO follower:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for updating NPO profile
+   * @returns {MutationObserver}
+   */
+  window.createUpdateNPOProfileMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ zuid, data }) => window.updateNPOAdminProfile(zuid, data),
+      onSuccess: (data, variables) => {
+        // Invalidate NPO profile
+        window.queryClient.invalidateQueries({ queryKey: ['npo', variables.zuid] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to update NPO profile:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for clicking NPO donate button
+   * @returns {MutationObserver}
+   */
+  window.createClickNpoDonateMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (zuid) => window.clickNpoDonate(zuid),
+      onSuccess: (data, zuid) => {
+        // Invalidate NPO stats
+        window.queryClient.invalidateQueries({ queryKey: ['npo', zuid, 'stats'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to track NPO donate click:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for clicking NPO follow button
+   * @returns {MutationObserver}
+   */
+  window.createClickNpoFollowMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (zuid) => window.clickNpoFollow(zuid),
+      onSuccess: (data, zuid) => {
+        // Invalidate NPO stats and followers
+        window.queryClient.invalidateQueries({ queryKey: ['npo', zuid, 'stats'] });
+        window.queryClient.invalidateQueries({ queryKey: ['npo', zuid, 'followers'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to track NPO follow click:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for clicking NPO share button
+   * @returns {MutationObserver}
+   */
+  window.createClickNpoShareMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (zuid) => window.clickNpoShare(zuid),
+      onSuccess: (data, zuid) => {
+        // Invalidate NPO stats
+        window.queryClient.invalidateQueries({ queryKey: ['npo', zuid, 'stats'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to track NPO share click:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for tracking NPO profile views
+   * @returns {MutationObserver}
+   */
+  window.createViewNpoProfileMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (zuid) => window.viewNpoProfile(zuid),
+      onSuccess: (data, zuid) => {
+        // Invalidate NPO stats
+        window.queryClient.invalidateQueries({ queryKey: ['npo', zuid, 'stats'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to track NPO profile view:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for inviting users (admins or followers) to NPO
+   * @returns {MutationObserver}
+   */
+  window.createInviteUsersMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ zuid, data }) => window.inviteUsers(zuid, data),
+      onSuccess: async (data, variables) => {
+        // Wait for server to process the invites before invalidating
+        // This ensures the backend has time to update the pending invites
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        
+        // Invalidate NPO profile (which contains pending invites) and admins/followers list
+        window.queryClient.invalidateQueries({ queryKey: ['npo', variables.zuid, 'profile'] });
+        if (variables.data.type === 'admin') {
+          window.queryClient.invalidateQueries({ queryKey: ['npo', variables.zuid, 'admins'] });
+        } else if (variables.data.type === 'follower') {
+          window.queryClient.invalidateQueries({ queryKey: ['npo', variables.zuid, 'followers'] });
+        }
+      },
+      onError: (error) => {
+        console.error('❌ Failed to invite users:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for sending invite reminders
+   * @returns {MutationObserver}
+   */
+  window.createSendInviteReminderMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ zuid, data }) => window.sendInviteReminder(zuid, data),
+      onSuccess: (data, variables) => {
+        // Invalidate NPO profile (which contains pending invites)
+        window.queryClient.invalidateQueries({ queryKey: ['npo', variables.zuid, 'profile'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to send invite reminders:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for creating a new story stream
+   * @returns {MutationObserver}
+   */
+  window.createCreateStoryStreamMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ zuid, data }) => window.createStoryStream(zuid, data),
+      onSuccess: async (data, variables) => {
+        // Wait for server to process the story stream creation
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        
+        // Invalidate NPO profile (which contains story streams)
+        window.queryClient.invalidateQueries({ queryKey: ['npo', variables.zuid, 'profile'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to create story stream:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for updating a story stream
+   * @returns {MutationObserver}
+   */
+  window.createUpdateStoryStreamMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ zuid, streamId, data }) => window.updateStoryStream(zuid, streamId, data),
+      onSuccess: async (data, variables) => {
+        // Wait for server to process the story stream update
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        
+        // Invalidate NPO profile (which contains story streams)
+        window.queryClient.invalidateQueries({ queryKey: ['npo', variables.zuid, 'profile'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to update story stream:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for deleting a story stream
+   * @returns {MutationObserver}
+   */
+  window.createDeleteStoryStreamMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ npoZuid, streamZuid }) => window.deleteStoryStream(npoZuid, streamZuid),
+      onSuccess: async (data, variables) => {
+        // Wait for server to process the story stream deletion
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        
+        // Invalidate NPO profile (which contains story streams)
+        window.queryClient.invalidateQueries({ queryKey: ['npo', variables.npoZuid, 'profile'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to delete story stream:', error);
+      },
+    });
+  };
+</script>

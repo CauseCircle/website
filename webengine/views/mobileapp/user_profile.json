@@ -1,1 +1,37 @@
-{{users.filter({get_var.user_zuid}).toJSON()}}
+{{$page = 1}}
+{{$limit = 25}}
+{{$search = }}
+
+{{if {get_var.page} }}
+    {{$page = {get_var.page} }}
+{{/if}}
+{{if {get_var.limit} }}
+    {{$limit = {get_var.limit} }}
+{{/if}}
+
+{{if {get_var.name} }}
+    {{$search = WHERE item.first_name LIKE '%{get_var.name}%' OR item.last_name LIKE '%{get_var.name}%' }}
+{{else-if {get_var.email} }}
+    {{$search = WHERE item.email LIKE '%{get_var.email}%' }}
+{{/if}}
+
+{{ if {get_var.user _zuid} }}
+    {{$search = WHERE item.zuid = {get_var.user_zuid} }}
+    {{$page = 1}}
+    {{$limit = 1}}
+{{ /if }}
+
+{{$start = {math(({$page} - 1) * {$limit})} }}
+{
+    "data" :
+    [
+        {{each users as item {$search} limit {$start}, {$limit} }}
+        {{item.toJSON(2)}}
+        {{item._arraycomma}}
+        {{/each}}
+    ],
+    "meta" : {
+        "page" : {{$page}},
+        "limit" : {{$limit}}
+    }
+}

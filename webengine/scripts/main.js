@@ -26,27 +26,39 @@ window.fbAsyncInit = function () {
   fjs.parentNode.insertBefore(js, fjs);
 })(document, "script", "facebook-jssdk");
 
-async function loginWithFacebook() {
-  FB.login(
-    function (response) {
-      if (response.status === "connected") {
-        // The user is logged in and has authenticated your app
-        const accessToken = response.authResponse.accessToken;
-        let userEmail = null;
+// async function loginWithFacebook() {
+//   FB.login(
+//     function (response) {
+//       if (response.status === "connected") {
+//         // The user is logged in and has authenticated your app
+//         const accessToken = response.authResponse.accessToken;
+//         let userEmail = null;
 
-        // Use the token to fetch user information or other actions
-        FB.api("/me", { fields: "name,email" }, function (userInfo) {
-          console.log("User Info:", userInfo);
-          userEmail = userInfo.email;
-          // Optionally store user info in local storage or use it as needed
-          localStorage.setItem("fbUserInfo", JSON.stringify(userInfo));
-          loginZestyUser();
-        });
-      } else {
-        // The person is not logged into your app or we are unable to tell
-        console.log("User cancelled login or did not fully authorize.");
-      }
-    },
-    { scope: "public_profile,email" }
-  ); // Request permissions
-}
+//         // Use the token to fetch user information or other actions
+//         FB.api("/me", { fields: "name,email" }, function (userInfo) {
+//           console.log("User Info:", userInfo);
+//           userEmail = userInfo.email;
+//           // Optionally store user info in local storage or use it as needed
+//           localStorage.setItem("fbUserInfo", JSON.stringify(userInfo));
+//           loginZestyUser();
+//         });
+//       } else {
+//         // The person is not logged into your app or we are unable to tell
+//         console.log("User cancelled login or did not fully authorize.");
+//       }
+//     },
+//     { scope: "public_profile,email" }
+//   ); // Request permissions
+// }
+
+// const firebaseConfig = {
+//   apiKey: "AIzaSyD9K6jTlFzWJEf164M7QfA1X7P7jgQ-z7Y",
+//   authDomain: "cause-circle-429522.firebaseapp.com",
+//   projectId: "cause-circle-429522",
+//   storageBucket: "cause-circle-429522.appspot.com",
+//   messagingSenderId: "150409629176",
+//   appId: "1:150409629176:web:6004a4daa4e0094c29da0d",
+//   databaseURL: `https://cause-circle-429522.firebaseio.com`,
+// };
+
+// firebase.initializeApp(firebaseConfig);

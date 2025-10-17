@@ -1,0 +1,71 @@
+<!-- ==================== CAUSECIRCLE MAIN SCRIPT ====================
+     Modular architecture for better maintainability
+     See CLAUDE.md for documentation on module structure and dependencies
+     ================================================================== -->
+
+<!-- 1. Parsley Variables -->
+{{ include /scripts/config/parsley-vars.html }}
+
+<!-- 2. App Configuration -->
+{{ include /scripts/config/app-config.html }}
+
+<!-- ==================== LEGACY API ==================== -->
+
+<!-- 3. Firebase Initialization -->
+{{ include /scripts/core/firebase-init.html }}
+
+<!-- 4. Auth UI (Loading Overlays) -->
+{{ include /scripts/auth/auth-ui.html }}
+
+<!-- 5. Media API (Used by auth handlers) -->
+{{ include /scripts/api/legacy/media.html }}
+
+<!-- 6. Auth Providers Setup -->
+{{ include /scripts/core/auth-providers.html }} 
+
+<!-- 7. User API -->
+{{ include /scripts/api/legacy/users.html }}
+
+<!-- 8. Comments API -->
+{{ include /scripts/api/legacy/comments.html }}
+
+<!-- 9. Stories API -->
+{{ include /scripts/api/legacy/stories.html }}
+
+<!-- 10. Feedback API -->
+{{ include /scripts/api/legacy/feedback.html }}
+
+<!-- 11. NPO API -->
+{{ include /scripts/api/legacy/npo.html }}
+
+<!-- 12. NPO Stats API -->
+{{ include /scripts/api/legacy/npo-stats.html }}
+
+<!-- 13. FCM Service (Push Notifications) -->
+{{ include /scripts/services/fcm.html }}
+
+<!-- 14. Auth Helpers -->
+{{ include /scripts/auth/auth-helpers.html }}
+
+<!-- 15. Auth Handlers --> 
+{{ include /scripts/auth/auth-handlers.html }}
+
+<!-- 16. App Initialization -->
+{{ include /scripts/init/app-init.html }}
+
+<!-- ==================== TANSTACK QUERY (NEW) ==================== -->
+<!-- TanStack Query for caching, loading states, and optimistic updates -->
+
+<!-- TanStack Query Client -->
+{{ include /scripts/api/new/core/query-client.html }}
+
+<!-- TanStack Query Helpers -->
+{{ include /scripts/api/new/helpers.html }}
+
+<!-- TanStack Query Wrappers -->
+{{ include /scripts/api/new/users.html }}
+{{ include /scripts/api/new/stories.html }}
+{{ include /scripts/api/new/npo.html }}
+{{ include /scripts/api/new/comments.html }} 
+{{ include /scripts/api/new/media.html }}
+{{ include /scripts/api/new/search.html }}

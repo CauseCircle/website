@@ -1,6 +1,6 @@
 <style>
   .followers-list {
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 10%);
     overflow-y: auto;
   }
 
@@ -79,65 +79,88 @@
     opacity: 0.7;
   }
 </style>
-
-<div class="tab-pane" id="followers">
+<div class="tab-pane fade" id="followers">
   <div>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="mb-0 text-center">Followers</h3>
-      <button
-        class="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#inviteModal"
-      >
-        <i class="bi bi-person-plus"></i> Invite Followers
-      </button>
+    <div id="followers-header" class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="mb-0 text-center">Supporters</h3>
+      <div class="d-flex gap-2">
+        <button
+          class="btn btn-secondary"
+          id="sendReminderBtn" 
+        >
+          <i class="bi bi-envelope"></i> Send Invite Reminder 
+        </button>
+        <button
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#followers-inviteModal"
+        >
+          <i class="bi bi-person-plus"></i> Invite Supporters
+        </button>
+      </div>
     </div>
 
-    <!-- Followers List -->
-    <div class="followers-list d-flex flex-column gap-3">
-      <!--prettier-ignore-->
-      {{each users as member where find_in_set('{get_var.zuid}', member.favorite_npos)}}
-      <div
-        class="follower-item d-flex flex-row justify-content-between align-items-center card"
-      >
-        <div class="d-flex align-items-center">
-          <img
-            src="{{ member.profile_image.getImage() }}"
-            alt="Profile"
-            class="rounded-circle"
-            width="48"
-            height="48"
-          />
-          <div class="ms-3">
-            <h6 class="mb-0">{{ member.first_name }} {{ member.last_name }}</h6>
-            <small class="text-muted"
-              >{{member.email}} • Joined {{member.created_at}}</small
-            >
+    <!-- Add tabs navigation -->
+    <ul class="nav nav-tabs mb-3">
+      <li class="nav-item">
+        <a 
+          class="nav-link active accepted-followers" 
+          data-bs-toggle="tab" 
+          href="#acceptedFollowers"
+        >
+          Accepted 0
+        </a>
+      </li>
+      <li class="nav-item">
+        <a 
+          class="nav-link" 
+          data-bs-toggle="tab" 
+          href="#pendingFollowers"
+        >
+          Pending 0
+        </a>
+      </li>
+    </ul>
+
+    <!-- Followers List with tabs content -->
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="acceptedFollowers">
+        <div class="followers-list d-flex flex-column gap-3" id="followersContainer">
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
           </div>
         </div>
-        <a href="{{member.getUrl()}}" class="btn btn-link text-decoration-none"
-          >View Profile</a
-        >
       </div>
-      {{/each}}
+      
+      <!-- Pending Invites Tab -->
+      <div class="tab-pane fade" id="pendingFollowers">
+        <div class="followers-list d-flex flex-column gap-3" id="pendingInvitesContainer">
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Invite Modal -->
-<div class="modal fade" id="inviteModal" tabindex="-1">
+<div class="modal fade" id="followers-inviteModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header border-0">
-        <div class="modal-title d-flex flex-row align-items-center gap-2">
+      <div class="modal-header border-0 d-flex justify-content-between align-items-start">
+        <div class="modal-title d-flex flex-row align-items-start gap-2">
           <span class="invite-icon">
             <i class="bi bi-person-plus fs-4"></i>
           </span>
           <div class="d-flex flex-column">
-            <h5 class="mb-0">Invite Followers</h5>
+            <h5 class="mb-0">Invite Supporters</h5>
             <p class="modal-subtitle mb-0">
-              Input emails as comma-separated values. These invites will be sent
-              as emails on your behalf.
+              Send invitations to your supporters. To invite multiple people, separate email addresses with commas.
             </p>
           </div>
         </div>
@@ -154,7 +177,7 @@
             class="form-control"
             id="inviteEmails"
             rows="3"
-            placeholder="e.g. zoshua@zesty.io, stuart@zesty.io"
+            placeholder="e.g. admin@causecircle.org, todd@causecircle.org, ..."
           ></textarea>
         </div>
       </div>
@@ -183,16 +206,16 @@
 </div>
 
 <!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1">
+<div class="modal fade" id="followers-successModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header border-0">
+      <div class="modal-header border-0 d-flex justify-content-between align-items-start">
         <div class="modal-title d-flex flex-row align-items-center gap-2">
           <span class="invite-icon">
             <i class="bi bi-person-plus fs-4"></i>
           </span>
           <div class="d-flex flex-column">
-            <h5 class="mb-0">Followers Invited</h5>
+            <h5 class="mb-0">Supporters Invited</h5>
             <p class="modal-subtitle mb-0">
               These invites will be sent as emails
             </p>
@@ -226,80 +249,596 @@
   </div>
 </div>
 
-<script>
-  $(document).ready(function () {
-    const inviteModal = new bootstrap.Modal(
-      document.getElementById("inviteModal")
-    );
-    const successModal = new bootstrap.Modal(
-      document.getElementById("successModal")
-    );
+<!-- Add Admin Confirmation Modal -->
+<div class="modal fade" id="followers-addAdminConfirmModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 d-flex justify-content-between align-items-start">
+        <div class="modal-title d-flex flex-row align-items-start gap-2">
+          <span class="invite-icon">
+            <i class="bi bi-person-gear fs-4"></i>
+          </span>
+          <div class="d-flex flex-column">
+            <h5 class="mb-0">Confirm Admin Addition</h5>
+            <p class="modal-subtitle mb-0">
+              This user will receive admin privileges
+            </p>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to make this user an admin?</p>
+        <p class="text-muted small">They will be able to manage organization settings and content.</p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmAddAdminBtn">
+          <span class="d-none spinner-border spinner-border-sm" role="status"></span>
+          <span class="btn-text">Add as Admin</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
-    // Handle invite submission
-    $("#sendInvites").click(async function () {
+<!-- Add Admin Success Modal -->
+<div class="modal fade" id="followers-addAdminSuccessModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 d-flex justify-content-between align-items-start">
+        <div class="modal-title d-flex flex-row align-items-center gap-2">
+          <span class="invite-icon">
+            <i class="bi bi-person-check fs-4"></i>
+          </span>
+          <div class="d-flex flex-column">
+            <h5 class="mb-0">Admin Added</h5>
+            <p class="modal-subtitle mb-0">
+              User has been granted admin privileges
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="success-icon">
+          <i class="bi bi-check-lg checkmark"></i>
+        </div>
+        <h4>New Admin Added Successfully</h4>
+        <p class="modal-subtitle">
+          The user can now access admin features
+        </p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Send Reminder Modal -->
+<div class="modal fade" id="followers-reminderModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 d-flex justify-content-between align-items-start">
+        <div class="modal-title d-flex flex-row align-items-start gap-2">
+          <span class="invite-icon">
+            <i class="bi bi-person-plus fs-4"></i>
+          </span>
+          <div class="d-flex flex-column">
+            <h5 class="mb-0">Send Reminder to Accept Invite</h5>
+            <p class="modal-subtitle mb-0">
+              These reminders will be sent as emails
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="reminderEmails" class="form-label">Invite</label>
+          <textarea
+            class="form-control"
+            id="reminderEmails"
+            rows="5"
+            placeholder="e.g. zoshua@causecircle.org, stuart@causecircle.org"
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-0 d-flex justify-content-end">
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" id="sendReminderConfirmBtn">
+            <span class="d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="reminder-text">Send Reminder</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reminder Success Modal -->
+<div class="modal fade" id="followers-reminderSuccessModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 d-flex justify-content-between align-items-start">
+        <div class="modal-title d-flex flex-row align-items-center gap-2">
+          <span class="invite-icon">
+            <i class="bi bi-person-check fs-4"></i>
+          </span>
+          <div class="d-flex flex-column">
+            <h5 class="mb-0">Reminders Sent</h5>
+            <p class="modal-subtitle mb-0">
+              Emails sent to pending followers
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="success-icon">
+          <i class="bi bi-check-lg checkmark"></i>
+        </div>
+        <h4>Your reminder to accept invite has been sent to <span id="reminderCount">0 user/s</span></h4>
+        <p class="modal-subtitle">
+          Please ask them to check their inbox for an email from<br />
+          invite@causecircle.com
+        </p>
+      </div>
+      <div class="modal-footer border-0 d-flex justify-content-end">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  // ==================== TANSTACK QUERY SETUP ====================
+  const npoZuid = "{{$zuid}}";
+
+  // Initialize modals
+  const inviteModal = new bootstrap.Modal(document.getElementById("followers-inviteModal"));
+  const successModal = new bootstrap.Modal(document.getElementById("followers-successModal"));
+  const addAdminConfirmModalEl = document.getElementById('followers-addAdminConfirmModal');
+  const addAdminConfirmModal = addAdminConfirmModalEl ? new bootstrap.Modal(addAdminConfirmModalEl) : null;
+  const addAdminSuccessModalEl = document.getElementById('followers-addAdminSuccessModal');
+  const addAdminSuccessModal = addAdminSuccessModalEl ? new bootstrap.Modal(addAdminSuccessModalEl) : null;
+  const reminderModalEl = document.getElementById('followers-reminderModal');
+  const reminderModal = reminderModalEl ? new bootstrap.Modal(reminderModalEl) : null;
+  const reminderSuccessModalEl = document.getElementById('followers-reminderSuccessModal');
+  const reminderSuccessModal = reminderSuccessModalEl ? new bootstrap.Modal(reminderSuccessModalEl) : null;
+
+  // Create TanStack Query observers
+  const npoProfileQuery = window.createNPOProfileQuery(npoZuid);
+  const npoAdminsQuery = window.createNpoAdminsQuery(npoZuid);
+  const npoFollowersQuery = window.createNpoFollowersQuery(npoZuid);
+
+  // Create mutation observers
+  const inviteUsersMutation = window.createInviteUsersMutation();
+  const sendReminderMutation = window.createSendInviteReminderMutation();
+  const createAdminMutation = window.createCreateNpoAdminMutation();
+
+  // Reactive subscription for NPO profile (pending invites)
+  npoProfileQuery.subscribe((result) => {
+      if (result.isSuccess) {
+        const pendingFollowerInvites = result.data?.data[0]?.pending_follower_invite || '';
+        const pendingEmails = pendingFollowerInvites.split(',').map(email => email.trim()).filter(email => email.trim() !== '');
+        
+        renderPendingInvites(pendingEmails);
+        // Enable/disable reminder button based on pending emails
+        $('#sendReminderBtn').prop('disabled', pendingEmails.length === 0);
+      }
+  });
+
+  // Reactive subscription for NPO admins
+  npoAdminsQuery.subscribe((result) => {
+      if (result.isSuccess) {
+        const admins = result.data?.data || [];
+        const adminZuids = admins.map(admin => admin?.meta?.zuid);
+        
+        // Re-render followers with updated admin status
+        const followersResult = npoFollowersQuery.getCurrentResult();
+        if (followersResult.isSuccess) {
+          renderFollowers(followersResult.data?.data || [], adminZuids);
+        }
+      }
+  });
+
+  // Reactive subscription for NPO followers
+  npoFollowersQuery.subscribe((result) => {
+      if (result.isLoading) {
+        $('#followersContainer').html(`
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        `);
+      } else if (result.isSuccess) {
+        const followers = result.data?.data || [];
+        const adminsResult = npoAdminsQuery.getCurrentResult();
+        const adminZuids = adminsResult.isSuccess ? (adminsResult.data?.data || []).map(admin => admin?.meta?.zuid) : [];
+        
+        renderFollowers(followers, adminZuids);
+      } else if (result.isError) {
+        $('#followersContainer').html(`
+          <div class="text-center py-4 text-danger">
+            Error loading followers. Please try again later.
+          </div>
+        `);
+      }
+  });
+
+  // Render followers function
+  function renderFollowers(followers, adminZuids) {
+      try {
+        const followersHtml = followers.map(member => `
+          <div class="follower-item d-flex flex-row justify-content-between align-items-center card">
+            <div class="d-flex align-items-center">
+              <img src="${(() => {
+                const profileImage = member.profile_image;
+                const placeholder = 'https://www.gravatar.com/avatar/?d=mp';
+
+                if (!profileImage) return placeholder;
+
+                if (typeof profileImage === 'string') {
+                  return profileImage.trim() !== '' ? profileImage : placeholder;
+                } else {
+                  return profileImage.data?.[0]?.url || placeholder;
+                }
+              })()}"
+                  class="rounded-circle"
+                  width="48"
+                  height="48" />
+              <div class="ms-3">
+                <h6 class="mb-0">${member.first_name} ${member.last_name}</h6>
+                <small class="text-muted">${member.email} • Follower since ${new Date(member.meta?.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</small>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <div class="dropdown">
+                <button class="btn btn-secondary" type="button" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a href="${member.meta?.web?.uri || '#'}" 
+                      class="dropdown-item d-flex align-items-center justify-content-start gap-2"
+                      target="_blank">
+                      <i class="bi bi-eye"></i> View Profile
+                    </a>
+                  </li>
+                  <li class="${adminZuids.includes(member.meta?.zuid) ? 'd-none' : ''} add-admin-list-item" data-member-zuid="${member.meta?.zuid}">
+                    <button 
+                      class="dropdown-item d-flex align-items-center justify-content-start gap-2 add-admin-btn"
+                      data-member-zuid="${member.meta?.zuid}"
+                      data-npo-zuid="${npoZuid}">
+                      <i class="bi bi-person-plus"></i> Add as Admin
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        $('#followersContainer').html(followersHtml || '<div class="text-center py-4 text-muted">No accepted followers yet.</div>');
+        $(".accepted-followers").text(`Accepted ${followers.length}`);
+      } catch (error) {
+        console.error("Error rendering followers:", error);
+        $('#followersContainer').html(`
+          <div class="text-center py-4 text-danger">
+            Error loading followers. Please try again later.
+          </div>
+        `);
+      }
+  }
+  
+  // Render pending invites function
+  function renderPendingInvites(emails) {
+       const pendingInvitesHtml = emails.length > 0 
+        ? emails.map(email => `
+            <div class="follower-item d-flex flex-row justify-content-between align-items-center card">
+              <div class="d-flex align-items-center">
+                 <img src="https://www.gravatar.com/avatar/?d=mp" 
+                     class="rounded-circle" 
+                     width="48" 
+                     height="48" />
+                <div class="ms-3">
+                  <h6 class="mb-0">${email}</h6>
+                  <small class="text-muted">Invite sent • Pending</small>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-warning text-dark">Pending</span>
+                <div class="dropdown">
+                  <button class="btn btn-secondary" type="button" 
+                          data-bs-toggle="dropdown" 
+                          aria-expanded="false">
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <button 
+                        class="dropdown-item d-flex align-items-center justify-content-start gap-2 send-reminder-single"
+                        data-email="${email}">
+                        <i class="bi bi-envelope"></i> Send Reminder
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          `).join('')
+        : `<div class="text-center py-4 text-muted">No pending invites at this time</div>`;
+
+      $('#pendingInvitesContainer').html(pendingInvitesHtml);
+      $('a[href="#pendingFollowers"]').html(`Pending ${emails.length}`);
+  }
+
+  // Invite submission handler using TanStack Query mutation
+  $("#sendInvites").click(function() {
       const $button = $(this);
       const $spinner = $button.find('.spinner-border');
       const $text = $button.find('.invite-text');
       
-      // Disable button and show loading
-      $button.prop('disabled', true);
-      $spinner.removeClass('d-none');
-
-      const emailsText = $("#inviteEmails").val();
-      const emails = emailsText
+      const emailsToInvite = $("#inviteEmails").val()
         .split(",")
-        .map((email) => email.trim())
-        .filter((email) => email);
+        .map(e => e.trim())
+        .filter(e => e);
 
-      if (emails.length === 0) {
+      if (!emailsToInvite.length) {
         alert("Please enter at least one email address");
-        // Reset button state
-        $button.prop('disabled', false);
-        $spinner.addClass('d-none');
-        $text.text('Invite');
         return;
       }
 
-      try {
-        const response = await window.inviteUsers("{{get_var.zuid}}", {
-          emails: emails.join(','),
-          type: "follower",
-        });
+      
+      const unsubscribe = inviteUsersMutation.subscribe((result) => {
+        if (result.status === 'success') {
+          
+          // Reset button state
+          $spinner.addClass('d-none');
+          $button.prop('disabled', false);
+          $text.text('Invite');
+          
+          // Show success modal and hide invite modal
+          const inviteModal = bootstrap.Modal.getInstance(document.getElementById("followers-inviteModal"));
+          const successModal = bootstrap.Modal.getInstance(document.getElementById("followers-successModal"));
+          
+          if (inviteModal) inviteModal.hide();
+          if (successModal) successModal.show();
+          
+          // Clear the email textarea
+          $("#inviteEmails").val("");
+          
+          // Update success modal count
+          $("#inviteCount").text(emailsToInvite.length);
+          
+          // Unsubscribe after handling success
+          unsubscribe();
+        } else if (result.status === 'error') {
+          console.error('Invite mutation failed:', result.error);
+          
+          // Reset button state on error
+          $spinner.addClass('d-none');
+          $button.prop('disabled', false);
+          $text.text('Invite');
+          
+          alert("Failed to send invites. Please try again.");
+          
+          // Unsubscribe after handling error
+          unsubscribe();
+        }
+      });
 
-        // console.log("response", response);
+      $button.prop('disabled', true);
+      $spinner.removeClass('d-none');
+      $text.text('Inviting...');
 
-        // Update success message and show success modal
-        $("#inviteCount").text(emails.length);
-        inviteModal.hide();
-        successModal.show();
-      } catch (error) {
-        console.error("Error sending invites:", error);
-        alert("Failed to send invites. Please try again.");
-      } finally {
-        // Reset button state
-        $button.prop('disabled', false);
-        $spinner.addClass('d-none');
-        $text.text('Invite');
+      inviteUsersMutation.mutate({
+        zuid: npoZuid,
+        data: { emails: emailsToInvite.join(','), type: "follower" }
+      });
+  });
+
+  // Send Reminder button click
+  $("#sendReminderBtn").click(function() {
+      const profileResult = npoProfileQuery.getCurrentResult();
+      if (profileResult.isSuccess) {
+        const pendingFollowerInvites = profileResult.data?.data[0]?.pending_follower_invite || '';
+        const pendingEmails = pendingFollowerInvites.split(',').map(email => email.trim()).filter(email => email.trim() !== '');
+        
+        if (pendingEmails.length > 0) {
+          $("#reminderEmails").val(pendingEmails.join(', '));
+          reminderModal?.show();
+        } else {
+          alert("There are no pending invites to send reminders for.");
+        }
+      } else {
+        alert("Unable to load pending invites. Please try again.");
       }
-    });
+  });
+  
+  // Send Reminder confirmation handler using TanStack Query mutation
+  $("#sendReminderConfirmBtn").click(function() {
+      const $button = $(this);
+      const $spinner = $button.find('.spinner-border');
+      const $text = $button.find('.reminder-text');
+      
+      const emailsToSendReminder = $("#reminderEmails").val()
+        .split(",")
+        .map(e => e.trim())
+        .filter(e => e);
 
-    // Handle "Invite More" button
-    $("#inviteMore").click(function () {
+      if (!emailsToSendReminder.length) {
+        alert("Please ensure there are emails listed to send reminders.");
+        return;
+      }
+
+      // Use TanStack Query mutation with subscription pattern
+      const unsubscribe = sendReminderMutation.subscribe((result) => {
+        if (result.status === 'success') {
+          
+          // Reset button state
+          $spinner.addClass('d-none');
+          $button.prop('disabled', false);
+          $text.text('Send Reminder');
+          
+          // Show success modal and hide reminder modal
+          $("#reminderCount").text(`${emailsToSendReminder.length} user${emailsToSendReminder.length > 1 ? 's' : ''}`);
+          reminderModal.hide();
+          reminderSuccessModal.show();
+          
+          // Unsubscribe after handling success
+          unsubscribe();
+        } else if (result.status === 'error') {
+          console.error('Reminder mutation failed:', result.error);
+          
+          // Reset button state on error
+          $spinner.addClass('d-none');
+          $button.prop('disabled', false);
+          $text.text('Send Reminder');
+          
+          alert("Failed to send reminders. Please try again.");
+          
+          // Unsubscribe after handling error
+          unsubscribe();
+        }
+      });
+
+      // Set loading state
+      $button.prop('disabled', true);
+      $spinner.removeClass('d-none');
+      $text.text('Sending...');
+
+      // Trigger mutation
+      sendReminderMutation.mutate({
+        zuid: npoZuid,
+        data: { emails: emailsToSendReminder.join(','), type: "follower" }
+      });
+  });
+
+  // Other event handlers
+  $("#inviteMore").click(() => {
       successModal.hide();
-      $("#inviteEmails").val(""); // Clear previous inputs
+      $("#inviteEmails").val("");
       inviteModal.show();
     });
 
-    // Reset form when modal is hidden
-    $("#inviteModal").on("hidden.bs.modal", function () {
-      $("#inviteEmails").val("");
-    });
+  $("#followers-inviteModal").on("hidden.bs.modal", () => $("#inviteEmails").val(""));
+  // No need to clear reminderEmails on hide, as it's repopulated on show
 
-    // Add QR Code download handler
-    $("#downloadQRCode").click(function () {
-      const npoId = "{{get_var.zuid}}";
-      const url = `https://api.causecircle.org/npos/${npoId}/qrcode?type=png&mode=download`;
-      window.open(url, "_blank");
-    });
+  $("#downloadQRCode").click(() => {
+    window.open(`https://api.causecircle.org/npos/{{$zuid}}/qrcode?type=png&mode=download`, "_blank");
+  });
+
+  // Admin add handlers
+  $(document).on('click', '.add-admin-btn', function(e) {
+      e.preventDefault();
+      const $button = $(this);
+      $('#confirmAddAdminBtn').data('admin-data', {
+        memberZuid: $button.data('member-zuid'),
+        npoZuid: $button.data('npo-zuid'),
+        button: $button
+      });
+      addAdminConfirmModal?.show();
+  });
+
+  // Open reminder modal for a single pending email from the dropdown
+  $(document).on('click', '.send-reminder-single', function(e) {
+      e.preventDefault();
+      const email = $(this).data('email');
+      if (email) {
+        $('#reminderEmails').val(email);
+        reminderModal?.show();
+      }
+  });
+
+  $('#confirmAddAdminBtn').click(function() {
+      const $btn = $(this);
+      const { memberZuid, npoZuid: adminNpoZuid, button } = $btn.data('admin-data');
+      const $spinner = $btn.find('.spinner-border');
+      const $text = $btn.find('.btn-text');
+      
+      // Use TanStack Query mutation with subscription pattern
+      const unsubscribe = createAdminMutation.subscribe((result) => {
+        if (result.status === 'success') {
+          
+          // Reset button state
+          $spinner.addClass('d-none');
+          $btn.prop('disabled', false);
+          $text.text('Add as Admin');
+          
+          // Show success modal and hide confirm modal
+          addAdminConfirmModal.hide();
+          // Find the specific list item and replace the button within it
+          $(`.add-admin-list-item[data-member-zuid="${memberZuid}"]`).html(`
+            <span class="dropdown-item text-success d-flex align-items-center justify-content-start gap-2">
+              <i class="bi bi-check-circle-fill"></i> Admin Added
+            </span>
+          `);
+          addAdminSuccessModal?.show();
+          
+          // Unsubscribe after handling success
+          unsubscribe();
+        } else if (result.status === 'error') {
+          console.error('Admin creation mutation failed:', result.error);
+          
+          // Reset button state on error
+          $spinner.addClass('d-none');
+          $btn.prop('disabled', false);
+          $text.text('Add as Admin');
+          
+          alert('Failed to add admin. ' + (result.error?.message || ''));
+          
+          // Unsubscribe after handling error
+          unsubscribe();
+        }
+      });
+
+      // Set loading state
+      $btn.prop('disabled', true);
+      $spinner.removeClass('d-none');
+      $text.text('Adding...');
+
+      // Trigger mutation
+      createAdminMutation.mutate({
+        zuid: adminNpoZuid,
+        data: { zuid: memberZuid }
+      });
+  });
+
+  // Ensure modals are properly handled if elements don't exist
+  [addAdminConfirmModalEl, addAdminSuccessModalEl, reminderModalEl, reminderSuccessModalEl].forEach(el => {
+      if (el) {
+        el.addEventListener('hidden.bs.modal', event => {
+          // Reset button states if modal is closed prematurely
+          $(event.target).find('button[type="button"]').prop('disabled', false);
+          $(event.target).find('.spinner-border').addClass('d-none');
+          // Reset specific button texts if needed
+           $('#confirmAddAdminBtn .btn-text').text('Add as Admin');
+           $('#sendReminderConfirmBtn .reminder-text').text('Send Reminder');
+           $('#sendInvites .invite-text').text('Invite');
+        });
+      }
   });
 </script>

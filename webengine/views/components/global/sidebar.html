@@ -58,24 +58,28 @@
     font-weight: 400;
     color: #525866;
   }
+
+  .badge-claimed {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background-color: #e0f7fa;
+    color: #00796b;
+    font-size: 12px;
+    font-weight: 400;
+    width: auto;
+    max-width: max-content;
+  }
 </style>
 
 <div class="card sidebar-card">
-  <p>Status</p>
-  {{ if {this.claimed} == '0' || {this.claimed} == '' }}
-  <div class="badge text-white bg-danger">
-    <i class="bi bi-x-circle-fill me-1"></i>
-    Not Verified
-  </div>
-  {{ else if {this.claimed} == '1' }}
-  <div class="badge text-white bg-success">
-    <i class="bi bi-check-circle-fill me-1"></i>
-    Verified
-  </div>
-  {{ /if }}
-  <div class="table-group-divider border-light-subtle my-3"></div>
   <p>Badge</p>
-  <div class="badge">Top NPO</div>
+  <div class="d-flex gap-2">
+    <div class="badge">Top Nonprofit</div>
+    {{ if {this.claimed} == '1' }}
+    <div class="badge-claimed">Claimed</div>
+    {{ /if }}
+  </div>
   <!--prettier-ignore-->
   {{if {this.headquarters_address} != ''}}
   <div class="table-group-divider border-light-subtle my-3"></div>
@@ -111,11 +115,12 @@
     <a href="{{npo.getUrl()}}" class="text-decoration-none text-reset">
       <div class="d-flex align-items-center gap-2">
         <img
-          src="{{npo.logo.getImage()}}"
+          src="{{npo.logo.getImage()}}?width=48"
           class="rounded border border-light-subtle"
           width="48"
           height="48"
-          style="border-radius: 8px; object-fit: cover"
+          style="border-radius: 8px; object-fit: contain; background-color: white;"
+          alt="NPO logo"
         />
         <div class="d-flex flex-column justify-content-between overflow-hidden">
           <p class="m-0 p-0 fw-medium npo-name">{{npo.name}}</p>

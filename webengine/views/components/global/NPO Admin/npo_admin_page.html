@@ -1,0 +1,920 @@
+{{$slug = {request.pathPart(2)} }}
+{{$zuid = }}
+{{each non_profits as npo where npo._path_part like '{$slug}' }}
+{{$zuid = {npo._zuid} }}
+{{$npo_admins = {npo.admins} }}
+{{$npoZuid = {npo._zuid} }}
+
+<html lang="en">
+  <head>
+    <title>{{npo.name}} Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="/styles/bootstrap.css" rel="stylesheet" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="icon" href="https://4xxglxlj.media.zestyio.com/cause-circle-icon-color.png" type="image/png" sizes="196x196">
+
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"></noscript>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <script>
+      {{include /auth/facebook.js}}
+    </script>
+
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"
+    ></script>
+
+    <script type="module" src="/auth/firebase-config.js"></script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+
+    <script
+      defer
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+    {{ include /scripts/main.html }}
+
+    <script type="module">
+      const pathname = window.location.pathname;
+
+      if (pathname === "/nonprofits") {
+        window.location.href = "{{non_profits_landing_page.first().path_full}}";
+      }
+    </script>
+
+    {{include /components/global/header.html}}
+    <style>
+      .sidebar {
+        height: fit-content;
+        margin: 20px 0px 0px 0px;
+      }
+    
+      /* Mobile sidebar transformation */
+      @media (max-width: 768px) {
+        .sidebar {
+          height: 100%;
+        }
+        .sidebar .card {
+          margin-bottom: 20px;
+        }
+    
+        .sidebar .nav {
+          display: flex;
+          overflow-x: auto;
+          flex-wrap: nowrap;
+          padding: 10px 0;
+          margin: 0 -10px;
+          -webkit-overflow-scrolling: touch;
+        }
+    
+        .sidebar .nav-link {
+          white-space: nowrap;
+          display: flex;
+          align-items: center;
+          padding: 8px 16px;
+          margin: 0 5px;
+          border-radius: 20px;
+          font-size: 14px;
+        }
+    
+        .sidebar .nav-link i {
+          margin-right: 6px;
+        }
+    
+        .sidebar .d-flex {
+          justify-content: center;
+          padding: 10px;
+        }
+      }
+    
+      .tab-content {
+        margin: 20px 0px;
+      }
+    
+      .nav-link {
+        color: #666;
+        padding: 10px 15px;
+      }
+    
+      .nav-link.active {
+        background-color: #7b3fee;
+        color: white;
+        border-radius: 8px;
+        font-weight: 500;
+      }
+    
+      .nav-link:hover:not(.active) {
+        background-color: #f8f9fa;
+        color: #7b3fee;
+      }
+    
+      .metrics-card {
+        background-color: #fff;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+    
+      .metrics-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      }
+    
+      .metric-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #2d3748;
+        margin-bottom: 5px;
+      }
+    
+      .metric-label {
+        color: #718096;
+        font-size: 14px;
+        font-weight: 500;
+      }
+    
+      .action-card {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #dee2e6;
+      }
+    
+      .post-interaction {
+        border-top: 1px solid #dee2e6;
+        padding-top: 15px;
+        margin-top: 15px;
+      }
+    
+      .interaction-btn {
+        color: #666;
+        text-decoration: none;
+        margin-right: 20px;
+      }
+    
+      .card {
+        border-radius: 10px;
+        padding: 20px;
+      }
+    
+      .posts-container {
+        width: 100%;
+        overflow: hidden;
+        padding: 10px 0;
+      }
+    
+      .posts-scroll {
+        display: flex;
+        overflow-x: auto;
+        gap: 20px;
+        padding: 10px;
+        scrollbar-width: thin;
+        scrollbar-color: #7b3fee #f0f0f0;
+      }
+    
+      .posts-scroll::-webkit-scrollbar {
+        height: 6px;
+      }
+    
+      .posts-scroll::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+      }
+    
+      .posts-scroll::-webkit-scrollbar-thumb {
+        background: #7b3fee;
+        border-radius: 10px;
+      }
+    
+      .post-card {
+        width: 100%;
+        height: 100%;
+        max-width: 560px;
+        background: white;
+        border: none;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+    
+      .post-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+    
+      .post-card img.img-fluid {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+      }
+    
+      .story-subtitle {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 2.8em;
+        line-height: 1.4em;
+      }
+    
+      /* Responsive adjustments */
+      @media (max-width: 576px) {
+        .metric-value {
+          font-size: 24px;
+        }
+    
+        .post-card {
+          padding: 15px;
+        }
+    
+        .posts-scroll {
+          padding: 5px;
+          gap: 15px;
+        }
+      }
+    
+      /* Add this media query for mobile responsiveness */
+      @media (max-width: 768px) {
+        .sidebar .card.min-vh-100 {
+          min-height: auto !important;  /* Override the min-vh-100 class */
+          height: auto;
+        }
+      }
+    </style>
+    <style>
+      .hero {
+        background-image: url("{{npo.story_image.getImage()}}");
+        background-size: cover;
+        background-position: center;
+        color: #fff;
+        position: relative;
+        z-index: 1;
+      }
+      .hero::after {
+        content: "";
+        background: rgba(0, 0, 0, 0.5);
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+      }
+      .article-content {
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 5px;
+        padding: 20px;
+      }
+      .back-btn {
+        background: #eceff3;
+        /* border: none; */
+        color: black;
+        font-size: 1.5rem;
+        cursor: pointer;
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .back-btn:hover {
+        color: #7b3fee;
+      }
+      .back-btn i {
+        font-size: 1.6rem;
+      }
+      .hero-img {
+        width: 100%;
+        height: 100%;
+        max-height: 300px;
+        object-fit: cover;
+        border-radius: 10px;
+      }
+    
+      .story-container img {
+        max-width: 100%;
+        max-height: auto;
+        padding: 20px 0;
+      }
+      .story-container p {
+        padding-bottom: 12px;
+      }
+      .author-img {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        object-fit: cover;
+      }
+    
+      .story-description p,
+      .npo-description p,
+      .npo-description,
+      .story-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    
+      .one-line-text,
+      .one-line-text p {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    
+      .card {
+        border-radius: 10px;
+      }
+    
+      .npo-logo {
+        width: 42px;
+        height: 42px;
+        border-radius: 3px;
+        object-fit: cover;
+      }
+    
+      .badge {
+        background-color: #7c3fee2d;
+      }
+    
+      .story-card {
+        transition: all 0.3s ease;
+      }
+      .story-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      #qr-code-container {
+        width: 100%;
+        height: 288px;
+        background: #4C25A7;
+    
+      }
+
+      .nav-tabs .nav-link {
+        color: #6c757d;
+        border: none;
+        border-bottom: 2px solid transparent;
+        border-radius: 0;
+      }
+      .nav-tabs .nav-link.active {
+        color: #7749f8;
+        border-bottom: 2px solid #7749f8;
+      }
+
+      /* Onboarding Modal Styles */
+      #onboardingModal .modal-content {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        max-width: 600px;
+        width: 90vw;
+        background: white;
+        position: relative;
+      }
+
+      .modal-header-custom {
+        background: #7b3fee;
+        padding: 30px 40px 20px;
+        text-align: center;
+      }
+
+      .slide-image {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        margin: 0 auto 20px;
+        display: block;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(123, 63, 238, 0.2);
+      }
+
+      .slide-content {
+        background: white;
+        padding: 30px 40px 40px;
+        text-align: center;
+      }
+
+      .slide-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 15px;
+        line-height: 1.3;
+      }
+
+      .slide-description {
+        font-size: 1.1rem;
+        color: #4a5568;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        max-width: 450px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .modal-footer-custom {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 40px 30px;
+        background: white;
+        position: relative;
+      }
+
+      .pagination-dots {
+        display: flex;
+        gap: 8px;
+      }
+
+      .pagination-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(123, 63, 238, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .pagination-dot.active {
+        background: #7b3fee;
+        transform: scale(1.2);
+      }
+
+      .btn-action,
+      #nextSlideBtn {
+        background: #7b3fee;
+        border: none;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        min-width: 100px;
+        position: absolute;
+        right: 40px;
+      }
+
+      .btn-action:hover,
+      #nextSlideBtn:hover {
+        background: #6b2fd6;
+        color: white;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 24px;
+        cursor: pointer;
+        transition: color 0.3s ease;
+        z-index: 10;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .close-btn:hover {
+        color: white;
+      }
+
+      .onboarding-slide {
+        display: none;
+      }
+
+      .onboarding-slide.active {
+        display: block;
+      }
+
+      @media (max-width: 768px) {
+        #onboardingModal .modal-content {
+          margin: 20px;
+          width: calc(100vw - 40px);
+        }
+        
+        .modal-header-custom,
+        .slide-content,
+        .modal-footer-custom {
+          padding-left: 25px;
+          padding-right: 25px;
+        }
+        
+        .slide-title {
+          font-size: 1.5rem;
+        }
+        
+        .slide-description {
+          font-size: 1rem;
+        }
+
+        .slide-image {
+          max-width: 250px;
+        }
+
+        .btn-action,
+        #nextSlideBtn {
+          right: 25px;
+        }
+      }
+
+      /* Sidebar header link hover: make text primary */
+      .sidebar a:hover,
+      .sidebar a:hover h5 {
+        color: var(--bs-primary) !important;
+      }
+
+      @media (max-width: 480px) {
+        .modal-header-custom,
+        .slide-content,
+        .modal-footer-custom {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+
+        .slide-image {
+          max-width: 200px;
+        }
+
+        .btn-action,
+        #nextSlideBtn {
+          right: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading-overlay" class="w-100 h-100 d-flex justify-content-center align-items-center py-10 px-3" style="background: rgba(255,255,255,0.8);">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <section id="npo-admin-page" class="container" style="display: none;">
+      <div class="row mb-3">
+        <!-- Sidebar -->
+        <div class="col-12 col-md-3 col-lg-3 sidebar">
+          <div class="card mb-0 p-0 d-flex flex-column justify-content-between h-100">
+            <div class="p-3">
+              <a href="{{ npo.getUrl() }}" class="d-flex align-items-center mb-3 text-decoration-none text-dark">
+                <div class="d-flex align-items-center">
+                  <img
+                    src="{{ npo.logo.getImage() }}"
+                    alt="Organization Logo"
+                    width="40"
+                    height="40"
+                    class="rounded"
+                    style="object-fit: cover;"
+                  />
+                </div>
+                <h5 class="mb-0 ms-3">
+                  {{ npo.name }}
+                </h5>
+              </a >
+              <div class="nav flex-md-column">
+                <a class="nav-link active" href="#dashboard" data-bs-toggle="tab">
+                  <i class="bi bi-grid"></i> <span>Dashboard</span>
+                </a>
+                <a class="nav-link" href="#followers" data-bs-toggle="tab">
+                  <i class="bi bi-people"></i> Supporters
+                </a>
+                <a class="nav-link" href="#story-stream" data-bs-toggle="tab">
+                  <i class="bi bi-collection"></i> Story Hub
+                </a>
+                <a class="nav-link" href="#story-stream-settings" data-bs-toggle="tab">
+                  <i class="bi bi-gear-fill"></i> Story Stream Settings
+                </a>
+                <a class="nav-link" href="#story-goal" data-bs-toggle="tab">
+                  <i class="bi bi-flag-fill"></i> Story Goal
+                </a>
+                <a class="nav-link" href="#story-stats" data-bs-toggle="tab">
+                  <i class="bi bi-graph-up"></i> Story Stats
+                </a>
+                <a class="nav-link" href="#profile" data-bs-toggle="tab">
+                  <i class="bi bi-person"></i> Profile Details
+                </a>
+                <a class="nav-link d-none" href="#" data-tab="settings">
+                  <i class="bi bi-gear"></i> Settings
+                </a>
+                <a class="nav-link" href="#admins" data-bs-toggle="tab">
+                  <i class="bi bi-person-fill-lock"></i> Admins
+                </a>
+                <a class="nav-link" href="#marketplace-tab" data-bs-toggle="tab">
+                  <i class="bi bi-shop"></i> Marketplace
+                </a>
+                <a class="nav-link" href="#npo-stats" data-bs-toggle="tab">
+                  <i class="bi bi-bar-chart-line-fill"></i> Nonprofit Stats
+                </a>
+                <a class="nav-link" href="/docs" target="_blank">
+                  <i class="bi bi-book"></i> Help Center
+                </a>
+              </div>
+            </div>
+            <div id="qr-code-container" class="d-none d-md-flex flex-column justify-content-center align-items-center gap-3 rounded-bottom-3">
+              <div id="qr-code-image">
+                <img src="https://api.causecircle.org/npos/{{$zuid}}/qrcode?type=svg&mode=serve&color=fff" alt="QR Code" style="width: 128px; height: 128px;" />
+              </div>
+              <div id="qr-code-text" class="text-center text-white">
+                <h6>Use QR Code to Gain Followers and Stories</h6>
+              </div>
+              <div id="qr-code-download" class="text-center d-flex gap-3">
+                <a href="https://api.causecircle.org/npos/{{$zuid}}/qrcode?type=png&mode=download" target="_blank" class="btn btn-primary bg-white text-primary"><i class="bi bi-download"></i> PNG</a>
+                <a href="https://api.causecircle.org/npos/{{$zuid}}/qrcode?type=svg&mode=download" target="_blank" class="btn btn-primary bg-white text-primary"><i class="bi bi-download"></i> SVG</a>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Main Content -->
+        <div class="col-12 col-md-9 col-lg-9 pb-4">
+          <div class="tab-content">
+            {{include /components/global/NPO Admin/Dashboard/npo_admin_dashboard.html}}
+            {{include /components/global/NPO Admin/Followers/npo_admin_followers.html}}
+            {{include /components/global/NPO Admin/Admins/npo_admins.html}}
+            {{include /components/global/NPO Admin/Story Stream/npo_admin_story_stream.html}}
+            {{include /components/global/NPO Admin/Story Goal/npo_admin_story_goal.html}}
+            {{include /components/global/NPO Admin/Story Stats/story_stats.html}}
+            {{include /components/global/NPO Admin/Story Stream/npo_admin_story_stream_settings.html}}
+            {{include /components/global/NPO Admin/Profile/npo_admin_profile.html}}
+            {{include /components/global/NPO Admin/Marketplace/npo_admin_marketplace.html}}
+            {{include /components/global/NPO Admin/NPO Stats/npo_stats.html}}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Onboarding Modal -->
+    <div class="modal fade" id="onboardingModal" tabindex="-1" aria-labelledby="onboardingModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-0">
+          <button type="button" class="close-btn" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+          
+          <!-- Slide 1 -->
+          <div class="onboarding-slide active" data-slide="1">
+            <div class="modal-header-custom">
+              <img src="https://4xxglxlj.media.zestyio.com/Add-a-Story-Goal.png" alt="Set a Story Goal" class="slide-image">
+            </div>
+            <div class="slide-content">
+              <h2 class="slide-title">Set a Story Goal</h2>
+              <p class="slide-description">Pick a goal—like "10 stories this month"—to rally your team to post consistently, and track storytelling progress in one place.</p>
+            </div>
+          </div>
+
+          <!-- Slide 2 -->
+          <div class="onboarding-slide" data-slide="2">
+            <div class="modal-header-custom">
+              <img src="https://4xxglxlj.media.zestyio.com/Create-your-First-Story---Admin.png" alt="Create Your First Post" class="slide-image">
+            </div>
+            <div class="slide-content">
+              <h2 class="slide-title">Create Your First Post!</h2>
+              <p class="slide-description">Kick things off by posting a story from your latest campaign, event, or milestone. Show supporters what impact looks like. Create your first post today.</p>
+            </div>
+          </div>
+
+          <!-- Slide 3 -->
+          <div class="onboarding-slide" data-slide="3">
+            <div class="modal-header-custom">
+              <img src="https://4xxglxlj.media.zestyio.com/Invite-your-Community.png" alt="Invite Your Community" class="slide-image">
+            </div>
+            <div class="slide-content">
+              <h2 class="slide-title">Invite Your Community to Create Posts</h2>
+              <p class="slide-description">Tap into your biggest asset—your people. Send invites and let volunteers, staff, or partners post stories for your nonprofit. Invite Followers and other Admins from your Admin Panel.</p>
+            </div>
+          </div>
+
+          <!-- Slide 4 -->
+          <div class="onboarding-slide" data-slide="4">
+            <div class="modal-header-custom">
+              <img src="https://4xxglxlj.media.zestyio.com/Review-Stories-for-your-Nonprofit.png" alt="Review Posts" class="slide-image">
+            </div>
+            <div class="slide-content">
+              <h2 class="slide-title">Review Posts in Story Hub</h2>
+              <p class="slide-description">Approve and publish posts submitted to your nonprofit from Story Hub in your Admin Panel. You stay in control of what gets showcased in your nonprofit page.</p>
+            </div>
+          </div>
+
+          <!-- Slide 5 -->
+          <div class="onboarding-slide" data-slide="5">
+            <div class="modal-header-custom">
+              <img src="https://4xxglxlj.media.zestyio.com/Update-your-Nonprofit-Profile.png" alt="Update Your Nonprofit Profile" class="slide-image">
+            </div>
+            <div class="slide-content">
+              <h2 class="slide-title">Update Your Nonprofit Profile</h2>
+              <p class="slide-description">Add your logo, mission, and donation links. An updated profile builds trust—and makes it easier to get discovered.</p>
+            </div>
+          </div>
+
+          <div class="modal-footer-custom">
+            <div class="pagination-dots">
+              <div class="pagination-dot active" data-slide="1"></div>
+              <div class="pagination-dot" data-slide="2"></div>
+              <div class="pagination-dot" data-slide="3"></div>
+              <div class="pagination-dot" data-slide="4"></div>
+              <div class="pagination-dot" data-slide="5"></div>
+            </div>
+            <button type="button" class="btn btn-primary" id="nextSlideBtn">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--prettier-ignore-->
+    {{include /components/global/NPO Admin/Dashboard/Review Story Modal/review_story_modal.html}}
+
+    <!-- Add required scripts -->
+
+    <script type="module">
+      const currentNpo = "{{$zuid}}";
+
+      $(document).ready(async function() {
+        const localUser = JSON.parse(localStorage.getItem("user"));
+        if (!localUser) {
+          return;
+        }
+
+        try {
+          // Get managed NPOs and verify access
+          const managedNpos = await window.getUserManagedNpos(localUser.zuid);
+          const hasAccess = managedNpos && managedNpos.data && managedNpos.data.some(npo => npo.meta?.zuid === currentNpo);
+
+          if (hasAccess) {
+            // Show content and initialize page
+            $('#loading-overlay').remove();
+            $('#npo-admin-page').show();
+
+            // Check if this is the first time visiting this NPO admin page
+            const onboardingKey = `npo_onboarding_${currentNpo}`;
+            const hasSeenOnboarding = localStorage.getItem(onboardingKey);
+            
+            if (!hasSeenOnboarding) {
+              // Show onboarding modal after a short delay
+              setTimeout(() => {
+                const onboardingModal = new bootstrap.Modal(document.getElementById('onboardingModal'));
+                onboardingModal.show();
+              }, 500);
+            }
+
+            // Handle onboarding modal dismissal
+            $('#onboardingModal .close-btn').on('click', function() {
+              localStorage.setItem(onboardingKey, 'true');
+              const onboardingModal = bootstrap.Modal.getInstance(document.getElementById('onboardingModal'));
+              onboardingModal.hide();
+            });
+
+            // Handle modal backdrop click
+            $('#onboardingModal').on('click', function(e) {
+              if (e.target === this) {
+                localStorage.setItem(onboardingKey, 'true');
+              }
+            });
+
+            // Slide navigation logic
+            let currentSlide = 1;
+            const totalSlides = 5;
+
+            function showSlide(slideNumber) {
+              // Hide all slides
+              document.querySelectorAll('.onboarding-slide').forEach(slide => {
+                slide.classList.remove('active');
+              });
+              
+              // Show current slide
+              document.querySelector(`[data-slide="${slideNumber}"]`).classList.add('active');
+              
+              // Update pagination dots
+              document.querySelectorAll('.pagination-dot').forEach(dot => {
+                dot.classList.remove('active');
+              });
+              document.querySelector(`.pagination-dot[data-slide="${slideNumber}"]`).classList.add('active');
+              
+              // Update button text
+              const btnAction = document.querySelector('#nextSlideBtn');
+              btnAction.textContent = slideNumber === totalSlides ? 'Done' : 'Next';
+            }
+
+            function nextSlide() {
+              if (currentSlide < totalSlides) {
+                currentSlide++;
+                showSlide(currentSlide);
+              } else {
+                // On final slide, close modal
+                localStorage.setItem(onboardingKey, 'true');
+                const onboardingModal = bootstrap.Modal.getInstance(document.getElementById('onboardingModal'));
+                onboardingModal.hide();
+              }
+            }
+
+            // Handle next button clicks
+            $('#nextSlideBtn').on('click', function() {
+              nextSlide();
+            });
+
+            // Add click handlers to pagination dots
+            document.querySelectorAll('.pagination-dot').forEach((dot) => {
+              dot.addEventListener('click', (e) => {
+                currentSlide = parseInt(e.target.getAttribute('data-slide'));
+                showSlide(currentSlide);
+              });
+            });
+
+            // Escape key to close
+            document.addEventListener('keydown', (e) => {
+              if (e.key === 'Escape' && document.getElementById('onboardingModal').classList.contains('show')) {
+                localStorage.setItem(onboardingKey, 'true');
+                const onboardingModal = bootstrap.Modal.getInstance(document.getElementById('onboardingModal'));
+                onboardingModal.hide();
+              }
+            });
+
+            // Initialize first slide
+            showSlide(1);
+
+            // Tab URL hash logic
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+              const target = $(e.target).attr('href');
+              if (target && target.startsWith('#')) {
+                const newHash = target.substring(1);
+                if (history.pushState) {
+                  history.pushState(null, null, '#' + newHash);
+                } else {
+                  location.hash = '#' + newHash;
+                }
+              }
+            });
+
+            // Initialize tab from URL hash
+            const initialHash = window.location.hash.substring(1);
+            if (initialHash) {
+              const targetTab = $(`a[href="#${initialHash}"]`);
+              if (targetTab.length) {
+                new bootstrap.Tab(targetTab[0]).show();
+              }
+            }
+          } else {
+            $('#loading-overlay').html(`
+              <div class="text-center">
+                <div class="alert alert-warning mb-3">
+                  <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                  You don't have access to this Non-Profit's admin dashboard
+                </div>
+                <a href="{{home_feed.first().getUrl()}}" class="btn btn-primary">
+                  Return to Home
+                </a>
+              </div>
+            `);
+          }
+        } catch (error) {
+          console.error('Error verifying NPO access:', error);
+          $('#loading-overlay').html(`
+            <div class="text-center">
+              <div class="alert alert-danger">Error loading dashboard. Please try again.</div>
+              <button class="btn btn-primary" onclick="window.location.reload()">Reload Page</button>
+            </div>
+          `);
+        }
+      });
+    </script>
+    
+    
+  </body>
+  <!-- prettier-ignore -->
+  {{include /components/global/footer.html}}
+</html>
+{{/each}}

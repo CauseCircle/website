@@ -1,0 +1,394 @@
+<style>
+  /* Reuse followers styles */
+  .followers-list {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+
+  .follower-item {
+    transition: background-color 0.2s ease;
+  }
+
+  .follower-item:hover {
+    background-color: #f8f9fa;
+  }
+
+  .btn-link {
+    color: #666;
+  }
+
+  .btn-link:hover {
+    color: #000;
+  }
+</style>
+<div class="tab-pane fade" id="admins">
+  <div>
+    <div id="admins-header" class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="mb-0 text-center">Admins</h3>
+      <button
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#inviteAdminModal"
+      >
+        <i class="bi bi-person-plus"></i> Invite Admins
+      </button>
+    </div>
+
+    <!-- Add tabs navigation -->
+    <ul class="nav nav-tabs mb-3">
+      <li class="nav-item">
+        <a 
+          class="nav-link active accepted-admins" 
+          data-bs-toggle="tab" 
+          href="#acceptedAdmins"
+        >
+          Accepted 0
+        </a>
+      </li>
+      <li class="nav-item">
+        <a 
+          class="nav-link" 
+          data-bs-toggle="tab" 
+          href="#pendingAdmins"
+        >
+          Pending 0
+        </a>
+      </li>
+    </ul>
+
+    <!-- Admins List with tabs content -->
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="acceptedAdmins">
+        <div class="followers-list d-flex flex-column gap-3">
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pending Invites Tab -->
+      <div class="tab-pane fade" id="pendingAdmins">
+        <div class="followers-list d-flex flex-column gap-3" id="pendingAdminsContainer">
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Invite Admin Modal (Similar structure to followers modal but with different endpoint) -->
+<div class="modal fade" id="inviteAdminModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 d-flex justify-content-between align-items-start">
+        <div class="modal-title d-flex flex-row align-items-start gap-2">
+          <span class="invite-icon">
+            <i class="bi bi-person-plus fs-4"></i>
+          </span>
+          <div class="d-flex flex-column">
+            <h5 class="mb-0">Add Admin</h5>
+            <p class="modal-subtitle mb-0">
+              Send invitations to your admins. To invite multiple people, separate email addresses with commas.
+              These users will be granted admin privileges.
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="adminEmails" class="form-label">Invite Admins</label>
+          <textarea
+            class="form-control"
+            id="adminEmails"
+            rows="3"
+            placeholder="e.g. admin1@example.com, admin2@example.com, ..."
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-0 d-flex justify-content-between">
+        <div class="d-flex gap-2 ms-auto">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-primary" id="sendAdminInvites">
+            <span class="d-none spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="invite-text">Add Admins</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Success Modal after Invite Admin Modal -->
+<!-- Success Modal -->
+<div class="modal fade" id="adminSuccessModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <div class="modal-title d-flex flex-row align-items-center gap-2">
+          <span class="invite-icon">
+            <i class="bi bi-person-plus fs-4"></i>
+          </span>
+          <div class="d-flex flex-column">
+            <h5 class="mb-0">Admins Invited</h5>
+            <p class="modal-subtitle mb-0">
+              These invites will be sent as emails
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="success-icon">
+          <i class="bi bi-check-lg checkmark"></i>
+        </div>
+        <h4>You've invited <span id="adminInviteCount">0</span> new admins</h4>
+        <p class="modal-subtitle">
+          Please ask them to check their inbox for an email from<br />
+          invite@causecircle.com
+        </p>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light" id="adminInviteMore">
+          Invite More
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  $(document).ready(function() {
+    // ==================== TANSTACK QUERY SETUP ====================
+    const npoZuid = "{{$zuid}}";
+
+    // Create query observers
+    const adminsQuery = window.createNpoAdminsQuery(npoZuid);
+    const profileQuery = window.createNPOProfileQuery(npoZuid);
+
+    // Create mutation observers
+    const inviteUsersMutation = window.createInviteUsersMutation();
+
+    // ==================== HELPER FUNCTIONS ====================
+    const renderAdmins = (admins) => {
+      return admins.map(admin => `
+        <div class="follower-item d-flex flex-row justify-content-between align-items-center card">
+          <div class="d-flex align-items-center">
+            <img src="${(() => {
+              const profileImage = admin.profile_image;
+              const placeholder = 'https://www.gravatar.com/avatar/?d=mp';
+
+              if (!profileImage) return placeholder;
+
+              if (typeof profileImage === 'string') {
+                return profileImage.trim() !== '' ? profileImage : placeholder;
+              } else {
+                return profileImage.data?.[0]?.url || placeholder;
+              }
+            })()}"
+                 class="rounded-circle"
+                 width="48"
+                 height="48" />
+            <div class="ms-3">
+              <h6 class="mb-0">${admin.first_name} ${admin.last_name}</h6>
+              <small class="text-muted">
+                ${admin.email} • Joined ${new Date(admin.meta?.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </small>
+            </div>
+          </div>
+          <a href="${admin.meta?.web?.uri || '#'}"
+             class="btn btn-link text-decoration-none"
+             target="_blank">
+            View Profile
+          </a>
+        </div>
+      `).join('');
+    };
+
+    const renderPendingInvites = (emails) => {
+      if (!emails || emails.length === 0) {
+        return `<div class="text-center py-4 text-muted">No pending invites at this time</div>`;
+      }
+
+      return emails.map(email => `
+        <div class="follower-item d-flex flex-row justify-content-between align-items-center card">
+          <div class="d-flex align-items-center">
+            <div class="ms-3">
+              <h6 class="mb-0">${email}</h6>
+              <small class="text-muted">Invite sent • Pending</small>
+            </div>
+          </div>
+          <span class="badge bg-warning">Pending</span>
+        </div>
+      `).join('');
+    };
+
+    const updateUI = (adminsData, profileData) => {
+      // Extract admins
+      const admins = adminsData?.data || [];
+
+      // Extract pending invites
+      const pendingAdminInvites = profileData?.data?.[0]?.pending_admin_invite || '';
+      const pendingEmails = pendingAdminInvites.split(',').filter(email => email.trim() !== '');
+
+      // Render accepted admins
+      const adminsHtml = admins.length > 0
+        ? renderAdmins(admins)
+        : `<div class="text-center py-4 text-muted">No admins yet</div>`;
+
+      $('#acceptedAdmins .followers-list').html(adminsHtml);
+      $(".accepted-admins").text(`Accepted ${admins.length}`);
+
+      // Render pending invites
+      const pendingHtml = renderPendingInvites(pendingEmails);
+      $('#pendingAdminsContainer').html(pendingHtml);
+      $('a[href="#pendingAdmins"]').html(`Pending ${pendingEmails.length}`);
+    };
+
+    // ==================== QUERY SUBSCRIPTIONS ====================
+    // Subscribe to admins query
+    adminsQuery.subscribe((result) => {
+      if (result.isLoading) {
+      } else if (result.isError) {
+        console.error("Error loading admins:", result.error);
+        $('#acceptedAdmins .followers-list').html(`
+          <div class="text-center py-4 text-danger">
+            Error loading admins. Please try again later.
+          </div>
+        `);
+      } else if (result.isSuccess) {
+        // Store admins data and update UI when both queries are ready
+        window._adminsData = result.data;
+        if (window._profileData) {
+          updateUI(window._adminsData, window._profileData);
+        }
+      }
+    });
+
+    // Subscribe to profile query
+    profileQuery.subscribe((result) => {
+      if (result.isLoading) {
+      } else if (result.isError) {
+        console.error("Error loading profile:", result.error);
+      } else if (result.isSuccess) {
+        // Store profile data and update UI when both queries are ready
+        window._profileData = result.data;
+        if (window._adminsData) {
+          updateUI(window._adminsData, window._profileData);
+        }
+      }
+    });
+
+    // ==================== MODAL SETUP ====================
+    const adminInviteModal = new bootstrap.Modal(
+      document.getElementById("inviteAdminModal")
+    );
+    const adminSuccessModal = new bootstrap.Modal(
+      document.getElementById("adminSuccessModal")
+    );
+
+    // ==================== INVITE ADMINS MUTATION ====================
+    // Subscribe to mutation state to handle UI updates
+    let mutationUnsubscribe = null;
+
+    $("#sendAdminInvites").click(function () {
+      const $button = $(this);
+      const $spinner = $button.find('.spinner-border');
+      const $text = $button.find('.invite-text');
+
+      const emails = $("#adminEmails").val()
+        .split(",")
+        .map(e => e.trim())
+        .filter(e => e);
+
+      if (!emails.length) {
+        alert("Please enter at least one email address");
+        return;
+      }
+
+      $button.prop('disabled', true);
+      $spinner.removeClass('d-none');
+
+      // Unsubscribe from previous mutation if exists
+      if (mutationUnsubscribe) {
+        mutationUnsubscribe();
+      }
+
+      // Subscribe to mutation state changes
+      mutationUnsubscribe = inviteUsersMutation.subscribe((result) => {
+        if (result.status === 'success') {
+          // Success! The invalidateQueries in the mutation will trigger automatic refetch
+          $("#adminInviteCount").text(emails.length);
+          $("#adminEmails").val("");
+
+          $button.prop('disabled', false);
+          $spinner.addClass('d-none');
+
+          adminInviteModal.hide();
+
+          // Use setTimeout to ensure modal is fully hidden before showing next one
+          setTimeout(() => {
+            adminSuccessModal.show();
+          }, 300);
+
+          // Unsubscribe after success
+          if (mutationUnsubscribe) {
+            mutationUnsubscribe();
+            mutationUnsubscribe = null;
+          }
+        } else if (result.status === 'error') {
+          console.error("Error adding admins:", result.error);
+          alert("Failed to add admins. Please try again.");
+
+          $button.prop('disabled', false);
+          $spinner.addClass('d-none');
+
+          // Unsubscribe after error
+          if (mutationUnsubscribe) {
+            mutationUnsubscribe();
+            mutationUnsubscribe = null;
+          }
+        }
+      });
+
+      // Trigger the mutation
+      inviteUsersMutation.mutate({
+        zuid: npoZuid,
+        data: {
+          emails: emails.join(','),
+          type: "admin",
+        }
+      });
+    });
+
+    // ==================== MODAL HANDLERS ====================
+    $("#adminInviteMore").click(function () {
+      adminSuccessModal.hide();
+      $("#adminEmails").val("");
+      adminInviteModal.show();
+    });
+
+    $("#inviteAdminModal").on("hidden.bs.modal", function () {
+      $("#adminEmails").val("");
+    });
+  });
+</script> 

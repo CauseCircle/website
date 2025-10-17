@@ -1,0 +1,71 @@
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="storyActionLoginPromptModal"
+  tabindex="-1"
+  aria-labelledby="storyActionLoginPromptModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content p-0">
+      <div class="modal-header w-100 border-0 pb-0">
+        <div class="d-flex justify-content-end w-100">
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div
+          class="d-flex flex-column justify-content-center align-items-center"
+        >
+          <img
+            src="https://4xxglxlj.media.zestyio.com/Custom-Icon.png"
+            alt=""
+            class="img-fluid mb-3"
+          />
+          <p id="storyActionLoginPromptModalLabel" class="text-center fs-5 fw-medium text-muted">
+            <!-- prettier-ignore -->
+            Please Sign In to continue
+          </p>
+          <button id="storyActionLoginBtn" class="btn btn-primary w-100 mt-3">
+            Sign In
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  $(document).ready(function () {
+    const modalElement = document.getElementById('storyActionLoginPromptModal');
+    const modalLabel = document.getElementById('storyActionLoginPromptModalLabel');
+    
+    // Update text when modal is about to be shown
+    if (modalElement) {
+      modalElement.addEventListener('show.bs.modal', function (event) {
+        const actionType = modalElement.getAttribute('data-action-type');
+        if (actionType === 'like') {
+          modalLabel.textContent = 'Please Sign In to like this story.';
+        } else if (actionType === 'comment') {
+          modalLabel.textContent = 'Please Sign In to comment on this story.';
+        } else {
+          modalLabel.textContent = 'Please Sign In to continue.'; // Default text
+        }
+      });
+    }
+
+    $("#storyActionLoginBtn").click(function () {
+      const redirectUrl = window.location.href; // Use full href
+      // Assuming 'login_page' is a global variable or accessible model
+      // Fallback to a default login path if necessary
+      const loginPageUrl = " {{login_page.first().getUrl() }}"; 
+      localStorage.setItem("loginRedirectUrl", redirectUrl); // Use a generic redirect key
+      window.location.href = loginPageUrl; 
+    });
+  });
+</script>

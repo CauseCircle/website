@@ -1,0 +1,1004 @@
+<style>
+  .story-stream-container {
+    display: flex;
+    height: 70vh;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .stream-sidebar {
+    width: 280px;
+    border-right: 1px solid #e9ecef;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stream-sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+    background: #fff;
+  }
+
+  .add-stream-btn {
+    background: #7b3fee;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .add-stream-btn:hover {
+    background: #6b2de8;
+    color: white;
+  }
+
+  .stream-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+  }
+
+  .stream-item {
+    padding: 16px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s;
+  }
+
+  .stream-item:hover {
+    background: #ffffff;
+  }
+
+  .stream-item.active {
+    background: #fff;
+    border-right: 3px solid #7b3fee;
+    position: relative;
+  }
+
+  .stream-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #333;
+  }
+
+  .stream-status {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 4px;
+  }
+
+  .stream-status.active {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .stream-status.upcoming {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .stream-status.expired {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .stream-dates {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .stream-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  .stream-settings {
+    padding: 30px;
+    max-width: 600px;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #6b7280;
+    text-align: center;
+  }
+
+  .empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #d1d5db;
+  }
+
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+
+  input:checked + .slider {
+    background-color: #7b3fee;
+  }
+
+  input:focus + .slider {
+    box-shadow: 0 0 1px #7b3fee;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+
+  .story-selection {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 16px;
+    background: #f8f9fa;
+    position: relative;
+  }
+
+  .story-item {
+    padding: 12px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    background: white;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .story-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .story-checkbox {
+    margin: 0;
+  }
+
+  .story-details {
+    flex: 1;
+  }
+
+  .story-title {
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #333;
+  }
+
+  .story-meta {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 24px;
+  }
+
+  .delete-stream-btn {
+    color: #dc3545;
+    background: none;
+    border: 1px solid #dc3545;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  .delete-stream-btn:hover {
+    background: #dc3545;
+    color: white;
+  }
+
+  /* Loading States */
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  .stream-sidebar.loading {
+    position: relative;
+  }
+
+  .stream-sidebar.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(248, 249, 250, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+  }
+
+  .story-selection.loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    .story-stream-container {
+      flex-direction: column;
+      height: auto;
+    }
+    
+    .stream-sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .stream-list {
+      max-height: 200px;
+    }
+  }
+</style>
+
+<div class="tab-pane fade" id="story-stream-settings">
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title mb-4">Story Stream Settings</h4>
+      <p class="text-muted mb-4">Manage multiple story streams for your organization. Create time-limited campaigns to collect stories for specific events or causes.</p>
+      
+      <div class="story-stream-container">
+        <!-- Left Sidebar - Stream List -->
+        <div class="stream-sidebar">
+          <div class="stream-sidebar-header">
+            <button type="button" class="add-stream-btn" id="addStreamBtn">
+              <i class="bi bi-plus-lg"></i>
+              Add New Stream
+            </button>
+          </div>
+          
+          <div class="stream-list" id="streamList">
+            <!-- Stream items will be populated here -->
+          </div>
+        </div>
+        
+        <!-- Right Content - Stream Settings -->
+        <div class="stream-content">
+          <!-- Empty State -->
+          <div class="empty-state p-4" id="emptyState">
+            <i class="bi bi-collection"></i>
+            <h5>No Story Stream Selected</h5>
+            <p>Select a story stream from the left to view and edit its settings, or create a new one.</p>
+          </div>
+          
+          <!-- Stream Settings Form -->
+          <div class="stream-settings" id="streamSettings" style="display: none;">
+            <form id="streamForm">
+              <input type="hidden" id="currentStreamId" value="">
+              
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Stream Settings</h5>
+                <button type="button" class="delete-stream-btn" id="deleteStreamBtn">
+                  <i class="bi bi-trash me-1"></i>
+                  Delete
+                </button>
+              </div>
+              
+              <!-- Stream Title -->
+              <div class="mb-4">
+                <label class="form-label">Stream Title <span class="text-danger">*</span></label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="streamTitle" 
+                  placeholder="Enter stream title..."
+                  maxlength="100"
+                  required
+                />
+                <div class="form-text">This title will be displayed to users when they submit stories.</div>
+              </div>
+              
+              <!-- Enable Stream Toggle -->
+              <div class="mb-4">
+                <label class="form-label">Enable Stream</label>
+                <div class="d-flex align-items-center">
+                  <label class="toggle-switch me-3 flex-grow-0">
+                    <input type="checkbox" id="enableStream">
+                    <span class="slider"></span>
+                  </label>
+                  <span class="form-text flex-grow-1">Turn on to activate this story stream</span>
+                </div>
+              </div>
+              
+              <!-- Date Range -->
+              <div class="row mb-4 g-2">
+                <div class="col-md-6">
+                  <label class="form-label">Start Date <span class="text-danger">*</span></label>
+                  <input 
+                    type="date" 
+                    class="form-control" 
+                    id="startDate"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">End Date <span class="text-danger">*</span></label>
+                  <input 
+                    type="date" 
+                    class="form-control" 
+                    id="endDate"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <!-- Enable Live Stream -->
+              <div class="mb-4">
+                <label class="form-label">Enable Live Stream</label>
+                <div class="d-flex align-items-center">
+                  <label class="toggle-switch me-3 flex-shrink-0">
+                    <input type="checkbox" id="enableLiveStream">
+                    <span class="slider"></span>
+                  </label>
+                  <span class="form-text flex-grow-1">Allow real-time story submissions during the event</span>
+                </div>
+              </div>
+              
+              <!-- Story Selection -->
+              <div class="mb-4">
+                <label class="form-label">Story Selection</label>
+                <div class="mb-2">
+                  <input type="text" id="storySearchInput" class="form-control" placeholder="Search stories by title...">
+                </div>
+                <div class="story-selection" id="storySelection">
+                  <div class="text-center text-muted py-3">
+                    <i class="bi bi-collection me-2"></i>
+                    Loading available stories...
+                  </div>
+                </div>
+                <div class="form-text">Select which stories to include in this stream.</div>
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="action-buttons">
+                <button type="submit" class="btn btn-primary" id="saveStreamBtn">
+                  Save Stream
+                </button>
+                <button type="button" class="btn btn-secondary" id="viewStreamBtn">
+                  View Stream
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{ include /components/global/NPO Admin/Story Stream/story_stream_settings_success_modal.html }}
+
+<script type="module">
+  // Create TanStack Query observers
+  const npoProfileQuery = window.createNPOProfileQuery("{{$zuid}}");
+  const storiesQuery = window.createStoriesQuery({
+    npo: "{{$zuid}}",
+    approved: "1",
+    status: "approved"
+  });
+  const createStoryStreamMutation = window.createCreateStoryStreamMutation();
+  const updateStoryStreamMutation = window.createUpdateStoryStreamMutation();
+  const deleteStoryStreamMutation = window.createDeleteStoryStreamMutation();
+
+  // Component state
+  let currentStreamId = null;
+  let isCreatingNew = false;
+  let searchDebounceTimeout = null;
+  let lastActionType = null; // Track the last action for success modal
+
+  // Reactive subscription for NPO profile data
+  npoProfileQuery.subscribe((result) => {
+    if (result.isLoading) {
+      $('#streamList').html(`
+        <div class="p-4 text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <div class="mt-2 text-muted">Loading streams...</div>
+        </div>
+      `);
+    } else if (result.isSuccess) {
+      const npoData = result.data?.data?.[0];
+      if (npoData) {
+        renderStreamList(npoData);
+      }
+    } else if (result.isError) {
+      $('#streamList').html(`
+        <div class="p-4 text-center text-danger">
+          <i class="bi bi-exclamation-triangle d-block mb-2" style="font-size: 24px;"></i>
+          <small>Error loading streams.<br>Please refresh to try again.</small>
+        </div>
+      `);
+    }
+  });
+
+  // Reactive subscription for stories data
+  storiesQuery.subscribe((result) => {
+    if (result.isLoading) {
+      $('#storySelection').html(`
+        <div class="text-center text-muted py-3">
+          <div class="spinner-border spinner-border-sm me-2" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          Loading stories...
+        </div>
+      `);
+    } else if (result.isSuccess) {
+      const stories = result.data?.data || [];
+      const currentStream = getCurrentStream();
+      renderStorySelection(currentStream, stories, $('#storySearchInput').val() || '');
+    } else if (result.isError) {
+      $('#storySelection').html(`
+        <div class="text-center text-muted py-3">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Error loading stories.
+        </div>
+      `);
+    }
+  });
+
+  // Helper function to get current stream from NPO profile
+  function getCurrentStream() {
+    const npoResult = npoProfileQuery.getCurrentResult();
+    if (npoResult.isSuccess && currentStreamId) {
+      const streams = npoResult.data?.data?.[0]?.story_stream?.data || [];
+      return streams.find(s => s.meta.zuid === currentStreamId);
+    }
+    return null;
+  }
+
+  // Helper function to get available stories from NPO profile
+  function getAvailableStories() {
+    const npoResult = npoProfileQuery.getCurrentResult();
+    const storiesResult = storiesQuery.getCurrentResult();
+    
+    if (!npoResult.isSuccess || !storiesResult.isSuccess) {
+      return [];
+    }
+
+    const streams = npoResult.data?.data?.[0]?.story_stream?.data || [];
+    const allStoriesFromStreams = streams.flatMap(stream => stream.stories?.data || []);
+    const npoApprovedStories = storiesResult.data?.data || [];
+    
+    // Create a unique list of stories available for selection
+    const storyMap = new Map();
+
+    allStoriesFromStreams.forEach(story => {
+      if (story?.meta?.zuid) {
+        storyMap.set(story.meta.zuid, story);
+      }
+    });
+
+    npoApprovedStories.forEach(story => {
+      if (story?.meta?.zuid) {
+        storyMap.set(story.meta.zuid, story);
+      }
+    });
+    
+    return Array.from(storyMap.values());
+  }
+
+  // Render the stream list in sidebar
+  function renderStreamList(npoData) {
+    const streamList = $('#streamList');
+    const streams = npoData?.story_stream?.data || [];
+    
+    streamList.empty();
+    
+    if (streams.length === 0) {
+      streamList.append(`
+        <div class="p-4 text-center text-muted">
+          <i class="bi bi-collection d-block mb-2" style="font-size: 24px;"></i>
+          <small>No story streams yet.<br>Create your first one!</small>
+        </div>
+      `);
+      return;
+    }
+    
+    streams.forEach((stream, index) => {
+      const status = getStreamStatus(stream);
+      const statusClass = status.class;
+      const statusText = status.text;
+      
+      const streamItem = $(`
+        <div class="stream-item" data-stream-id="${stream.meta.zuid}">
+          <div class="stream-title">${stream.title || 'Untitled Stream'}</div>
+          <div class="stream-status ${statusClass}">${statusText}</div>
+          <div class="stream-dates">
+            ${formatDate(stream.start_date)} - ${formatDate(stream.end_date)}
+          </div>
+        </div>
+      `);
+      
+      streamList.append(streamItem);
+    });
+  }
+
+  // Get stream status
+  function getStreamStatus(stream) {
+    const today = new Date();
+    const startDate = new Date(stream.start_date);
+    const endDate = new Date(stream.end_date);
+    
+    today.setHours(0, 0, 0, 0);
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(23, 59, 59, 999);
+    
+    if (today < startDate) {
+      return { class: 'upcoming', text: 'Upcoming' };
+    } else if (today > endDate) {
+      return { class: 'expired', text: 'Expired' };
+    } else {
+      return { class: 'active', text: 'Active' };
+    }
+  }
+
+  // Format date for display
+  function formatDate(dateString) {
+    if (!dateString) return 'Not set';
+    return new Date(dateString).toLocaleDateString();
+  }
+
+  // Load stream data into form
+  function loadStreamData(streamId) {
+    const stream = getCurrentStream();
+    
+    if (!stream) return;
+    
+    $('#currentStreamId').val(streamId);
+    $('#streamTitle').val(stream.title || '');
+    $('#enableStream').prop('checked', stream.enable === "1" || stream.enable === 1);
+    $('#startDate').val(stream.start_date || '');
+    $('#endDate').val(stream.end_date || '');
+    $('#enableLiveStream').prop('checked', stream.enable_live_stream === "1" || stream.enable_live_stream === 1);
+
+    // Clear search input
+    $('#storySearchInput').val('');
+    
+    // Show settings panel
+    $('#emptyState').hide();
+    $('#streamSettings').show();
+    
+    // Update view stream button
+    const npoResult = npoProfileQuery.getCurrentResult();
+    if (npoResult.isSuccess) {
+      const npoData = npoResult.data?.data?.[0];
+      const viewUrl = `${window.location.origin}${npoData?.meta?.web?.uri}${stream.meta?.web?.uri}/`;
+      $('#viewStreamBtn').off('click').on('click', function() {
+        window.open(viewUrl, '_blank');
+      });
+    }
+  }
+
+  // Render story selection checkboxes
+  function renderStorySelection(stream, storiesToRender = [], searchTerm = '') {
+    const storySelection = $('#storySelection');
+    const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+    
+    // Get available stories from reactive queries
+    const availableStories = getAvailableStories();
+ 
+    // Collect priority story IDs (stream-attached + currently selected)
+    const savedStoryIds = stream?.stories?.data?.map(s => s.meta?.zuid) || [];
+    const checkedStoryIds = [];
+    $('.story-checkbox:checked').each(function() {
+      checkedStoryIds.push($(this).val());
+    });
+    const priorityStoryIds = new Set([...savedStoryIds, ...checkedStoryIds]);
+
+    // Build a lookup map from available, selected, and search result stories
+    const lookupMap = new Map();
+    availableStories.forEach(s => { if (s?.meta?.zuid) lookupMap.set(s.meta.zuid, s); });
+    storiesToRender.forEach(s => { if (s?.meta?.zuid) lookupMap.set(s.meta.zuid, s); });
+
+    // Assemble priority stories (keep order consistent with availableStories first)
+    const priorityStories = [];
+    priorityStoryIds.forEach(id => {
+      if (lookupMap.has(id)) {
+        priorityStories.push(lookupMap.get(id));
+      }
+    });
+
+    // Determine regular stories to show
+    let regularStories = [];
+    if (normalizedSearchTerm) {
+      // When searching, only include search result stories (excluding priority ones)
+      storiesToRender.forEach(story => {
+        if (story?.meta?.zuid && !priorityStoryIds.has(story.meta.zuid)) {
+          regularStories.push(story);
+        }
+      });
+    } else {
+      // No search term -> show remaining available stories
+      availableStories.forEach(story => {
+        if (story?.meta?.zuid && !priorityStoryIds.has(story.meta.zuid)) {
+          regularStories.push(story);
+        }
+      });
+    }
+
+    const finalStories = [...priorityStories, ...regularStories];
+
+    if (finalStories.length === 0) {
+      const emptyMessage = normalizedSearchTerm ? `No stories found matching "${searchTerm}".` : 'No stories available for selection';
+      storySelection.html(`
+        <div class="text-center text-muted py-3">
+          <i class="bi bi-search me-2"></i>
+          ${emptyMessage}
+        </div>
+      `);
+      return;
+    }
+
+    let html = '';
+
+    finalStories.forEach(story => {
+      const isSelected = priorityStoryIds.has(story.meta?.zuid);
+      const author = story.author?.data?.[0];
+      const authorName = author?.name || `${author?.first_name || ''} ${author?.last_name || ''}`.trim() || 'Unknown Author';
+
+      html += `
+      <div class="story-item">
+          <input type="checkbox" class="form-check-input story-checkbox" 
+              value="${story.meta?.zuid}" ${isSelected ? 'checked' : ''}>
+          <div class="story-details">
+          <div class="story-title">${story.title || 'Untitled Story'}</div>
+          <div class="story-meta">
+              ${authorName} • 
+              ${formatDate(story.meta?.createdAt)}
+          </div>
+          </div>
+      </div>
+      `;
+    });
+    storySelection.html(html);
+  }
+
+  // Clear form for new stream
+  function clearForm() {
+    $('#currentStreamId').val('');
+    $('#streamTitle').val('');
+    $('#enableStream').prop('checked', false);
+    $('#startDate').val('');
+    $('#endDate').val('');
+    $('#enableLiveStream').prop('checked', false);
+    $('#storySearchInput').val('');
+    
+    $('#emptyState').hide();
+    $('#streamSettings').show();
+    $('#deleteStreamBtn').hide();
+    $('#viewStreamBtn').hide();
+    
+    isCreatingNew = true;
+  }
+
+  // Show success modal with contextual message
+  function showSuccessModal() {
+    let title, message;
+    
+    switch(lastActionType) {
+      case 'create':
+        title = 'Stream Created!';
+        message = 'Your story stream has been successfully created and is ready to use.';
+        break;
+      case 'update':
+        title = 'Stream Updated!';
+        message = 'Your story stream has been successfully updated with the new settings.';
+        break;
+      case 'delete':
+        title = 'Stream Deleted!';
+        message = 'The story stream has been successfully deleted.';
+        break;
+      default:
+        title = 'Success!';
+        message = 'Operation completed successfully.';
+    }
+    
+    // Update modal content using specific IDs
+    $('#storyStreamSuccessModalTitle').text(title);
+    $('#storyStreamSuccessModalMessage').text(message);
+    $('#storyStreamSuccessModal').modal('show');
+  }
+
+  // Show error modal with custom message
+  function showErrorModal(message, title = 'Error') {
+    $('#storyStreamErrorModalTitle').html(`<i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>${title}`);
+    $('#storyStreamErrorModalMessage').text(message);
+    $('#storyStreamErrorModal').modal('show');
+  }
+
+  // Event Handlers
+  
+  // Stream item click
+  $(document).on('click', '.stream-item', function() {
+    const streamId = $(this).data('stream-id');
+    
+    // Update active state
+    $('.stream-item').removeClass('active');
+    $(this).addClass('active');
+    
+    currentStreamId = streamId;
+    isCreatingNew = false;
+    loadStreamData(streamId);
+    $('#deleteStreamBtn').show();
+    $('#viewStreamBtn').show();
+  });
+
+  // Add new stream
+  $('#addStreamBtn').on('click', function() {
+    $('.stream-item').removeClass('active');
+    currentStreamId = null;
+    clearForm();
+  });
+
+  // Delete stream - show confirmation modal
+  $('#deleteStreamBtn').on('click', function() {
+    if (!currentStreamId) return;
+    
+    // Show confirmation modal instead of browser confirm
+    const stream = getCurrentStream();
+    const streamTitle = stream?.title || 'this stream';
+    
+    // Update modal message with stream title
+    $('#storyStreamDeleteModalMessage').text(`Are you sure you want to delete "${streamTitle}"? This action cannot be undone.`);
+    $('#storyStreamDeleteModal').modal('show');
+  });
+
+  // Confirm delete stream - actual deletion logic
+  $('#confirmDeleteStreamBtn').on('click', function() {
+    if (!currentStreamId) return;
+    
+    const $confirmBtn = $(this);
+    const originalText = $confirmBtn.html();
+    
+    // Mutation subscription pattern for delete operation
+    const unsubscribe = deleteStoryStreamMutation.subscribe((result) => {
+      if (result.status === 'success') {
+        // Handle success UI updates
+        $confirmBtn.prop('disabled', false);
+        $confirmBtn.html(originalText);
+        $('#storyStreamDeleteModal').modal('hide');
+        
+        $('#emptyState').show();
+        $('#streamSettings').hide();
+        currentStreamId = null;
+        
+        lastActionType = 'delete';
+        showSuccessModal();
+        unsubscribe();
+      } else if (result.status === 'error') {
+        // Handle error UI updates
+        $confirmBtn.prop('disabled', false);
+        $confirmBtn.html(originalText);
+        $('#storyStreamDeleteModal').modal('hide');
+        showErrorModal('Failed to delete stream. Please try again.', 'Delete Failed');
+        unsubscribe();
+      }
+    });
+
+    // Set loading state and trigger mutation
+    $confirmBtn.prop('disabled', true);
+    $confirmBtn.html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>Deleting...');
+    
+    deleteStoryStreamMutation.mutate({
+      npoZuid: "{{$zuid}}",
+      streamZuid: currentStreamId
+    });
+  });
+
+  // Form submission
+  $('#streamForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    // Validate dates
+    const startDate = $('#startDate').val();
+    const endDate = $('#endDate').val();
+    
+    if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+      // Add inline validation styling and message
+      $('#endDate').addClass('is-invalid');
+      if (!$('#endDate').next('.invalid-feedback').length) {
+        $('#endDate').after('<div class="invalid-feedback">End date must be after start date.</div>');
+      }
+      $('#endDate').focus();
+      return;
+    } else {
+      // Remove validation styling if dates are valid
+      $('#startDate, #endDate').removeClass('is-invalid');
+      $('.invalid-feedback').remove();
+    }
+    
+    const $saveBtn = $('#saveStreamBtn');
+    const originalText = $saveBtn.html();
+    
+    // Set lastActionType early to ensure correct modal message
+    lastActionType = isCreatingNew ? 'create' : 'update';
+    
+    // Prepare form data
+    const formData = {
+      title: $('#streamTitle').val(),
+      start_date: startDate,
+      end_date: endDate,
+      enable: $('#enableStream').is(':checked') ? 1 : 0,
+      enable_live_stream: $('#enableLiveStream').is(':checked') ? 1 : 0
+    };
+    
+    // Get selected stories
+    const selectedStories = [];
+    $('.story-checkbox:checked').each(function() {
+      selectedStories.push($(this).val());
+    });
+    
+    if (selectedStories.length > 0) {
+      formData.stories = selectedStories.join(',');
+    } else if (selectedStories.length === 0) {
+      formData.stories = "";
+    }
+    
+    // Choose mutation based on operation type
+    const mutation = isCreatingNew ? createStoryStreamMutation : updateStoryStreamMutation;
+    
+    // Mutation subscription pattern for form submission
+    const unsubscribe = mutation.subscribe((result) => {
+      if (result.status === 'success') {
+        // Handle success UI updates
+        $saveBtn.prop('disabled', false);
+        $saveBtn.html(originalText);
+        
+        if (isCreatingNew) {
+          // For new streams, find and select the newly created stream
+          const npoResult = npoProfileQuery.getCurrentResult();
+          if (npoResult.isSuccess) {
+            const streams = npoResult.data?.data?.[0]?.story_stream?.data || [];
+            
+            if (streams.length > 0) {
+              // Find the most recently created stream (or use result data if available)
+              let newStream;
+              if (result.data && result.data.meta && result.data.meta.zuid) {
+                newStream = streams.find(s => s.meta.zuid === result.data.meta.zuid);
+              } else {
+                // Fallback: assume the last stream in the array is the new one
+                newStream = streams[streams.length - 1];
+              }
+              
+              if (newStream) {
+                currentStreamId = newStream.meta.zuid;
+                isCreatingNew = false;
+                $('.stream-item').removeClass('active');
+                $(`.stream-item[data-stream-id="${currentStreamId}"]`).addClass('active');
+                loadStreamData(currentStreamId);
+                $('#deleteStreamBtn').show();
+                $('#viewStreamBtn').show();
+              }
+            }
+          }
+        } else {
+          // For updates, reload the current stream data
+          $('.stream-item').removeClass('active');
+          $(`.stream-item[data-stream-id="${currentStreamId}"]`).addClass('active');
+          loadStreamData(currentStreamId);
+        }
+        
+        showSuccessModal();
+        unsubscribe();
+      } else if (result.status === 'error') {
+        // Handle error UI updates
+        $saveBtn.prop('disabled', false);
+        $saveBtn.html(originalText);
+        showErrorModal('Failed to save stream. Please try again.', 'Save Failed');
+        unsubscribe();
+      }
+    });
+
+    // Set loading state and trigger mutation
+    $saveBtn.prop('disabled', true);
+    
+    if (isCreatingNew) {
+      $saveBtn.html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>Creating...');
+      mutation.mutate({
+        zuid: "{{$zuid}}",
+        data: formData
+      });
+    } else {
+      $saveBtn.html('<span class="spinner-border spinner-border-sm me-1" role="status"></span>Updating...');
+      mutation.mutate({
+        zuid: "{{$zuid}}",
+        streamId: currentStreamId,
+        data: formData
+      });
+    }
+  });
+
+  // Date validation
+  $('#startDate, #endDate').on('change', function() {
+    const startDate = $('#startDate').val();
+    const endDate = $('#endDate').val();
+    
+    // Remove any existing validation messages
+    $('.invalid-feedback').remove();
+    $('#startDate, #endDate').removeClass('is-invalid');
+    
+    if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+      $('#endDate').addClass('is-invalid');
+      $('#endDate').after('<div class="invalid-feedback">End date must be after start date.</div>');
+    }
+  });
+
+  // Story search functionality
+  $('#storySearchInput').off('keyup').on('keyup', function() {
+    const searchTerm = $(this).val();
+    
+    clearTimeout(searchDebounceTimeout);
+    searchDebounceTimeout = setTimeout(() => {
+      const currentStream = getCurrentStream();
+      const storiesResult = storiesQuery.getCurrentResult();
+      
+      if (storiesResult.isSuccess) {
+        const stories = storiesResult.data?.data || [];
+        renderStorySelection(currentStream, stories, searchTerm);
+      }
+    }, 300); // 300ms debounce
+  });
+</script> 

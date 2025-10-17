@@ -933,7 +933,7 @@
           <input
             type="hidden"
             name="zf_redirect_url"
-            value="https://causecircle.org/about/confirmation-page/"
+            value="{{ $base_url }}about/confirmation-page/"
           /><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
           <input
             type="hidden"
@@ -1028,7 +1028,7 @@
 <!--prettier-ignore-->
 {{include /components/global/Modals/Onboading/onboarding_modal.html}}
 
-<script>
+<script type="module">
   $(document).ready(function () {
     $("#hero-description ul").each(function () {
       $(this).addClass("custom-bullet");
@@ -1089,12 +1089,11 @@
   });
 
   function triggerOnboarding() {
-    console.log("Triggering onboarding modal");
     $("#onboardingModal").modal("show");
   }
 </script>
 
-<script>
+<script type="module">
   function validateForm() {
     let isValid = true;
     let firstNameError = document.getElementById("firstNameError");

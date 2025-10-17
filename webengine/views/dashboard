@@ -162,7 +162,7 @@
   </div>
 </section>
 
-<script>
+<script type="module">
   $(document).ready(async function () {
     $(".scroll-container").on('wheel', function (evt) {
       evt.preventDefault();

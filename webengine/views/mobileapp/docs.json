@@ -1,0 +1,9 @@
+{
+  "data" :
+  [
+    {{each help_center_docs as docs sort by docs.sort_order asc}}
+    {{docs.toJSON(2)}}
+    {{docs._arraycomma}}
+    {{/each}}
+  ]
+}

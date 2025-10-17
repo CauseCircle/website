@@ -1,0 +1,431 @@
+<script type="module">
+  // ==================== BASE URL ====================
+  const BASE_URL = "https://api.causecircle.org";
+  // const BASE_URL = "http://localhost:8080";
+
+  // ==================== STORY MANAGEMENT ====================
+
+  window.getStory = async (zuid) => {
+    const user = firebase.auth().currentUser;
+    const userId = user?.uid;
+    const url = `${BASE_URL}/stories/${zuid}`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error getting story:", error);
+      throw error;
+    }
+  }
+
+  window.getStories = async (params) => {
+    const user = firebase.auth().currentUser;
+    const userId = user?.uid;
+    const url = `${BASE_URL}/stories?${new URLSearchParams(params).toString()}`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error getting stories:", error);
+      throw error;
+    }
+  }
+
+  window.getStoryStats = async (zuid) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const url = `${BASE_URL}/stories/${zuid}/stats`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    const response = await fetch(url, options);
+    const data = await response.json();
+    return data;
+  };
+
+  window.getStoryStatsGranular = async (zuid, type, npo_zuid) => {
+    if (type) {
+      if(!['like', 'share', 'view', 'donate-click', 'daily'].includes(type)) {
+        throw new Error("Invalid type");
+      }
+    }
+
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const url = type
+      ? `${BASE_URL}/admin/stats/stories/${zuid}/${type}?npo_zuid=${npo_zuid}`
+      : `${BASE_URL}/admin/stats/stories/${zuid}?npo_zuid=${npo_zuid}`;
+
+    const options = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error getting story stats:", error);
+      throw error;
+    }
+  }
+
+  window.updateStoryLikes = async (zuid) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const url = `${BASE_URL}/stories/${zuid}/stats/like`;
+
+    const options = {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error updating story likes:", error);
+      throw error;
+    }
+  };
+
+  window.updateStoryViews = async (zuid) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const url = `${BASE_URL}/stories/${zuid}/stats/view`;
+
+    const options = {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error updating story views:", error);
+      throw error;
+    }
+  }
+
+  window.updateStoryShares = async (zuid) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const url = `${BASE_URL}/stories/${zuid}/stats/share`;
+
+    const options = {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error updating story shares:", error);
+      throw error;
+    }
+  }
+
+  window.updateStory = async (zuid, data) => {
+    try {
+      const user = firebase.auth().currentUser;
+      const userId = user.uid;
+      const url = `${BASE_URL}/stories/${zuid}`;
+
+      const options = {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userId}`,
+        },
+        body: JSON.stringify({data: data}),
+      };
+
+      const response = await fetch(url, options);
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      console.error("Error updating story:", error);
+      throw error;
+    }
+
+  }
+
+  window.createStory = async (data) => {
+    // const {
+    //   title,
+    //   story_body,
+    //   related_causes = [],
+    //   related_npos = [],
+    //   story_image = "",
+    // } = data;
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const idToken = await user.getIdToken();
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/stories`, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error creating story:", error);
+      throw error;
+    }
+  };
+
+  window.newUploadMedia = async (mediaFiles) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/heic", "image/heif", "image/jpg", "video/mp4", "video/x-flv", "video/quicktime"];
+    const allowedImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/heic", "image/heif", "image/jpg"];
+    const allowedVideoTypes = ["video/mp4", "video/x-flv", "video/quicktime"];
+    const MAX_VIDEO_SIZE_MB = 250; // Video file size limit (matches backend)
+    const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024;
+
+    const user = firebase.auth().currentUser;
+    if (!user) {
+      console.error("User not authenticated for media upload.");
+      alert("You must be logged in to upload media.");
+      throw new Error("User not authenticated.");
+    }
+
+    const userId = user.uid;
+    const validMediaFiles = mediaFiles.filter(file => file instanceof File && file.type && allowedTypes.includes(file.type));
+
+    if (validMediaFiles.length === 0) {
+      return [];
+    }
+
+    // Check individual file sizes (only for videos, no limit for images)
+    for (const file of validMediaFiles) {
+      if (allowedVideoTypes.includes(file.type) && file.size > MAX_VIDEO_SIZE_BYTES) {
+        const errorMessage = `Video file "${file.name}" (${(file.size / (1024*1024)).toFixed(2)}MB) exceeds the size limit of ${MAX_VIDEO_SIZE_MB}MB.`;
+        console.error(errorMessage);
+        alert(errorMessage);
+        throw new Error(errorMessage);
+      }
+    }
+
+         // Step 1: Get signed URLs for all files
+     const getSignedUrl = async (filename) => {
+       try {
+         const response = await fetch(`${BASE_URL}/media/signed-url?filename=${encodeURIComponent(filename)}`, {
+           method: "GET",
+           headers: {
+             Authorization: `Bearer ${userId}`,
+           },
+         });
+
+        if (!response.ok) {
+          let errorData;
+          try {
+            errorData = await response.json();
+          } catch (e) {
+            errorData = { message: `Failed to get signed URL with status: ${response.status}` };
+          }
+          console.error("Signed URL request error:", errorData);
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const signedUrlData = await response.json();
+        return signedUrlData;
+      } catch (error) {
+        console.error(`Failed to get signed URL for ${filename}:`, error.message);
+        throw error;
+      }
+    };
+
+    // Step 2: Upload file to signed URL
+    const uploadToSignedUrl = async (file, signedUrlData) => {
+      try {
+
+        const response = await fetch(signedUrlData.url, {
+          method: "PUT",
+          headers: {
+            "Content-Type": signedUrlData.contentType,
+          },
+          body: file,
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => 'No error details available');
+          console.error(`Failed to upload ${file.name} to signed URL:`, {
+            status: response.status,
+            statusText: response.statusText,
+            errorText: errorText,
+            signedUrlData: signedUrlData
+          });
+          throw new Error(`Upload to signed URL failed with status: ${response.status} - ${response.statusText}`);
+        }
+
+        return signedUrlData.filename;
+      } catch (error) {
+        console.error(`Failed to upload ${file.name} to signed URL:`, error.message);
+        throw error;
+      }
+    };
+
+         // Step 3: Register uploaded files with the media service
+     const registerUploadedFiles = async (filenames) => {
+       try {
+         const response = await fetch(`${BASE_URL}/media/uploads/gcs`, {
+           method: "POST",
+           headers: {
+             "Content-Type": "application/json",
+             Authorization: `Bearer ${userId}`,
+           },
+           body: JSON.stringify({
+             files: filenames,
+           }),
+         });
+
+        if (!response.ok) {
+          let errorData;
+          try {
+            errorData = await response.json();
+          } catch (e) {
+            errorData = { message: `Failed to register files with status: ${response.status}` };
+          }
+          console.error("File registration error:", errorData);
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const responseData = await response.json();
+        if (responseData && typeof responseData.data !== 'undefined') {
+          return Array.isArray(responseData.data) ? responseData.data : [responseData.data];
+        } else {
+          console.error("Unexpected response structure from file registration:", responseData);
+          throw new Error("Failed to process registration response: 'data' field missing or invalid.");
+        }
+      } catch (error) {
+        console.error("Failed to register uploaded files:", error.message);
+        throw error;
+      }
+    };
+
+    try {
+      // Process all files
+      const uploadPromises = validMediaFiles.map(async (file) => {
+        try {
+          // Step 1: Get signed URL (use sanitized filename from backend)
+          const signedUrlData = await getSignedUrl(file.name);
+
+          // Step 2: Upload to signed URL (use the exact filename from signed URL response)
+          await uploadToSignedUrl(file, signedUrlData);
+
+          // Return the sanitized filename that was actually used in GCS
+          return signedUrlData.filename;
+        } catch (error) {
+          console.error(`Failed to process file ${file.name}:`, error.message);
+          throw error;
+        }
+      });
+
+      // Wait for all uploads to complete
+      const uploadedFilenames = await Promise.all(uploadPromises);
+
+      // Step 3: Register all uploaded files using the sanitized filenames
+      const registrationResult = await registerUploadedFiles(uploadedFilenames);
+
+      return registrationResult;
+    } catch (error) {
+      console.error("Media upload process failed:", error.message);
+      alert(`Failed to upload media: ${error.message || "An error occurred during upload. Please try again."}`);
+      throw error;
+    }
+  };
+
+  // Keep the old function for backward compatibility
+  window.newUploadImages = window.newUploadMedia;
+
+  window.deleteStory = async (zuid) => {
+    try {
+      const response = await fetch(
+        `${CONFIG.CLOUD_FUNCTIONS_URL["delete-story"]}?zuid=${zuid}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${CONFIG.CLOUD_FUNCTIONS_KEY}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error deleting story:", error);
+      throw error;
+    }
+  };
+
+  window.approveStory = async (zuid, status, changeRequest = null) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+    const idToken = await user.getIdToken();
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+    };
+
+    try {
+      let url = `${BASE_URL}/stories/${zuid}/approvals?status=${status}`;
+      if (changeRequest) {
+        url += `&change_request=${encodeURIComponent(changeRequest)}`;
+      }
+
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error approving story:", error);
+      throw error;
+    }
+  };
+</script>

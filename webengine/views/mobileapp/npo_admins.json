@@ -1,0 +1,14 @@
+{{$admins = {non_profits.filter({get_var.zuid}).admins} }}
+{
+  "data" :
+  [
+      {{each users as member where find_in_set(member.zuid, '{$admins}') }}
+      {{member.toJSON(2)}}
+      {{member._arraycomma}}
+      {{/each}}
+  ],
+  "meta" : {
+    "zuid" : "{{get_var.zuid}}",
+    "admins" : "{{$admins}}"
+  }
+}

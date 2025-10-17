@@ -1,0 +1,287 @@
+<script type="module">
+  // Comments Module for Home Feed
+  // Handles comment functionality, rendering, and interactions
+
+  // Comment functions are now defined in story-rendering.html to avoid dependency issues
+
+  // Helper function to load all comments for a story using TanStack Query
+  async function loadAllComments(storyZuid) {
+       try {
+         const storyCommentsQuery = window.createStoryCommentsQuery(storyZuid);
+         
+         const result = await new Promise((resolve) => {
+           const unsubscribe = storyCommentsQuery.subscribe((result) => {
+             if (result.status === 'success' || result.status === 'error') {
+               unsubscribe();
+               resolve(result);
+             }
+           });
+         });
+
+         if (result.status === 'success' && result.data) {
+           const allComments = result.data.data || [];
+           
+           if (allComments.length === 0) {
+             return ''; // Return empty string if no comments
+           }
+
+           // Sort comments: newest first
+           allComments.sort((a, b) => (new Date(b.createdAt || 0)) - (new Date(a.createdAt || 0)));
+
+           // Fetch author details efficiently
+           const authorIds = [...new Set(allComments.map(c => c.authorId).filter(id => id))];
+           const authorDetailsMap = new Map();
+           await Promise.all(authorIds.map(async (id) => {
+               const details = await getCommentAuthorDetails(id);
+               authorDetailsMap.set(id, details);
+           }));
+
+           // Generate HTML for all comments
+           let allCommentsHtml = '';
+           for (const comment of allComments) {
+               const authorDetails = authorDetailsMap.get(comment.authorId) || await getCommentAuthorDetails(null); // Fallback
+               allCommentsHtml += generateCommentHtml(comment, authorDetails);
+           }
+           return allCommentsHtml;
+         } else {
+           console.error("Error loading comments:", result.error);
+           return '';
+         }
+       } catch (error) {
+         console.error("Error loading comments:", error);
+         return '';
+       }
+  }
+
+  // Function to toggle the display of all comments
+  async function toggleAllComments(storyZuid, buttonElement, event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const button = $(buttonElement);
+      const storyCard = button.closest('.post-card');
+      const commentsSection = storyCard.find(`#comments-${storyZuid}`);
+      const latestCommentContainer = commentsSection.find('.latest-comment-container');
+      const allCommentsContainer = commentsSection.find('.all-comments-container');
+      const isLoaded = button.data('loaded') === true;
+      const currentlyExpanded = allCommentsContainer.is(':visible');
+      const totalCount = parseInt(button.data('count') || '0', 10);
+
+      if (!isLoaded) {
+          // First time clicking: Load comments
+          button.html('<div class="comments-loading" style="width:100%; text-align:left; padding: 0;"><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...</div>').prop('disabled', true);
+          try {
+              const allCommentsHtml = await loadAllComments(storyZuid);
+              if (allCommentsHtml) {
+                 allCommentsContainer.html(allCommentsHtml);
+              } else {
+                 allCommentsContainer.html('<div class="text-center text-muted p-3">No comments found.</div>'); // Should not happen if count > 1
+              }
+              
+              allCommentsContainer.show();
+              latestCommentContainer.hide();
+              button.html(`<i class="bi bi-chevron-down"></i> Hide Comments`).addClass('expanded').data('loaded', true).prop('disabled', false);
+
+          } catch (error) {
+              console.error(`Error loading all comments for story ${storyZuid}:`, error);
+              allCommentsContainer.html('<div class="text-center text-danger p-3">Could not load comments.</div>').show(); // Show error in the container
+              latestCommentContainer.hide(); // Keep preview hidden on error for now
+              // Reset button state on error
+              button.html(`<i class="bi bi-chevron-down"></i> View All ${totalCount} Comments`).removeClass('expanded').prop('disabled', false);
+              // Keep data-loaded as false so user can retry
+          }
+
+      } else {
+          // Comments already loaded, just toggle visibility
+          if (currentlyExpanded) {
+              // Collapse: Hide all, show latest
+              allCommentsContainer.hide();
+              latestCommentContainer.show();
+              button.html(`<i class="bi bi-chevron-down"></i> View All ${totalCount} Comments`).removeClass('expanded');
+          } else {
+              // Expand: Show all, hide latest
+              allCommentsContainer.show();
+              latestCommentContainer.hide();
+              button.html(`<i class="bi bi-chevron-down"></i> Hide Comments`).addClass('expanded');
+          }
+      }
+  }
+
+  // Update the handleCommentSubmit function
+  async function handleCommentSubmit(storyZuid, inputElement, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const commentText = inputElement.value.trim();
+    if (!commentText) return;
+    
+    const authUser = JSON.parse(localStorage.getItem("user"));
+    const storyCard = $(inputElement).closest('.post-card');
+    const commentsSection = storyCard.find(`#comments-${storyZuid}`);
+    const allCommentsContainer = commentsSection.find('.all-comments-container');
+    const latestCommentContainer = commentsSection.find('.latest-comment-container');
+    const toggleButton = commentsSection.find('.toggle-comments-btn');
+    const mainCommentButton = storyCard.find('.action-btn').filter((i, btn) => $(btn).find('.bi-chat').length > 0);
+
+    inputElement.value = ''; // Clear input immediately
+    
+    if (!authUser) {
+      alert('Please login to comment');
+      return;
+    }
+    
+    // --- Optimistic UI Update --- 
+    const tempCommentId = `temp-${Date.now()}`;
+    const authorDetails = { name: `${authUser.firstName || ''} ${authUser.lastName || ''}`, avatar: authUser.profilePhoto || 'https://placehold.co/100x100?text=User' };
+    // Generate HTML with a temporary ID for potential reverting
+    const newCommentHtml = $(generateCommentHtml({ content: commentText, createdAt: new Date().toISOString(), authorId: authUser.zuid, zuid: tempCommentId }, authorDetails))
+                            .attr('data-comment-id', tempCommentId); // Add temp ID attribute
+
+    // 1. Always update the latest comment preview container
+    latestCommentContainer.html(newCommentHtml.clone()); // Use clone to avoid issues moving the element
+    // Ensure the parent section and the preview container itself are visible
+    commentsSection.show().attr('data-visible', 'true'); 
+    latestCommentContainer.show();
+
+    // 2. If comments are already loaded, prepend to the full list as well
+    const commentsLoaded = toggleButton.data('loaded') === true;
+    if (commentsLoaded) {
+        allCommentsContainer.prepend(newCommentHtml.clone());
+    }
+
+    // 3. Collapse the view if it was expanded, to show the new comment as the preview
+    const currentlyExpanded = allCommentsContainer.is(':visible');
+    if (currentlyExpanded) {
+        allCommentsContainer.hide();
+        toggleButton.removeClass('expanded'); // Ensure button shows "View All..." state
+    } 
+
+    // 4. Update counts and button text/visibility
+    // --- Get current count reliably BEFORE incrementing ---
+    const mainButtonText = mainCommentButton.text().trim();
+    const countMatch = mainButtonText.match(/\d+/);
+    const currentCount = countMatch ? parseInt(countMatch[0], 10) : 0;
+    // --- End get current count ---
+    
+    const newCount = currentCount + 1;
+    mainCommentButton.html(`<i class="bi bi-chat"></i> ${newCount}`);
+
+    if (newCount > 1) {
+        // Find the toggle button *again* here, as it might have been added in a previous step
+        const existingToggleButton = commentsSection.find('.toggle-comments-btn');
+        if (existingToggleButton.length === 0) {
+            // Add the button if it didn't exist
+            const newToggleButtonHtml = `
+               <button class="toggle-comments-btn" data-loaded="${commentsLoaded}" data-count="${newCount}" onclick="window.toggleAllComments('${storyZuid}', this, event)">
+                 <i class="bi bi-chevron-down"></i> View All ${newCount} Comments
+               </button>
+            `;
+            // Append after the all-comments-container
+            allCommentsContainer.after(newToggleButtonHtml); 
+        } else {
+            // Update existing button count and ensure correct text for collapsed state
+            existingToggleButton.data('count', newCount);
+            existingToggleButton.html(`<i class="bi bi-chevron-down"></i> View All ${newCount} Comments`).removeClass('expanded');
+        }
+    } else {
+         // Ensure toggle button is removed if count is now 1 or 0
+         commentsSection.find('.toggle-comments-btn').remove(); 
+    }
+    // --- End Optimistic UI Update --- 
+
+    // Actual API call using TanStack Query mutation
+    try {
+      const postCommentMutation = window.createPostCommentMutation();
+      
+      // Subscribe to mutation state changes before triggering
+      const unsubscribe = postCommentMutation.subscribe((result) => {
+        if (result.status === 'success') {
+          // Handle success UI updates
+          
+          // Update temp comment with real ZUID if possible
+          const realZuid = result.data?.data?.zuid;
+          if (realZuid) {
+              storyCard.find(`.comment-container[data-comment-id="${tempCommentId}"]`).attr('data-comment-zuid', realZuid);
+          }
+          
+          // Invalidate 'loaded' state if comments were previously loaded, 
+          // because our optimistic prepend might be out of order with server reality.
+          // Force reload on next expand.
+          if (commentsLoaded) {
+             toggleButton.data('loaded', false);
+          }
+          
+          unsubscribe();
+        } else if (result.status === 'error') {
+          // Handle error UI updates
+          console.error("Error posting comment:", result.error);
+          alert('Failed to post comment. Please try again.');
+          
+          // --- Revert optimistic UI update --- 
+          storyCard.find(`.comment-container[data-comment-id="${tempCommentId}"]`).remove();
+          mainCommentButton.html(`<i class="bi bi-chat"></i> ${currentCount > 0 ? currentCount : 'Comment'}`); // Revert main count/text
+          
+          // Revert latest comment view only if it was showing the failed comment
+          if(latestCommentContainer.find(`.comment-container[data-comment-id="${tempCommentId}"]`).length) {
+              // Fetch and show the actual previous latest comment, or clear it
+               latestCommentContainer.empty(); 
+               if(currentCount === 0) commentsSection.hide().attr('data-visible', 'false'); // Hide section if no comments left
+          }
+
+          // Revert toggle button state
+          const toggleButtonAfterFailedAttempt = commentsSection.find('.toggle-comments-btn');
+          if (currentCount === 1 && newCount === 2) { // Revert adding the button
+               toggleButtonAfterFailedAttempt.remove();
+          } else if (currentCount > 1) { // Revert count update on existing button
+             toggleButtonAfterFailedAttempt.data('count', currentCount);
+             toggleButtonAfterFailedAttempt.html(`<i class="bi bi-chevron-down"></i> View All ${currentCount} Comments`).removeClass('expanded');
+          }
+          allCommentsContainer.hide(); // Ensure full list is hidden after revert
+          // --- End Revert --- 
+          
+          unsubscribe();
+        }
+      });
+
+      // Trigger the mutation
+      const commentData = { authorId: authUser.zuid, storyId: storyZuid, content: commentText, createdAt: new Date().toISOString() };
+      postCommentMutation.mutate({ zuid: storyZuid, data: commentData });
+      
+    } catch (error) {
+      console.error("Error posting comment:", error);
+      alert('Failed to post comment. Please try again.');
+      // --- Revert optimistic UI update --- 
+      storyCard.find(`.comment-container[data-comment-id="${tempCommentId}"]`).remove();
+      mainCommentButton.html(`<i class="bi bi-chat"></i> ${currentCount > 0 ? currentCount : 'Comment'}`);
+      if (currentCount === 0) commentsSection.hide().attr('data-visible', 'false');
+      if (currentCount <= 1 && newCount > 1) { commentsSection.find('.toggle-comments-btn').remove(); }
+      else if (currentCount > 1) { 
+          const existingToggleButton = commentsSection.find('.toggle-comments-btn');
+          existingToggleButton.data('count', currentCount);
+          existingToggleButton.html(`<i class="bi bi-chevron-down"></i> View All ${currentCount} Comments`).removeClass('expanded');
+      }
+      latestCommentContainer.empty(); // Clear preview
+      allCommentsContainer.hide();
+    }
+  }
+  
+  // Simplified toggleCommentSection - just shows/hides the main container
+  function toggleCommentSection(storyZuid, event) {
+    event.stopPropagation();
+    const commentSection = $(`#comments-${storyZuid}`);
+    
+    if (commentSection.is(':visible')) {
+      commentSection.hide().attr('data-visible', 'false');
+    } else {
+      commentSection.show().attr('data-visible', 'true');
+      // Focus input field when showing
+      commentSection.find('.comment-input').focus();
+    }
+  }
+
+  // Export functions to window for global access
+  window.loadAllComments = loadAllComments;
+  window.toggleAllComments = toggleAllComments;
+  window.handleCommentSubmit = handleCommentSubmit;
+  window.toggleCommentSection = toggleCommentSection;
+</script>

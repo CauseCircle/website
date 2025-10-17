@@ -1,0 +1,134 @@
+<script type="module">
+  import { QueryObserver, MutationObserver } from 'https://esm.sh/@tanstack/query-core@5.90.2';
+
+  // ==================== USER QUERIES & MUTATIONS ====================
+  // TanStack Query wrappers for user operations
+
+  // ==================== QUERIES (GET) ====================
+
+  /**
+   * Query for getting user profile
+   * @param {string} zuid - User ZUID
+   * @returns {QueryObserver}
+   */
+  window.createUserProfileQuery = (zuid) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['users', zuid, 'profile'],
+      queryFn: () => window.getUserProfile(zuid),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      enabled: !!zuid, // Only fetch if zuid exists
+    });
+  };
+
+  /**
+   * Query for getting all users
+   * @returns {QueryObserver}
+   */
+  window.createAllUsersQuery = () => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['users'],
+      queryFn: () => window.getAllUsers(),
+      staleTime: 2 * 60 * 1000, // 2 minutes
+    });
+  };
+
+  /**
+   * Query for getting Zesty user data
+   * @param {string} zuid - User ZUID
+   * @returns {QueryObserver}
+   */
+  window.createZestyUserQuery = (zuid) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['users', zuid, 'zesty'],
+      queryFn: () => window.getZestyUser(zuid),
+      staleTime: 5 * 60 * 1000,
+      enabled: !!zuid,
+    });
+  };
+
+  // ==================== MUTATIONS (POST/PATCH/DELETE) ====================
+
+  /**
+   * Mutation for updating user profile
+   * @returns {MutationObserver}
+   */
+  window.createUpdateUserMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ zuid, data }) => window.updateZestyUser(zuid, data),
+      onSuccess: (data, variables) => {
+        // Invalidate specific user profile query to refetch
+        window.queryClient.invalidateQueries({ queryKey: ['users', variables.zuid, 'profile'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to update user:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for following a user
+   * @returns {MutationObserver}
+   */
+  window.createFollowUserMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (zuid) => window.followUser(zuid),
+      onSuccess: (data, zuid) => {
+        window.queryClient.invalidateQueries({ queryKey: ['users', zuid] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to follow user:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for unfollowing a user
+   * @returns {MutationObserver}
+   */
+  window.createUnfollowUserMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (zuid) => window.unfollowUser(zuid),
+      onSuccess: (data, zuid) => {
+        window.queryClient.invalidateQueries({ queryKey: ['users', zuid] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to unfollow user:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for deleting a user
+   * @returns {MutationObserver}
+   */
+  window.createDeleteUserMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (zuid) => window.deleteUser(zuid),
+      onSuccess: () => {
+        // Invalidate all users list
+        window.queryClient.invalidateQueries({ queryKey: ['users'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to delete user:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for creating a new Zesty user
+   * @returns {MutationObserver}
+   */
+  window.createCreateZestyUserMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (data) => window.createZestyUser(data),
+      onSuccess: () => {
+        // Invalidate all users list
+        window.queryClient.invalidateQueries({ queryKey: ['users'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to create Zesty user:', error);
+      },
+    });
+  };
+</script>

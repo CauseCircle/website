@@ -105,7 +105,7 @@
   </div>
 </div>
 
-<script>
+<script type="module">
   $(document).ready(function () {
     const heroImageInput = $("#heroImageInput");
     const imagePreview = $("#imagePreview");
@@ -138,46 +138,69 @@
 
     uploadBgImageBtn.on("click", async function () {
       try {
+        const file = heroImageInput.prop("files")[0];
+        if (!file) {
+          throw new Error("No file selected");
+        }
+
+        // Set loading state manually
         uploadBgImageBtn
           .prop("disabled", true)
           .html(
             '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...'
           );
 
-        const file = heroImageInput.prop("files")[0];
-        if (!file) {
-          throw new Error("No file selected");
-        }
-
-        const image = await uploadImages([file]);
+        // Upload image first
+        const image = await window.newUploadImages([file]);
 
         if (image && image.length > 0) {
+          // Get current user
           const localUser = await window.localStorage.getItem("user");
           const user = JSON.parse(localUser);
           const userZuid = user.zuid;
 
-          let userData = await getZestyUser(userZuid);
-          if (!userData?.user) return;
+          // Use TanStack Query mutation for user profile update
+          const updateUserMutation = window.createUpdateUserMutation();
+          
+          // Subscribe to mutation state changes before triggering
+          const unsubscribe = updateUserMutation.subscribe((result) => {
+            if (result.status === 'success') {
+              // Handle success UI updates
+              
+              // Update UI elements
+              $("#uploadBgImageModal").modal("hide");
+              $("#profile-card")
+                .find(".background-img")
+                .attr("src", image[0].data[0].url);
+              
+              // Reset button state
+              uploadBgImageBtn.prop("disabled", false).html("Upload");
+              
+              unsubscribe();
+            } else if (result.status === 'error') {
+              // Handle error UI updates
+              console.error("Error updating background image:", result.error);
+              alert("An error occurred while uploading the image. Please try again.");
+              
+              // Reset button state on error
+              uploadBgImageBtn.prop("disabled", false).html("Upload");
+              
+              unsubscribe();
+            }
+          });
 
-          // Edit the user data
-          userData.user.data.background_image = image[0].data[0].id;
-
-          const updatedUser = await updateZestyUser(userZuid, userData.user.data);
-
-          // console.log("User profile updated:", updatedUser);
-
-          $("#uploadBgImageModal").modal("hide");
-
-          $("#profile-card")
-            .find(".background-img")
-            .attr("src", image[0].data[0].url);
+          // Trigger mutation with updated user data
+          const updateData = {
+            "background_image": image[0].data[0].id
+          };
+          
+          updateUserMutation.mutate({ zuid: userZuid, data: updateData });
         } else {
           throw new Error("Upload failed");
         }
       } catch (error) {
         console.error("Error uploading image:", error);
         alert("An error occurred while uploading the image. Please try again.");
-      } finally {
         uploadBgImageBtn.prop("disabled", false).html("Upload");
       }
     });

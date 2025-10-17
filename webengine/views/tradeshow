@@ -355,7 +355,7 @@
             <input
               type="hidden"
               name="zf_redirect_url"
-              value="https://causecircle.org{{ non_profits_landing_page.first().getUrl() }}"
+              value="{{ $base_url }}{{ non_profits_landing_page.first().getUrl() }}"
             />
             <input type="hidden" name="zc_gad" value="" />
 
@@ -589,7 +589,7 @@
           <input
             type="hidden"
             name="zf_redirect_url"
-            value="https://causecircle.org/about/confirmation-page/"
+            value="{{ $base_url }}about/confirmation-page/"
           /><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
           <input
             type="hidden"
@@ -744,7 +744,7 @@
   </div>
 </div>
 
-<script>
+<script type="module">
   $(document).ready(function () {
     $("#tradeshow-form #form").on("submit", function (e) {
       e.preventDefault();
@@ -854,7 +854,6 @@
   }
 
   function triggerOnboarding() {
-    // console.log("Triggering onboarding modal");
     $("#onboardingModal").modal("show");
   }
 

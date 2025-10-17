@@ -1,0 +1,195 @@
+<script type="module">
+  const BASE_URL = "https://api.causecircle.org";
+  
+  import { QueryObserver, MutationObserver } from 'https://esm.sh/@tanstack/query-core@5.90.2';
+
+  // ==================== STORY QUERIES & MUTATIONS ====================
+  // TanStack Query wrappers for story operations
+
+  // ==================== QUERIES (GET) ====================
+
+  /**
+   * Query for getting a single story
+   * @param {string} zuid - Story ZUID
+   * @returns {QueryObserver}
+   */
+  window.createStoryQuery = (zuid) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['stories', zuid],
+      queryFn: () => window.getStory(zuid),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      enabled: !!zuid, // Only fetch if zuid exists
+    });
+  };
+
+  /**
+   * Query for getting multiple stories with params
+   * @param {Object} params - Query parameters for filtering stories
+   * @returns {QueryObserver}
+   */
+  window.createStoriesQuery = (params = {}) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['stories', 'list', params],
+      queryFn: () => window.getStories(params),
+      staleTime: 2 * 60 * 1000, // 2 minutes
+    });
+  };
+
+  /**
+   * Query for getting story stats
+   * @param {string} zuid - Story ZUID
+   * @returns {QueryObserver}
+   */
+  window.createStoryStatsQuery = (zuid) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['stories', zuid, 'stats'],
+      queryFn: () => window.getStoryStats(zuid),
+      staleTime: 5 * 60 * 1000,
+      enabled: !!zuid,
+    });
+  };
+
+  /**
+   * Query for getting granular story stats
+   * @param {string} zuid - Story ZUID
+   * @param {string} type - Stats type (like, share, view, donate-click, daily)
+   * @param {string} npo_zuid - NPO ZUID
+   * @returns {QueryObserver}
+   */
+  window.createStoryStatsGranularQuery = (zuid, type, npo_zuid) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['stories', zuid, 'stats', 'granular', type, npo_zuid],
+      queryFn: () => window.getStoryStatsGranular(zuid, type, npo_zuid),
+      staleTime: 5 * 60 * 1000,
+      enabled: !!zuid,
+    });
+  };
+
+  // ==================== MUTATIONS (POST/PATCH/DELETE) ====================
+
+  /**
+   * Mutation for creating a new story
+   * @returns {MutationObserver}
+   */
+  window.createCreateStoryMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (data) => window.createStory(data),
+      onSuccess: () => {
+        // Invalidate all stories list
+        window.queryClient.invalidateQueries({ queryKey: ['stories', 'list'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to create story:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for updating a story
+   * @returns {MutationObserver}
+   */
+  window.createUpdateStoryMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ zuid, data }) => window.updateStory(zuid, data),
+      onSuccess: (data, variables) => {
+        // Invalidate specific story and stories list
+        window.queryClient.invalidateQueries({ queryKey: ['stories', variables.zuid] });
+        window.queryClient.invalidateQueries({ queryKey: ['stories', 'list'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to update story:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for deleting a story
+   * @returns {MutationObserver}
+   */
+  window.createDeleteStoryMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (zuid) => window.deleteStory(zuid),
+      onSuccess: () => {
+        // Invalidate all stories list
+        window.queryClient.invalidateQueries({ queryKey: ['stories'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to delete story:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for approving/rejecting a story
+   * @returns {MutationObserver}
+   */
+  window.createApproveStoryMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ zuid, status, changeRequest = null }) =>
+        window.approveStory(zuid, status, changeRequest),
+      onSuccess: async (data, variables) => {
+        // Wait 5 seconds for API to process the changes before invalidating
+        // This ensures the backend has time to update the story status
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        // Invalidate ALL story queries to ensure both pending and approved lists update
+        window.queryClient.invalidateQueries({ queryKey: ['stories'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to approve story:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for updating story likes
+   * @returns {MutationObserver}
+   */
+  window.createUpdateStoryLikesMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (zuid) => window.updateStoryLikes(zuid),
+      onSuccess: (data, zuid) => {
+        // Invalidate story stats
+        window.queryClient.invalidateQueries({ queryKey: ['stories', zuid, 'stats'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to update story likes:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for updating story views
+   * @returns {MutationObserver}
+   */
+  window.createUpdateStoryViewsMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (zuid) => window.updateStoryViews(zuid),
+      onSuccess: (data, zuid) => {
+        // Invalidate story stats
+        window.queryClient.invalidateQueries({ queryKey: ['stories', zuid, 'stats'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to update story views:', error);
+      },
+    });
+  };
+
+  /**
+   * Mutation for updating story shares
+   * @returns {MutationObserver}
+   */
+  window.createUpdateStorySharesMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (zuid) => window.updateStoryShares(zuid),
+      onSuccess: (data, zuid) => {
+        // Invalidate story stats
+        window.queryClient.invalidateQueries({ queryKey: ['stories', zuid, 'stats'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to update story shares:', error);
+      },
+    });
+  };
+</script>

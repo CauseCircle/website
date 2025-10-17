@@ -2,19 +2,19 @@
   /* General Styles */
   h5 {
     color: rgb(94, 94, 94);
-    font-size: 2.4vw;
+    font-size: 1.125rem;
     font-weight: 400;
   }
 
   @media (min-width: 600px) {
     h5 {
-      font-size: min(2.4vw, 24px);
+      font-size: min(1.125rem, 18px);
     }
   }
 
   @media (max-width: 599px) {
     h5 {
-      font-size: max(2.4vw, 20px);
+      font-size: max(1.125rem, 18px);
     }
   }
 
@@ -219,6 +219,154 @@
     animation: rotate 8s linear infinite;
   }
 
+  /* Image Carousel Styles */
+  .image-carousel {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    margin: 10px 0 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Carousel Tabs */
+  .carousel-tabs {
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+  }
+  
+  @keyframes tabPulse {
+    0% { box-shadow: 0 4px 8px rgba(108, 99, 255, 0.3); }
+    50% { box-shadow: 0 4px 12px rgba(108, 99, 255, 0.5); }
+    100% { box-shadow: 0 4px 8px rgba(108, 99, 255, 0.3); }
+  }
+  
+  .carousel-tab {
+    padding: 10px 20px;
+    background-color: #f5f5f5;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    user-select: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    text-align: center;
+  }
+  
+  .carousel-tab.active {
+    background-color: #6c63ff;
+    color: white;
+    box-shadow: 0 4px 8px rgba(108, 99, 255, 0.3);
+    transform: scale(1.1);
+    font-weight: 600;
+    padding: 12px 24px;
+    z-index: 5;
+    animation: tabPulse 2s infinite ease-in-out;
+  }
+  
+  .carousel-tab:hover:not(.active) {
+    background-color: #e9e9e9;
+    transform: translateY(-2px);
+  }
+  
+  .carousel-container {
+    display: flex;
+    transition: transform 0.5s ease;
+    width: fit-content;
+  }
+  
+  .carousel-slide {
+    min-width: 100%;
+    transition: 0.5s;
+    position: relative;
+  }
+  
+  .carousel-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 0;
+  }
+  
+  /* Carousel navigation dots */
+  .carousel-dots {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    z-index: 10;
+  }
+  
+  .carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .carousel-dot.active {
+    background-color: #fff;
+    width: 12px;
+    height: 12px;
+  }
+  
+  /* Responsive carousel styles */
+  @media (max-width: 768px) {
+    .carousel-image {
+      height: 300px;
+    }
+    
+    .carousel-tab {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    
+    .carousel-tab.active {
+      padding: 10px 20px;
+      font-size: 15px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .carousel-image {
+      height: 200px;
+    }
+    
+    .carousel-dots {
+      bottom: 10px;
+    }
+    
+    .carousel-dot {
+      width: 8px;
+      height: 8px;
+    }
+    
+    .carousel-tab {
+      padding: 6px 12px;
+      font-size: 12px;
+      flex: 1;
+      min-width: calc(50% - 5px);
+      max-width: calc(50% - 5px);
+    }
+    
+    .carousel-tab.active {
+      padding: 8px 16px;
+      font-size: 13px;
+      transform: scale(1.05);
+    }
+    
+    .carousel-tabs {
+      gap: 5px;
+      padding: 0 10px;
+    }
+  }
+
   @keyframes scroll {
     from {
       transform: translateX(0);
@@ -308,6 +456,17 @@
     color: var(--bs-gray-500);
     max-width: 53.125rem;
   }
+
+  /* Custom shadow class */
+  .shadow-md {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.12);
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+  }
+  
+  .shadow-md:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
 </style>
 
 <!--prettier-ignore-->
@@ -377,8 +536,90 @@
   </div>
 </section>
 
+<!-- Image Carousel Section -->
+<section class="container my-5 d-none">
+  <!-- Custom tab controls for carousel -->
+  <div class="carousel-tabs d-flex justify-content-center mb-4 gap-4">
+    <div class="carousel-tab active" data-index="0">Create, Share and Collect</div>
+    <div class="carousel-tab" data-index="1">Expand Your Reach</div>
+    <div class="carousel-tab" data-index="2">Engage and Grow</div>
+    <div class="carousel-tab" data-index="3">Track and Report</div>
+  </div>
+  <div class="image-carousel">
+    <div class="carousel-container" id="imageCarousel">
+      <!-- Static carousel slides with AB testing image -->
+      <div class="carousel-slide">
+        <img src="https://kfg6bckb.media.zestyio.com/AB-Testing.webp?quality=10" alt="AB Testing Image 1" class="carousel-image">
+        <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);">
+          <p class="text-white-50 d-none d-md-block">Optimize your fundraising campaigns with data-driven decisions</p>
+        </div>
+      </div>
+      <div class="carousel-slide">
+        <img src="https://kfg6bckb.media.zestyio.com/AB-Testing.webp?quality=10" alt="AB Testing Image 2" class="carousel-image">
+        <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);">
+          <p class="text-white-50 d-none d-md-block">Test different messaging strategies to maximize impact</p>
+        </div>
+      </div>
+      <div class="carousel-slide">
+        <img src="https://kfg6bckb.media.zestyio.com/AB-Testing.webp?quality=10" alt="AB Testing Image 3" class="carousel-image">
+        <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);">
+          <p class="text-white-50 d-none d-md-block">Learn what resonates with your audience through testing</p>
+        </div>
+      </div>
+      <div class="carousel-slide">
+        <img src="https://kfg6bckb.media.zestyio.com/AB-Testing.webp?quality=10" alt="AB Testing Image 4" class="carousel-image">
+        <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);">
+          <p class="text-white-50 d-none d-md-block">Make informed choices with powerful analytics</p>
+        </div>
+      </div>
+    </div>
+    <!-- Navigation dots (hidden but kept for mobile) -->
+    <div class="carousel-dots d-md-none" id="carouselDots">
+      <div class="carousel-dot active" data-index="0"></div>
+      <div class="carousel-dot" data-index="1"></div>
+      <div class="carousel-dot" data-index="2"></div>
+      <div class="carousel-dot" data-index="3"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SEO Features Section -->
+<section class="container my-5">
+  <div class="row">
+    <!-- Left big card -->
+    <div class="col-md-6 mb-4 mb-md-0">
+      <div class="card h-100 border-0 shadow-md" style="min-height: 340px;">
+        <div class="card-body p-0 h-100">
+          <img src="{{this.features_hero_image.getImage()}}" alt="" class="w-100 h-100 rounded-3" style="object-fit: cover;">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right side 4 cards -->
+    <div class="col-md-6">
+      <div class="row g-4">
+        {{each {this.features} as feature sort by feature.sort }}
+        <div class="col-sm-6">
+          <div class="card h-100 border-0 shadow-md">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle bg-purple-100 me-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 60px; height: 60px; background-color: rgba(158, 119, 237, 0.15);">
+                  <img src="{{feature.logo.getImage()}}" alt="" class="w-100 h-100" style="object-fit: cover;">
+                </div>
+                <h5 class="card-title mb-0 fs-6">{{feature.title}}</h5>
+              </div>
+              <div class="card-text">{{feature.description}}</div>
+            </div>
+          </div>
+        </div>
+        {{end-each}}
+      </div>
+    </div>
+  </div>
+</section>
+
 <!--NPO section-->
-<section id="npo-section" class="container py-5">
+<section id="npo-section" class="container my-3">
   <div class="d-flex flex-column gap-3">
     <p class="section-title">{{ this.npo_title }}</p>
     <div class="hero-description mx-auto">
@@ -405,7 +646,7 @@
 
 <section
   id="first-use-cases"
-  class="container d-flex flex-column align-items-center justify-content-center py-5"
+  class="container d-flex flex-column align-items-center justify-content-center my-4"
 >
   <div class="text-center">{{ this.first_use_cases_title }}</div>
 
@@ -419,15 +660,23 @@
   <div class="row d-none d-sm-flex mt-5">
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
     </div>
     <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
-      <div class="w-75 d-flex flex-column gap-4">
+      <div class="w-75 d-flex flex-column gap-2">
         <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
         <div class="usecase-description">{{ usecase.description }}</div>
+        <div>
+          <a
+            href="{{ how_it_works_page.first().path_full }}"
+            class="btn btn-primary scroll-to-demo"
+          >
+            {{ this.primary_use_case_cta_label }}
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -435,14 +684,22 @@
     <div
       class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
     >
-      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-2">
         <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
         <div class="usecase-description">{{ usecase.description }}</div>
+        <div>
+          <a
+            href="{{ how_it_works_page.first().path_full }}"
+            class="btn btn-primary scroll-to-demo"
+          >
+            {{ this.primary_use_case_cta_label }}
+          </a>
+        </div>
       </div>
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -453,31 +710,34 @@
     <div
       class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
     >
-      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-2">
         <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
         <div class="usecase-description">{{ usecase.description }}</div>
+        <div>
+          <a
+            href="{{ how_it_works_page.first().path_full }}"
+            class="btn btn-primary scroll-to-demo"
+          >
+            {{ this.primary_use_case_cta_label }}
+          </a>
+        </div>
       </div>
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
     </div>
   </div>
-  {{end-if}} {{/each}}
-  <a
-    href="{{ how_it_works_page.first().path_full }}"
-    class="btn btn-primary scroll-to-demo mt-5"
-  >
-    {{ this.primary_use_case_cta_label }}
-  </a>
+  {{end-if}} 
+  {{/each}}
 </section>
 
 <section
   id="second-use-cases"
-  class="container d-flex flex-column align-items-center justify-content-center py-5"
+  class="container d-flex flex-column align-items-center justify-content-center my-4"
 >
   <div class="text-center">{{ this.second_use_cases_title }}</div>
   <!-- prettier-ignore -->
@@ -490,15 +750,23 @@
   <div class="row d-none d-sm-flex mt-5">
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
     </div>
     <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
-      <div class="w-75 d-flex flex-column gap-4">
+      <div class="w-75 d-flex flex-column gap-2">
         <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
         <div class="usecase-description">{{ usecase.description }}</div>
+        <div>
+          <a
+            href="{{ how_it_works_page.first().path_full }}"
+            class="btn btn-primary scroll-to-demo"
+          >
+            {{ this.primary_use_case_cta_label }}
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -506,14 +774,21 @@
     <div
       class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
     >
-      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-2">
         <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
         <div class="usecase-description">{{ usecase.description }}</div>
-      </div>
+        <div>
+          <a
+            href="{{ how_it_works_page.first().path_full }}"
+            class="btn btn-primary scroll-to-demo"
+          >
+            {{ this.primary_use_case_cta_label }}
+          </a>
+        </div>
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -524,31 +799,33 @@
     <div
       class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
     >
-      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-2">
         <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
         <div class="usecase-description">{{ usecase.description }}</div>
+        <div>
+          <a
+            href="{{ how_it_works_page.first().path_full }}"
+            class="btn btn-primary scroll-to-demo"
+          >
+            {{ this.primary_use_case_cta_label }}
+          </a>
+        </div>
       </div>
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
     </div>
   </div>
   {{end-if}} {{/each}}
-  <a
-    href="{{ how_it_works_page.first().path_full }}"
-    class="btn btn-primary scroll-to-demo mt-5"
-  >
-    {{ this.primary_use_case_cta_label }}
-  </a>
 </section>
 
 <section
   id="third-use-cases"
-  class="container d-flex flex-column align-items-center justify-content-center py-5"
+  class="container d-flex flex-column align-items-center justify-content-center my-4"
 >
   <div class="text-center">{{ this.third_use_cases_title }}</div>
   <!-- prettier-ignore -->
@@ -561,15 +838,23 @@
   <div class="row d-none d-sm-flex mt-5">
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
     </div>
     <div class="col-12 col-md-6 d-flex flex-column justify-content-center ps-5">
-      <div class="w-75 d-flex flex-column gap-4">
+      <div class="w-75 d-flex flex-column gap-2">
         <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
         <div class="usecase-description">{{ usecase.description }}</div>
+        <div>
+          <a
+            href="{{ how_it_works_page.first().path_full }}"
+            class="btn btn-primary scroll-to-demo"
+          >
+            {{ this.primary_use_case_cta_label }}
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -577,14 +862,22 @@
     <div
       class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
     >
-      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-2">
         <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
         <div class="usecase-description">{{ usecase.description }}</div>
+        <div>
+          <a
+            href="{{ how_it_works_page.first().path_full }}"
+            class="btn btn-primary scroll-to-demo"
+          >
+            {{ this.primary_use_case_cta_label }}
+          </a>
+        </div>
       </div>
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -595,31 +888,34 @@
     <div
       class="col-12 col-md-6 d-flex flex-column justify-content-center ps-sm-5"
     >
-      <div class="w-100 w-sm-75 d-flex flex-column gap-4">
+      <div class="w-100 w-sm-75 d-flex flex-column gap-2">
         <h2 style="color: rgb(213, 68, 124)">{{ usecase.title }}</h2>
         <div class="usecase-description">{{ usecase.description }}</div>
+        <div>
+          <a
+            href="{{ how_it_works_page.first().path_full }}"
+            class="btn btn-primary scroll-to-demo"
+          >
+            {{ this.primary_use_case_cta_label }}
+          </a>
+        </div>
       </div>
     </div>
     <div class="col-12 col-md-6">
       <img
-        src="{{ usecase.image.getImage() }}"
+        src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
     </div>
   </div>
-  {{end-if}} {{/each}}
-  <a
-    href="{{ how_it_works_page.first().path_full }}"
-    class="btn btn-primary scroll-to-demo mt-5"
-  >
-    {{ this.primary_use_case_cta_label }}
-  </a>
+  {{end-if}} 
+  {{/each}}
 </section>
 
 <section
   id="fundraising-banner"
-  class="position-relative bg-primary d-flex flex-column justify-content-center py-5"
+  class="position-relative bg-primary d-flex flex-column justify-content-center py-5 mt-4"
   style="height: 752px"
 >
   <div
@@ -705,7 +1001,7 @@
           <input
             type="hidden"
             name="zf_redirect_url"
-            value="https://causecircle.org/about/confirmation-page/"
+            value="{{ $base_url }}about/confirmation-page/"
           /><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
           <input
             type="hidden"
@@ -794,12 +1090,15 @@
   </div>
 </section>
 
-<script>
+<script type="module">
   $(document).ready(function () {
     // Add custom bullet class to specific elements
     $("#hero-description ul, .usecase-description ul").addClass(
       "custom-bullet"
     );
+
+    // Initialize image carousel
+    setupImageCarousel();
 
     // Scroll to demo section
     $(".scroll-to-demo").click(function () {
@@ -860,7 +1159,6 @@
   }
 
   function triggerOnboarding() {
-    // console.log("Triggering onboarding modal");
     $("#onboardingModal").modal("show");
   }
 
@@ -931,5 +1229,105 @@
 
     const domain = email.split("@")[1];
     return !freeEmailDomains.includes(domain);
+  }
+
+  // Image Carousel Functionality
+  function setupImageCarousel() {
+    const carousel = document.getElementById('imageCarousel');
+    const dots = document.querySelectorAll('.carousel-dot');
+    const tabs = document.querySelectorAll('.carousel-tab');
+    if (!carousel || (dots.length === 0 && tabs.length === 0)) return;
+    
+    const slides = carousel.querySelectorAll('.carousel-slide');
+    if (slides.length <= 1) return;
+    
+    let currentIndex = 0;
+    let slideWidth = slides[0].clientWidth;
+    let autoScrollInterval;
+    
+    // Function to update slide width on window resize
+    function updateSlideWidth() {
+      slideWidth = slides[0].clientWidth;
+      moveToSlide(currentIndex, false);
+    }
+    
+    // Add window resize listener
+    window.addEventListener('resize', updateSlideWidth);
+    
+    // Clone first slide and append to end for infinite scroll effect
+    const firstSlideClone = slides[0].cloneNode(true);
+    carousel.appendChild(firstSlideClone);
+    
+    // Update active indicators (dots and tabs)
+    function updateIndicators(index) {
+      // Update dots for mobile
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+      });
+      
+      // Update tabs
+      tabs.forEach((tab, i) => {
+        tab.classList.toggle('active', i === index);
+      });
+    }
+    
+    // Move to specific slide
+    function moveToSlide(index, animate = true) {
+      currentIndex = index;
+      carousel.style.transition = animate ? 'transform 0.5s ease' : 'none';
+      carousel.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+      
+      // Update indicators (use modulo to handle looping)
+      updateIndicators(currentIndex % slides.length);
+    }
+    
+    function moveToNextSlide() {
+      moveToSlide(currentIndex + 1);
+      
+      // When we reach the cloned slide, reset to the first slide without animation
+      if (currentIndex >= slides.length) {
+        setTimeout(() => {
+          currentIndex = 0;
+          moveToSlide(0, false);
+        }, 500);
+      }
+    }
+    
+    // Reset and start auto-scroll
+    function startAutoScroll() {
+      clearInterval(autoScrollInterval);
+      autoScrollInterval = setInterval(moveToNextSlide, 4000);
+    }
+    
+    // Add click event to dots (mobile)
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        moveToSlide(index);
+        startAutoScroll();
+      });
+    });
+    
+    // Add click event to tabs
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => {
+        moveToSlide(index);
+        startAutoScroll();
+      });
+    });
+    
+    // Pause auto-scroll when hovering over carousel
+    const carouselContainer = document.querySelector('.image-carousel');
+    carouselContainer.addEventListener('mouseenter', () => {
+      clearInterval(autoScrollInterval);
+    });
+    
+    // Resume auto-scroll when mouse leaves
+    carouselContainer.addEventListener('mouseleave', () => {
+      startAutoScroll();
+    });
+    
+    // Initialize first slide and start auto-scroll
+    updateIndicators(0);
+    startAutoScroll();
   }
 </script>

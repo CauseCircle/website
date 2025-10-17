@@ -1,0 +1,85 @@
+<script type="module">
+  // ==================== BASE URL ====================
+  const BASE_URL = "https://api.causecircle.org";
+  // const BASE_URL = "http://localhost:8080";
+
+  // ==================== FEEDBACK ====================
+  window.submitFeedback = async (data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/feedback/submissions`,
+        options
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      throw error;
+    }
+  };
+
+  // ==================== INVITE USERS ====================
+  window.inviteUsers = async (zuid, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/npos/${zuid}/invites`,
+        options
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error inviting users:", error);
+      throw error;
+    }
+  };
+
+  window.sendInviteReminder = async (zuid, data) => {
+    const user = firebase.auth().currentUser;
+    const userId = user.uid;
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userId}`,
+      },
+      body: JSON.stringify(data),
+    };
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/npos/${zuid}/invites/reminder`,
+        options
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error sending invite reminder:", error);
+      throw error;
+    }
+  };
+</script>

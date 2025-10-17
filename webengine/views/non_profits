@@ -45,9 +45,56 @@
   .npo-logo {
     width: 90px;
     height: 90px;
-    object-fit: cover;
+    object-fit: contain;
+    background-color: white;
     border-radius: 10px;
     border: 1px solid #e1e4ea;
+  }
+  .logo-container {
+    position: relative;
+    display: inline-block; /* Or block, depending on layout */
+  }
+  .verified-badge-overlay {
+    position: absolute;
+    bottom: 7px;
+    right: 3px;
+    z-index: 1;
+  }
+  .verified-badge-overlay .badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3em 0.5em; /* Adjust padding as needed */
+    font-size: 0.7rem; /* Adjust font size as needed */
+    border-radius: 0.75rem; /* Adjust for a more circular badge if desired */
+    opacity: 0.3; /* Semi-transparent by default */
+    transition: opacity 0.3s ease-in-out; /* Smooth transition */
+  }
+  .verified-badge-overlay .badge i {
+    font-size: 0.8rem; /* Adjust icon size */
+    margin-right: 0; /* No margin by default as text is hidden */
+    transition: margin-right 0.3s ease-in-out;
+  }
+  .verified-badge-overlay .badge .badge-text {
+    font-size: 0.6rem;
+    display: inline-block;
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: middle; /* Align text with icon */
+    /* Transition text appearance slightly after hover, and a bit slower for max-width */
+    transition: max-width 0.35s ease-in-out 0.05s, opacity 0.3s ease-in-out 0.05s;
+  }
+  .logo-container:hover .verified-badge-overlay .badge {
+    opacity: 1; /* Fully opaque on hover */
+  }
+  .logo-container:hover .verified-badge-overlay .badge i {
+    margin-right: 0.35rem; /* Add space for the text */
+  }
+  .logo-container:hover .verified-badge-overlay .badge .badge-text {
+    max-width: 80px; /* Adjust if "Not Verified" is wider */
+    opacity: 1;
   }
   .cause-subtitle,
   .cause-subtitle * {
@@ -84,12 +131,19 @@
   .card-btn {
     height: 36px;
   }
-  .hero-img {
+  .hero-img,
+  #hero-image-container {
     width: 100%;
     height: 100%;
-    max-height: 140px;
+    max-height: 250px;
     object-fit: cover;
     border-radius: 8px;
+  }
+  
+  #hero-image-container {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
   .story-image {
     height: 100%;
@@ -167,56 +221,196 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+  /* Add new styles for npo-actions scrolling */
+  #npo-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  @media (max-width: 767.98px) {
+    #npo-actions {
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; /* Firefox */
+      padding-bottom: 0.5rem;
+      justify-content: flex-start !important;
+      width: 100%;
+    }
+    
+    #npo-actions::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+    
+    #npo-actions > .btn,
+    #npo-actions > a.btn {
+      flex-shrink: 0;
+    }
+  }
+
+  /* Hashtag styles for non-profits page */
+  .hashtag-item {
+    color: #7b3fee;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  
+  .hashtag-item:hover {
+    text-decoration: underline;
+    color: #5a2bb8;
+  }
+
+  .hashtags-container {
+    line-height: 1.4;
+    margin-top: 8px;
+  }
+
+  /* Story skeleton loader styles */
+  .story-skeleton {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  .skeleton-image {
+    width: 100%;
+    height: 100px;
+    background-color: #e1e4ea;
+    border-radius: 10px;
+  }
+  
+  .skeleton-text {
+    height: 16px;
+    background-color: #e1e4ea;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  
+  .skeleton-text.short {
+    width: 60%;
+  }
+  
+  .skeleton-text.medium {
+    width: 80%;
+  }
+  
+  .skeleton-circle {
+    width: 24px;
+    height: 24px;
+    background-color: #e1e4ea;
+    border-radius: 3px;
+  }
+  
+  .skeleton-button {
+    height: 36px;
+    background-color: #e1e4ea;
+    border-radius: 4px;
+  }
+
+  /* Skeleton to story transition */
+  .skeleton-placeholder {
+    transition: all 0.3s ease-in-out;
+  }
+
+  .story-card-rendered {
+    opacity: 0;
+    animation: slideInStory 0.4s ease-out forwards;
+  }
+
+  @keyframes slideInStory {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
 
 <!--prettier-ignore-->
-{{ $heroImage =  }}
-{{ if {this.hero_image.getImage()} }}
-{{ $heroImage = {this.hero_image.getImage()} }}
-{{ else }}
-{{ $heroImage = https://placehold.co/600x400?text=NPO+Image }}
-{{ /if }}
 {{include /components/global/Nonprofits/Claimlisting Modal/claim_listing_modal.html}}
 
 <section class="container my-4">
   <div class="card pb-0">
-    <img class="hero-img mb-4" src="{{ $heroImage }}" alt="" />
+    <div id="hero-image-container" class="mb-4" style="width: 100%; height: 250px; border-radius: 8px; background-color: #f8f9fa; position: relative; overflow: hidden;">
+      {{ if {this.hero_image} }}
+      <img 
+        id="server-hero-image"
+        src="{{ this.hero_image.getImage() }}?width=800&height=250&fit=cover" 
+        alt="{{ this.name }} hero image"
+        style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;"
+        loading="eager"
+      />
+      {{ else }}
+      <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+        <i class="bi bi-image" style="font-size: 3rem;"></i>
+      </div>
+      {{ end-if }}
+      <div id="hero-loading-overlay" class="d-none position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background-color: rgba(248, 249, 250, 0.8); border-radius: 8px;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
     <div class="row">
-      <div class="col-12 col-md-5 col-lg-6">
+      <div class="col-12 col-md-7 col-lg-7">
         <div class="d-flex gap-3">
-          <div class="flex-shrink-0">
+          <div class="flex-shrink-0 logo-container">
             <img
-              src="{{ this.logo.getImage() }}"
-              class="img-fluid npo-logo"
+              src="{{ this.logo.getImage() }}?width=90"
+              class="img-fluid npo-logo p-1"
               alt=""
             />
+            {{ if {this.claimed} == '1' }}
+            <div class="verified-badge-overlay">
+              <div class="badge text-white bg-success">
+                <i class="bi bi-check-circle-fill"></i>
+                <span class="badge-text">Verified</span>
+              </div>
+            </div>
+            {{ else }}
+            <div class="verified-badge-overlay">
+              <div class="badge text-white bg-dark" style="opacity: 0.5;">
+                <i class="bi bi-x-circle-fill"></i>
+                <span class="badge-text">Not Claimed</span>
+              </div>
+            </div>
+            {{ /if }}
           </div>
           <div class="flex-grow-1">
             <div class="d-flex flex-column justify-content-center h-100">
-              <h3 class="card-title mb-0">{{ this.name }}</h3>
+              <div class="d-flex gap-2 align-items-center">
+                <h3 class="card-title mb-0">{{ this.name }}</h3>
+                <a id="event-happening-badge" class="badge bg-primary text-decoration-none fst-italic d-none" href="{{ this.getUrl() }}/story-stream">Event happening now!</a>
+              </div>
               <div class="card-text cause-subtitle text-muted">
-                {{ this.cause_description }}
+                {{ if {this.cause_description} == '' }}
+                  {{ this.short_cause_description }}
+                {{ else }}
+                  {{ this.cause_description }}
+                {{ /if }}
               </div>
-              (**
-              <div class="d-flex gap-2">
-                <p class="card-text text-muted">
-                  <strong>12.3k</strong> Followers
-                </p>
-                <p class="card-text text-muted">
-                  <strong>$</strong><strong>2.5M</strong> Donations Received
-                </p>
-                <p class="card-text text-muted">
-                  <strong>12</strong> Ongoing Projects
-                </p>
-              </div>
-              **)
             </div>
           </div>
         </div>
       </div>
-      <div class="col-12 col-md-7 col-lg-6 pt-4 pt-md-0">
+      <div class="col-12 col-md-5 col-lg-5 pt-4 pt-md-0">
         <div
-          class="d-flex align-items-end justify-content-end h-100 gap-2 flex-wrap flex-md-nowrap"
+          id="npo-actions"
+          class="d-flex align-items-end justify-content-end h-100 gap-2 flex-wrap"
         >
           {{ if {this.claimed} == '0' || {this.claimed} == '' }}
           <!--prettier-ignore-->
@@ -228,6 +422,12 @@
             <i class="bi bi-flag"></i> Claim Listing
           </a>
           {{ /if }}
+
+          {{ if {this.donate_link} }}
+            <button class="btn btn-secondary" onclick="window.open('{{ this.donate_link }}', '_blank')">
+              <i class="bi bi-heart"></i> Donate
+            </button>
+          {{ /if }}
           <button
             class="btn btn-secondary"
             data-bs-toggle="modal"
@@ -235,6 +435,14 @@
           >
             <i class="bi bi-share"></i> Share Page
           </button>
+          <!--Create Story Button-->
+          <a
+            href="{{ this.getUrl() }}/create-story"
+            class="btn btn-secondary"
+            id="create-story-btn"
+          >
+            <i class="bi bi-pencil-square"></i> Create Post
+          </a>
           <button id="followButton" class="btn btn-outline-primary d-none">
             <span class="button-content">
               <i class="bi bi-plus follow-icon"></i>
@@ -249,12 +457,6 @@
               <span class="loading-text ms-1">Loading...</span>
             </span>
           </button>
-          <a
-            href="{{ non_profits_search_page.first().getUrl() }}"
-            class="btn btn-primary"
-          >
-            <i class="bi bi-currency-dollar"></i> Donate Now
-          </a>
         </div>
       </div>
     </div>
@@ -351,7 +553,7 @@
           {{if {this.claimed} == '0' || {this.claimed} == ''}}
           <div class="d-flex gap-3 align-items-center mt-3">
             <p class="text-muted">
-              <i>Edit this profile by claiming this Nonprofit</i>
+              <i>Does this nonprofit belong to you? Make it yours—claim it for free and update today.</i>
             </p>
             <!--prettier-ignore-->
             <a
@@ -373,7 +575,7 @@
         {{/if}}
         <!--prettier-ignore-->
         {{if {this.programs} != ''}}
-        <div id="programs-section" class="d-flex flex-column gap-2">
+        <div id="programs-section" class="d-flex flex-column gap-2 d-none">
           <h4 class="fs-5">Our Programs</h4>
           <div class="cause-description">{{ this.programs }}</div>
         </div>
@@ -392,10 +594,30 @@
           </div>
         </div>
         **)
-        <div id="stories-section" class="d-flex flex-column gap-2 d-none">
+        <div id="stories-section" class="d-flex flex-column gap-2">
           <h4 class="fs-5">Our Stories</h4>
           <div class="row stories-container">
-            
+            <!-- Stories will be dynamically rendered here -->
+          </div>
+          <!-- Stories Loading Skeleton -->
+          <div id="stories-loading-skeleton" class="row">
+            <div class="col-12 col-sm-6 col-md-4 mb-4 skeleton-placeholder" data-skeleton-index="0">
+              <div class="card d-flex flex-column h-100 p-3 gap-2 story-skeleton">
+                <div class="skeleton-image"></div>
+                <div class="d-flex flex-column gap-2 h-100">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="skeleton-circle"></div>
+                    <div class="skeleton-text short" style="flex: 1;"></div>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="skeleton-text medium"></div>
+                    <div class="skeleton-text"></div>
+                    <div class="skeleton-text short"></div>
+                  </div>
+                  <div class="skeleton-button"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div
@@ -447,7 +669,9 @@
   </div>
 </section>
 
+{{ if {this.claimed} != '1' }}
 <div
+  id="claim-listing-section"
   class="container d-flex flex-column align-items-center justify-content-center pt-7"
 >
   <!--prettier-ignore-->
@@ -458,7 +682,7 @@
   <div class="row my-5">
     <div class="col-12 col-md-6">
       <img
-        src="https://4xxglxlj.media.zestyio.com/Home.png"
+        src="https://4xxglxlj.media.zestyio.com/Home.png?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
       />
@@ -496,6 +720,7 @@
     </div>
   </div>
 </div>
+{{ /if }}
 
 <!-- Share Modal -->
 <!--prettier-ignore-->
@@ -607,7 +832,540 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+  // Configuration for Fastly Image Optimizer
+  const FASTLY_CONFIG = {
+    enabled: true, // Set to false to use fallback manual cropping
+    defaultQuality: 85,
+    autoFormat: true, // Auto-select best format (WebP, AVIF, etc.)
+    optimize: true
+  };
+
+  // Function to convert cropper.js rotation degrees to Fastly orient parameter
+  function convertRotationToFastlyOrient(degrees) {
+    if (!degrees || degrees === 0) return null;
+    
+    // Normalize degrees to 0-360 range
+    let normalizedDegrees = ((degrees % 360) + 360) % 360;
+    
+    // Round to nearest 90 degrees for better Fastly compatibility
+    const roundedDegrees = Math.round(normalizedDegrees / 90) * 90;
+    
+    // Map degrees to Fastly orient values
+    // Fastly orient values: r (90°), l (270°), h (flip horizontal), v (flip vertical)
+    // EXIF values: 6 (90° CW), 8 (90° CCW), 3 (180°), 2 (flip horizontal), 4 (flip vertical)
+    switch (roundedDegrees % 360) {
+      case 90:
+        return '6'; // EXIF value for 90° clockwise (same as 'r')
+      case 180:
+        return '3'; // EXIF value for 180°
+      case 270:
+        return '8'; // EXIF value for 270° clockwise / 90° counter-clockwise (same as 'l')
+      case 0:
+      case 360:
+        return null; // No rotation needed
+      default:
+        // For edge cases, determine closest rotation
+        if (normalizedDegrees > 45 && normalizedDegrees <= 135) {
+          return '6'; // Closer to 90°
+        } else if (normalizedDegrees > 135 && normalizedDegrees <= 225) {
+          return '3'; // Closer to 180°
+        } else if (normalizedDegrees > 225 && normalizedDegrees <= 315) {
+          return '8'; // Closer to 270°
+        }
+        return null; // Closer to 0°/360°
+    }
+  }
+
+  // Function to transform crop coordinates for rotation
+  // Fastly applies crop BEFORE rotation, but Cropper.js shows rotated image first
+  // So we need to reverse-transform the coordinates
+  function transformCropCoordinatesForRotation(cropData, imageWidth, imageHeight) {
+    if (!cropData || !cropData.rotate || cropData.rotate === 0) {
+      return cropData; // No rotation, return as-is
+    }
+
+    const { x, y, width, height, rotate } = cropData;
+    
+    // Normalize rotation to 0-360 degrees
+    const normalizedRotation = ((rotate % 360) + 360) % 360;
+    
+    // Only handle 90-degree increments (which is what Fastly supports)
+    const roundedRotation = Math.round(normalizedRotation / 90) * 90;
+    
+    let newX, newY, newWidth, newHeight;
+    
+    switch (roundedRotation) {
+      case 90: // 90° clockwise
+        // For 90° rotation: new_x = y, new_y = imageWidth - x - width
+        newX = y;
+        newY = imageWidth - x - width;
+        newWidth = height;
+        newHeight = width;
+        break;
+        
+      case 180: // 180° rotation
+        // For 180° rotation: new_x = imageWidth - x - width, new_y = imageHeight - y - height
+        newX = imageWidth - x - width;
+        newY = imageHeight - y - height;
+        newWidth = width;
+        newHeight = height;
+        break;
+        
+      case 270: // 270° clockwise (90° counter-clockwise)
+        // For 270° rotation: new_x = imageHeight - y - height, new_y = x
+        newX = imageHeight - y - height;
+        newY = x;
+        newWidth = height;
+        newHeight = width;
+        break;
+        
+      default: // 0° or no rotation
+        return cropData;
+    }
+    
+    return {
+      ...cropData,
+      x: Math.round(newX),
+      y: Math.round(newY),
+      width: Math.round(newWidth),
+      height: Math.round(newHeight)
+    };
+  }
+
+  // Function to convert cropper.js data to Fastly URL parameters (with fallback dimensions)
+  function generateFastlyImageUrl(originalImageUrl, cropData) {
+    if (!originalImageUrl || !FASTLY_CONFIG.enabled) return originalImageUrl;
+    
+    // Convert cropper.js coordinates to Fastly crop parameters
+    const fastlyParams = new URLSearchParams();
+    
+    // Add basic optimization parameters for all images
+    if (FASTLY_CONFIG.optimize) {
+      fastlyParams.set('optimize', 'true');
+    }
+    if (FASTLY_CONFIG.autoFormat) {
+      fastlyParams.set('format', 'auto'); // Auto-select best format (WebP, AVIF when supported)
+    }
+    fastlyParams.set('quality', FASTLY_CONFIG.defaultQuality.toString());
+    
+    // Add crop parameters if crop data is provided
+    if (cropData) {
+      const { rotate } = cropData;
+      
+      // For coordinate transformation, we need image dimensions
+      // Since we don't have them stored here, we'll use fallback values
+      // This is not ideal but prevents errors - ideally dimensions should be stored
+      let imageWidth = 1000; // fallback
+      let imageHeight = 1000; // fallback
+      
+      // Transform crop coordinates to account for Fastly's processing order
+      const transformedCropData = transformCropCoordinatesForRotation(cropData, imageWidth, imageHeight);
+      const { x, y, width, height } = transformedCropData;
+      
+      // Basic crop parameters: crop=width,height,x{x},y{y}
+      fastlyParams.set('crop', `${Math.round(width)},${Math.round(height)},x${Math.round(x)},y${Math.round(y)}`);
+      
+      // Convert rotation from degrees to Fastly orient parameter
+      if (rotate && rotate !== 0) {
+        const orientValue = convertRotationToFastlyOrient(rotate);
+        if (orientValue) {
+          fastlyParams.set('orient', orientValue);
+        }
+      }
+    }
+    
+    // If the URL already has query parameters, we need to handle them properly
+    const urlParts = originalImageUrl.split('?');
+    const baseUrl = urlParts[0];
+    const existingParams = urlParts[1] ? new URLSearchParams(urlParts[1]) : new URLSearchParams();
+    
+    // Merge existing params with Fastly params (Fastly params take precedence)
+    for (const [key, value] of fastlyParams.entries()) {
+      existingParams.set(key, value);
+    }
+    
+    return `${baseUrl}?${existingParams.toString()}`;
+  }
+
+  // Function to convert cropper.js data to Fastly URL parameters with known image dimensions
+  function generateFastlyImageUrlWithDimensions(originalImageUrl, cropData, imageWidth, imageHeight) {
+    if (!originalImageUrl || !FASTLY_CONFIG.enabled) return originalImageUrl;
+    
+    // Convert cropper.js coordinates to Fastly crop parameters
+    const fastlyParams = new URLSearchParams();
+    
+    // Add basic optimization parameters for all images
+    if (FASTLY_CONFIG.optimize) {
+      fastlyParams.set('optimize', 'true');
+    }
+    if (FASTLY_CONFIG.autoFormat) {
+      fastlyParams.set('format', 'auto'); // Auto-select best format (WebP, AVIF when supported)
+    }
+    fastlyParams.set('quality', FASTLY_CONFIG.defaultQuality.toString());
+    
+    // Add crop parameters if crop data is provided
+    if (cropData) {
+      const { x, y, width, height, rotate } = cropData;
+      
+      // Basic crop parameters: crop=width,height,x{x},y{y}
+      fastlyParams.set('crop', `${Math.round(width)},${Math.round(height)},x${Math.round(x)},y${Math.round(y)}`);
+      
+      // Convert rotation from degrees to Fastly orient parameter
+      if (rotate && rotate !== 0) {
+        const orientValue = convertRotationToFastlyOrient(rotate);
+        if (orientValue) {
+          fastlyParams.set('orient', orientValue);
+        }
+      }
+    }
+    
+    // If the URL already has query parameters, we need to handle them properly
+    const urlParts = originalImageUrl.split('?');
+    const baseUrl = urlParts[0];
+    const existingParams = urlParts[1] ? new URLSearchParams(urlParts[1]) : new URLSearchParams();
+    
+    // Merge existing params with Fastly params (Fastly params take precedence)
+    for (const [key, value] of fastlyParams.entries()) {
+      existingParams.set(key, value);
+    }
+    
+    return `${baseUrl}?${existingParams.toString()}`;
+  }
+
+  // Function to create cropped image data (fallback method)
+  function createCroppedImageFallback(imageUrl, cropData) {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      // Add timeout to prevent hanging
+      const timeout = setTimeout(() => {
+        reject(new Error('Image loading timeout'));
+      }, 10000);
+      
+      img.onload = function() {
+        clearTimeout(timeout);
+        
+        try {
+          // Get the actual crop data
+          const x = cropData.x;
+          const y = cropData.y;
+          const width = cropData.width;
+          const height = cropData.height;
+          const rotate = cropData.rotate || 0;
+          const scaleX = cropData.scaleX || 1;
+          const scaleY = cropData.scaleY || 1;
+          
+          // Create a temporary canvas for transformations if needed
+          let tempCanvas = null;
+          let tempCtx = null;
+          
+          if (rotate !== 0 || scaleX !== 1 || scaleY !== 1) {
+            // Use a temporary canvas for transformations
+            tempCanvas = document.createElement('canvas');
+            tempCtx = tempCanvas.getContext('2d');
+            
+            // Set temp canvas size to hold the entire image
+            tempCanvas.width = img.naturalWidth;
+            tempCanvas.height = img.naturalHeight;
+            
+            // Draw the original image to the temp canvas
+            tempCtx.drawImage(img, 0, 0);
+            
+            // Now transform the main canvas according to crop data
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Apply transformations
+            ctx.save();
+            
+            // Move to center of the canvas
+            ctx.translate(width / 2, height / 2);
+            
+            // Apply rotation
+            ctx.rotate(rotate * Math.PI / 180);
+            
+            // Apply scaling
+            ctx.scale(scaleX, scaleY);
+            
+            // Draw the cropped part from the temp canvas
+            ctx.drawImage(
+              tempCanvas,
+              x, y, width, height,
+              -width / 2, -height / 2, width, height
+            );
+            
+            // Restore the context
+            ctx.restore();
+          } else {
+            // No transformations needed, just crop
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Draw the cropped portion directly
+            ctx.drawImage(
+              img,
+              x, y, width, height,
+              0, 0, width, height
+            );
+          }
+          
+          // Convert to data URL
+          const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+          resolve(croppedDataUrl);
+        } catch (error) {
+          console.error('Error during canvas operations:', error);
+          reject(error);
+        }
+      };
+      
+      img.onerror = function(error) {
+        console.error('Image failed to load:', error);
+        clearTimeout(timeout);
+        reject(error);
+      };
+      
+      // Enable CORS for cross-origin images
+      img.crossOrigin = 'anonymous';
+      img.src = imageUrl;
+    });
+  }
+
+  // Function to check and display event happening badge
+  function checkEventHappeningBadge(npoData) {
+    const badge = document.getElementById('event-happening-badge');
+    
+    if (!npoData || !badge) {
+      return;
+    }
+
+    try {
+      // Check if story stream is enabled (it's a string "1", not number)
+      const storyStreamData = npoData?.story_stream?.data?.filter(item => item?.enable === "1");
+      const storyStreamToggle = storyStreamData?.length > 0;
+      const startDate = storyStreamData?.[0]?.start_date;
+      const endDate = storyStreamData?.[0]?.end_date;
+
+      if (storyStreamToggle && startDate && endDate) {
+        // Convert current date to YYYY-MM-DD format for comparison
+        const now = new Date();
+        const currentDate = now.getFullYear() + '-' + 
+          String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+          String(now.getDate()).padStart(2, '0');
+
+        // Since dates are already in YYYY-MM-DD format, we can compare them directly as strings
+        if (currentDate >= startDate && currentDate <= endDate) {
+          badge.classList.remove('d-none');
+          badge.setAttribute('href', `${window.location.pathname}${storyStreamData?.[0]?.meta?.web?.uri}`);
+        } else {
+          badge.classList.add('d-none');
+          badge.removeAttribute('href');
+        }
+      } else {
+        badge.classList.add('d-none');
+      }
+    } catch (error) {
+      console.error('Error checking event happening badge:', error);
+      badge.classList.add('d-none');
+    }
+  }
+
+  // Function to load and display hero image with crop data using TanStack Query
+  function loadHeroImage() {
+    const npoZuid = "{{this.zuid}}";
+    
+    // Create NPO profile query
+    const npoProfileQuery = window.createNPOProfileQuery(npoZuid);
+    
+    // Subscribe to query changes for reactive updates
+    npoProfileQuery.subscribe((result) => {
+      const heroContainer = document.getElementById('hero-image-container');
+      const serverHeroImage = document.getElementById('server-hero-image');
+      const loadingOverlay = document.getElementById('hero-loading-overlay');
+      
+      if (result.isLoading) {
+        // Show loading overlay over server-side image
+        if (loadingOverlay) {
+          loadingOverlay.classList.remove('d-none');
+          loadingOverlay.classList.add('d-flex');
+        }
+        return;
+      } else if (result.isError) {
+        console.error('Error loading NPO profile:', result.error);
+        // Fallback to placeholder
+        displayOriginalImage(heroContainer, "{{globals.npo_placeholder_image.getImage()}}");
+        return;
+      } else if (result.isSuccess) {
+        const npoData = result.data?.data?.[0];
+        
+        if (!npoData) {
+          console.error('NPO data not found');
+          displayOriginalImage(heroContainer, "{{globals.npo_placeholder_image.getImage()}}");
+          return;
+        }
+
+        // Check and display event happening badge
+        checkEventHappeningBadge(npoData);
+
+        // Get hero image URL
+        let heroUrl;
+        if (typeof npoData.hero_image === "string") {
+          heroUrl = npoData.hero_image;
+        } else if (npoData.hero_image?.data?.[0]?.url) {
+          heroUrl = npoData.hero_image.data[0].url;
+        }
+
+        // Default fallback image
+        if (!heroUrl) {
+          heroUrl = "{{globals.npo_placeholder_image.getImage()}}";
+        }
+
+        // Check if there's crop data and we have a real image (not placeholder)
+        if (npoData.banner_image_properties && heroUrl !== "{{globals.npo_placeholder_image.getImage()}}") {
+          try {
+            if (FASTLY_CONFIG.enabled) {
+              // If we have rotation in crop data, load image dimensions first for proper coordinate transformation
+              if (npoData.banner_image_properties.rotate && npoData.banner_image_properties.rotate !== 0) {
+                
+                // Create a new generateFastlyImageUrl function call with proper dimensions
+                const img = new Image();
+                img.onload = function() {
+                  const imageWidth = img.naturalWidth;
+                  const imageHeight = img.naturalHeight;
+                  
+                  // Transform coordinates with actual image dimensions
+                  const transformedCropData = transformCropCoordinatesForRotation(
+                    npoData.banner_image_properties, 
+                    imageWidth, 
+                    imageHeight
+                  );
+                  
+                  // Generate Fastly URL with transformed coordinates
+                  const fastlyUrl = generateFastlyImageUrlWithDimensions(heroUrl, transformedCropData, imageWidth, imageHeight);
+                  
+                  // Hide server image and loading overlay, show API image as background
+                  if (serverHeroImage) serverHeroImage.style.display = 'none';
+                  if (loadingOverlay) {
+                    loadingOverlay.classList.add('d-none');
+                    loadingOverlay.classList.remove('d-flex');
+                  }
+                  
+                  heroContainer.style.backgroundImage = `url(${fastlyUrl})`;
+                  heroContainer.style.backgroundSize = 'cover';
+                  heroContainer.style.backgroundPosition = 'center';
+                  heroContainer.style.backgroundRepeat = 'no-repeat';
+                };
+                img.onerror = function(error) {
+                  console.error('Failed to load image for dimension detection:', error);
+                  displayOptimizedImage(heroContainer, heroUrl);
+                };
+                img.crossOrigin = 'anonymous';
+                img.src = heroUrl;
+                img.fetchpriority = 'high';
+              } else {
+                // No rotation, use standard Fastly processing
+                const fastlyUrl = generateFastlyImageUrl(heroUrl, npoData.banner_image_properties);
+                
+                // Hide server image and loading overlay, show API image as background
+                if (serverHeroImage) serverHeroImage.style.display = 'none';
+                if (loadingOverlay) {
+                  loadingOverlay.classList.add('d-none');
+                  loadingOverlay.classList.remove('d-flex');
+                }
+                
+                heroContainer.style.backgroundImage = `url(${fastlyUrl})`;
+                heroContainer.style.backgroundSize = 'cover';
+                heroContainer.style.backgroundPosition = 'center';
+                heroContainer.style.backgroundRepeat = 'no-repeat';
+                heroContainer.fetchpriority = 'high';
+              }
+            } else {
+              // Fallback to manual cropping
+              createCroppedImageFallback(heroUrl, npoData.banner_image_properties)
+                .then(croppedImageUrl => {
+                  // Hide server image and loading overlay, show API image as background
+                  if (serverHeroImage) serverHeroImage.style.display = 'none';
+                  if (loadingOverlay) {
+                    loadingOverlay.classList.add('d-none');
+                    loadingOverlay.classList.remove('d-flex');
+                  }
+                  
+                  heroContainer.style.backgroundImage = `url(${croppedImageUrl})`;
+                  heroContainer.style.backgroundSize = 'cover';
+                  heroContainer.style.backgroundPosition = 'center';
+                  heroContainer.style.backgroundRepeat = 'no-repeat';
+                })
+                .catch(cropError => {
+                  console.error('Error processing cropped image:', cropError);
+                  displayOptimizedImage(heroContainer, heroUrl);
+                });
+                heroContainer.fetchpriority = 'high';
+            }
+          } catch (cropError) {
+            console.error('Error processing cropped image:', cropError);
+            // Fallback to original image with basic optimization
+            displayOptimizedImage(heroContainer, heroUrl);
+          }
+        } else {
+          // No crop data, show original image with basic optimization
+          displayOptimizedImage(heroContainer, heroUrl);
+        }
+      }
+    });
+    
+    // Trigger initial fetch
+    npoProfileQuery.refetch();
+  }
+
+  // Function to display original image with basic Fastly optimization
+  function displayOptimizedImage(container, imageUrl) {
+    const serverHeroImage = document.getElementById('server-hero-image');
+    const loadingOverlay = document.getElementById('hero-loading-overlay');
+    
+    let optimizedUrl = imageUrl;
+    
+    // Apply basic Fastly optimization even without crop data
+    if (FASTLY_CONFIG.enabled && imageUrl !== "{{globals.npo_placeholder_image.getImage()}}") {
+      optimizedUrl = generateFastlyImageUrl(imageUrl, null);
+    }
+    
+    // Hide server image and loading overlay, show API image as background
+    if (serverHeroImage) serverHeroImage.style.display = 'none';
+    if (loadingOverlay) {
+      loadingOverlay.classList.add('d-none');
+      loadingOverlay.classList.remove('d-flex');
+    }
+    
+    container.style.backgroundImage = `url(${optimizedUrl})`;
+    container.style.backgroundSize = 'cover';
+    container.style.backgroundPosition = 'center';
+    container.style.backgroundRepeat = 'no-repeat';
+    container.fetchpriority = 'high';
+  }
+
+  // Function to display original image (fallback method)
+  function displayOriginalImage(container, imageUrl) {
+    const serverHeroImage = document.getElementById('server-hero-image');
+    const loadingOverlay = document.getElementById('hero-loading-overlay');
+    
+    // Hide server image and loading overlay, show API image as background
+    if (serverHeroImage) serverHeroImage.style.display = 'none';
+    if (loadingOverlay) {
+      loadingOverlay.classList.add('d-none');
+      loadingOverlay.classList.remove('d-flex');
+    }
+    
+    container.style.backgroundImage = `url(${imageUrl})`;
+    container.style.backgroundSize = 'cover';
+    container.style.backgroundPosition = 'center';
+    container.style.backgroundRepeat = 'no-repeat';
+    container.fetchpriority = 'high';
+  }
+
+  // Legacy getNPOAdminProfile function removed - now using TanStack Query
+
   const userData = JSON.parse(localStorage.getItem("user"));
   const claimListingRedirectBool = window.location.search.includes(
     "claim-listing-redirect"
@@ -633,155 +1391,191 @@
   }
 
   $(document).ready(async function () {
+    // Load hero image with crop data
+    loadHeroImage();
+
+    // Track page view using TanStack Query mutation
+    const viewNpoProfileMutation = window.createViewNpoProfileMutation();
+    viewNpoProfileMutation.mutate("{{this.zuid}}");
+
     if (followNpoBool && userData) {
-      let zestyUser = await window.getZestyUser(userData.zuid);
-      const userZuid = zestyUser.user.meta.ZUID;
+      const userZuid = userData.zuid;
+      const npoZuid = "{{this.zuid}}";
 
-      // Check if nonprofit is already followed
-      if (
-        zestyUser.user.data.favorite_npos.split(",").includes("{{this.zuid}}")
-      ) {
-        // Show "Already followed" modal
-        $("#alreadyFollowedModal").modal("show");
-      } else {
-        // Show confirmation modal
-        $("#followConfirmModal").modal("show");
-
-        // Add event listener for Follow button click
-        $("#confirmFollowBtn").click(async () => {
-          const confirmBtn = $(this);
-          const buttonContent = confirmBtn.find(".button-content");
-          const spinner = confirmBtn.find(".spinner-border");
-
-          try {
-            // Show loading state
-            confirmBtn.prop("disabled", true);
-            buttonContent.addClass("d-none");
-            spinner.removeClass("d-none");
-
-            // Update favorite_npos
-            zestyUser.user.data.favorite_npos = `${zestyUser.user.data.favorite_npos},{{this.zuid}}`;
-            const updatedUser = await updateZestyUser(
-              userZuid,
-              zestyUser.user.data
-            );
-            console.log("User profile updated:", updatedUser);
-
-            // Hide follow confirmation modal
-            $("#followConfirmModal").modal("hide");
-
-            // Wait for modal to finish hiding
-            setTimeout(() => {
-              // Update the follow button state
-              const followBtn = $("#followButton");
-              updateButtonState(true);
-
-              // Show success message
-              // toastr.success("Successfully followed {{this.name}}");
-            }, 150);
-          } catch (error) {
-            console.error("Error following NPO:", error);
-            // toastr.error("Failed to follow NPO. Please try again.");
-          } finally {
-            // Reset button state
-            confirmBtn.prop("disabled", false);
-            buttonContent.removeClass("d-none");
-            spinner.addClass("d-none");
+      // Create user profile query
+      const userProfileQuery = window.createUserProfileQuery(userZuid);
+      
+      // Subscribe to user profile changes
+      userProfileQuery.subscribe((result) => {
+        if (result.isSuccess) {
+          const zestyUser = result.data?.data?.[0];
+          
+          if (!zestyUser) {
+            console.error("Failed to fetch user data");
+            return;
           }
-        });
-      }
+
+          // Check if nonprofit is already followed
+          let isFollowing = false;
+          
+          // Check if favorite_npos is a relationship object
+          if (zestyUser?.favorite_npos?.data && Array.isArray(zestyUser.favorite_npos.data)) {
+            const favoriteZuids = zestyUser.favorite_npos.data.map(npo => npo.meta.zuid);
+            isFollowing = favoriteZuids.includes(npoZuid);
+          } 
+          // Fallback for legacy format
+          else if (typeof zestyUser?.favorite_npos === 'string') {
+            isFollowing = zestyUser.favorite_npos.split(",").includes(npoZuid); 
+          }
+
+          if (isFollowing) {
+            // Show "Already followed" modal
+            $("#alreadyFollowedModal").modal("show");
+          } else {
+            // Show confirmation modal
+            $("#followConfirmModal").modal("show");
+
+            // Add event listener for Follow button click
+            $("#confirmFollowBtn").off('click').on("click", function() {
+              const confirmBtn = $(this);
+              const buttonContent = confirmBtn.find(".button-content");
+              const spinner = confirmBtn.find(".spinner-border");
+
+              // Track analytics (fire and forget)
+              window.clickNpoFollow(npoZuid).catch(error => {
+                console.error("Error tracking follow action:", error);
+              });
+
+              // Simulate API delay and update UI
+              setTimeout(() => {
+                // Hide follow confirmation modal
+                $("#followConfirmModal").modal("hide");
+
+                // Update the follow button state to "Following"
+                const followBtn = $("#followButton");
+                updateButtonState(true);
+              }, 1000); // 1 second delay to show loading state
+
+              // Show loading state
+              confirmBtn.prop("disabled", true);
+              buttonContent.addClass("d-none");
+              spinner.removeClass("d-none");
+            });
+          }
+        }
+      });
+      
+      // Trigger initial fetch
+      userProfileQuery.refetch();
     }
 
-    const hasStories = $(".stories-container").children().length > 0;
+    // Show stories section with skeletons initially
+    $("#stories-section").removeClass("d-none");
+    $("#stories-tab").parent().removeClass("d-none");
 
     let hasGlobalStories = false;
 
-    if (hasStories) {
-      $("#stories-section").removeClass("d-none");
-      $("#stories-tab").parent().removeClass("d-none");
-    } else {
-      $("#stories-tab").parent().addClass("d-none");
+    // Function to check and update no-stories message visibility
+    function checkAndUpdateNoStoriesMessage() {
+      // Show no-stories message only if both local and global stories sections are hidden
+      const localStoriesHidden = $("#stories-section").hasClass("d-none");
+      const globalStoriesHidden = $("#global-stories-section").hasClass("d-none");
+      
+      if (localStoriesHidden && globalStoriesHidden) {
+        $("#no-stories-message").show();
+      } else {
+        $("#no-stories-message").hide();
+      }
     }
 
-    // Fetch and handle RSS data
-    try {
-      const rssData = await fetch(
-        "https://morss.it/:format=json:cors/{{ this.website }}"
-      ).then((res) => res.json());
+    // Fetch and handle RSS data asynchronously (non-blocking)
+    (async function fetchGlobalStories() {
+      try {
+        const rssData = await fetch(
+          "https://morss.it/:format=json:cors/{{ this.website }}"
+        ).then((res) => res.json());
 
-      const stories = rssData?.items || [];
-      hasGlobalStories = stories.length > 0;
+        const stories = rssData?.items || [];
+        hasGlobalStories = stories.length > 0;
 
-      if (hasGlobalStories) {
-        $("#global-stories-section").removeClass("d-none");
-        $("#global-stories-tab").parent().removeClass("d-none");
-        // Function to extract the first non-placeholder image from content
-        function extractImage(content) {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(content, "text/html");
-          const images = doc.getElementsByTagName("img");
-          for (let img of images) {
-            if (!img.src.includes("placeholder")) {
-              return img.src;
+        if (hasGlobalStories) {
+          $("#global-stories-section").removeClass("d-none");
+          $("#global-stories-tab").parent().removeClass("d-none");
+          // Function to extract the first non-placeholder image from content
+          function extractImage(content) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(content, "text/html");
+            const images = doc.getElementsByTagName("img");
+            for (let img of images) {
+              if (!img.src.includes("placeholder")) {
+                return img.src;
+              }
             }
+            return "https://placehold.co/150x100?text=No+Image";
           }
-          return "https://placehold.co/600x400?text=No+Image";
-        }
 
-        // Update the HTML with the fetched data
-        const storiesContainer = $(".global-stories-container");
-        storiesContainer.html(""); // Clear the existing content
-        stories.forEach((story) => {
-          const storyImage = extractImage(story.content);
-          const storyElement = `
-            <div class="col-12 col-sm-6 col-md-4 mb-4">
-              <div class="card d-flex flex-column h-100 p-3 gap-2 story-card" data-story-url="${story.url}">
-                <img src="${storyImage}" class="story-image">
-                <div class="d-flex flex-column gap-2 h-100">
-                  <div class="d-flex align-items-end gap-2">
-                    <img src="https://placehold.co/24x24?text=BBC" class="story-npo-logo" alt="BBC News">
-                    <p class="npo-name my-auto">${rssData.title}</p>
-                  </div>
-                  <div class="flex-grow-1">
-                    <p class="story-title">${story.title}</p>
-                    <div class="story-subtitle">${story.desc}</div>
-                  </div>
-                  <div class="d-flex align-items-center justify-content-start flex-wrap">
-                    <div class="story-cause d-flex align-items-center">
-                      <p class="text-center">World News</p>
+          // Update the HTML with the fetched data
+          const storiesContainer = $(".global-stories-container");
+          storiesContainer.html(""); // Clear the existing content
+          stories.forEach((story) => {
+            const storyImage = extractImage(story.content);
+            const storyElement = `
+              <div class="col-12 col-sm-6 col-md-4 mb-4">
+                <div class="card d-flex flex-column h-100 p-3 gap-2 story-card" data-story-url="${story.url}">
+                  <img src="${storyImage}?width=200" class="story-image" alt="Story image">
+                  <div class="d-flex flex-column gap-2 h-100">
+                    <div class="d-flex align-items-end gap-2">
+                      <img src="https://placehold.co/24x24?text=BBC" class="story-npo-logo" alt="BBC News">
+                      <p class="npo-name my-auto">${rssData.title}</p>
                     </div>
+                    <div class="flex-grow-1">
+                      <p class="story-title">${story.title}</p>
+                      <div class="story-subtitle">${story.desc}</div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-start flex-wrap">
+                      <div class="story-cause d-flex align-items-center">
+                        <p class="text-center">World News</p>
+                      </div>
+                    </div>
+                    <a href="${story.url}" class="btn btn-secondary story-btn card-btn">Read More</a>
                   </div>
-                  <a href="${story.url}" class="btn btn-secondary story-btn card-btn">Read More</a>
                 </div>
               </div>
-            </div>
-          `;
-          storiesContainer.append(storyElement);
-        });
+            `;
+            storiesContainer.append(storyElement);
+          });
 
-        $("#global-stories-section").removeClass("d-none");
-        $("#global-stories-tab").parent().removeClass("d-none");
+          $("#global-stories-section").removeClass("d-none");
+          $("#global-stories-tab").parent().removeClass("d-none");
 
-        // Add click event listener for the story cards
-        $(".global-stories-container").on("click", ".story-btn", function (e) {
-          e.preventDefault();
-          var storyUrl = $(this).closest(".story-card").data("story-url");
-          window.open(storyUrl, "_blank");
-        });
-      } else {
-        $("#global-stories-tab").parent().addClass("d-none");
+          // Add click event listener for the story cards
+          $(".global-stories-container").on("click", ".story-btn", function (e) {
+            e.preventDefault();
+            var storyUrl = $(this).closest(".story-card").data("story-url");
+            window.open(storyUrl, "_blank");
+          });
+          
+          // Update no-stories message visibility
+          checkAndUpdateNoStoriesMessage();
+        } else {
+          $("#global-stories-tab").parent().addClass("d-none");
+          $("#global-stories-section").addClass("d-none");
+          
+          // Update no-stories message visibility
+          checkAndUpdateNoStoriesMessage();
+        }
+      } catch (error) {
+        console.error("Error fetching RSS data:", error);
         $("#global-stories-section").addClass("d-none");
+        $("#global-stories-tab").parent().addClass("d-none");
+        hasGlobalStories = false;
+        
+        // Update no-stories message visibility
+        checkAndUpdateNoStoriesMessage();
       }
-    } catch (error) {
-      console.error("Error fetching RSS data:", error);
-      $("#global-stories-section").addClass("d-none");
-      $("#global-stories-tab").parent().addClass("d-none");
-    }
+    })(); // Immediately invoke the async function without awaiting
 
-    // Show no stories message if both sections are empty
-    if (!hasStories && !hasGlobalStories) {
-      $("#no-stories-message").show();
-    }
+    // Note: Local stories will be fetched independently and shown as they're ready
 
     // Handle claim listing button and modal
     if (!userData) {
@@ -806,6 +1600,12 @@
     // Event handlers for navigation
     $(".back-btn").click(function () {
       window.history.back();
+    });
+
+    // Handle share button clicks using TanStack Query mutation
+    $("[data-bs-target='#shareModal']").on("click", function () {
+      const shareMutation = window.createClickNpoShareMutation();
+      shareMutation.mutate("{{this.zuid}}");
     });
 
     // Tab click handlers
@@ -838,9 +1638,7 @@
       $(this).tab("show");
     });
 
-    if ($(".stories-container").children().length === 0) {
-      $("#stories-section").addClass("d-none");
-    }
+    // Story visibility is handled in the async fetch section above
 
     // Initialize Bootstrap tabs
     var triggerTabList = [].slice.call(
@@ -878,80 +1676,89 @@
         window.location.href =
           "{{login_page.first().getUrl()}}?follow_npo={{this.zuid}}";
       });
-      return;
-    }
 
-    try {
-      // Get current user data
-      const zestyUserData = await window.getZestyUser(localUser.zuid);
-      if (!zestyUserData?.user?.data) {
-        throw new Error("Failed to fetch user data");
-      }
-
-      // Check if user is already following this NPO
-      const currentFavorites =
-        zestyUserData.user.data.favorite_npos
-          ?.split(",")
-          .filter((zuid) => zuid) || [];
-      const isFollowing = currentFavorites.includes("{{this.zuid}}");
-
-      // Update button state and show button
-      updateButtonState(isFollowing);
-      followBtn.removeClass("d-none");
-
-      // Handle follow/unfollow click
-      followBtn.on("click", async function () {
-        try {
-          // Show loading state
+      // Create Story Button
+      const createStoryBtn = $("#create-story-btn");
+      createStoryBtn.attr("href", "{{ this.getUrl() }}/join");
+    } else {
+      // Create user profile query for logged-in user
+      const userProfileQuery = window.createUserProfileQuery(localUser.zuid);
+      const npoZuid = "{{this.zuid}}";
+      
+      // Subscribe to user profile changes
+      userProfileQuery.subscribe((result) => {
+        if (result.isLoading) {
+          // Show loading state for follow button
           showLoading(true);
-
-          const zestyUserData = await window.getZestyUser(localUser.zuid);
-          if (!zestyUserData?.user?.data) {
-            throw new Error("Failed to fetch user data");
+          return;
+        } else if (result.isError) {
+          console.error("Error initializing follow button:", result.error);
+          followBtn.addClass("d-none");
+          return;
+        } else if (result.isSuccess) {
+          const zestyUser = result.data?.data?.[0];
+          
+          if (!zestyUser) {
+            console.error("Failed to fetch user data");
+            followBtn.addClass("d-none");
+            return;
           }
 
-          const currentFavorites =
-            zestyUserData.user.data.favorite_npos
-              ?.split(",")
-              .filter((zuid) => zuid) || [];
-          const isCurrentlyFollowing =
-            currentFavorites.includes("{{this.zuid}}");
-
-          if (isCurrentlyFollowing) {
-            // Unfollow
-            const updatedFavorites = currentFavorites.filter(
-              (zuid) => zuid !== "{{this.zuid}}"
-            );
-            zestyUserData.user.data.favorite_npos = updatedFavorites.join(",");
-          } else {
-            // Follow
-            currentFavorites.push("{{this.zuid}}");
-            zestyUserData.user.data.favorite_npos = currentFavorites.join(",");
+          // Check if user is already following this NPO
+          let isFollowing = false;
+          
+          // Check if favorite_npos is a relationship object
+          if (zestyUser.favorite_npos?.data && Array.isArray(zestyUser.favorite_npos.data)) {
+            const favoriteZuids = zestyUser.favorite_npos.data.map(npo => npo.meta.zuid);
+            isFollowing = favoriteZuids.includes(npoZuid);
+          } 
+          // Fallback for legacy format
+          else if (typeof zestyUser.favorite_npos === 'string') {
+            const favoriteZuids = zestyUser.favorite_npos.split(',').filter(zuid => zuid);
+            isFollowing = favoriteZuids.includes(npoZuid);
           }
 
-          // Update user data
-          await window.updateZestyUser(localUser.zuid, zestyUserData.user.data);
-
-          // Update button state
-          updateButtonState(!isCurrentlyFollowing);
-
-          // Show success message
-          // toastr.success(
-          //   isCurrentlyFollowing
-          //     ? "NPO unfollowed successfully"
-          //     : "NPO followed successfully"
-          // );
-        } catch (error) {
-          console.error("Error updating follow status:", error);
-          // toastr.error("Failed to update follow status. Please try again.");
-        } finally {
+          // Update button state and show button
+          updateButtonState(isFollowing);
+          followBtn.removeClass("d-none");
           showLoading(false);
+
+          // Handle follow/unfollow click
+          followBtn.off('click').on("click", function () {
+            // Show loading state
+            showLoading(true);
+
+            // Get current follow status
+            let isCurrentlyFollowing = false;
+            
+            if (zestyUser.favorite_npos?.data && Array.isArray(zestyUser.favorite_npos.data)) {
+              const favoriteZuids = zestyUser.favorite_npos.data.map(npo => npo.meta.zuid);
+              isCurrentlyFollowing = favoriteZuids.includes(npoZuid);
+            } else if (typeof zestyUser.favorite_npos === 'string') {
+              const favoriteZuids = zestyUser.favorite_npos.split(',').filter(zuid => zuid);
+              isCurrentlyFollowing = favoriteZuids.includes(npoZuid);
+            }
+
+            // Track analytics (fire and forget)
+            window.clickNpoFollow(npoZuid).catch(error => {
+              console.error("Error tracking follow action:", error);
+            });
+
+            // Simulate API delay and update UI
+            setTimeout(() => {
+              // Toggle the button state
+              updateButtonState(!isCurrentlyFollowing);
+              showLoading(false);
+            }, 1000); // 1 second delay to show loading state
+          });
         }
       });
-    } catch (error) {
-      console.error("Error initializing follow button:", error);
-      followBtn.addClass("d-none");
+      
+      // Trigger initial fetch
+      userProfileQuery.refetch();
     }
+
+   
 
     function showLoading(isLoading) {
       if (isLoading) {
@@ -975,77 +1782,303 @@
         followIcon.addClass("bi-plus").removeClass("bi-check2");
         followText.text("Follow");
       }
-
-      // Add hover effect for following state
-      if (isFollowing) {
-        followBtn.hover(
-          function () {
-            followIcon.removeClass("bi-check2").addClass("bi-x");
-            followText.text("Unfollow");
-            $(this).removeClass("btn-primary").addClass("btn-danger");
-          },
-          function () {
-            followIcon.addClass("bi-check2").removeClass("bi-x");
-            followText.text("Following");
-            $(this).addClass("btn-primary").removeClass("btn-danger");
-          }
-        );
-      } else {
-        followBtn.off("mouseenter mouseleave");
-      }
     }
 
-    // Fetch stories data from the API
-    try {
-      const npoZUID = "{{this.zuid}}";
-      const storiesApiUrl = `https://4xxglxlj-dev.webengine.zesty.io/mobileapp/stories.json?npo=${npoZUID}&approved=1&status=approved&zpw=causecircle`;
-      const response = await fetch(storiesApiUrl);
-      const data = await response.json();
+      // Function to decode HTML entities
+      function decodeHtmlEntities(text) {
+        if (!text) return '';
+        
+        // Create a temporary div element to decode HTML entities
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = text;
+        return tempDiv.textContent || tempDiv.innerText || '';
+      }
 
-      if (data && data.data && data.data.length > 0) {
-        $("#no-stories-message").addClass("d-none");
-        const storiesContainer = $(".stories-container");
-        storiesContainer.empty(); // Clear existing stories
+      // Function to extract hashtags from story text
+      function extractHashtagsFromText(text) {
+        if (!text) return [];
+        
+        // First decode HTML entities (like &#39; &#32; etc.)
+        const decodedText = decodeHtmlEntities(text);
+        
+        // Regular expression to find hashtags (#word)
+        const hashtagRegex = /#[a-zA-Z0-9_]+/g;
+        const hashtags = decodedText.match(hashtagRegex);
+        
+        if (!hashtags || hashtags.length === 0) return [];
+        
+        // Remove duplicates and clean up
+        const uniqueHashtags = [...new Set(hashtags.map(tag => tag.toLowerCase()))];
+        
+        return uniqueHashtags;
+      }
 
-        data.data.forEach((story) => {
-          // Create a story card using the API data
-          const storyCard = `
-            <div class="col-12 col-sm-6 col-md-4" data-story-id="${story.meta.zuid}" data-story-date="${story.meta.createdAt}">
-              <div class="card d-flex flex-column h-100 p-3 gap-2 story-card">
-                <img src="${story.story_image?.data?.[0]?.url}" class="story-image" alt="${story.title}">
-                <div class="d-flex flex-column gap-2 h-100">
-                  <div class="d-flex align-items-end gap-2">
-                    <img src="${story.author?.data?.[0]?.profile_image}" class="story-npo-logo" alt="${story.author?.data?.[0]?.first_name}">
-                    <p class="npo-name my-auto">${story.author?.data?.[0]?.first_name} ${story.author?.data?.[0]?.last_name}</p>
+      // Function to generate hashtag HTML for story cards
+      function generateHashtagsHtml(storyText) {
+        const hashtags = extractHashtagsFromText(storyText);
+        
+        if (hashtags.length === 0) return '';
+        
+        // Create hashtag HTML with proper links and accessibility attributes
+        const hashtagsHtml = hashtags.map(hashtag => {
+          const encodedHashtag = encodeURIComponent(hashtag);
+          return `<a href="/stories/?search=${encodedHashtag}" class="hashtag-item" target="_blank" rel="noopener noreferrer" aria-label="Search for stories tagged with ${hashtag}">${hashtag}</a>`;
+        }).join('');
+        
+        return `<div class="hashtags-container">${hashtagsHtml}</div>`;
+      }
+
+      // Function to detect if a URL is a video
+  function isVideoUrl(url) {
+    if (!url) return false;
+    const videoPatterns = [
+      /vimeo\.com\/video\/\d+/i,
+      /vimeo\.com\/\d+/i,
+      /player\.vimeo\.com\/video\/\d+/i,
+      /youtube\.com\/watch\?v=/i,
+      /youtu\.be\//i,
+      /\.mp4$/i,
+      /\.webm$/i,
+      /\.ogg$/i,
+      /\.mov$/i,
+      /\.avi$/i
+    ];
+    return videoPatterns.some(pattern => pattern.test(url));
+  }
+
+    // Function to get video embed URL
+    function getVideoEmbedUrl(url) {
+      if (!url) return null;
+      
+      
+      // Check if it's already a Vimeo player URL
+      if (url.includes('player.vimeo.com/video/')) {
+        return url.includes('?') ? url : `${url}?autoplay=0&loop=0&muted=0`;
+      }
+      
+          // Vimeo regular URLs - handles both /video/ID and direct /ID formats
+    const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+    if (vimeoMatch) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+      
+      // YouTube
+      const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i);
+      if (youtubeMatch) {
+        return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=0&loop=0&muted=0`;
+      }
+      
+      // Direct video files
+      if (/\.(mp4|webm|ogg|mov|avi)$/i.test(url)) {
+        return url;
+      }
+      
+      return null;
+    }
+
+    // Function to create media element (image or video)
+    function createMediaElement(mediaUrl, storyTitle) {
+      if (!mediaUrl) {
+        return `<img src="https://placehold.co/600x400?text=No+Image" class="story-image" alt="${storyTitle}">`;
+      }
+
+      const isVideo = isVideoUrl(mediaUrl);
+      
+      if (isVideo) {
+        const embedUrl = getVideoEmbedUrl(mediaUrl);
+        
+                  if (embedUrl) {
+            if (embedUrl.includes('youtube.com') || embedUrl.includes('vimeo.com')) {
+              // Embedded video (YouTube/Vimeo) - match image dimensions
+              return `
+                <iframe class="story-image" 
+                        src="${embedUrl}" 
+                        frameborder="0" 
+                        allow="autoplay; fullscreen; picture-in-picture" 
+                        allowfullscreen
+                        title="${storyTitle}"
+                        style="background-color: #000;"></iframe>
+              `;
+            } else {
+              // Direct video file - match image dimensions
+              return `
+                <video class="story-image" 
+                       controls 
+                       preload="metadata" 
+                       controlsList="nodownload"
+                       style="background-color: #000;">
+                  <source src="${embedUrl}" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              `;
+            }
+        }
+      }
+      
+      // Default to image
+      return `<img src="${mediaUrl}?width=250&auto=webp&optimize=high&quality=80" class="story-image" alt="${storyTitle}">`;
+    }
+
+    // Function to create skeleton placeholder
+    function createSkeletonPlaceholder(index) {
+      return `
+        <div class="col-12 col-sm-6 col-md-4 mb-4 skeleton-placeholder" data-skeleton-index="${index}">
+          <div class="card d-flex flex-column h-100 p-3 gap-2 story-skeleton">
+            <div class="skeleton-image"></div>
+            <div class="d-flex flex-column gap-2 h-100">
+              <div class="d-flex align-items-center gap-2">
+                <div class="skeleton-circle"></div>
+                <div class="skeleton-text short" style="flex: 1;"></div>
+              </div>
+              <div class="flex-grow-1">
+                <div class="skeleton-text medium"></div>
+                <div class="skeleton-text"></div>
+                <div class="skeleton-text short"></div>
+              </div>
+              <div class="skeleton-button"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Function to render individual story with animation
+    async function renderStoryCard(story, index) {
+      return new Promise((resolve) => {
+        // Small delay for smoother animation
+        setTimeout(() => {
+          try {
+            // Determine media URL - handle both string and object formats
+            let mediaUrl = '';
+            if (typeof story?.story_image === 'string') {
+              mediaUrl = story.story_image || '';
+            } else if (story?.story_image?.data && story.story_image.data.length > 0) {
+              mediaUrl = story.story_image.data[0]?.url || '';
+            }
+
+            // Create media element (image or video)
+            const mediaElement = createMediaElement(mediaUrl, story?.title || '');
+
+            // Extract hashtags from story body
+            const hashtagsHtml = generateHashtagsHtml(story.story_body || story.description || '');
+
+            // Create story card
+            const storyCard = `
+              <div class="col-12 col-sm-6 col-md-4 mb-4 story-card-rendered" data-story-id="${story?.meta?.zuid}" data-story-date="${story?.meta?.createdAt}">
+                <div class="card d-flex flex-column h-100 p-3 gap-2 story-card">
+                  ${mediaElement}
+                  <div class="d-flex flex-column gap-2 h-100">
+                    <div class="d-flex align-items-end gap-2">
+                      <img src="${typeof story?.author?.data[0]?.profile_image === 'string' && story?.author?.data[0]?.profile_image !== '' ? `${story?.author?.data[0]?.profile_image}?width=24` : story?.author?.data[0]?.profile_image?.data?.[0]?.url ? `${story?.author?.data[0]?.profile_image?.data[0]?.url}?width=24` : 'https://www.gravatar.com/avatar/?d=mp'}" class="story-npo-logo" alt="${story.author?.data?.[0]?.first_name}">
+                      <p class="npo-name my-auto">${story?.author?.data[0]?.first_name} ${story?.author?.data[0]?.last_name}</p>
+                    </div>
+                    <div class="flex-grow-1">
+                      <p class="story-title">${story?.title}</p>
+                      <div class="story-subtitle">${story?.story_body}</div>
+                      ${hashtagsHtml}
+                    </div>
+                    <a href="{{ $base_url }}${story?.meta?.web?.uri}" class="btn btn-secondary story-btn card-btn" aria-label="Read more about ${story?.title}">Read More</a>
                   </div>
-                  <div class="flex-grow-1">
-                    <p class="story-title">${story.title}</p>
-                    <div class="story-subtitle">${story.story_body}</div>
-                  </div>
-                  <div class="d-flex align-items-center justify-content-start flex-wrap">
-                    ${(story.related_causes !== null || story.related_causes !== "") ? `<div class="story-cause d-flex align-items-center">
-                      <p class="text-center">${story.related_causes?.data?.[0]?.title}</p>
-                    </div>` : ""}
-                  </div>
-                  <a href="https://causecircle.org/${story.meta.web.uri}" class="btn btn-secondary story-btn card-btn">Read More</a>
                 </div>
               </div>
-            </div>
-          `;
-          storiesContainer.append(storyCard);
-        });
+            `;
 
-        $("#stories-section").removeClass("d-none");
-        $("#stories-tab").parent().removeClass("d-none");
-      } else {
+            // Find and replace the corresponding skeleton
+            const skeletonSelector = `.skeleton-placeholder[data-skeleton-index="${index}"]`;
+            const skeletonToReplace = $(skeletonSelector);
+            
+            if (skeletonToReplace.length) {
+              skeletonToReplace.fadeOut(200, function() {
+                $(this).replaceWith(storyCard);
+                resolve();
+              });
+            } else {
+              // Fallback: append to container
+              $(".stories-container").append(storyCard);
+              resolve();
+            }
+          } catch (storyError) {
+            console.error(`Error processing story ${story?.meta?.zuid}:`, storyError);
+            resolve(); // Continue with next story
+          }
+        }, index * 100); // Stagger by 100ms per story
+      });
+    }
+
+    // Fetch stories data using TanStack Query
+    const npoZUID = "{{this.zuid}}";
+    const storiesContainer = $(".stories-container");
+    const storiesLoadingSkeleton = $("#stories-loading-skeleton");
+
+    // Create stories query
+    const storiesQuery = window.createStoriesQuery({
+      npo: npoZUID,
+      approved: '1',
+      status: 'approved'
+    });
+
+    // Subscribe to stories query changes for reactive updates
+    storiesQuery.subscribe((result) => {
+      if (result.isLoading) {
+        // Show skeleton loading
+        storiesContainer.addClass("d-none");
+        storiesLoadingSkeleton.removeClass("d-none");
+        return;
+      } else if (result.isError) {
+        console.error("Error fetching stories:", result.error);
+        // Hide skeleton on error
+        storiesLoadingSkeleton.addClass("d-none");
         $("#stories-tab").parent().addClass("d-none");
         $("#stories-section").addClass("d-none");
-        $("#no-stories-message").removeClass("d-none");
+        checkAndUpdateNoStoriesMessage();
+        return;
+      } else if (result.isSuccess) {
+        const data = result.data;
+        
+        if (data && data.data && data.data.length > 0) {
+          // Step 1: Create skeletons matching the number of stories
+          storiesLoadingSkeleton.empty();
+          data.data.forEach((_, index) => {
+            storiesLoadingSkeleton.append(createSkeletonPlaceholder(index));
+          });
+
+          // Step 2: Process and render stories progressively
+          const renderPromises = data.data.map((story, index) => renderStoryCard(story, index));
+          
+          // Wait for all stories to be rendered
+          Promise.all(renderPromises).then(() => {
+            // Step 3: After all stories are rendered, clean up
+            setTimeout(() => {
+              // Move rendered stories to the container
+              $('.story-card-rendered').each(function() {
+                $(this).removeClass('story-card-rendered');
+                storiesContainer.append(this);
+              });
+              
+              // Hide skeleton container and show stories
+              storiesLoadingSkeleton.addClass("d-none");
+              storiesContainer.removeClass("d-none");
+              
+              // Check if we should hide the no-stories message
+              checkAndUpdateNoStoriesMessage();
+            }, 500);
+
+            $("#stories-section").removeClass("d-none");
+            $("#stories-tab").parent().removeClass("d-none");
+          });
+        } else {
+          // No stories found - hide stories section and tab
+          storiesLoadingSkeleton.addClass("d-none");
+          $("#stories-tab").parent().addClass("d-none");
+          $("#stories-section").addClass("d-none");
+          
+          // Check if we should show no-stories message
+          checkAndUpdateNoStoriesMessage();
+        }
       }
-    } catch (error) {
-      console.error("Error fetching stories:", error);
-      $("#stories-tab").parent().addClass("d-none");
-      $("#stories-section").addClass("d-none");
-    }
+    });
+
+    // Trigger initial fetch
+    storiesQuery.refetch();
   });
 </script>

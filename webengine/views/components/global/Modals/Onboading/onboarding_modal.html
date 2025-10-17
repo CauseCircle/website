@@ -118,7 +118,7 @@
   </div>
 </div>
 
-<script>
+<script type="module">
   function toggleBtn(selectedId) {
     // Remove btn-primary class from all buttons inside #user-type and add btn-secondary
     $("#user-type .btn").removeClass("btn-primary").addClass("btn-secondary");
@@ -154,7 +154,7 @@
 
   $(document).ready(function () {
     $("#loginModal .btn-secondary").click(function () {
-      loginWithFacebook();
+      // loginWithFacebook();
       $("#loginModal").modal("hide");
     });
   });

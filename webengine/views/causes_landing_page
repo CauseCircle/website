@@ -81,14 +81,14 @@
   <div
     class="d-flex flex-column gap-2 justify-content-center align-items-center"
   >
-    <p class="fs-1 fw-normal text-center">Explore Impactful Causes</p>
+    <p class="fs-1 fw-normal text-center">Explore Cause Categories</p>
     <p class="fs-5 text-muted text-center">
       Discover and support causes that matter to you.
     </p>
     <input
       type="text"
       id="cause-search"
-      class="search-input form-control w-100 mb-2 mb-md-0 py-2 my-4"
+      class="search-input form-control w-100 mb-2 mb-md-0 py-2 my-4 d-none"
       placeholder="Search Causes by name..."
       aria-label="Search"
     />
@@ -136,7 +136,7 @@
   </div>
 </section>
 
-<script>
+<script type="module">
   $(document).ready(function () {
     const $causeSearch = $(".search-input");
     const $searchCausesContainer = $("#search-causes-container");
@@ -203,13 +203,14 @@
       }
 
       $.ajax({
-        url: `https://causecircle.org/mobileapp/causes.json`,
+        url: `{{ $base_url }}mobileapp/causes.json`,
         method: "GET",
         data: {
-          limit: limit,
+          // limit: limit,
+          limit: 9999,
           search: searchInput,
           page: currentPage,
-          featured: isFeatured,
+          // featured: isFeatured,
         },
         success: function (data) {
           if (currentPage === 1) {

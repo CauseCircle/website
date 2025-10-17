@@ -1,0 +1,42 @@
+<script type="module">
+  import { QueryObserver, MutationObserver } from 'https://esm.sh/@tanstack/query-core@5.90.2';
+
+  // ==================== COMMENT QUERIES & MUTATIONS ====================
+  // TanStack Query wrappers for comment operations
+
+  // ==================== QUERIES (GET) ====================
+
+  /**
+   * Query for getting story comments
+   * @param {string} zuid - Story ZUID
+   * @returns {QueryObserver}
+   */
+  window.createStoryCommentsQuery = (zuid) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey: ['stories', zuid, 'comments'],
+      queryFn: () => window.getStoryComments(zuid),
+      staleTime: 2 * 60 * 1000, // 2 minutes
+      cacheTime: 10 * 60 * 1000, // 10 minutes
+      enabled: !!zuid, // Only fetch if zuid exists
+    });
+  };
+
+  // ==================== MUTATIONS (POST/PATCH/DELETE) ====================
+
+  /**
+   * Mutation for posting a comment on a story
+   * @returns {MutationObserver}
+   */
+  window.createPostCommentMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: ({ zuid, data }) => window.postComment(zuid, data),
+      onSuccess: (data, variables) => {
+        // Invalidate story comments to refetch
+        window.queryClient.invalidateQueries({ queryKey: ['stories', variables.zuid, 'comments'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to post comment:', error);
+      },
+    });
+  };
+</script>

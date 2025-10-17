@@ -69,12 +69,13 @@
     font-size: 12px;
   }
   .npo-npo-logo {
-    width: 24px;
+    width: 24px; 
     height: 24px;
     border: 1px solid #aeaeae;
     border-radius: 3px;
-    object-fit: cover;
-    object-position: center;
+    object-fit: contain;
+    object-position: center; 
+    background-color: white;
   }
   .npo-btn {
     font-size: 12px;
@@ -100,9 +101,9 @@
   }
 </style>
 
-<div class="my-4">
-  <h2 class="mb-4 fw-semibold fs-6">Your NPOs</h2>
-  <div id="nposCarousel" class="carousel slide" data-bs-ride="carousel">
+<div id="nposCarousel-container" class="my-4 d-none">
+  <h2 class="mb-4 fw-semibold fs-6">Followed Organizations</h2>
+  <div id="nposCarousel" class="carousel slide">
     <div class="carousel-inner" id="npoCards">
       <!-- NPO cards will be dynamically inserted here -->
     </div>
@@ -121,7 +122,7 @@
       data-bs-target="#nposCarousel"
       data-bs-slide="next"
     >
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="carousel-control-next-icon" aria-hidden="true"></span> 
       <span class="visually-hidden">Next</span>
     </button>
   </div>

@@ -1,0 +1,466 @@
+{{$slug = {request.pathPart(2)} }}
+<!--prettier-ignore-->
+{{$zuid = }}
+<!--prettier-ignore-->
+{{each non_profits as npo where npo._path_part like '{$slug}' }}
+{{$zuid = {npo._zuid} }}
+{{$invite_type = {get_var.style} }}
+
+<html lang="en">
+  <head>
+    <title>{{npo.name}} invited you to Join their CauseCircle!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Add required stylesheets -->
+    <link href="/styles/bootstrap.css" rel="stylesheet" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></noscript>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="https://4xxglxlj.media.zestyio.com/cause-circle-icon-color.png" type="image/png" sizes="196x196">
+    
+    <style>
+      .left-side {
+        width: 600px;
+        background-color: #fff;
+        transition: width 0.3s ease;
+      }
+      @media (max-width: 767.98px) {
+        .left-side {
+          width: 100%;
+        }
+      }
+      .right-side {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4rem;
+      }
+      .login-btn {
+        min-width: 7.625rem;
+        height: 2.5rem;
+        border-radius: 10px;
+        border: 1px solid #e1e4ea;
+        box-shadow: 0px 1px 2px 0px #0a0d1408;
+        background-color: #fff;
+        transition: box-shadow 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .login-btn:hover {
+        box-shadow: 0px 4px 8px 0px #0a0d1420;
+        background-color: #f5f7fa;
+      }
+
+      @media (max-width: 1199px) {
+        .left-side {
+          width: 100%;
+        }
+      }
+
+      .section-title p,
+      .section-title {
+        font-size: 2rem;
+        font-weight: 500;
+        text-align: center;
+      }
+      .hero-description p,
+      .hero-description {
+        font-size: 1.125rem;
+        font-weight: 400;
+        text-align: center;
+        color: var(--bs-gray-500);
+        max-width: 53.125rem;
+      }
+
+      .left-side-full {
+        width: 100% !important;
+      }
+    </style>
+
+    <script>
+      <!-- prettier-ignore -->
+      {{include /auth/facebook.js}}
+    </script>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Firebase Scripts -->
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"
+    ></script>
+    <script
+      defer
+      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"
+    ></script>
+
+    <script type="module" src="/auth/firebase-config.js"></script>
+
+    <!-- Bootstrap Bundle -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Include base auth -->
+    {{include /scripts/main.html}}
+  </head>
+  <body>
+    <div class="d-flex flex-column flex-md-row" style="height: 100vh; background-color: #f5f7fa">
+      <div class="left-side">
+        <div id="login-section" class="d-none d-flex flex-column h-100 pt-5 pt-md-0 min-vh-100">
+          <div
+            class="d-flex flex-column justify-content-center align-items-center flex-grow-1 px-3"
+          >
+            <div>
+              <img
+                src="{{npo.logo.getImage()}}"
+                alt="{{npo.name}}"
+                style="width: 200px; height: auto"
+                class:"img-fluid"
+              />
+            </div>
+            <div style="max-width: 800px">
+              <p class="text-center fs-4 fw-medium mb-0 mt-4 login-title">
+                Get Started with {{npo.name}}
+              </p>
+              <div id="login-description" class="text-center fs-6 text-muted">
+                Start creating Stories now for {{npo.name}}. It's easy and takes less than a minute. Continue by selecting your preferred login method.
+              </div>
+            </div>
+            <div
+              class="login-button-container d-flex flex-column gap-2 mt-4 flex-wrap align-items-center justify-content-center w-100"
+              style="max-width: 300px"
+            >
+              <button
+            type="button"
+            class="login-btn btn btn-light w-100"
+            id="google-signin-btn"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24">
+              <path
+                fill="#EA4335"
+                d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27006974,0 3.1977497,2.69829785 1.23999023,6.65002441 L5.26620003,9.76452941 Z"
+              />
+              <path
+                fill="#34A853"
+                d="M16.0407269,18.0125889 C14.9509167,18.7163016 13.5660892,19.0909091 12,19.0909091 C8.86648613,19.0909091 6.21911939,17.076871 5.27698177,14.2678769 L1.23746264,17.3349879 C3.19279051,21.2936293 7.26500293,24 12,24 C14.9328362,24 17.7353462,22.9573905 19.834192,20.9995801 L16.0407269,18.0125889 Z"
+              />
+              <path
+                fill="#4A90E2"
+                d="M19.834192,20.9995801 C22.0291676,18.9520994 23.4545455,15.903663 23.4545455,12 C23.4545455,11.2909091 23.3454545,10.5272727 23.1818182,9.81818182 L12,9.81818182 L12,14.4545455 L18.4363636,14.4545455 C18.1187732,16.013626 17.2662994,17.2212117 16.0407269,18.0125889 L19.834192,20.9995801 Z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.27698177,14.2678769 C5.03832634,13.556323 4.90909091,12.7937589 4.90909091,12 C4.90909091,11.2182781 5.03443647,10.4668121 5.26620003,9.76452941 L1.23999023,6.65002441 C0.43658717,8.26043162 0,10.0753848 0,12 C0,13.9195484 0.444780743,15.7301709 1.23746264,17.3349879 L5.27698177,14.2678769 Z"
+              />
+            </svg>
+            <span class="ms-2">Sign in with Google</span>
+          </button>
+          <button
+            type="button"
+            class="login-btn btn btn-light w-100"
+            id="continue-with-fb-btn"
+          >
+            <i
+              class="bi bi-facebook"
+              style="font-size: 20px; color: #448afd"
+            ></i>
+            <span class="ms-2">Sign in with Facebook</span>
+          </button>
+          <button
+            type="button"
+            class="login-btn btn btn-light w-100"
+            id="microsoft-signin-btn"
+          >
+            <svg width="20" height="20" viewBox="0 0 23 23">
+              <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
+              <path fill="#f35325" d="M1 1h10v10H1z"></path>
+              <path fill="#81bc06" d="M12 1h10v10H12z"></path>
+              <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
+              <path fill="#ffba08" d="M12 12h10v10H12z"></path>
+            </svg>
+            <span class="ms-2">Sign in with Microsoft</span>
+          </button>
+          <button
+            type="button"
+            class="login-btn btn btn-light w-100"
+            id="apple-signin-btn"
+          >
+            <i class="bi bi-apple" style="font-size: 20px"></i>
+            <span class="ms-2">Sign in with Apple</span>
+          </button>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center p-4">
+            <p class="fs-6 text-muted mb-0">© 2025 CauseCircle</p>
+            <span class="text-muted d-none">
+              <i class="bi bi-globe text-muted" style="font-size: 20px"></i>
+              ENG
+            </span>
+          </div>
+        </div>
+
+        <div id="accept-invite-section" class="d-flex flex-column h-100 pt-5 pt-md-0">
+          <div
+            class="d-flex flex-column justify-content-center align-items-center flex-grow-1 px-3 px-md-5"
+          >
+            <div>
+              <img
+                src="{{npo.logo.getImage()}}"
+                alt="{{npo.name}}"
+                style="width: 200px; height: auto"
+                class="img-fluid"
+              />
+            </div>
+            <div>
+              <p class="text-center fs-4 fw-medium mb-0 mt-4 login-title">
+                {{npo.name}} has invited you to join CauseCircle
+              </p>
+              <div id="login-description" class="text-center fs-6 text-muted">
+                CauseCircle is a platform where you can share and amplify
+                stories about causes you care about to a community that cares.
+              </div>
+              <button class="btn btn-primary w-100 mt-4">Accept Invite</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--Use Cases section-->
+      <section
+        id="use-cases-section"
+        class="right-side d-flex p-lg-3 container py-5"
+      >
+        <div class="d-flex flex-column gap-3">
+          <p class="section-title mb-0">What is CauseCircle?</p>
+          <div class="hero-description mx-auto">
+            <p>Empower your community with stories that inspire action.</p>
+          </div>
+          <div class="row pt-3 row-gap-5">
+            <!--prettier-ignore-->
+            {{ $home_use_cases = 7-eccaa2dac4-sm90wx,7-a4c8bee5b3-ntk1f4,7-dea2c4fd8c-4bxdh1 }}
+            <!--prettier-ignore-->
+            {{each use_cases as use_case where FIND_IN_SET (use_case.zuid, '{$home_use_cases}') }}
+            <div class="col-12 col-sm-6 col-md-4">
+              <!--prettier-ignore-->
+              {{ include /components/global/Nonprofits/Join/usecases_card.html }}
+            </div>
+            {{/each}}
+          </div>
+          <div class="d-flex justify-content-center pt-3 d-none">
+            <button class="btn btn-primary mx-auto">Accept Invite</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Add required scripts -->
+    <script
+      defer
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+      crossorigin="anonymous"
+    ></script>
+
+    <script type="module">
+      document.addEventListener("DOMContentLoaded", async function () {
+        // Wait for Firebase to be initialized
+        const waitForFirebase = () => {
+          return new Promise((resolve) => {
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+              resolve();
+            } else {
+              // Check every 100ms until Firebase is loaded
+              const checkFirebase = setInterval(() => {
+                if (typeof firebase !== 'undefined' && firebase.auth) {
+                  clearInterval(checkFirebase);
+                  resolve();
+                }
+              }, 100);
+            }
+          });
+        };
+
+        // Wait for Firebase to be ready
+        await waitForFirebase();
+
+        let currentUser = null;
+
+        // Now check if user is logged in using onAuthStateChanged
+        firebase.auth().onAuthStateChanged((user) => {
+          currentUser = user;
+          if (user) {
+            checkUserFollowingStatus();
+          }
+        });
+
+        // Function to check if user is already following the NPO
+        async function checkUserFollowingStatus() {
+          if (!currentUser || inviteType === "admin-invite") return;
+
+          try {
+            // Get user data from localStorage or fetch it
+            let userData = JSON.parse(localStorage.getItem("zestyUser") || "null");
+            if (!userData) {
+              const fbUserData = JSON.parse(localStorage.getItem("user") || "null");
+              if (fbUserData?.zuid) {
+                const userProfile = await getUserProfile(fbUserData.zuid);
+                userData = userProfile?.data[0];
+                if (userData) {
+                  localStorage.setItem("zestyUser", JSON.stringify(userData));
+                }
+              }
+            }
+
+            if (userData) {
+              const isAlreadyFollowing = checkIfFollowingNpo(userData, zuid);
+              if (isAlreadyFollowing) {
+                updateUIForAlreadyFollowing();
+              }
+            }
+          } catch (error) {
+            console.error("Error checking following status:", error);
+          }
+        }
+
+        // Function to check if user is following the NPO
+        function checkIfFollowingNpo(userData, npoZuid) {
+          // Check if favorite_npos is a relationship object with data array
+          if (userData?.favorite_npos?.data && Array.isArray(userData.favorite_npos.data)) {
+            return userData.favorite_npos.data.some(npo => npo.meta.zuid === npoZuid);
+          }
+          // Check if favorite_npos is a comma-separated string
+          else if (typeof userData?.favorite_npos === 'string' && userData.favorite_npos !== "") {
+            const favoriteNpoIds = userData.favorite_npos.split(",");
+            return favoriteNpoIds.includes(npoZuid);
+          }
+          return false;
+        }
+
+        // Function to update UI when user is already following
+        function updateUIForAlreadyFollowing() {
+          const npoName = "{{npo.name}}";
+          // Update the invite message
+          const inviteTitle = document.querySelector("#accept-invite-section .login-title");
+          if (inviteTitle) {
+            inviteTitle.textContent = `You're already following ${npoName}!`;
+          }
+          
+          const inviteDescription = document.querySelector("#accept-invite-section #login-description");
+          if (inviteDescription) {
+            inviteDescription.textContent = `You're already part of ${npoName}'s community on CauseCircle. Click below to continue to your feed.`;
+          }
+
+          // Update button text
+          const acceptButton = document.querySelector("#accept-invite-section .btn-primary");
+          if (acceptButton) {
+            acceptButton.textContent = "Continue to Feed";
+          }
+        }
+
+        // Invite handling code
+        const zuid = "{{$zuid}}";
+        const inviteType = "{{$invite_type}}";
+        
+        // Add admin invite specific content
+        if (inviteType === "admin-invite") {
+          const npoName = "{{npo.name}}";
+          // Update page title
+          document.title = `You are invited as an admin of ${npoName}`;
+          // Update login section title
+          const loginTitle = document.querySelectorAll('.login-title');
+          loginTitle.forEach(title => {
+            title.textContent = `You are invited as an admin of ${npoName}`;
+          });
+        }
+
+        async function handleAcceptInvite() {
+          // Check if user is already logged in
+          if (currentUser) {
+            // User is logged in, process invite directly
+            try {
+              // Get user data from localStorage or fetch it
+              let userData = JSON.parse(localStorage.getItem("zestyUser") || "null");
+              if (!userData) {
+                const fbUserData = JSON.parse(localStorage.getItem("user") || "null");
+                if (fbUserData?.zuid) {
+                  const userProfile = await getUserProfile(fbUserData.zuid);
+                  userData = userProfile?.data[0];
+                  if (userData) {
+                    localStorage.setItem("zestyUser", JSON.stringify(userData));
+                  }
+                }
+              }
+
+              // Check if user is already following (for non-admin invites)
+              const isAlreadyFollowing = inviteType !== "admin-invite" && checkIfFollowingNpo(userData, zuid);
+              
+              if (isAlreadyFollowing) {
+                // User is already following, just redirect to home feed
+                const homeUrl = "{{home_feed.first().getUrl()}}";
+                window.location.replace(homeUrl);
+                return;
+              }
+
+              // Process the invite based on type
+              if (inviteType === "admin-invite") {
+                await window.createNpoAdmin(zuid, {
+                  email: currentUser?.providerData[0]?.email || userData?.email || "",
+                });
+              } else {
+                await window.createNpoFollower(zuid, {
+                  email: userData?.email || currentUser?.providerData[0]?.email || "",
+                  ...(inviteType !== "admin-invite" && inviteType !== "follow-invite" ? {
+                    qr: true
+                  } : {})
+                });
+              }
+              const npoSlug = localStorage.getItem("npoSlug");
+              // Redirect to home feed with success message
+              const homeUrl = inviteType === "admin-invite" ? `{{non_profits_landing_page.first().getUrl()}}/{{$slug}}/admin` : "{{home_feed.first().getUrl()}}";
+              const redirectUrl = inviteType === "follow-invite" || inviteType === "" || inviteType === null || inviteType === undefined 
+                ? `${homeUrl}?followed-npo=${zuid}`
+                : homeUrl;
+
+              localStorage.removeItem("npoZuidToFollow");
+              localStorage.removeItem("invite_type");
+              localStorage.removeItem("npoSlug");
+              window.location.replace(redirectUrl);
+              
+            } catch (error) {
+              console.error("Error processing invite:", error);
+              alert("There was an error processing your invite. Please try again.");
+            }
+          } else {
+            // User not logged in, show login buttons
+            document.getElementById("accept-invite-section").classList.add("d-none");
+            document.getElementById("login-section").classList.remove("d-none");
+            document.querySelector(".left-side").classList.add("left-side-full");
+            const useCasesSection = document.getElementById("use-cases-section");
+            useCasesSection.classList.remove("d-lg-flex");
+            useCasesSection.classList.add("d-none");
+          }
+        }
+
+        // Attach event listeners to buttons
+        const acceptInviteButtons = document.querySelectorAll(".btn-primary");
+        acceptInviteButtons.forEach((button) => {
+          button.addEventListener("click", handleAcceptInvite);
+        });
+      });
+    </script>
+  </body>
+</html>
+{{/each}}

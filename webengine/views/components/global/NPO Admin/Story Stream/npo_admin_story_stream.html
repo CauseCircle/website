@@ -70,17 +70,130 @@
     background-color: #f8f9fa;
     color: #000;
   }
+
+  /* Hashtag styles */
+  .hashtag-item {
+    color: #7b3fee;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  
+  .hashtag-item:hover {
+    text-decoration: underline;
+    color: #5a2bb8;
+  }
+
+  .hashtags-container {
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  /* Story media styling */
+  .story-media {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  /* Author section hover effect */
+  .author-section:hover .author-name {
+    color: var(--bs-primary) !important;
+    transition: color 0.2s ease;
+  }
+
+  /* Skeleton Loading Animation */
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+  }
+
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  .skeleton-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .skeleton-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .skeleton-text {
+    height: 1rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
+
+  .skeleton-text-sm {
+    width: 60%;
+    height: 0.875rem;
+  }
+
+  .skeleton-text-md {
+    width: 80%;
+  }
+
+  .skeleton-text-lg {
+    width: 100%;
+    height: 1.125rem;
+  }
+
+  .skeleton-media {
+    width: 100%;
+    height: 200px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  /* Skeleton to story transition */
+  .skeleton-placeholder {
+    transition: all 0.3s ease-in-out;
+  }
+
+  .story-card-rendered {
+    opacity: 0;
+    animation: slideInStory 0.4s ease-out forwards;
+  }
+
+  @keyframes slideInStory {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 </style>
 
-<div class="tab-pane" id="story-stream">
+<div class="tab-pane fade" id="story-stream">
   <div>
-    <h3 class="mb-4">Story Stream</h3>
+    <h3 class="mb-4">Story Hub</h3>
     <div
-      class="card d-flex flex-row justify-content-between align-items-center mb-4"
+      id="stream-review-stories-card"
+      class="card d-flex flex-row justify-content-between align-items-center mb-4 d-none"
       role="button"
       data-bs-toggle="modal"
       data-bs-target="#reviewStoriesModal"
-      style="cursor: pointer;"
+      style="cursor: pointer"
     >
       <div class="d-flex gap-4 align-items-center">
         <div>
@@ -102,34 +215,34 @@
     <!-- Story Stream Tabs -->
     <div class="story-stream-tabs">
       <div class="nav flex-row mb-4">
-        <a class="stream-nav-link active" href="#" data-tab="approved">
+        <a class="stream-nav-link active" href="#approved" data-bs-toggle="tab">
           Approved <span class="count" id="approved-count">0</span>
         </a>
-        <a class="stream-nav-link" href="#" data-tab="rejected">
+        <a class="stream-nav-link" href="#rejected" data-bs-toggle="tab">
           Rejected <span class="count" id="rejected-count">0</span>
         </a>
-        <a class="stream-nav-link" href="#" data-tab="to-review">
+        <a class="stream-nav-link" href="#to-review" data-bs-toggle="tab">
           To Review <span class="count" id="to-review-count">0</span>
         </a>
       </div>
 
       <div class="tab-content">
         <!-- Approved Stories -->
-        <div class="stream-tab-pane active" id="approved">
+        <div class="tab-pane fade show active" id="approved">
           <div class="stories-list row g-3">
             <!-- Stories will be loaded here -->
           </div>
         </div>
 
         <!-- Rejected Stories -->
-        <div class="stream-tab-pane" id="rejected">
+        <div class="tab-pane fade" id="rejected">
           <div class="stories-list row g-3">
             <!-- Stories will be loaded here -->
           </div>
         </div>
 
         <!-- To Review Stories -->
-        <div class="stream-tab-pane" id="to-review">
+        <div class="tab-pane fade" id="to-review">
           <div class="stories-list row g-3">
             <!-- Stories will be loaded here -->
           </div>
@@ -139,182 +252,476 @@
   </div>
 </div>
 
-<script>
-  function createStoryCard(story) {
-    return `
-      <div class="col-md-6 mb-3">
-        <div class="post-card">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <div class="d-flex align-items-center">
-              <img
-                src="${story.author.data[0]?.profile_image}"
-                alt="Profile"
-                class="rounded-circle"
-                width="40"
-                height="40"
-              />
-              <div class="ms-3">
-                <h6 class="mb-0">${story.author.data[0]?.first_name} ${
-      story.author.data[0]?.last_name
-    }</h6>
-                <small class="text-muted">${story.title}</small>
-              </div>
+<script type="module">
+  // Function to decode HTML entities
+  function decodeHtmlEntities(text) {
+    if (!text) return '';
+    
+    // Create a temporary div element to decode HTML entities
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = text;
+    return tempDiv.textContent || tempDiv.innerText || '';
+  }
+
+  // Function to extract hashtags from story text
+  function extractHashtagsFromText(text) {
+    if (!text) return [];
+    
+    // First decode HTML entities (like &#39; &#32; etc.)
+    const decodedText = decodeHtmlEntities(text);
+    
+    // Regular expression to find hashtags (#word)
+    const hashtagRegex = /#[a-zA-Z0-9_]+/g;
+    const hashtags = decodedText.match(hashtagRegex);
+    
+    if (!hashtags || hashtags.length === 0) return [];
+    
+    // Remove duplicates and clean up
+    const uniqueHashtags = [...new Set(hashtags.map(tag => tag.toLowerCase()))];
+    
+    return uniqueHashtags;
+  }
+
+  // Function to generate hashtag HTML for story cards
+  function generateHashtagsHtml(storyText) {
+    const hashtags = extractHashtagsFromText(storyText);
+    
+    if (hashtags.length === 0) return '';
+    
+    // Create hashtag HTML with proper links
+    const hashtagsHtml = hashtags.map(hashtag => {
+      const encodedHashtag = encodeURIComponent(hashtag);
+      return `<a href="/stories/?search=${encodedHashtag}" class="hashtag-item" target="_blank" rel="noopener noreferrer">${hashtag}</a>`;
+    }).join('');
+    
+    return `<div class="hashtags-container">${hashtagsHtml}</div>`;
+  }
+
+  // Helper function to format dates as time ago
+  function formatTimeAgo(dateString) {
+    if (!dateString) return '';
+    
+    try {
+      let date;
+      
+      // Check if dateString is already in ISO format (includes 'T' and ends with 'Z' or timezone)
+      if (dateString.includes('T') && (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-'))) {
+        // ISO format with timezone info - parse directly
+        date = new Date(dateString);
+      } else {
+        // Legacy format without timezone - treat as UTC
+        date = new Date(dateString + ' UTC');
+      }
+      
+      // Validate the date
+      if (isNaN(date.getTime())) {
+        throw new Error('Invalid date');
+      }
+      
+      const now = new Date();
+      const diffInMilliseconds = now - date;
+      const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+      const diffInMinutes = Math.floor(diffInSeconds / 60);
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      const diffInDays = Math.floor(diffInHours / 24);
+      const diffInMonths = Math.floor(diffInDays / 30);
+      const diffInYears = Math.floor(diffInDays / 365);
+      
+      if (diffInSeconds < 60) {
+        return diffInSeconds <= 1 ? 'just now' : `${diffInSeconds}s ago`;
+      } else if (diffInMinutes < 60) {
+        return `${diffInMinutes}m ago`;
+      } else if (diffInHours < 24) {
+        return `${diffInHours}h ago`;
+      } else if (diffInDays < 30) {
+        return `${diffInDays}d ago`;
+      } else if (diffInMonths < 12) {
+        return `${diffInMonths}mo ago`;
+      } else {
+        return `${diffInYears}y ago`;
+      }
+    } catch (error) {
+      console.error('Error formatting time:', error, 'Input:', dateString);
+      return '';
+    }
+  }
+
+  // Function to detect if a URL is a video
+  function isVideoUrl(url) {
+    if (!url) return false;
+    const videoPatterns = [
+      /vimeo\.com\/video\/\d+/i,
+      /vimeo\.com\/\d+/i,
+      /player\.vimeo\.com\/video\/\d+/i,
+      /youtube\.com\/watch\?v=/i,
+      /youtu\.be\//i,
+      /\.mp4$/i,
+      /\.webm$/i,
+      /\.ogg$/i,
+      /\.mov$/i,
+      /\.avi$/i
+    ];
+    return videoPatterns.some(pattern => pattern.test(url));
+  }
+
+  // Function to get video embed URL
+  function getVideoEmbedUrl(url) {
+    if (!url) return null;
+    
+    
+    // Check if it's already a Vimeo player URL
+    if (url.includes('player.vimeo.com/video/')) {
+      return url.includes('?') ? url : `${url}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // Vimeo regular URLs - handles both /video/ID and direct /ID formats
+    const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+    if (vimeoMatch) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // YouTube
+    const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i);
+    if (youtubeMatch) {
+      return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=0&loop=0&muted=0`;
+    }
+    
+    // Direct video files
+    if (/\.(mp4|webm|ogg|mov|avi)$/i.test(url)) {
+      return url;
+    }
+    return null;
+  }
+
+  // Function to create media element (image or video)
+  function createMediaElement(mediaUrl, storyTitle) {
+    if (!mediaUrl) {
+      return `<img src="https://placehold.co/600x400?text=No+Image" class="story-media mb-3" alt="${storyTitle}">`;
+    }
+
+    const isVideo = isVideoUrl(mediaUrl);
+    
+    if (isVideo) {
+      const embedUrl = getVideoEmbedUrl(mediaUrl);
+      
+      if (embedUrl) {
+        if (embedUrl.includes('youtube.com') || embedUrl.includes('vimeo.com')) {
+          // Embedded video (YouTube/Vimeo) - match image dimensions
+          return `
+            <div class="video-container mb-3" style="width: 100%; height: 200px; background-color: #000; border-radius: 8px; overflow: hidden;">
+              <iframe style="width: 100%; height: 100%; object-fit: cover;" 
+                      src="${embedUrl}" 
+                      frameborder="0" 
+                      allow="autoplay; fullscreen; picture-in-picture" 
+                      allowfullscreen
+                      title="${storyTitle}"></iframe>
             </div>
-            ${
-              story.npo_approved
-                ? `
-              <div class="dropdown">
-                <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-three-dots-vertical"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li>
-                    <button class="dropdown-item" type="button">
-                      <i class="bi bi-download me-2"></i>Download Story
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            `
-                : ""
-            }
+          `;
+        } else {
+          // Direct video file - match image dimensions
+          return `
+            <div class="video-container mb-3" style="width: 100%; height: 200px; background-color: #000; border-radius: 8px; overflow: hidden;">
+              <video style="width: 100%; height: 100%; object-fit: cover;" 
+                     controls 
+                     preload="metadata" 
+                     controlsList="nodownload">
+                <source src="${embedUrl}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          `;
+        }
+      }
+    }
+    
+    // Default to image
+    return `<img src="${mediaUrl}?width=200&auto=webp&quality=80&optimize=high" alt="${storyTitle}" class="story-media mb-3">`;
+  }
+
+  // Function to create skeleton placeholder
+  function createSkeletonPlaceholder(index) {
+    return `
+      <div class="col-md-6 mb-3 skeleton-placeholder" data-skeleton-index="${index}">
+        <div class="post-card">
+          <div class="skeleton-header">
+            <div class="skeleton skeleton-avatar"></div>
+            <div style="flex: 1;">
+              <div class="skeleton skeleton-text skeleton-text-md" style="width: 40%;"></div>
+              <div class="skeleton skeleton-text skeleton-text-sm" style="width: 30%;"></div>
+            </div>
           </div>
-          <div class="text-muted mb-3 story-subtitle">
-            ${story.story_body}
-          </div>
-          <img
-            src="${typeof story.story_image == 'string' ? story.story_image : story.story_image.data[0]?.url}"
-            alt="${story.title}"
-            class="img-fluid rounded mb-3"
-          />
-          <div class="post-interaction d-none">
-            <a href="#" class="interaction-btn">Like</a>
-            <a href="#" class="interaction-btn">Donate</a>
-            <a href="#" class="interaction-btn">Comment</a>
-            <a href="#" class="interaction-btn">Share</a>
-          </div>
+          <div class="skeleton skeleton-text skeleton-text-lg mb-2"></div>
+          <div class="skeleton skeleton-text skeleton-text-md mb-2"></div>
+          <div class="skeleton skeleton-text skeleton-text-md mb-3"></div>
+          <div class="skeleton skeleton-media"></div>
         </div>
       </div>
     `;
   }
 
-  async function loadStoriesByStatus(status) {
+  // Function to render individual story with animation
+  async function renderStoryCard(story, index, containerSelector) {
+    return new Promise((resolve) => {
+      // Small delay for smoother animation
+      setTimeout(() => {
+        try {
+          const storyCardHtml = createStoryCard(story);
+          
+          // Find and replace the corresponding skeleton
+          const skeletonSelector = `${containerSelector} .skeleton-placeholder[data-skeleton-index="${index}"]`;
+          const skeletonToReplace = $(skeletonSelector);
+          
+          if (skeletonToReplace.length) {
+            skeletonToReplace.fadeOut(200, function() {
+              $(this).replaceWith(storyCardHtml);
+              resolve();
+            });
+          } else {
+            // Fallback: append to container
+            $(containerSelector).append(storyCardHtml);
+            resolve();
+          }
+        } catch (error) {
+          console.error(`Error rendering story ${story?.meta?.zuid}:`, error);
+          resolve(); // Continue with next story
+        }
+      }, index * 100); // Stagger by 100ms per story
+    });
+  }
+
+  function createStoryCard(story) {
+    // Determine media URL - handle both string and object formats
+    let mediaUrl = '';
+    if (typeof story?.story_image === 'string') {
+      mediaUrl = story.story_image || '';
+    } else if (story?.story_image?.data && story.story_image.data.length > 0) {
+      mediaUrl = story.story_image.data[0]?.url || '';
+    }
+
+    // Create media element (image or video)
+    const mediaElement = createMediaElement(mediaUrl, story?.title || '');
+
+    return `
+    <div class="col-md-6 mb-3 story-card-rendered">
+      <div class="post-card">
+        <div class="d-flex align-items-start justify-content-between mb-3">
+          <div class="d-flex align-items-center author-section flex-grow-1" onclick="if('${story.author.data[0]?.meta?.web?.uri || ''}') window.open('{{ $base_url }}${story.author.data[0]?.meta?.web?.uri || ''}', '_blank');" style="cursor: pointer;">
+            <img
+              src="${
+                typeof story.author.data[0]?.profile_image == "string"
+                  ? story.author.data[0]?.profile_image
+                  : story.author.data[0]?.profile_image?.data[0]?.url ||
+                    "https://placehold.co/100x100?text=Profile"
+              }?width=40"
+              alt="Profile"
+              class="rounded-circle"
+              width="40"
+              height="40"
+            />
+            <div class="ms-3">
+              <h6 class="mb-0 author-name">${story.author.data[0]?.first_name ?? "Anonymous"} ${
+      story.author.data[0]?.last_name ?? ""
+    }</h6>
+              <small class="text-muted">${formatTimeAgo(
+                story.createdAt || story.meta?.createdAt || story.date_published
+              )}</small>
+            </div>
+          </div>
+          ${story.npo_approved ? `
+          <div class="d-flex align-items-start">
+            <div class="dropdown">
+              <button class="btn btn-link" type="button" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false">
+                <i class="bi bi-three-dots-vertical"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <button class="dropdown-item" type="button" 
+                    onclick="window.open('https://api.causecircle.org/stories/${story?.meta?.zuid}/download', '_blank')">
+                    <i class="bi bi-download me-2"></i>Download Story
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>` : ""}
+        </div>
+        <a href="{{ $base_url }}${story?.meta?.web?.uri}" class="text-decoration-none text-dark">
+          <h6 class="mb-2">${story.title}</h6>
+          <div class="text-muted mb-3 story-subtitle">
+            ${story.story_body}
+          </div>
+          ${generateHashtagsHtml(story.story_body || '')}
+          ${mediaElement}
+        </a>
+        <div class="post-interaction d-none">
+          <a href="#" class="interaction-btn">Like</a>
+          <a href="#" class="interaction-btn">Donate</a>
+          <a href="#" class="interaction-btn">Comment</a>
+          <a href="#" class="interaction-btn">Share</a>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ==================== TANSTACK QUERY OBSERVERS ====================
+  
+  // Create TanStack Query observers for different story statuses
+  const approvedStoriesQuery = window.createStoriesQuery({
+    npo: "{{$zuid}}",
+    approved: "1",
+    status: "approved"
+  });
+
+  const rejectedStoriesQuery = window.createStoriesQuery({
+    npo: "{{$zuid}}",
+    approved: "0",
+    status: "rejected"
+  });
+
+  const pendingStoriesQuery = window.createStoriesQuery({
+    npo: "{{$zuid}}",
+    approved: "0",
+    status: "pending"
+  });
+
+  // ==================== REACTIVE SUBSCRIPTIONS ====================
+
+  // Subscribe to approved stories for reactive UI updates
+  approvedStoriesQuery.subscribe((result) => {
+    if (result.isLoading) {
+      // Show skeleton while loading
+      $("#approved .stories-list").html(createSkeletonPlaceholder(0));
+    } else if (result.isSuccess) {
+      const stories = result.data?.data || [];
+      renderStoriesByStatus("approved", stories);
+    } else if (result.isError) {
+      $("#approved .stories-list").html(
+        '<div class="col-12"><p class="text-danger">Error loading approved stories.</p></div>'
+      );
+    }
+  });
+
+  // Subscribe to rejected stories for reactive UI updates
+  rejectedStoriesQuery.subscribe((result) => {
+    if (result.isLoading) {
+      // Show skeleton while loading
+      $("#rejected .stories-list").html(createSkeletonPlaceholder(0));
+    } else if (result.isSuccess) {
+      const stories = result.data?.data || [];
+      renderStoriesByStatus("rejected", stories);
+    } else if (result.isError) {
+      $("#rejected .stories-list").html(
+        '<div class="col-12"><p class="text-danger">Error loading rejected stories.</p></div>'
+      );
+    }
+  });
+
+  // Subscribe to pending stories for reactive UI updates
+  pendingStoriesQuery.subscribe((result) => {
+    if (result.isLoading) {
+      // Show skeleton while loading
+      $("#to-review .stories-list").html(createSkeletonPlaceholder(0));
+    } else if (result.isSuccess) {
+      const stories = result.data?.data || [];
+      renderStoriesByStatus("to-review", stories);
+    } else if (result.isError) {
+      $("#to-review .stories-list").html(
+        '<div class="col-12"><p class="text-danger">Error loading pending stories.</p></div>'
+      );
+    }
+  });
+
+  // Subscribe to all queries for count updates
+  const updateCountsFromQueries = () => {
+    const approvedResult = approvedStoriesQuery.getCurrentResult();
+    const rejectedResult = rejectedStoriesQuery.getCurrentResult();
+    const pendingResult = pendingStoriesQuery.getCurrentResult();
+
+    const approvedCount = approvedResult.isSuccess ? (approvedResult.data?.data?.length || 0) : 0;
+    const rejectedCount = rejectedResult.isSuccess ? (rejectedResult.data?.data?.length || 0) : 0;
+    const pendingCount = pendingResult.isSuccess ? (pendingResult.data?.data?.length || 0) : 0;
+
+    // Update the counts in the tabs
+    $("#approved-count").text(approvedCount);
+    $("#rejected-count").text(rejectedCount);
+    $("#to-review-count").text(pendingCount);
+
+    // Update the review stories count card
+    const streamReviewStoriesCard = $("#stream-review-stories-card");
+    const reviewStoriesCount = $("#stream-review-stories-count");
+    
+    reviewStoriesCount.empty();
+    reviewStoriesCount.append(
+      `<h6 class="mb-0">Review ${pendingCount} New User Stories</h6>`
+    );
+    reviewStoriesCount.append(
+      `<small class="text-muted">Approve or reject stories created by users for your non profit</small>`
+    );
+
+    if (pendingCount > 0) {
+      streamReviewStoriesCard.removeClass("d-none");
+    } else {
+      streamReviewStoriesCard.addClass("d-none");
+    }
+  };
+
+  // Subscribe to each query to update counts reactively
+  approvedStoriesQuery.subscribe(() => updateCountsFromQueries());
+  rejectedStoriesQuery.subscribe(() => updateCountsFromQueries());
+  pendingStoriesQuery.subscribe(() => updateCountsFromQueries());
+
+  // ==================== RENDER FUNCTIONS ====================
+
+  async function renderStoriesByStatus(status, stories) {
     const storiesContainer = $(`#${status} .stories-list`);
-    storiesContainer.empty();
-
-    let approved = 0;
-    let statusFilter = "";
-
-    switch (status) {
-      case "approved":
-        approved = 1;
-        statusFilter = "approved";
-        break;
-      case "rejected":
-        approved = 0;
-        statusFilter = "rejected";
-        break;
-      case "to-review":
-        approved = 0;
-        statusFilter = "null";
-        break;
-    }
-
-    try {
-      const stories = await getStories(
-        "{{get_var.zuid}}",
-        approved,
-        statusFilter
-      );
-
-      if (!stories || stories.length === 0) {
-        storiesContainer.html(
-          '<div class="col-12"><p class="text-muted">No stories found.</p></div>'
-        );
-        return;
-      }
-
-      const storyCards = stories
-        .map((story) => createStoryCard(story))
-        .join("");
-      storiesContainer.html(storyCards);
-    } catch (error) {
-      console.error(`Error loading ${status} stories:`, error);
+    const containerSelector = `#${status} .stories-list`;
+    
+    if (!stories || stories.length === 0) {
       storiesContainer.html(
-        '<div class="col-12"><p class="text-danger">Error loading stories.</p></div>'
+        '<div class="col-12"><p class="text-muted">No stories found.</p></div>'
       );
+      return;
     }
-  }
 
-  async function updateStoryStreamCounts() {
-    try {
-      // Get stories for each status
-      const approvedStories = await getStories(
-        "{{get_var.zuid}}",
-        1,
-        "approved"
-      );
-      const rejectedStories = await getStories(
-        "{{get_var.zuid}}",
-        0,
-        "rejected"
-      );
-      const toReviewStories = await getStories("{{get_var.zuid}}", 0, "null");
-
-      // Update the counts in the tabs
-      $("#approved-count").text(approvedStories?.length || 0);
-      $("#rejected-count").text(rejectedStories?.length || 0);
-      $("#to-review-count").text(toReviewStories?.length || 0);
-
-      // Update the review stories count card
-      const reviewStoriesCount = $("#stream-review-stories-count");
-      reviewStoriesCount.empty();
-      reviewStoriesCount.append(
-        `<h6 class="mb-0">Review ${
-          toReviewStories?.length || 0
-        } New User Stories</h6>`
-      );
-      reviewStoriesCount.append(
-        `<small class="text-muted">Approve or reject stories created by users for your non profit</small>`
-      );
-    } catch (error) {
-      console.error("Error updating story stream counts:", error);
-    }
-  }
-
-  async function switchTab(tabId) {
-    // Hide all tab panes
-    $(".stream-tab-pane").removeClass("active");
-
-    // Show selected tab pane
-    $(`#${tabId}`).addClass("active");
-
-    // Update nav links
-    $(".stream-nav-link").removeClass("active");
-    $(`.stream-nav-link[data-tab="${tabId}"]`).addClass("active");
-
-    // Load stories for the selected tab
-    await loadStoriesByStatus(tabId);
-  }
-
-  $(document).ready(async function () {
-    // Initial load of approved stories (since it's the default active tab)
-    await switchTab("approved");
-    await updateStoryStreamCounts();
-
-    // Tab functionality
-    $(".stream-nav-link").click(async function (e) {
-      e.preventDefault();
-      const tabId = $(this).data("tab");
-      await switchTab(tabId);
+    // Step 1: Create skeletons matching the number of stories
+    storiesContainer.empty();
+    stories.forEach((_, index) => {
+      storiesContainer.append(createSkeletonPlaceholder(index));
     });
 
-    // Update counts when the review modal is closed
-    $("#reviewStoriesModal").on("hidden.bs.modal", async function () {
-      await updateStoryStreamCounts();
-      // Reload stories for the currently active tab
-      const activeTab = $(".stream-nav-link.active").data("tab");
-      await loadStoriesByStatus(activeTab);
+    // Step 2: Process and render stories progressively
+    const renderPromises = stories.map((story, index) => 
+      renderStoryCard(story, index, containerSelector)
+    );
+    
+    // Wait for all stories to be rendered
+    await Promise.all(renderPromises);
+
+    // Step 3: Clean up rendered cards after animation
+    setTimeout(() => {
+      $(`${containerSelector} .story-card-rendered`).each(function() {
+        $(this).removeClass('story-card-rendered');
+      });
+    }, 500);
+  }
+
+  // ==================== INITIALIZATION ====================
+
+  $(document).ready(function () {
+    // Handle tab changes - no need to manually load data, subscriptions handle it
+    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+      const tabId = $(e.target).attr("href").substring(1); // Gets the tab ID without #
+      // Tab switching handled by subscriptions - no manual loading needed
     });
+
+    // Load correct tab on initial page load based on hash
+    const initialTab = window.location.hash.substring(1);
+    if (initialTab && ['approved', 'rejected', 'to-review'].includes(initialTab)) {
+      $(`a[href="#${initialTab}"]`).tab('show');
+    }
+
+    // No need for manual modal refresh - subscriptions handle reactive updates
+    // When mutations invalidate queries, subscriptions automatically update UI
   });
 </script>

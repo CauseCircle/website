@@ -1,0 +1,861 @@
+<style>
+  /* Container */
+  .stats-toolbar {
+    gap: 8px;
+  }
+  .table-stories th { font-weight: 600; font-size: 0.85rem; color: #6c757d; }
+  .table-stories td { vertical-align: middle; }
+  .author-cell { display: flex; align-items: center; gap: 10px; }
+  .author-avatar { width: 36px; height: 36px; object-fit: cover; border-radius: 50%; }
+  .author-meta { line-height: 1.2; }
+  .author-name { font-weight: 600; }
+  .author-email { font-size: 0.8rem; color: #6c757d; }
+  .status-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 999px; }
+  .action-btn { color: #6c757d; }
+  .action-btn:hover { color: #0d6efd; }
+  /* Ensure horizontal scroll for wide tables */
+  .stats-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-stories { min-width: 1200px; }
+
+  /* Skeleton loader styles */
+  .skeleton {
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    border-radius: 6px;
+  }
+  @keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .skeleton-row { height: 46px; }
+  /* Analytics subpage styles */
+  .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 16px; }
+  .metric-card-stats { background: #fff; border-radius: 12px; padding: 16px 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; }
+  .metric-label { color: #6c757d; font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+  .metric-value { font-size: 28px; font-weight: 700; margin: 0; }
+  .metric-icon { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #e9ecef; border-radius: 50%; color: #3b82f6; }
+  .time-period-tabs .nav-link { color: #6c757d; border: none; background: transparent; padding: 6px 10px; border-radius: 8px; font-weight: 500; font-size: 13px; }
+  .time-period-tabs .nav-link.active { background-color: #7b3fee; color: #fff; }
+  .chart-card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 16px; }
+  .chart-title-text { font-size: 16px; font-weight: 600; color: #2d3748; margin-bottom: 0px; }
+  /* User list trigger button */
+  .user-list-trigger { 
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 999px;
+    border: 1px solid #e2e8f0; background: #ffffff; color: #6c757d;
+    transition: all 0.15s ease; padding: 0;
+  }
+  .user-list-trigger:hover { background: #7b3fee; color: #ffffff; border-color: #7b3fee; }
+  .user-list-trigger:focus { box-shadow: 0 0 0 3px rgba(123,63,238,0.2); outline: none; }
+</style>
+
+<div class="tab-pane fade" id="story-stats">
+  <!-- Main List Page -->
+  <div id="stats-main" class="card p-3 mb-0">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+      <h5 class="mb-2 mb-md-0">CauseCircle's Stories</h5>
+      <div class="d-flex stats-toolbar">
+        <select id="statusFilter" class="form-select form-select-sm" style="width: 160px;">
+          <option value="approved" selected>Approved</option>
+          <option value="pending">Pending</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        <div class="input-group input-group-sm" style="width: 280px;">
+          <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+          <input id="storiesSearch" type="text" class="form-control border-start-0" placeholder="Search for Stories.." />
+        </div>
+        <select id="limitFilter" class="form-select form-select-sm" style="width: 75px;">
+          <option value="10" selected>10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-responsive stats-table-scroll">
+      <table class="table table-stories align-middle">
+        <thead>
+          <tr>
+            <th class="text-uppercase">Title</th>
+            <th class="text-uppercase">Author</th>
+            <th class="text-uppercase">Date Created</th>
+            <th class="text-uppercase">Status</th>
+            <th class="text-uppercase">Likes</th>
+            <th class="text-uppercase">Shares</th>
+            <th class="text-uppercase">Views</th>
+            <th class="text-uppercase">Donation Clicks</th>
+            <th class="text-uppercase text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody id="storiesTableBody">
+          <!-- Skeleton rows injected during load -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="small text-muted" id="storiesResultsSummary"></div>
+      <nav aria-label="Stories pagination">
+        <ul class="pagination pagination-sm mb-0" id="storiesPagination"></ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Analytics Subpage -->
+  <div id="stats-analytics" class="card p-3 d-none">
+    <div class="d-flex align-items-center mb-2">
+      <button id="analyticsBack" class="btn btn-link p-0 me-2"><i class="bi bi-arrow-left"></i></button>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mt-2 mb-2">
+      <div class="text-muted" id="analyticsStoryTitle"></div>
+      <ul class="nav time-period-tabs">
+        <li class="nav-item"><button class="nav-link active" data-period="daily">Daily</button></li>
+        <li class="nav-item"><button class="nav-link" data-period="weekly">Weekly</button></li>
+        <li class="nav-item"><button class="nav-link" data-period="monthly">Monthly</button></li>
+      </ul>
+    </div>
+
+    <div class="metrics-row" id="storyMetrics">
+      <div class="metric-card-stats">
+        <div>
+          <div class="metric-label">Total Likes</div>
+          <div id="totalLikes" class="metric-value skeleton" style="height:32px;border-radius:6px;"></div>
+        </div>
+        <div class="metric-icon"><i class="bi bi-hand-thumbs-up"></i></div>
+      </div>
+      <div class="metric-card-stats">
+        <div>
+          <div class="metric-label">Total Shares</div>
+          <div id="totalShares" class="metric-value skeleton" style="height:32px;border-radius:6px;"></div>
+        </div>
+        <div class="metric-icon"><i class="bi bi-share"></i></div>
+      </div>
+      <div class="metric-card-stats">
+        <div>
+          <div class="metric-label">Total Views</div>
+          <div id="totalViews" class="metric-value skeleton" style="height:32px;border-radius:6px;"></div>
+        </div>
+        <div class="metric-icon"><i class="bi bi-eye"></i></div>
+      </div>
+      <div class="metric-card-stats">
+        <div>
+          <div class="metric-label">Total Donation Clicks</div>
+          <div id="totalDonate" class="metric-value skeleton" style="height:32px;border-radius:6px;"></div>
+        </div>
+        <div class="metric-icon"><i class="bi bi-heart"></i></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 col-12">
+        <div class="chart-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="chart-title-text">Likes</div>
+            <button type="button" class="user-list-trigger" data-type="likedBy" title="View users who liked"><i class="bi bi-person"></i></button>
+          </div>
+          <div id="likesChart" style="height: 260px;">
+            <div class="skeleton" style="height:100%; border-radius: 8px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 col-12">
+        <div class="chart-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="chart-title-text">Shares</div>
+            <button type="button" class="user-list-trigger" data-type="sharedBy" title="View users who shared"><i class="bi bi-person"></i></button>
+          </div>
+          <div id="sharesChart" style="height: 260px;">
+            <div class="skeleton" style="height:100%; border-radius: 8px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6 col-12">
+        <div class="chart-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="chart-title-text">Views</div>
+            <button type="button" class="user-list-trigger" data-type="viewedBy" title="View users who viewed"><i class="bi bi-person"></i></button>
+          </div>
+          <div id="viewsChart" style="height: 260px;">
+            <div class="skeleton" style="height:100%; border-radius: 8px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 col-12">
+        <div class="chart-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="chart-title-text">Donate Clicks</div>
+            <button type="button" class="user-list-trigger" data-type="donateClickBy" title="View users who clicked donate"><i class="bi bi-person"></i></button>
+          </div>
+          <div id="donateChart" style="height: 260px;">
+            <div class="skeleton" style="height:100%; border-radius: 8px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- User List Modal -->
+<div class="modal fade" id="userListModal" tabindex="-1" aria-labelledby="userListModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="userListModalLabel">User List</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="userListContainer" class="list-group"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+<!-- ApexCharts CDN -->
+<script defer src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<script type="module">
+  (function() {
+    var zuid = "{{$zuid}}";
+    var currentStatus = "approved";
+    var currentSearch = "";
+    var currentPage = 1;
+    var pageSize = 10;
+
+    // Create TanStack Query observers for each status
+    var approvedStoriesQuery = null;
+    var pendingStoriesQuery = null;
+    var rejectedStoriesQuery = null;
+    var storyStatsQuery = null;
+
+    function showTableSkeleton(rowCount) {
+      var tbody = $("#storiesTableBody");
+      tbody.empty();
+      for (var i = 0; i < rowCount; i++) {
+        tbody.append(
+          '<tr class="skeleton-row">' +
+            '<td><div class="skeleton" style="height: 14px; width: 70%;"></div></td>' +
+            '<td><div class="d-flex align-items-center gap-2">' +
+              '<div class="skeleton" style="width:36px;height:36px;border-radius:50%;"></div>' +
+              '<div class="w-100">' +
+                '<div class="skeleton mb-1" style="height: 12px; width: 120px;"></div>' +
+                '<div class="skeleton" style="height: 10px; width: 160px;"></div>' +
+              '</div>' +
+            '</div></td>' +
+            '<td><div class="skeleton" style="height: 14px; width: 120px;"></div></td>' +
+            '<td><div class="skeleton" style="height: 20px; width: 90px;"></div></td>' +
+            '<td><div class="skeleton" style="height: 14px; width: 36px;"></div></td>' +
+            '<td><div class="skeleton" style="height: 14px; width: 36px;"></div></td>' +
+            '<td><div class="skeleton" style="height: 14px; width: 36px;"></div></td>' +
+            '<td><div class="skeleton" style="height: 14px; width: 60px;"></div></td>' +
+            '<td class="text-end"><div class="skeleton" style="height: 20px; width: 24px; margin-left:auto;"></div></td>' +
+          '</tr>'
+        );
+      }
+    }
+
+    function isVideoUrl(url) {
+      if (!url) return false;
+      var patterns = [/vimeo\.com\/video\/\d+/i, /vimeo\.com\/\d+/i, /player\.vimeo\.com\/video\/\d+/i, /youtube\.com\/watch\?v=/i, /youtu\.be\//i, /\.mp4$/i, /\.webm$/i, /\.ogg$/i, /\.mov$/i, /\.avi$/i];
+      return patterns.some(function(p){ return p.test(url); });
+    }
+
+    function toDate(dateString) {
+      if (!dateString) return null;
+      try {
+        var date;
+        if (dateString.indexOf('T') !== -1 && (dateString.indexOf('Z') !== -1 || dateString.indexOf('+') !== -1 || dateString.lastIndexOf('-') > 7)) {
+          date = new Date(dateString);
+        } else {
+          date = new Date(dateString + ' UTC');
+        }
+        if (isNaN(date.getTime())) return null;
+        return date;
+      } catch(e) { return null; }
+    }
+
+    function formatDateTime(dateString) {
+      var d = toDate(dateString);
+      if (!d) return '';
+      var pad = function(n){ return (n<10?'0':'') + n; };
+      return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+    }
+
+    function statusBadge(status) {
+      var map = {
+        approved: 'success',
+        pending: 'warning',
+        rejected: 'danger'
+      };
+      var variant = map[status] || 'secondary';
+      var label = status ? status.charAt(0).toUpperCase() + status.slice(1) : '';
+      return '<span class="badge bg-' + variant + ' bg-opacity-25 text-' + variant + ' status-badge">' + label + '</span>';
+    }
+
+    function getAuthor(story) {
+      var a = story && story.author && story.author.data && story.author.data[0] ? story.author.data[0] : {};
+      return {
+        name: [a.first_name || '', a.last_name || ''].join(' ').trim() || 'Unknown',
+        email: a.email || '',
+        image: (function(){
+          if (!a.profile_image) return 'https://placehold.co/100x100?text=Profile';
+          if (typeof a.profile_image === 'string') return a.profile_image;
+          return a.profile_image.data && a.profile_image.data[0] && a.profile_image.data[0].url ? a.profile_image.data[0].url : 'https://placehold.co/100x100?text=Profile';
+        })()
+      };
+    }
+
+    function applyFilters(stories) {
+      var q = currentSearch.trim().toLowerCase();
+      return (stories || []).filter(function(s) {
+        if (!q) return true;
+        var author = getAuthor(s);
+        var hay = [s.title || '', s.story_body || '', author.name || '', author.email || ''].join(' ').toLowerCase();
+        return hay.indexOf(q) !== -1;
+      });
+    }
+
+    function getStoryId(story) {
+      return story && (story.zuid || (story.meta && (story.meta.zuid || story.meta.id)) || story.id || story._id || story.uuid) || '';
+    }
+
+    function updateStoryStatsInTable(items) {
+      items.forEach(function(story){
+        var id = getStoryId(story);
+        if (!id) return;
+        
+        // Get stats from TanStack Query cache
+        var statsQuery = window.createStoryStatsQuery(id);
+        var statsResult = statsQuery.getCurrentResult();
+        
+        var stats = { likes: 0, shares: 0, views: 0, donate: 0 };
+        if (statsResult.isSuccess && statsResult.data?.data?.storyStats) {
+          var s = statsResult.data.data.storyStats;
+          stats = {
+            likes: s.totalLikes || 0,
+            shares: s.totalShares || 0,
+            views: s.totalViews || 0,
+            donate: s.totalDonateClicks || 0
+          };
+        }
+        
+        $("#likes-"+id).text(stats.likes);
+        $("#shares-"+id).text(stats.shares);
+        $("#views-"+id).text(stats.views);
+        $("#donate-"+id).text(stats.donate);
+      });
+    }
+
+    function render(stories) {
+      var filteredStories = applyFilters(stories);
+      var tbody = $("#storiesTableBody");
+      tbody.empty();
+
+      var total = filteredStories.length;
+      var totalPages = Math.max(1, Math.ceil(total / pageSize));
+      currentPage = Math.min(currentPage, totalPages);
+      var start = (currentPage - 1) * pageSize;
+      var end = Math.min(start + pageSize, total);
+      var pageItems = filteredStories.slice(start, end);
+
+      pageItems.forEach(function(story, idx) {
+        var author = getAuthor(story);
+        var url = story && story.meta && story.meta.web && story.meta.web.uri ? '{{ $base_url }}' + story.meta.web.uri : '#';
+        var st = (story.status || currentStatus || '').toLowerCase();
+        if (!st) {
+          // derive when not present
+          st = currentStatus;
+        }
+        var storyId = getStoryId(story) || (start + idx);
+        var rowId = 'story-row-' + storyId;
+        tbody.append(
+          '<tr id="' + rowId + '">' +
+            '<td>' +
+              '<a href="' + url + '" target="_blank" class="text-decoration-none">' + (story.title || 'Untitled') + ' <i class="bi bi-box-arrow-up-right small"></i></a>' +
+            '</td>' +
+            '<td>' +
+              '<div class="author-cell">' +
+                '<img class="author-avatar" src="' + author.image + '" alt="' + author.name + '">' +
+                '<div class="author-meta">' +
+                  '<div class="author-name">' + author.name + '</div>' +
+                  '<div class="author-email">' + (author.email || '') + '</div>' +
+                '</div>' +
+              '</div>' +
+            '</td>' +
+            '<td>' + formatDateTime(story.createdAt || story.meta?.createdAt || story.date_published || '') + '</td>' +
+            '<td>' + statusBadge(st) + '</td>' +
+            '<td><span id="likes-' + storyId + '">0</span></td>' +
+            '<td><span id="shares-' + storyId + '">0</span></td>' +
+            '<td><span id="views-' + storyId + '">0</span></td>' +
+            '<td><span id="donate-' + storyId + '">0</span></td>' +
+            '<td class="text-end">' +
+              '<div class="dropdown">' +
+                '<button class="btn btn-sm action-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></button>' +
+                '<ul class="dropdown-menu dropdown-menu-end">' +
+                  '<li><a class="dropdown-item view-analytics" href="#" data-story-index="' + (start + idx) + '"><i class="bi bi-graph-up me-2"></i>View Analytics</a></li>' +
+                '</ul>' +
+              '</div>' +
+            '</td>' +
+          '</tr>'
+        );
+      });
+
+      // Summary
+      var summary = total === 0 ? 'No stories found' : ('Showing ' + (start + 1) + '–' + end + ' of ' + total + ' stories');
+      $("#storiesResultsSummary").text(summary);
+
+      // Pagination
+      var $p = $("#storiesPagination");
+      $p.empty();
+      var prevDisabled = currentPage === 1 ? ' disabled' : '';
+      var nextDisabled = currentPage === totalPages ? ' disabled' : '';
+      $p.append('<li class="page-item' + prevDisabled + '"><a class="page-link" href="#" data-page="prev" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>');
+      // show up to 5 page buttons around current
+      var startPage = Math.max(1, currentPage - 2);
+      var endPage = Math.min(totalPages, startPage + 4);
+      startPage = Math.max(1, endPage - 4);
+      for (var p = startPage; p <= endPage; p++) {
+        $p.append('<li class="page-item' + (p === currentPage ? ' active' : '') + '"><a class="page-link" href="#" data-page="' + p + '">' + p + '</a></li>');
+      }
+      $p.append('<li class="page-item' + nextDisabled + '"><a class="page-link" href="#" data-page="next" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>');
+
+      // After rows render, update stats for visible items
+      updateStoryStatsInTable(pageItems);
+    }
+
+    function mapStatus(status) {
+      if (status === 'approved') return { approved: 1, status: 'approved' };
+      if (status === 'pending') return { approved: 0, status: 'pending' };
+      if (status === 'rejected') return { approved: 0, status: 'rejected' };
+      return { approved: '', status: 'all' };
+    }
+
+    function getCurrentStoriesQuery() {
+      if (currentStatus === 'approved') return approvedStoriesQuery;
+      if (currentStatus === 'pending') return pendingStoriesQuery;
+      if (currentStatus === 'rejected') return rejectedStoriesQuery;
+      return approvedStoriesQuery; // default
+    }
+
+    // Events
+    $(document).on('input', '#storiesSearch', debounce(function() {
+      currentSearch = $(this).val() || '';
+      currentPage = 1;
+      var currentQuery = getCurrentStoriesQuery();
+      if (currentQuery) {
+        var result = currentQuery.getCurrentResult();
+        if (result.isSuccess) {
+          render(result.data?.data || []);
+        }
+      }
+    }, 200));
+
+    $(document).on('change', '#statusFilter', function(){
+      currentStatus = $(this).val();
+      currentPage = 1;
+      // Get current query for the selected status
+      var currentQuery = getCurrentStoriesQuery();
+      if (currentQuery) {
+        var result = currentQuery.getCurrentResult();
+        if (result.isSuccess) {
+          render(result.data?.data || []);
+        } else if (result.isLoading) {
+          showTableSkeleton(pageSize);
+        } else if (result.isError) {
+          $("#storiesTableBody").html('<tr><td colspan="9" class="text-center text-danger">Error loading stories</td></tr>');
+        }
+      }
+    });
+
+    $(document).on('change', '#limitFilter', function(){
+      pageSize = parseInt($(this).val(), 10) || 10;
+      currentPage = 1;
+      var currentQuery = getCurrentStoriesQuery();
+      if (currentQuery) {
+        var result = currentQuery.getCurrentResult();
+        if (result.isSuccess) {
+          render(result.data?.data || []);
+        }
+      }
+    });
+
+    $(document).on('click', '#storiesPagination a', function(e){
+      e.preventDefault();
+      var page = $(this).data('page');
+      var currentQuery = getCurrentStoriesQuery();
+      if (currentQuery) {
+        var result = currentQuery.getCurrentResult();
+        if (result.isSuccess) {
+          var filteredStories = applyFilters(result.data?.data || []);
+          var totalPages = Math.max(1, Math.ceil(filteredStories.length / pageSize));
+          if (page === 'prev' && currentPage > 1) currentPage--;
+          else if (page === 'next' && currentPage < totalPages) currentPage++;
+          else if (typeof page === 'number' || /^[0-9]+$/.test(page)) currentPage = parseInt(page, 10);
+          render(result.data?.data || []);
+        }
+      }
+    });
+
+    // View Analytics action
+    $(document).on('click', '.view-analytics', function(e){
+      e.preventDefault();
+      var idx = parseInt($(this).data('story-index'), 10);
+      var currentQuery = getCurrentStoriesQuery();
+      if (currentQuery) {
+        var result = currentQuery.getCurrentResult();
+        if (result.isSuccess) {
+          var filteredStories = applyFilters(result.data?.data || []);
+          var story = filteredStories[idx] || null;
+          $("#stats-main").addClass('d-none');
+          $("#stats-analytics").removeClass('d-none');
+          $("#analyticsStoryTitle").text(story && story.title ? story.title : '');
+          var storyId = getStoryId(story);
+          if (storyId) {
+            $("#stats-analytics").data('story-id', storyId);
+            loadStoryAnalytics(storyId);
+          }
+        }
+      }
+    });
+
+    $('#analyticsBack').on('click', function(){
+      $("#stats-analytics").addClass('d-none');
+      $("#stats-main").removeClass('d-none');
+    });
+
+    // ================= Analytics Logic =================
+    var analyticsPeriod = 'daily';
+    var likesChart, sharesChart, viewsChart, donateChart;
+
+    function clearMetricSkeletons() {
+      ['#totalLikes', '#totalShares', '#totalViews', '#totalDonate'].forEach(function(id){
+        var el = $(id);
+        if (el.hasClass('skeleton')) { el.removeClass('skeleton').css('height','').css('border-radius',''); }
+      });
+    }
+
+    function setMetricPlaceholders() {
+      ['#totalLikes', '#totalShares', '#totalViews', '#totalDonate'].forEach(function(id){
+        $(id).addClass('skeleton').text('').css({height:'32px','border-radius':'6px'});
+      });
+      ['#likesChart','#sharesChart','#viewsChart','#donateChart'].forEach(function(id){
+        $(id).html('<div class="skeleton" style="height:100%; border-radius:8px;"></div>');
+      });
+    }
+
+    function destroyCharts() {
+      [likesChart, sharesChart, viewsChart, donateChart].forEach(function(ch){ try { if (ch) ch.destroy(); } catch(e){} });
+      likesChart = sharesChart = viewsChart = donateChart = null;
+      // Also clear containers to avoid stacking SVGs/skeletons
+      ['#likesChart','#sharesChart','#viewsChart','#donateChart'].forEach(function(id){ $(id).empty(); });
+    }
+
+    function clearChartPlaceholders() {
+      ['#likesChart','#sharesChart','#viewsChart','#donateChart'].forEach(function(id){ $(id).empty(); });
+    }
+
+    function buildPeriodBuckets(period) {
+      var now = new Date();
+      var labels = [], keys = [];
+      if (period === 'daily') {
+        for (var i = 6; i >= 0; i--) {
+          var d = new Date(now); d.setDate(now.getDate() - i); d.setHours(0,0,0,0);
+          labels.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
+          keys.push(localDateKey(d));
+        }
+      } else if (period === 'weekly') {
+        // last 7 weeks
+        for (var w = 6; w >= 0; w--) {
+          var end = new Date(now); end.setDate(now.getDate() - (w*7));
+          var start = new Date(end); var day = end.getDay(); var sub = (day === 0 ? 6 : day - 1); start.setDate(end.getDate() - sub); start.setHours(0,0,0,0);
+          labels.push('Week of ' + start.toLocaleDateString('en-US', { month:'short', day:'numeric' }));
+          keys.push(localDateKey(start));
+        }
+      } else { // monthly
+        for (var m = 6; m >= 0; m--) {
+          var dm = new Date(now.getFullYear(), now.getMonth() - m, 1);
+          labels.push(dm.toLocaleDateString('en-US', { month: 'long' }));
+          keys.push(dm.getFullYear() + '-' + String(dm.getMonth()+1).padStart(2,'0'));
+        }
+      }
+      return { labels: labels, keys: keys };
+    }
+
+    function eventKeyForDate(d, period) {
+      if (period === 'daily') return localDateKey(d);
+      if (period === 'weekly') {
+        var day = d.getDay(); var sub = (day === 0 ? 6 : day - 1); var start = new Date(d); start.setDate(d.getDate()-sub); start.setHours(0,0,0,0); return localDateKey(start);
+      }
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    }
+
+    function localDateKey(d) {
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var day = String(d.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+
+    function aggregateEventsByPeriod(events, period) {
+      var buckets = buildPeriodBuckets(period);
+      var counts = {}; buckets.keys.forEach(function(k){ counts[k] = 0; });
+      (events || []).forEach(function(ev){
+        var ts = ev && ev.timestamp; // { _seconds, _nanoseconds }
+        var dt = null;
+        if (ts && typeof ts._seconds === 'number') {
+          // Firestore-like timestamp to local Date
+          dt = new Date(ts._seconds * 1000);
+        } else if (typeof ts === 'string' || typeof ts === 'number') {
+          // Strings may be ISO (UTC). Construct Date then adjust to local implicitly
+          dt = new Date(ts);
+        }
+        if (!dt || isNaN(dt.getTime())) return;
+        var key = eventKeyForDate(dt, period);
+        if (counts[key] !== undefined) counts[key]++;
+      });
+      return { labels: buckets.labels, values: buckets.keys.map(function(k){ return counts[k] || 0; }) };
+    }
+
+    function createAreaChart(el, seriesName, data, color) {
+      // Ensure container is clean and ready
+      if (el) { while (el.firstChild) { el.removeChild(el.firstChild); } el.style.position = 'relative'; }
+      var options = {
+        series: [{ name: seriesName, data: data.values }],
+        chart: { type: 'area', height: 260, toolbar: { show: false } },
+        colors: [color],
+        fill: { type: 'gradient', gradient: { shadeIntensity: 0.8, opacityFrom: 0.6, opacityTo: 0.1, stops: [0,80,100] } },
+        stroke: { curve: 'smooth', width: 1 },
+        xaxis: { categories: data.labels, labels: { style: { fontSize: '12px', colors: '#666' } } },
+        yaxis: { min: 0, tickAmount: 5, forceNiceScale: true, labels: { style: { fontSize: '12px', colors: '#666' }, formatter: function(v){ return Math.round(v); } } },
+        grid: { borderColor: '#e2e8f0', strokeDashArray: 4 },
+        dataLabels: { enabled: false }
+      };
+      var chart = new ApexCharts(el, options);
+      // Render on next frame to ensure layout is settled
+      requestAnimationFrame(function(){ chart.render(); });
+      return chart;
+    }
+
+    function loadStoryAnalytics(storyId) {
+      setMetricPlaceholders();
+      destroyCharts();
+
+      // Create TanStack Query for granular stats
+      storyStatsQuery = window.createStoryStatsGranularQuery(storyId, null, zuid);
+      
+      // Subscribe to query for reactive updates
+      storyStatsQuery.subscribe(function(result) {
+        if (result.isLoading) {
+          // Keep placeholders while loading
+        } else if (result.isSuccess) {
+          var allRes = result.data;
+          var totals = allRes && allRes.data && allRes.data.storyStats ? allRes.data.storyStats : {};
+          clearMetricSkeletons();
+          $('#totalLikes').text(totals.totalLikes || 0);
+          $('#totalShares').text(totals.totalShares || 0);
+          $('#totalViews').text(totals.totalViews || 0);
+          $('#totalDonate').text(totals.totalDonateClicks || 0);
+
+          // Granular arrays
+          var likeEvents = (allRes && allRes.data && (allRes.data.likedBy || allRes.data.likes || [])) || [];
+          var shareEvents = (allRes && allRes.data && (allRes.data.sharedBy || allRes.data.shares || [])) || [];
+          var viewEvents = (allRes && allRes.data && (allRes.data.viewedBy || allRes.data.views || [])) || [];
+          var donateEvents = (allRes && allRes.data && (allRes.data.donateClickBy || allRes.data.donates || [])) || [];
+
+          var likeData = aggregateEventsByPeriod(likeEvents, analyticsPeriod);
+          var shareData = aggregateEventsByPeriod(shareEvents, analyticsPeriod);
+          var viewData = aggregateEventsByPeriod(viewEvents, analyticsPeriod);
+          var donateData = aggregateEventsByPeriod(donateEvents, analyticsPeriod);
+
+          // Clear skeletons inside chart containers before rendering
+          clearChartPlaceholders();
+
+          likesChart = createAreaChart(document.querySelector('#likesChart'), 'Likes', likeData, '#3B82F6');
+          sharesChart = createAreaChart(document.querySelector('#sharesChart'), 'Shares', shareData, '#F97316');
+          viewsChart = createAreaChart(document.querySelector('#viewsChart'), 'Views', viewData, '#16A34A');
+          donateChart = createAreaChart(document.querySelector('#donateChart'), 'Donate Clicks', donateData, '#7b3fee');
+
+          // Store raw events on analytics container for modal usage
+          var analyticsEl = document.getElementById('stats-analytics');
+          $(analyticsEl).data('events', {
+            likedBy: likeEvents,
+            sharedBy: shareEvents,
+            viewedBy: viewEvents,
+            donateClickBy: donateEvents
+          });
+
+          // Nudge charts to recalc size after render
+          setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 50);
+        } else if (result.isError) {
+          console.error('Failed to load story analytics:', result.error);
+          clearMetricSkeletons();
+          ['#totalLikes', '#totalShares', '#totalViews', '#totalDonate'].forEach(function(id){ $(id).text('--').css('color', '#e53e3e'); });
+          ['#likesChart','#sharesChart','#viewsChart','#donateChart'].forEach(function(id){
+            $(id).html('<div class="d-flex flex-column align-items-center justify-content-center h-100"><i class="bi bi-exclamation-triangle fs-1 text-danger mb-2"></i><p class="text-danger mb-0">Error loading data</p><small class="text-muted">Please try again later</small></div>');
+          });
+        }
+      });
+    }
+
+    // Period tab events
+    $(document).on('click', '.time-period-tabs .nav-link', function(e){
+      e.preventDefault();
+      $('.time-period-tabs .nav-link').removeClass('active');
+      $(this).addClass('active');
+      analyticsPeriod = $(this).data('period') || 'daily';
+      var storyId = $("#stats-analytics").data('story-id');
+      if (storyId && storyStatsQuery) {
+        // Get current data and re-render charts with new period
+        var result = storyStatsQuery.getCurrentResult();
+        if (result.isSuccess) {
+          var allRes = result.data;
+          var likeEvents = (allRes && allRes.data && (allRes.data.likedBy || allRes.data.likes || [])) || [];
+          var shareEvents = (allRes && allRes.data && (allRes.data.sharedBy || allRes.data.shares || [])) || [];
+          var viewEvents = (allRes && allRes.data && (allRes.data.viewedBy || allRes.data.views || [])) || [];
+          var donateEvents = (allRes && allRes.data && (allRes.data.donateClickBy || allRes.data.donates || [])) || [];
+
+          var likeData = aggregateEventsByPeriod(likeEvents, analyticsPeriod);
+          var shareData = aggregateEventsByPeriod(shareEvents, analyticsPeriod);
+          var viewData = aggregateEventsByPeriod(viewEvents, analyticsPeriod);
+          var donateData = aggregateEventsByPeriod(donateEvents, analyticsPeriod);
+
+          // Clear and re-render charts
+          clearChartPlaceholders();
+          likesChart = createAreaChart(document.querySelector('#likesChart'), 'Likes', likeData, '#3B82F6');
+          sharesChart = createAreaChart(document.querySelector('#sharesChart'), 'Shares', shareData, '#F97316');
+          viewsChart = createAreaChart(document.querySelector('#viewsChart'), 'Views', viewData, '#16A34A');
+          donateChart = createAreaChart(document.querySelector('#donateChart'), 'Donate Clicks', donateData, '#7b3fee');
+        }
+      }
+    });
+
+    // Simple debounce helper
+    function debounce(fn, wait) {
+      var t;
+      return function() {
+        var ctx = this, args = arguments;
+        clearTimeout(t);
+        t = setTimeout(function(){ fn.apply(ctx, args); }, wait);
+      };
+    }
+
+    function init() {
+      // defaults
+      currentStatus = 'approved';
+      pageSize = 10;
+      
+      // Create separate query instances for each status
+      approvedStoriesQuery = window.createStoriesQuery({
+        npo: zuid,
+        approved: "1",
+        status: "approved",
+        limit: 9999
+      });
+
+      pendingStoriesQuery = window.createStoriesQuery({
+        npo: zuid,
+        approved: "0",
+        status: "pending",
+        limit: 9999
+      });
+
+      rejectedStoriesQuery = window.createStoriesQuery({
+        npo: zuid,
+        approved: "0",
+        status: "rejected",
+        limit: 9999
+      });
+      
+      // Subscribe to approved stories query for reactive updates
+      approvedStoriesQuery.subscribe(function(result) {
+        if (currentStatus === 'approved') {
+          if (result.isLoading) {
+            showTableSkeleton(pageSize);
+          } else if (result.isSuccess) {
+            render(result.data?.data || []);
+          } else if (result.isError) {
+            $("#storiesTableBody").html('<tr><td colspan="9" class="text-center text-danger">Error loading stories</td></tr>');
+          }
+        }
+      });
+
+      // Subscribe to pending stories query for reactive updates
+      pendingStoriesQuery.subscribe(function(result) {
+        if (currentStatus === 'pending') {
+          if (result.isLoading) {
+            showTableSkeleton(pageSize);
+          } else if (result.isSuccess) {
+            render(result.data?.data || []);
+          } else if (result.isError) {
+            $("#storiesTableBody").html('<tr><td colspan="9" class="text-center text-danger">Error loading stories</td></tr>');
+          }
+        }
+      });
+
+      // Subscribe to rejected stories query for reactive updates
+      rejectedStoriesQuery.subscribe(function(result) {
+        if (currentStatus === 'rejected') {
+          if (result.isLoading) {
+            showTableSkeleton(pageSize);
+          } else if (result.isSuccess) {
+            render(result.data?.data || []);
+          } else if (result.isError) {
+            $("#storiesTableBody").html('<tr><td colspan="9" class="text-center text-danger">Error loading stories</td></tr>');
+          }
+        }
+      });
+    }
+
+    // Initialize when the tab becomes visible
+    $(document).ready(function() {
+      var tabTrigger = $('a[data-bs-toggle="tab"][href="#story-stats"], button[data-bs-toggle="tab"][data-bs-target="#story-stats"]');
+      if (tabTrigger.length) {
+        tabTrigger.on('shown.bs.tab', function(){ init(); });
+        if (tabTrigger.hasClass('active')) init();
+      } else {
+        // if this view is directly visible
+        init();
+      }
+      // User list modal trigger
+      $(document).on('click', '.user-list-trigger', function(){
+        var type = $(this).data('type');
+        var events = $('#stats-analytics').data('events') || {};
+        var items = events[type] || [];
+        renderUserList(type, items);
+      });
+    });
+
+    function formatLocalDateTime(ts) {
+      var dt = null;
+      if (ts && typeof ts._seconds === 'number') dt = new Date(ts._seconds * 1000);
+      else if (typeof ts === 'string' || typeof ts === 'number') dt = new Date(ts);
+      if (!dt || isNaN(dt.getTime())) return '';
+      return dt.toLocaleString();
+    }
+
+    function renderUserList(type, items) {
+      var titleMap = { likedBy: 'Users Who Liked', sharedBy: 'Users Who Shared', viewedBy: 'Users Who Viewed', donateClickBy: 'Users Who Clicked Donate' };
+      $('#userListModalLabel').text(titleMap[type] || 'User List');
+      var container = $('#userListContainer');
+      container.empty();
+      if (!items || items.length === 0) {
+        container.append('<div class="text-muted">No users found.</div>');
+      } else {
+        items.forEach(function(u){
+          var img = u.image || 'https://placehold.co/64x64?text=User';
+          var name = u.name || u.displayName || 'Unknown';
+          var id = u.user_zuid || u.id || '';
+          var time = formatLocalDateTime(u.timestamp);
+          var row = '\n          <div class="list-group-item border-0 d-flex align-items-center gap-3">\n            <img src="' + img + '" alt="' + (name || '') + '" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;">\n            <div class="flex-grow-1">\n              <div class="fw-semibold">' + (name || '') + '</div>\n              <div class="text-muted small">' + (id || '') + '</div>\n            </div>\n            <div class="text-muted small">' + (time || '') + '</div>\n          </div>';
+          container.append(row);
+        });
+      }
+      var modal = new bootstrap.Modal(document.getElementById('userListModal'));
+      modal.show();
+    }
+  })();
+</script>

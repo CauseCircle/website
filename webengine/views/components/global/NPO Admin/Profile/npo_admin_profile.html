@@ -46,6 +46,7 @@
   }
 
   /* Add new hero image specific styles */
+  /* Hero images now use Fastly Image Optimizer for dynamic cropping and optimization */
   #hero-upload {
     width: 100%;
     height: 200px;
@@ -53,6 +54,7 @@
     border: 2px dashed #dee2e6;
     background-color: #f8f9fa;
     margin-bottom: 2rem;
+    position: relative;
   }
 
   #hero-upload:hover {
@@ -70,12 +72,38 @@
     margin-bottom: 8px;
   }
 
+  /* Hero image overlay for existing images */
+  .hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+  }
+
+  #hero-upload:hover .hero-overlay {
+    display: flex;
+  }
+
+  .hero-overlay .btn {
+    margin: 0 5px;
+  }
+
   .action-buttons {
     display: flex;
     gap: 10px;
   }
 
   #cancelBtn {
+    display: none; /* Hidden by default */
+  }
+
+  #saveProfileBtn {
     display: none; /* Hidden by default */
   }
 
@@ -91,6 +119,7 @@
     min-height: 32px;
     padding: 4px 8px;
     cursor: pointer;
+    position: relative;
   }
 
   .select-input:focus {
@@ -103,6 +132,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
+    align-items: center;
   }
 
   .selected-tag {
@@ -148,30 +178,202 @@
   .search-input {
     border: none;
     width: 100%;
-    padding: 4px;
+    padding: 4px 4px 4px 28px; /* space for search icon */
   }
 
   .search-input:focus {
     outline: none;
   }
+
+  /* Search icon inside custom select input */
+  .select-input .search-icon {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  /* Image Cropper Modal Styles */
+  #imageCropModal .modal-content {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  }
+
+  #imageCropModal .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  #imageCropModal .modal-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: #424242;
+  }
+
+  #imageCropModal .modal-body {
+    padding: 24px;
+    background: white;
+  }
+
+  .crop-container {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    border: 2px solid #e9ecef;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .crop-container img {
+    border-radius: 8px;
+    max-height: 550px;
+    width: 100%;
+    object-fit: contain;
+    flex-grow: 1;
+  }
+
+  #imageCropModal .modal-footer {
+    background: white;
+    border-top: 1px solid #f0f0f0;
+    border-radius: 0 0 16px 16px;
+    padding: 20px 24px;
+    gap: 12px;
+  }
+
+  /* Cropper.js custom styling */
+  .cropper-container {
+    direction: ltr;
+    font-size: 0;
+    line-height: 0;
+    position: relative;
+    -ms-touch-action: none;
+    touch-action: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .cropper-container img {
+    display: block;
+    height: 100%;
+    image-orientation: 0deg;
+    max-height: none;
+    max-width: none;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* Enhanced cropper styling */
+  .cropper-crop-box {
+    border-radius: 4px;
+  }
+
+  .cropper-view-box {
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.5);
+  }
+
+  .cropper-face {
+    background-color: rgba(102, 126, 234, 0.1);
+  }
+
+  /* Crop tools */
+  .crop-tools {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .crop-tool-btn {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 12px;
+    color: #424242;
+  }
+
+  .crop-tool-btn:hover {
+    background: #f5f5f5;
+    border-color: #667eea;
+    color: #667eea;
+  }
+
+  .crop-tool-btn i {
+    margin-right: 4px;
+  }
+
+  .crop-tool-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+  }
+
+  .crop-tool-btn.active:hover {
+    background: #5a67d8;
+    border-color: #5a67d8;
+  }
+
+  /* Add smooth transitions for modal */
+  .modal.fade .modal-dialog {
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+
+  /* Loading states */
+  .spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* Success/Error feedback */
+  .btn.btn-primary .bi-check-circle {
+    color: #28a745;
+  }
+
+  .btn.btn-primary .bi-exclamation-triangle {
+    color: #ffc107;
+  }
+
+  /* Add highlight for focused element */
+  .element-highlight {
+    transition: all 0.5s ease-in-out;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5), 0 0 15px rgba(0, 123, 255, 0.3);
+    border-radius: 4px;
+  }
 </style>
 
-<div class="tab-pane" id="profile">
+<div class="tab-pane fade" id="profile">
   <div class="card">
     <div class="card-body">
       <h4 class="card-title mb-4">Profile Details</h4>
       <form class="profile-form">
-        <!--Hero Image Uplaod-->
+        <!--Hero Image Upload-->
         <div class="mb-4">
           <div class="hero-upload-label">Cover Image</div>
-          <div id="hero-upload" class="profile-image-upload">
-            <input
-              type="file"
-              accept="image/png,image/jpeg"
-              name="hero_image"
-            />
+          <div id="hero-upload" class="profile-image-upload" style="cursor: pointer;">
             <i class="bi bi-camera upload-icon"></i>
+            <div class="hero-overlay">
+              <button type="button" class="btn btn-primary btn-sm" id="changeCoverBtn">
+                <i class="bi bi-camera"></i> Change
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" id="editCoverBtn">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+            </div>
           </div>
+          <input type="file" id="heroImageInput" accept="image/*" style="display: none;">
         </div>
         <!-- Profile Image Upload -->
         <div class="mb-4">
@@ -183,11 +385,11 @@
 
         <hr class="text-muted" />
 
-        <h5 class="mb-4">About your NPO</h5>
+        <h5 class="mb-4">About your Nonprofit</h5>
         <!-- NPO Name -->
         <div class="mb-4">
           <label class="form-label"
-            >NPO Name <span class="text-danger">*</span></label
+            >Nonprofit Name <span class="text-danger">*</span></label
           >
           <input type="text" class="form-control" name="name" required />
         </div>
@@ -216,11 +418,27 @@
             name="cause_description"
             rows="4"
             placeholder="Describe yourself..."
-            maxlength="200"
+            maxlength="500"
           ></textarea>
           <div class="d-flex justify-content-between mt-1">
             <div class="form-text">It will be displayed on your profile.</div>
-            <div class="char-count">0/200</div>
+            <div class="char-count">0/500</div>
+          </div>
+        </div>
+
+        <!-- Short Description -->
+        <div class="mb-4">
+          <label class="form-label">Short Description</label>
+          <textarea
+            class="form-control"
+            name="short_cause_description"
+            rows="3"
+            placeholder="A short summary used in cards and listings..."
+            maxlength="150"
+          ></textarea>
+          <div class="d-flex justify-content-between mt-1">
+            <div class="form-text">Used in cards and lists across the site.</div>
+            <div class="char-count">0/150</div>
           </div>
         </div>
 
@@ -254,49 +472,54 @@
         </div>
 
         <div class="mb-4">
-          <label class="form-label">Address</label>
+          <h5 class="mt-4 mb-3">Address</h5>
           <div class="address-fields">
             <div class="mb-3">
+              <label for="street_address" class="form-label">Street Address</label>
               <input
                 type="text"
                 class="form-control"
                 id="street_address"
-                placeholder="Street Address"
+                name="street_address"
               />
             </div>
 
             <div class="row">
               <div class="col-md-6 mb-3">
+                <label for="address_city" class="form-label">City</label>
                 <input
                   type="text"
                   class="form-control"
                   id="address_city"
-                  placeholder="City"
+                  name="city"
                 />
               </div>
               <div class="col-md-3 mb-3">
+                <label for="address_state" class="form-label">State</label>
                 <input
                   type="text"
                   class="form-control"
                   id="address_state"
-                  placeholder="State"
+                  name="state"
                 />
               </div>
               <div class="col-md-3 mb-3">
+                <label for="address_zip" class="form-label">ZIP Code</label>
                 <input
                   type="text"
                   class="form-control"
                   id="address_zip"
-                  placeholder="ZIP"
+                  name="zip"
                 />
               </div>
             </div>
             <div class="mb-3">
+              <label for="address_country" class="form-label">Country</label>
               <input
                 type="text"
                 class="form-control"
                 id="address_country"
-                placeholder="Country"
+                name="country"
               />
             </div>
 
@@ -361,18 +584,415 @@
   </div>
 </div>
 
-<script>
+{{ include /components/global/NPO Admin/Profile/image_crop_modal.html }}
+
+{{ include /components/global/NPO Admin/Profile/success_modal.html }}
+
+<script type="module">
   // Move selectedItems to global scope (outside of any function)
   const selectedItems = new Set();
+  
+  // Configuration for Fastly Image Optimizer
+  const FASTLY_CONFIG = {
+    enabled: true, // Set to false to use fallback manual cropping
+    defaultQuality: 85,
+    autoFormat: true, // Auto-select best format (WebP, AVIF, etc.)
+    optimize: true
+  };
+  
+  // NOTE: Rotation Handling
+  // Cropper.js provides rotation in degrees (0, 90, 180, 270, etc.)
+  // Fastly's orient parameter expects EXIF orientation values (1-8) or letter codes (r, l, h, v)
+  // The convertRotationToFastlyOrient function handles this conversion
+  
+  // Global variables for cropping
+  let cropper = null;
+  let currentCropFile = null;
+  let originalImageUrl = null; // Store original image URL
+  let croppedImageDataUrl = null; // Store cropped/optimized image data URL
+  let temporaryCropData = null; // Store temporary crop data until form is saved
+  let originalData = null; // Store original NPO data globally for cropper access
+  let currentImageWidth = 0; // Store current image width for coordinate transformation
+  let currentImageHeight = 0; // Store current image height for coordinate transformation
+  const previousTextValues = new Map();
 
-  async function getNPOAdminProfile(zuid) {
-    const url = window.CONFIG.API_ROUTES["get-npo-admin-profile"];
-    const response = await fetch(`${url}/${zuid}`);
-    const data = await response.json();
-    return data;
+  // Helper function to convert data URL to File object
+  function dataURLtoFile(dataurl, filename) {
+    const arr = dataurl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
   }
 
-  function loadNPOAdminProfile(npo) {
+  // Function to convert cropper.js rotation degrees to Fastly orient parameter
+  function convertRotationToFastlyOrient(degrees) {
+    if (!degrees || degrees === 0) return null;
+    
+    // Normalize degrees to 0-360 range
+    let normalizedDegrees = ((degrees % 360) + 360) % 360;
+    
+    // Round to nearest 90 degrees for better Fastly compatibility
+    const roundedDegrees = Math.round(normalizedDegrees / 90) * 90;
+    
+    // Map degrees to Fastly orient values
+    // Fastly orient values: r (90°), l (270°), h (flip horizontal), v (flip vertical)
+    // EXIF values: 6 (90° CW), 8 (90° CCW), 3 (180°), 2 (flip horizontal), 4 (flip vertical)
+    switch (roundedDegrees % 360) {
+      case 90:
+        return '6'; // EXIF value for 90° clockwise (same as 'r')
+      case 180:
+        return '3'; // EXIF value for 180°
+      case 270:
+        return '8'; // EXIF value for 270° clockwise / 90° counter-clockwise (same as 'l')
+      case 0:
+      case 360:
+        return null; // No rotation needed
+      default:
+        // For edge cases, determine closest rotation
+        if (normalizedDegrees > 45 && normalizedDegrees <= 135) {
+          return '6'; // Closer to 90°
+        } else if (normalizedDegrees > 135 && normalizedDegrees <= 225) {
+          return '3'; // Closer to 180°
+        } else if (normalizedDegrees > 225 && normalizedDegrees <= 315) {
+          return '8'; // Closer to 270°
+        }
+        return null; // Closer to 0°/360°
+    }
+  }
+
+  // Function to transform crop coordinates for rotation
+  // Fastly applies crop BEFORE rotation, but Cropper.js shows rotated image first
+  // So we need to reverse-transform the coordinates
+  function transformCropCoordinatesForRotation(cropData, imageWidth, imageHeight) {
+    if (!cropData || !cropData.rotate || cropData.rotate === 0) {
+      return cropData; // No rotation, return as-is
+    }
+
+    const { x, y, width, height, rotate } = cropData;
+    
+    // Normalize rotation to 0-360 degrees
+    const normalizedRotation = ((rotate % 360) + 360) % 360;
+    
+    // Only handle 90-degree increments (which is what Fastly supports)
+    const roundedRotation = Math.round(normalizedRotation / 90) * 90;
+    
+    let newX, newY, newWidth, newHeight;
+    
+    switch (roundedRotation) {
+      case 90: // 90° clockwise
+        // For 90° rotation: new_x = y, new_y = imageWidth - x - width
+        newX = y;
+        newY = imageWidth - x - width;
+        newWidth = height;
+        newHeight = width;
+        break;
+        
+      case 180: // 180° rotation
+        // For 180° rotation: new_x = imageWidth - x - width, new_y = imageHeight - y - height
+        newX = imageWidth - x - width;
+        newY = imageHeight - y - height;
+        newWidth = width;
+        newHeight = height;
+        break;
+        
+      case 270: // 270° clockwise (90° counter-clockwise)
+        // For 270° rotation: new_x = imageHeight - y - height, new_y = x
+        newX = imageHeight - y - height;
+        newY = x;
+        newWidth = height;
+        newHeight = width;
+        break;
+        
+      default: // 0° or no rotation
+        return cropData;
+    }
+    
+    return {
+      ...cropData,
+      x: Math.round(newX),
+      y: Math.round(newY),
+      width: Math.round(newWidth),
+      height: Math.round(newHeight)
+    };
+  }
+
+  // Function to convert cropper.js data to Fastly URL parameters
+  function generateFastlyImageUrl(originalImageUrl, cropData) {
+    if (!originalImageUrl || !FASTLY_CONFIG.enabled) return originalImageUrl;
+    
+    // Check if the URL is a data URL (base64 encoded image)
+    // Data URLs cannot be processed by Fastly, so return original
+    if (originalImageUrl.startsWith('data:')) {
+      return originalImageUrl;
+    }
+    
+    // Convert cropper.js coordinates to Fastly crop parameters
+    const fastlyParams = new URLSearchParams();
+    
+    // Add basic optimization parameters for all images
+    if (FASTLY_CONFIG.optimize) {
+      fastlyParams.set('optimize', 'true');
+    }
+    if (FASTLY_CONFIG.autoFormat) {
+      fastlyParams.set('format', 'auto'); // Auto-select best format (WebP, AVIF when supported)
+    }
+    fastlyParams.set('quality', FASTLY_CONFIG.defaultQuality.toString());
+    
+    // Add crop parameters if crop data is provided
+    if (cropData) {
+      const { rotate } = cropData;
+      
+      // Use stored image dimensions for coordinate transformation
+      // If not available (e.g., when loading from DB), we need to get them first
+      let imageWidth = currentImageWidth;
+      let imageHeight = currentImageHeight;
+      
+      // If we don't have dimensions and there's rotation, we need to be careful
+      if ((!imageWidth || !imageHeight) && rotate && rotate !== 0) {
+        console.warn('Image dimensions not available for coordinate transformation. This may cause incorrect positioning.');
+        // Use fallback dimensions - this is not ideal but prevents errors
+        imageWidth = imageWidth || 1000;
+        imageHeight = imageHeight || 1000;
+      } else if (!imageWidth || !imageHeight) {
+        // No rotation, use safer fallbacks
+        imageWidth = imageWidth || 1000;
+        imageHeight = imageHeight || 1000;
+      }
+      
+      // Transform crop coordinates to account for Fastly's processing order
+      const transformedCropData = transformCropCoordinatesForRotation(cropData, imageWidth, imageHeight);
+      const { x, y, width, height } = transformedCropData;
+      
+      // Basic crop parameters: crop=width,height,x{x},y{y}
+      fastlyParams.set('crop', `${Math.round(width)},${Math.round(height)},x${Math.round(x)},y${Math.round(y)}`);
+      
+      // Convert rotation from degrees to Fastly orient parameter
+      if (rotate && rotate !== 0) {
+        const orientValue = convertRotationToFastlyOrient(rotate);
+        if (orientValue) {
+          fastlyParams.set('orient', orientValue);
+        }
+      }
+    }
+    
+    // If the URL already has query parameters, we need to handle them properly
+    const urlParts = originalImageUrl.split('?');
+    const baseUrl = urlParts[0];
+    const existingParams = urlParts[1] ? new URLSearchParams(urlParts[1]) : new URLSearchParams();
+    
+    // Merge existing params with Fastly params (Fastly params take precedence)
+    for (const [key, value] of fastlyParams.entries()) {
+      existingParams.set(key, value);
+    }
+    
+    return `${baseUrl}?${existingParams.toString()}`;
+  }
+
+  // Function to create fallback cropped image (kept for compatibility/fallback)
+  function createCroppedImageFallback(imageUrl, cropData) {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      // Add timeout to prevent hanging
+      const timeout = setTimeout(() => {
+        reject(new Error('Image loading timeout'));
+      }, 10000);
+      
+      img.onload = function() {
+        clearTimeout(timeout);
+        
+        try {
+          // Get the actual crop data
+          const x = cropData.x;
+          const y = cropData.y;
+          const width = cropData.width;
+          const height = cropData.height;
+          const rotate = cropData.rotate || 0;
+          const scaleX = cropData.scaleX || 1;
+          const scaleY = cropData.scaleY || 1;
+          
+          // Create a temporary canvas for transformations if needed
+          let tempCanvas = null;
+          let tempCtx = null;
+          
+          if (rotate !== 0 || scaleX !== 1 || scaleY !== 1) {
+            // Use a temporary canvas for transformations
+            tempCanvas = document.createElement('canvas');
+            tempCtx = tempCanvas.getContext('2d');
+            
+            // Set temp canvas size to hold the entire image
+            tempCanvas.width = img.naturalWidth;
+            tempCanvas.height = img.naturalHeight;
+            
+            // Draw the original image to the temp canvas
+            tempCtx.drawImage(img, 0, 0);
+            
+            // Now transform the main canvas according to crop data
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Apply transformations
+            ctx.save();
+            
+            // Move to center of the canvas
+            ctx.translate(width / 2, height / 2);
+            
+            // Apply rotation
+            ctx.rotate(rotate * Math.PI / 180);
+            
+            // Apply scaling
+            ctx.scale(scaleX, scaleY);
+            
+            // Draw the cropped part from the temp canvas
+            ctx.drawImage(
+              tempCanvas,
+              x, y, width, height,
+              -width / 2, -height / 2, width, height
+            );
+            
+            // Restore the context
+            ctx.restore();
+          } else {
+            // No transformations needed, just crop
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Draw the cropped portion directly
+            ctx.drawImage(
+              img,
+              x, y, width, height,
+              0, 0, width, height
+            );
+          }
+          
+          // Convert to data URL
+          const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+          resolve(croppedDataUrl);
+        } catch (error) {
+          console.error('Error during canvas operations:', error);
+          reject(error);
+        }
+      };
+      
+      img.onerror = function(error) {
+        console.error('Image failed to load:', error);
+        clearTimeout(timeout);
+        reject(error);
+      };
+      
+      // Enable CORS for cross-origin images
+      img.crossOrigin = 'anonymous';
+      img.src = imageUrl;
+    });
+  }
+
+  // Function to apply Fastly-optimized image to hero upload
+  function applyFastlyImage(originalImageUrl, cropData) {
+    const fastlyUrl = generateFastlyImageUrl(originalImageUrl, cropData);
+    $('#hero-upload').css({
+      'background-image': `url(${fastlyUrl})`,
+      'background-size': 'cover',
+      'background-position': 'center',
+      'background-repeat': 'no-repeat'
+    }).find('.upload-icon').hide();
+    
+    // Store the Fastly URL for reference
+    $('#hero-upload').data('fastly-url', fastlyUrl);
+  }
+
+  // Function to apply cropped image to hero upload (fallback method)
+  function applyCroppedImageFallback(croppedImageUrl) {
+    $('#hero-upload').css({
+      'background-image': `url(${croppedImageUrl})`,
+      'background-size': 'cover',
+      'background-position': 'center',
+      'background-repeat': 'no-repeat'
+    }).find('.upload-icon').hide();
+  }
+
+  // Function to load optimized image (Fastly or fallback)
+  async function loadOptimizedImage(originalImageUrl, cropData) {
+    if (!originalImageUrl) return;
+    
+    try {
+      // If we have crop data with rotation and we're using Fastly, 
+      // we need to load image dimensions first for proper coordinate transformation
+      if (cropData && cropData.rotate && FASTLY_CONFIG.enabled && (!currentImageWidth || !currentImageHeight)) {
+        await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = function() {
+            // Store image dimensions for coordinate transformation
+            currentImageWidth = img.naturalWidth;
+            currentImageHeight = img.naturalHeight;
+            resolve();
+          };
+          img.onerror = function(error) {
+            console.error('Failed to load image for dimension detection:', error);
+            reject(error);
+          };
+          img.crossOrigin = 'anonymous';
+          img.src = originalImageUrl;
+        });
+      }
+      
+      if (FASTLY_CONFIG.enabled && !originalImageUrl.startsWith('data:')) {
+        // Use Fastly Image Optimizer for dynamic cropping/optimization
+        applyFastlyImage(originalImageUrl, cropData);
+        croppedImageDataUrl = generateFastlyImageUrl(originalImageUrl, cropData);
+      } else if (cropData) {
+        // Fallback to manual cropping
+        await loadCroppedImageFallback(originalImageUrl, cropData);
+      } else {
+        // No cropping needed, just show original
+        $('#hero-upload').css({
+          'background-image': `url(${originalImageUrl})`,
+          'background-size': 'cover',
+          'background-position': 'center'
+        });
+      }
+    } catch (error) {
+      console.error('Error loading optimized image:', error);
+      // Final fallback to original image
+      $('#hero-upload').css({
+        'background-image': `url(${originalImageUrl})`,
+        'background-size': 'cover',
+        'background-position': 'center'
+      });
+    }
+  }
+
+  // Function to load cropped image from cropData (fallback method)
+  async function loadCroppedImageFallback(originalImageUrl, cropData) {
+    if (originalImageUrl && cropData) {
+      try {
+        const croppedImageUrl = await createCroppedImageFallback(originalImageUrl, cropData);
+        croppedImageDataUrl = croppedImageUrl;
+        applyCroppedImageFallback(croppedImageUrl);
+      } catch (error) {
+        console.error('Error creating cropped image:', error);
+        // Fallback to original image
+        $('#hero-upload').css({
+          'background-image': `url(${originalImageUrl})`,
+          'background-size': 'cover',
+          'background-position': 'center'
+        });
+      }
+    }
+  }
+
+  // Create TanStack Query observers
+  const npoProfileQuery = window.createNPOProfileQuery("{{$zuid}}");
+  const updateNPOProfileMutation = window.createUpdateNPOProfileMutation();
+  const uploadMediaMutation = window.createUploadMediaMutation();
+
+  async function loadNPOAdminProfile(npo) {
     // Clear existing selections when loading new profile
     selectedItems.clear();
 
@@ -408,36 +1028,39 @@
     }
 
     if (heroUrl) {
-      $("#hero-upload").css({
-        "background-image": `url(${heroUrl})`,
-        "background-size": "cover",
-        "background-position": "center",
-      });
+      originalImageUrl = heroUrl; // Store original image URL
+      
+      // Load image with crop data if available, or optimized version if not
+      await loadOptimizedImage(heroUrl, npo.banner_image_properties);
     }
 
-    $(".profile-form input[name='name']").val(npo.name);
+    $(".profile-form input[name='name']").val(npo?.name);
 
     // Add EIN loading
-    $(".profile-form input[name='ein_number']").val(npo.ein_number);
+    $(".profile-form input[name='ein_number']").val(npo?.ein_number);
 
     $(".profile-form textarea[name='cause_description']").val(
-      $("<div>").html(npo.cause_description).text()
+      $("<div>").html(npo?.cause_description).text()
     );
 
     $(".profile-form textarea[name='mission']").val(
-      $("<div>").html(npo.mission).text()
+      $("<div>").html(npo?.mission).text()
     );
 
-    $(".profile-form input[name='website']").val(npo.website);
+    $(".profile-form input[name='website']").val(npo?.website);
 
-    $(".profile-form input[name='donate_link']").val(npo.donate_link);
+    $(".profile-form input[name='donate_link']").val(npo?.donate_link);
 
-    if (npo.headquarters_address) {
+    $(".profile-form textarea[name='short_cause_description']").val(
+      $("<div>").html(npo?.short_cause_description).text()
+    );
+
+    if (npo?.headquarters_address) {
       // Set the hidden field
       $('input[name="headquarters_address"]').val(npo.headquarters_address);
 
       // Split address by commas and trim whitespace
-      const addressParts = npo.headquarters_address
+      const addressParts = npo?.headquarters_address
         .split(",")
         .map((part) => part.trim());
 
@@ -451,6 +1074,17 @@
         }
       }
     }
+
+    // Update counters to reflect loaded values (may show over-limit numbers)
+    $(".profile-form textarea").each(function () {
+      const maxLength = parseInt($(this).attr("maxlength") || "0", 10);
+      const currentLength = $(this).val().length;
+      $(this)
+        .closest(".mb-4")
+        .find(".char-count")
+        .text(`${currentLength}/${maxLength || currentLength}`);
+      previousTextValues.set(this, $(this).val());
+    });
 
     // Load NPO categories
     if (npo?.category?.data) {
@@ -479,10 +1113,32 @@
     }
   }
 
+  // Reactive subscription for profile data updates
+  npoProfileQuery.subscribe((result) => {
+    if (result.isLoading) {
+      // Show loading state if needed
+    } else if (result.isSuccess) {
+      const npoData = result.data?.data?.[0];
+      if (npoData) {
+        originalData = npoData; // Set global variable
+        loadNPOAdminProfile(originalData);
+      }
+    } else if (result.isError) {
+      console.error('Failed to load NPO profile:', result.error);
+      alert('Failed to load profile data. Please refresh the page.');
+    }
+  });
+
   $(document).ready(async function () {
-    const npoAdminProfile = await getNPOAdminProfile("{{get_var.zuid}}");
-    let originalData = npoAdminProfile.data[0];
-    loadNPOAdminProfile(originalData);
+    // Trigger initial load by getting current result
+    const initialResult = npoProfileQuery.getCurrentResult();
+    if (initialResult.isSuccess) {
+      const npoData = initialResult.data?.data?.[0];
+      if (npoData) {
+        originalData = npoData;
+        await loadNPOAdminProfile(originalData);
+      }
+    } 
 
     // Function to check if form has changes
     function hasFormChanges() {
@@ -490,6 +1146,7 @@
         name: $("input[name='name']").val(),
         ein_number: $("input[name='ein_number']").val(),
         cause_description: $("textarea[name='cause_description']").val(),
+        short_cause_description: $("textarea[name='short_cause_description']").val(),
         mission: $("textarea[name='mission']").val(),
         website: $("input[name='website']").val(),
         donate_link: $("input[name='donate_link']").val(),
@@ -511,20 +1168,23 @@
           originalCategories.has(zuid)
         );
 
-      // Check if any files were selected
+      // Check if any files were selected or crop data exists
       const hasFileChanges =
-        $('input[name="hero_image"]')[0].files.length > 0 ||
+        temporaryCropData !== null ||
+        currentCropFile !== null ||
         $('input[name="logo"]')[0].files.length > 0;
 
       return hasTextChanges || hasFileChanges || categoriesChanged;
     }
 
-    // Function to show/hide cancel button
+    // Function to show/hide cancel button and save button based on form changes
     function toggleCancelButton() {
       if (hasFormChanges()) {
         $("#cancelBtn").show();
+        $("#saveProfileBtn").show();
       } else {
         $("#cancelBtn").hide();
+        $("#saveProfileBtn").hide();
       }
     }
 
@@ -539,30 +1199,50 @@
     );
 
     // Handle cancel button click
-    $("#cancelBtn").on("click", function () {
+    $("#cancelBtn").on("click", async function () {
       if (confirm("Are you sure you want to discard your changes?")) {
         // Reset form to original data
-        loadNPOAdminProfile(originalData);
+        await loadNPOAdminProfile(originalData);
 
         // Clear file inputs
         $('input[type="file"]').val("");
+
+        // Clear temporary crop data and current file
+        temporaryCropData = null;
+        currentCropFile = null;
+        croppedImageDataUrl = null;
 
         // Reset background images to original state
         $(".profile-image-upload .upload-icon").show();
 
         // Hide cancel button
         $(this).hide();
+        $("#saveProfileBtn").hide();
       }
     });
 
-    // Handle character count for description
+    // Character count with over-limit display; prevent adding new chars beyond max
+    $(".profile-form textarea").on("focusin", function () {
+      previousTextValues.set(this, $(this).val());
+    });
+
     $(".profile-form textarea").on("input", function () {
-      const maxLength = $(this).attr("maxlength");
+      const maxLength = parseInt($(this).attr("maxlength") || "0", 10);
+      const previousValue = previousTextValues.get(this) ?? "";
+      const proposedValue = $(this).val();
+
+      if (maxLength && proposedValue.length > maxLength && proposedValue.length >= previousValue.length) {
+        // Disallow further input when already at/over limit; keep existing text
+        $(this).val(previousValue);
+      } else {
+        previousTextValues.set(this, proposedValue);
+      }
+
       const currentLength = $(this).val().length;
       $(this)
         .closest(".mb-4")
         .find(".char-count")
-        .text(`${currentLength}/${maxLength}`);
+        .text(`${currentLength}/${maxLength || currentLength}`);
     });
 
     // Handle file upload preview
@@ -586,73 +1266,137 @@
       }
     });
 
-    // Handle form submission
-    $(".profile-form").on("submit", async function (e) {
+    // Handle form submission using TanStack Query mutation subscription pattern
+    $(".profile-form").on("submit", function (e) {
       e.preventDefault();
 
-      // Show loading state
       const $saveBtn = $("#saveProfileBtn");
+      
+      // Subscribe to mutation state changes before triggering
+      const unsubscribe = updateNPOProfileMutation.subscribe((result) => {
+        if (result.status === 'success') {
+          // Handle success UI updates
+          $saveBtn.prop("disabled", false);
+          $saveBtn.find(".normal-state").removeClass("d-none");
+          $saveBtn.find(".loading-state").addClass("d-none");
+          
+          // Clear temporary crop data since it's now saved to the API
+          temporaryCropData = null;
+          
+          $("#cancelBtn").hide();
+          $("#saveProfileBtn").hide();
+          $('#npoSuccessModal').modal('show');
+          unsubscribe();
+        } else if (result.status === 'error') {
+          // Handle error UI updates
+          $saveBtn.prop("disabled", false);
+          $saveBtn.find(".normal-state").removeClass("d-none");
+          $saveBtn.find(".loading-state").addClass("d-none");
+          alert("Failed to update profile. Please try again.");
+          unsubscribe();
+        }
+      });
+
+      // Set loading state manually
       $saveBtn.prop("disabled", true);
       $saveBtn.find(".normal-state").addClass("d-none");
       $saveBtn.find(".loading-state").removeClass("d-none");
 
-      try {
-        // Upload both hero and profile images
-        const heroFile = $('input[name="hero_image"]')[0].files[0];
-        const logoFile = $('input[name="logo"]')[0].files[0];
-        let filesToUpload = [];
-
-        if (heroFile) filesToUpload.push(heroFile);
-        if (logoFile) filesToUpload.push(logoFile);
-
-        const uploadedImages = await window.uploadImages(filesToUpload);
-
-        // Create payload object
-        const formData = {
-          data: {
-            name: $("input[name='name']").val(),
-            ein_number: $("input[name='ein_number']").val(),
-            cause_description: $("textarea[name='cause_description']").val(),
-            mission: $("textarea[name='mission']").val(),
-            website: $("input[name='website']").val(),
-            donate_link: $("input[name='donate_link']").val(),
-            headquarters_address: $("input[name='headquarters_address']").val(),
-            category: Array.from(selectedItems).join(","),
-          },
-        };
-
-        // Add hero image if uploaded
-        if (heroFile && uploadedImages[0]) {
-          formData.data.hero_image = uploadedImages[0].data[0].id;
-        }
-
-        // Add logo if uploaded
-        if (logoFile) {
-          const logoIndex = heroFile ? 1 : 0;
-          if (uploadedImages[logoIndex]) {
-            formData.data.logo = uploadedImages[logoIndex].data[0].id;
+      // Prepare form data
+      async function prepareAndSubmit() {
+        try {
+          // Handle hero image upload
+          let heroFile = null;
+          
+          // Check if user selected a new hero image file
+          if (currentCropFile) {
+            // If we have a manually cropped image (data URL), convert it to a file
+            if (croppedImageDataUrl && croppedImageDataUrl.startsWith('data:')) {
+              // Convert the cropped data URL to a file
+              heroFile = await dataURLtoFile(croppedImageDataUrl, `cropped_${currentCropFile.name}`);
+            } else {
+              // Use original file for Fastly processing
+              heroFile = currentCropFile; 
+            }
           }
-        }
+          
+          // Upload both hero and profile images
+          const logoFile = $('input[name="logo"]')[0].files[0];
+          let filesToUpload = [];
 
-        const data = await window.updateNPOAdminProfile(
-          "{{get_var.zuid}}",
-          formData
-        );
+          if (heroFile) filesToUpload.push(heroFile);
+          if (logoFile) filesToUpload.push(logoFile);
 
-        if (data) {
-          originalData = data.data;
-          loadNPOAdminProfile(originalData);
-          $("#cancelBtn").hide();
+          let uploadedImages = [];
+          if (filesToUpload.length > 0) {
+            // Use TanStack Query mutation for media upload
+            uploadedImages = await new Promise((resolve, reject) => {
+              const unsubscribe = uploadMediaMutation.subscribe((result) => {
+                if (result.status === 'success') {
+                  resolve(result.data);
+                  unsubscribe();
+                } else if (result.status === 'error') {
+                  reject(result.error);
+                  unsubscribe();
+                }
+              });
+              uploadMediaMutation.mutate(filesToUpload);
+            });
+          }
+
+          // Create payload object
+          const formData = {
+            data: {
+              name: $("input[name='name']").val(),
+              ein_number: $("input[name='ein_number']").val(),
+              cause_description: $("textarea[name='cause_description']").val(),
+              short_cause_description: $("textarea[name='short_cause_description']").val(),
+              mission: $("textarea[name='mission']").val(),
+              website: $("input[name='website']").val(),
+              donate_link: $("input[name='donate_link']").val(),
+              headquarters_address: $("input[name='headquarters_address']").val(),
+              category: Array.from(selectedItems).join(","),
+            },
+          };
+
+          // Add hero image if uploaded
+          if (heroFile && uploadedImages[0]) {
+            formData.data.hero_image = uploadedImages[0].data[0].id;
+          }
+
+          // Add logo if uploaded
+          if (logoFile) {
+            const logoIndex = heroFile ? 1 : 0;
+            if (uploadedImages[logoIndex]) {
+              formData.data.logo = uploadedImages[logoIndex].data[0].id;
+            }
+          }
+
+          // Add crop data if it exists (for Fastly Image Optimizer)
+          // Only save crop data if we used Fastly processing (not manual cropping)
+          if (temporaryCropData && temporaryCropData.cropData && 
+              !(croppedImageDataUrl && croppedImageDataUrl.startsWith('data:'))) {
+            // Save the original cropper data (not the transformed coordinates)
+            // This way when we reload, we can apply the transformation fresh
+            formData.data.banner_image_properties = temporaryCropData.cropData;
+          }
+
+          // Trigger mutation - subscription will handle UI updates
+          updateNPOProfileMutation.mutate({ zuid: "{{$zuid}}", data: formData });
+          
+        } catch (error) {
+          console.error("Error preparing form data:", error);
+          // Reset button state on error
+          $saveBtn.prop("disabled", false);
+          $saveBtn.find(".normal-state").removeClass("d-none");
+          $saveBtn.find(".loading-state").addClass("d-none");
+          alert("Failed to prepare form data. Please try again.");
+          unsubscribe();
         }
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        alert("Failed to update profile. Please try again.");
-      } finally {
-        // Reset button state
-        $saveBtn.prop("disabled", false);
-        $saveBtn.find(".normal-state").removeClass("d-none");
-        $saveBtn.find(".loading-state").addClass("d-none");
       }
+
+      // Start the async preparation and submission
+      prepareAndSubmit();
     });
 
     // Add Custom Select functionality
@@ -673,22 +1417,30 @@
     // Load additional categories from causes API
     async function loadCategories() {
       try {
-        const causesUrl = `https://causecircle.org/mobileapp/causes.json`;
+        const causesUrl = `{{ $base_url }}mobileapp/causes.json?limit=1000&featured=true`;
         const response = await $.getJSON(causesUrl);
 
         if (response?.data) {
           // Create a Set to track unique categories we've already added
           const addedCategories = new Set(Array.from(selectedItems));
+          // Sort causes by title (case-insensitive)
+          const sortedCauses = response.data.slice().sort((a, b) => {
+            const at = (a.title || '').toLowerCase();
+            const bt = (b.title || '').toLowerCase();
+            if (at < bt) return -1;
+            if (at > bt) return 1;
+            return 0;
+          });
 
-          response.data.forEach((cause) => {
+          sortedCauses.forEach((cause) => {
             // Skip if we've already added this category
-            if (addedCategories.has(cause.meta.zuid)) return;
+            if (addedCategories.has(cause?.zuid)) return;
 
-            addedCategories.add(cause.meta.zuid);
+            addedCategories.add(cause?.zuid);
 
             const dropdownItem = $(`
               <div class="dropdown-item" 
-                   data-value="${cause.meta.zuid}" 
+                   data-value="${cause.zuid}" 
                    data-title="${cause.title}">
                 ${cause.title}
               </div>
@@ -752,7 +1504,7 @@
         if (searchText.length > 0) {
           try {
             // Fetch filtered categories from API
-            const causesUrl = `https://causecircle.org/mobileapp/causes.json?search=${encodeURIComponent(
+            const causesUrl = `{{ $base_url }}mobileapp/causes.json?featured=true&filter=${encodeURIComponent(
               searchText
             )}`;
             const response = await $.getJSON(causesUrl);
@@ -778,16 +1530,24 @@
             // Add new items from search results
             if (response?.data) {
               const addedCategories = new Set(Array.from(selectedItems));
+              // Sort causes by title (case-insensitive)
+              const sortedCauses = response.data.slice().sort((a, b) => {
+                const at = (a.title || '').toLowerCase();
+                const bt = (b.title || '').toLowerCase();
+                if (at < bt) return -1;
+                if (at > bt) return 1;
+                return 0;
+              });
 
-              response.data.forEach((cause) => {
+              sortedCauses.forEach((cause) => {
                 // Skip if we've already added this category
-                if (addedCategories.has(cause.meta.zuid)) return;
+                if (addedCategories.has(cause?.zuid)) return;
 
-                addedCategories.add(cause.meta.zuid);
+                addedCategories.add(cause?.zuid);
 
                 const dropdownItem = $(`
                   <div class="dropdown-item" 
-                       data-value="${cause.meta.zuid}" 
+                       data-value="${cause?.zuid}" 
                        data-title="${cause.title}">
                     ${cause.title}
                   </div>
@@ -865,7 +1625,6 @@
             <span class="remove-tag">×</span>
           </div>
         `);
-
         searchInput.before(tag);
       }
       searchInput.val("").focus();
@@ -924,24 +1683,316 @@
       }
     });
 
-    // Handle address field updates
-    $(".address-fields input").on("input", function () {
+    // Update the capitalization function to only affect first character
+    function capitalizeFirstLetterOnly(str) {
+      if (str.length === 0) return str;
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // Update the address field input handler
+    $(".address-fields input").on("input", function() {
+      // Capitalize only the first character of the input
+      const fieldsToCapitalize = ['street_address', 'address_city', 'address_state', 'address_country'];
+      if (fieldsToCapitalize.includes($(this).attr('id'))) {
+        const currentValue = $(this).val();
+        if (currentValue.length > 0) {
+          $(this).val(capitalizeFirstLetterOnly(currentValue));
+        }
+      }
+
       const street = $("#street_address").val();
       const city = $("#address_city").val();
       const state = $("#address_state").val();
       const zip = $("#address_zip").val();
       const country = $("#address_country").val();
 
-      // Combine all fields with commas
       const formattedAddress = [street, city, state, zip, country]
         .filter(Boolean)
         .join(", ");
 
-      // Update the hidden field
       $('input[name="headquarters_address"]').val(formattedAddress);
-
-      // Trigger form change detection
       toggleCancelButton();
     });
+
+    // Image Cropping Functionality
+    function initializeCropper(imageUrl, existingCropData = null) {
+      
+      const cropImage = document.getElementById('cropImage');
+      if (!cropImage) {
+        console.error('Crop image element not found');
+        return;
+      }
+      
+      cropImage.src = imageUrl;
+      
+      // Reset the Apply Crop button text
+      $('#applyCropBtn').html('Apply Crop');
+      
+      // Destroy existing cropper if it exists
+      if (cropper) {
+        cropper.destroy();
+      }
+      
+      // Initialize new cropper with hero upload dimensions ratio
+      const heroUpload = document.getElementById('hero-upload');
+      const aspectRatio = heroUpload.offsetWidth / heroUpload.offsetHeight;
+      
+      cropper = new Cropper(cropImage, {
+        aspectRatio: aspectRatio,
+        viewMode: 1,
+        autoCropArea: 0.8,
+        responsive: true,
+        minContainerWidth: 695,
+        minContainerHeight: 400,
+        dragMode: 'move',
+        guides: true,
+        center: true,
+        highlight: true,
+        cropBoxMovable: true,
+        cropBoxResizable: true,
+        toggleDragModeOnDblclick: true,
+        ready: function() {
+          
+          // Store image dimensions for coordinate transformation
+          const img = cropper.getImageData();
+          currentImageWidth = img.naturalWidth;
+          currentImageHeight = img.naturalHeight;
+          
+          // Enable apply button when cropper is ready
+          $('#applyCropBtn').prop('disabled', false);
+          
+          // Load existing crop data if available
+          const cropDataToUse = existingCropData || (originalData?.banner_image_properties);
+          
+          if (cropDataToUse && imageUrl === originalImageUrl) {
+            try {
+              cropper.setData(cropDataToUse);
+            } catch (e) {
+              console.error('Error loading existing crop data:', e);
+            }
+          }
+        }
+      });
+    }
+    
+    // Hero upload click handler
+    $('#hero-upload').on('click', function(e) {
+      e.preventDefault();
+      // Clear the file input to allow selecting the same file again
+      $('#heroImageInput').val('');
+      $('#heroImageInput').click();
+    });
+    
+    // Change cover button handler
+    $('#changeCoverBtn').on('click', function(e) {
+      e.stopPropagation();
+      // Clear the file input to allow selecting the same file again
+      $('#heroImageInput').val('');
+      $('#heroImageInput').click();
+    });
+    
+    // Edit cover button handler
+    $('#editCoverBtn').on('click', function(e) {
+      e.stopPropagation();
+      
+      // Check if there's an existing image to edit
+      if (originalImageUrl) {
+        // Open cropper with existing image and crop data
+        const existingCropData = originalData?.banner_image_properties;
+        initializeCropper(originalImageUrl, existingCropData);
+        $('#imageCropModal').modal('show');
+      } else {
+        // No existing image, open file selector
+        $('#heroImageInput').click();
+      }
+    });
+    
+    // Hero image input change handler
+    $('#heroImageInput').on('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        currentCropFile = file;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          originalImageUrl = event.target.result;
+          initializeCropper(event.target.result);
+          $('#imageCropModal').modal('show');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Apply crop button handler
+    $('#applyCropBtn').on('click', async function() {
+      if (!cropper) return;
+      
+      const $btn = $(this);
+      const originalHtml = $btn.html();
+      
+      // Show loading state
+      $btn.prop('disabled', true).html(
+        '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Processing...'
+      );
+      
+      try {
+        const cropData = cropper.getData();
+        
+        // Store crop data in temporary variable
+        temporaryCropData = {
+          cropData: cropData,
+          originalImageUrl: originalImageUrl,
+          timestamp: Date.now()
+        };
+        
+        // Use optimized image system (Fastly or fallback)
+        // Check if originalImageUrl is a data URL - if so, force fallback method
+        if (FASTLY_CONFIG.enabled && !originalImageUrl.startsWith('data:')) {
+          applyFastlyImage(originalImageUrl, cropData);
+          croppedImageDataUrl = generateFastlyImageUrl(originalImageUrl, cropData);
+        } else {
+          // Fallback to manual cropping (used for data URLs and when Fastly is disabled)
+          const manualCroppedUrl = await createCroppedImageFallback(originalImageUrl, cropData);
+          applyCroppedImageFallback(manualCroppedUrl);
+          croppedImageDataUrl = manualCroppedUrl;
+        }
+        
+        // Show success feedback
+        $btn.html('<i class="bi bi-check-circle me-1"></i>Applied!');
+        
+        // Close modal after brief delay
+        setTimeout(() => {
+          $('#imageCropModal').modal('hide');
+          toggleCancelButton();
+        }, 800);
+        
+      } catch (error) {
+        console.error('Error applying crop:', error);
+        
+        // Show error state
+        $btn.html('<i class="bi bi-exclamation-triangle me-1"></i>Error - Try Again');
+        
+        // Reset button after delay
+        setTimeout(() => {
+          $btn.prop('disabled', false).html(originalHtml);
+        }, 2000);
+      }
+    });
+    
+    // Modal show handler to reset button state
+    $('#imageCropModal').on('show.bs.modal', function() {
+      // Reset apply button text and state
+      $('#applyCropBtn').html('Apply Crop').prop('disabled', true);
+    });
+    
+    // Modal hide handler to cleanup cropper
+    $('#imageCropModal').on('hidden.bs.modal', function() {
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+      // Reset apply button state
+      $('#applyCropBtn').prop('disabled', true);
+    });
+    
+    // Crop tool button handlers
+    $('#zoomInBtn').on('click', function() {
+      if (cropper) cropper.zoom(0.1);
+    });
+    
+    $('#zoomOutBtn').on('click', function() {
+      if (cropper) cropper.zoom(-0.1);
+    });
+    
+    $('#rotateLeftBtn').on('click', function() {
+      if (cropper) cropper.rotate(-90);
+    });
+    
+    $('#resetCropBtn').on('click', function() {
+      if (cropper) {
+        cropper.reset();
+      }
+    });
+    
+    $('#moveBtn').on('click', function() {
+      if (cropper) {
+        const currentMode = cropper.options.dragMode;
+        const newMode = currentMode === 'move' ? 'crop' : 'move';
+        cropper.setDragMode(newMode);
+        
+        // Update button appearance
+        $(this).toggleClass('active', newMode === 'move');
+      }
+    });
+    
+    // Add keyboard shortcuts for better UX
+    $('#imageCropModal').on('keydown', function(e) {
+      if (!cropper) return;
+      
+      switch(e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          cropper.move(-10, 0);
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          cropper.move(10, 0);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          cropper.move(0, -10);
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          cropper.move(0, 10);
+          break;
+        case 'Enter':
+          e.preventDefault();
+          $('#applyCropBtn').click();
+          break;
+        case 'Escape':
+          e.preventDefault();
+          $('#imageCropModal').modal('hide');
+          break;
+      }
+    });
+
+    // Listener for when the profile tab is shown
+    const profileTab = document.querySelector('a[data-bs-toggle="tab"][href="#profile"], button[data-bs-toggle="tab"][data-bs-target="#profile"]');
+    if (profileTab) {
+      profileTab.addEventListener('shown.bs.tab', function () {
+        const targetSelector = sessionStorage.getItem('profileFocusTarget');
+        if (targetSelector) {
+          const targetElement = $(targetSelector);
+          if (targetElement.length) {
+
+            // Scroll to the element
+            $('html, body').animate({
+              scrollTop: targetElement.offset().top - 100 // Adjust offset as needed
+            }, 500);
+
+            // Special handling for file inputs (trigger click)
+            if (targetElement.is('input[type="file"]') || targetElement.closest('.profile-image-upload').length) {
+              // For file inputs, we trigger a click to open the dialog
+              let input = targetElement.is('input[type="file"]') ? targetElement : targetElement.find('input[type="file"]');
+              if(targetSelector == '#hero-upload') {
+                input = $('#heroImageInput')
+              }
+              setTimeout(() => {
+                input.click();
+              }, 200); // Small delay to ensure visibility
+            } else {
+              // For other elements, focus and highlight
+              targetElement.addClass('element-highlight');
+              targetElement.focus();
+              setTimeout(() => {
+                targetElement.removeClass('element-highlight');
+              }, 2000); // Remove highlight after 2 seconds
+            }
+          }
+          // Clear the target from session storage
+          sessionStorage.removeItem('profileFocusTarget');
+        }
+      });
+    }
   });
 </script>

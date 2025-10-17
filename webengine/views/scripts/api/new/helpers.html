@@ -1,0 +1,98 @@
+<script type="module">
+  import { QueryObserver, MutationObserver } from 'https://esm.sh/@tanstack/query-core@5.90.2';
+
+  // ==================== TANSTACK QUERY HELPERS ====================
+  // Helper functions for creating queries and mutations
+
+  /**
+   * Creates a simple query observer
+   * @param {Array} queryKey - The unique key for this query
+   * @param {Function} queryFn - The function that fetches the data
+   * @param {Object} options - Additional query options
+   * @returns {QueryObserver} The query observer instance
+   */
+  window.createQuery = (queryKey, queryFn, options = {}) => {
+    return new QueryObserver(window.queryClient, {
+      queryKey,
+      queryFn,
+      ...options,
+    });
+  };
+
+  /**
+   * Creates a simple mutation observer
+   * @param {Function} mutationFn - The function that performs the mutation
+   * @param {Object} options - Additional mutation options (onSuccess, onError, etc.)
+   * @returns {MutationObserver} The mutation observer instance
+   */
+  window.createMutation = (mutationFn, options = {}) => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn,
+      ...options,
+    });
+  };
+
+  /**
+   * Helper to invalidate queries by key pattern
+   * @param {Array|String} queryKey - The query key or pattern to invalidate
+   */
+  window.invalidateQueries = (queryKey) => {
+    return window.queryClient.invalidateQueries({ queryKey });
+  };
+
+  /**
+   * Helper to get cached query data
+   * @param {Array} queryKey - The query key to get data for
+   * @returns {any} The cached data or undefined
+   */
+  window.getQueryData = (queryKey) => {
+    return window.queryClient.getQueryData(queryKey);
+  };
+
+  /**
+   * Helper to set query data manually (useful for optimistic updates)
+   * @param {Array} queryKey - The query key to set data for
+   * @param {any} data - The data to set
+   */
+  window.setQueryData = (queryKey, data) => {
+    return window.queryClient.setQueryData(queryKey, data);
+  };
+
+  /**
+   * Helper to prefetch a query
+   * @param {Array} queryKey - The query key to prefetch
+   * @param {Function} queryFn - The function that fetches the data
+   * @param {Object} options - Additional query options
+   */
+  window.prefetchQuery = (queryKey, queryFn, options = {}) => {
+    return window.queryClient.prefetchQuery({
+      queryKey,
+      queryFn,
+      ...options,
+    });
+  };
+
+  /**
+   * Creates a query with automatic subscription management
+   * Returns unsubscribe function for cleanup
+   */
+  window.useQuery = (queryKey, queryFn, callback, options = {}) => {
+    const observer = window.createQuery(queryKey, queryFn, options);
+    const unsubscribe = observer.subscribe(callback);
+    return unsubscribe;
+  };
+
+  /**
+   * Creates a mutation with automatic subscription management
+   * Returns { mutate, unsubscribe } for triggering and cleanup
+   */
+  window.useMutation = (mutationFn, callback, options = {}) => {
+    const observer = window.createMutation(mutationFn, options);
+    const unsubscribe = observer.subscribe(callback);
+
+    return {
+      mutate: (variables) => observer.mutate(variables),
+      unsubscribe,
+    };
+  };
+</script>

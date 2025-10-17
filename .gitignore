@@ -1,3 +1,12 @@
 bootstrap
-
 node_modules
+
+.claude
+.cursor
+cypress
+docs
+
+CLAUDE.md
+cypress.config.js
+
+.env

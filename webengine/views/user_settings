@@ -2,7 +2,7 @@
   .nav-tabs .nav-link {
     color: #6c757d;
     border: none;
-    border-bottom: 2px solid transparent;
+    border-bottom: 2px solid transparent; 
   }
   .nav-tabs .nav-link.active {
     color: #7749f8;
@@ -55,7 +55,7 @@
       <a class="nav-link" href="#">Your Stories</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#">Your NPOs</a>
+      <a class="nav-link" href="#">NPOs I'm Following</a>
     </li>
   </ul>
 
@@ -99,7 +99,7 @@
 <!--prettier-ignore-->
 {{ include /components/global/UserSettings/upload_profile_image.html }}
 
-<script>
+<script type="module">
   const userTypes = {
     volunteer: "volunteer",
     donor: "donor",
@@ -157,15 +157,17 @@
     let zestyUserData;
 
     if (localUser) {
-      zestyUser = await getZestyUser(localUser.zuid);
-      zestyUserData = zestyUser.user.data;
+      const userData = await window.getUserProfile(localUser.zuid);
+      zestyUser = userData?.data[0];
+      zestyUserData = zestyUser;
 
       // Store original values
       window.originalFormData = {
         userType: userTypes[zestyUserData.user_type],
-        fullName: zestyUserData.first_name + " " + zestyUserData.last_name,
+        firstName: zestyUserData.first_name,
+        lastName: zestyUserData.last_name,
         aboutMe: zestyUserData.about_me,
-        profileImage: zestyUserData.profile_image,
+        profileImage: typeof zestyUserData.profile_image === 'string' ? zestyUserData.profile_image : zestyUserData.profile_image?.data[0]?.url,
       };
 
       originalContactFormData = {
@@ -176,7 +178,8 @@
 
       // Set initial values
       $("#userType").val(window.originalFormData.userType);
-      $("#fullName").val(window.originalFormData.fullName);
+      $("#firstName").val(window.originalFormData.firstName);
+      $("#lastName").val(window.originalFormData.lastName);
       $("#aboutme").val(window.originalFormData.aboutMe);
       $("#profileImage").attr("src", window.originalFormData.profileImage);
       $("#charCount").text(window.originalFormData.aboutMe?.length || 0);
@@ -199,14 +202,16 @@
     function hasFormChanges() {
       const currentValues = {
         userType: $("#userType").val(),
-        fullName: $("#fullName").val(),
+        firstName: $("#firstName").val(),
+        lastName: $("#lastName").val(),
         aboutMe: $("#aboutme").val(),
         profileImage: $("#profileImage").attr("src"),
       };
 
       return (
         currentValues.userType !== window.originalFormData.userType ||
-        currentValues.fullName !== window.originalFormData.fullName ||
+        currentValues.firstName !== window.originalFormData.firstName ||
+        currentValues.lastName !== window.originalFormData.lastName ||
         currentValues.aboutMe !== window.originalFormData.aboutMe ||
         currentValues.profileImage !== window.originalFormData.profileImage
       );
@@ -240,7 +245,7 @@
 
     // Add change event listeners to all form fields
     $(
-      "#userType, #fullName, #aboutme, #emailAddress, #phoneNumber, #address"
+      "#userType, #firstName, #lastName, #aboutme, #emailAddress, #phoneNumber, #address"
     ).on("input change", toggleActionButtons);
 
     // Add change event listener for profile image
@@ -256,7 +261,8 @@
 
       const formData = {
         user_type: $("#userType").val(),
-        full_name: $("#fullName").val(),
+        first_name: $("#firstName").val(),
+        last_name: $("#lastName").val(),
         about_me: $("#aboutme").val(),
         profile_image: $("#profileImage").attr("src"),
         email: $("#emailAddress").val(),
@@ -264,32 +270,55 @@
         address: $("#address").val(),
       };
 
+      $("#profileDropdown img").attr("src", `${formData.profile_image}?width=90`);
+      $("#profileDropdown .profile-name").text(formData.first_name);
+      $("#profileDropdown .profile-role").text(formData.user_type);
+      $(".profile-header img").attr("src", `${formData.profile_image}?width=90`);
+      $(".profile-header .profile-name").text(
+        formData.first_name + " " + formData.last_name
+      );
+      $(".profile-header .profile-role").text(formData.user_type);
+      $(".offcanvasProfile .profile-header img").attr(
+        "src",
+        `${formData.profile_image}?width=90`
+      );
+      $(".offcanvasProfile .profile-header .profile-name").text(
+        formData.first_name + " " + formData.last_name
+      );
+      $(".offcanvasProfile .profile-header .profile-role").text(
+        formData.user_type
+      );
+      $("#offcanvas-profile-image").attr("src", `${formData.profile_image}?width=90`);
+
+      // Define submitBtn outside try block so it's accessible in finally block
+      const submitBtn = $(this).find("button[type='submit']");
+      
       try {
         // Show loading state
-        const submitBtn = $(this).find("button[type='submit']");
         submitBtn.prop("disabled", true);
         submitBtn.html(
           '<span class="spinner-border spinner-border-sm me-2"></span>Saving...'
         );
 
-        // Make API call to update user
-        zestyUser.user.data.user_type = formData.user_type;
-        zestyUser.user.data.first_name = formData.full_name.split(" ")[0];
-        zestyUser.user.data.last_name = formData.full_name
-          .split(" ")
-          .slice(1)
-          .join(" ");
-        zestyUser.user.data.biography = formData.about_me;
-        zestyUser.user.data.email = formData.email;
-        zestyUser.user.data.phone_number = formData.phone_number;
-        zestyUser.user.data.address = formData.address;
+        // Instead of fetching and modifying the entire user object,
+        // create an object containing only the changed fields
+        const updatedFields = {
+          user_type: formData.user_type,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          biography: formData.about_me,
+          email: formData.email,
+          phone_number: formData.phone_number,
+          address: formData.address,
+        };
 
-        await updateZestyUser(localUser.zuid, zestyUser.user.data);
+        await window.updateZestyUser(localUser.zuid, updatedFields);
 
         // Update original data after successful save
         window.originalFormData = {
           userType: formData.user_type,
-          fullName: formData.full_name,
+          firstName: formData.first_name,
+          lastName: formData.last_name,
           aboutMe: formData.about_me,
           profileImage: formData.profile_image,
         };
@@ -304,7 +333,6 @@
         // toastr.success("Profile and contact information updated successfully");
 
         // After successful save, hide the action buttons
-        // console.log("Hiding buttons after successful update");
         $(".form-actions, .contact-form-actions").addClass("d-none");
       } catch (error) {
         console.error("Error updating profile and contact information:", error);

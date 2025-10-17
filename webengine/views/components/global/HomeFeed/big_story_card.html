@@ -1,68 +1,231 @@
 <style>
   .post-card {
-    /* margin: 20px auto; */
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
   }
+  
+  .post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
   .profile-img {
     width: 48px;
     height: 48px;
-    border-radius: 50%;
+    border-radius: 8px;
     object-fit: cover;
   }
+  
   .post-header {
     display: flex;
     align-items: center;
-    padding: 12px;
+    padding: 12px 16px;
   }
+  
   .post-meta {
     margin-left: 12px;
   }
+  
+  .post-content {
+    padding: 0 16px 16px;
+  }
+  
   .post-image {
     width: 100%;
-    height: auto;
-    border-radius: 0 0 8px 8px;
+    object-fit: cover;
+    border-radius: 0 0 10px 10px;
   }
-  .engagement-stats {
-    font-size: 0.9rem;
-    color: #65676b;
-    padding: 0 12px;
+  
+  /* New classes for aspect ratio handling */
+  .post-image-wide {
+    height: 400px;
+    object-fit: contain;
+    background-color: #F5F7FA;
   }
-  .action-buttons {
-    border-top: 1px solid #ddd;
-    padding: 4px 0;
+  
+  .post-image-tall {
+    max-height: 800px;
+    object-fit: contain;
+    background-color: #F5F7FA;
   }
-  .action-button {
-    border: none;
-    background: none;
-    color: #65676b;
-    font-weight: 600;
-  }
-
+  
   .story-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-bottom: 8px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
   }
+  
   .story-subtitle {
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-height: 2.8em;
-    line-height: 1.4em;
+    color: #666;
+    margin-bottom: 12px;
+    line-height: 1.5;
   }
-
-  .post-image {
+  
+  .story-hashtag {
+    color: #7b3fee;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-right: 8px;
+  }
+  
+  .story-hashtag:hover {
+    text-decoration: underline;
+  }
+  
+  /* Loading Indicator Styles */
+  .story-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
     width: 100%;
-    height: 360px;
-    object-fit: cover;
-    border-radius: 0 0 8px 8px;
+  }
+  
+  .story-loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #7b3fee;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .story-loading-text {
+    font-size: 18px;
+    color: #666;
+    text-align: center;
+  }
+  
+  .story-skeleton {
+    background: #f5f7fa;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  
+  .skeleton-pulse {
+    animation: pulse 1.5s infinite ease-in-out;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+  
+  .skeleton-author {
+    display: flex;
+    padding: 15px;
+    align-items: center;
+  }
+  
+  .skeleton-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: #e0e0e0;
+    margin-right: 15px;
+  }
+  
+  .skeleton-line {
+    height: 15px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  
+  .skeleton-line-short {
+    width: 40%;
+  }
+  
+  .skeleton-line-medium {
+    width: 60%;
+  }
+  
+  .skeleton-line-long {
+    width: 90%;
+  }
+  
+  .skeleton-content {
+    padding: 0 15px 15px;
+  }
+  
+  .skeleton-image {
+    height: 300px;
+    background: #e0e0e0;
   }
 </style>
 
-<div id="big-stories-container"></div>
+<div id="big-stories-container">
+  <!-- Loading skeleton will be shown initially -->
+  <div class="story-skeleton skeleton-pulse">
+    <div class="skeleton-author">
+      <div class="skeleton-circle"></div>
+      <div class="d-flex flex-column" style="width: 70%;">
+        <div class="skeleton-line skeleton-line-short"></div>
+      </div>
+    </div>
+    <div class="skeleton-content">
+      <div class="skeleton-line skeleton-line-medium"></div>
+      <div class="skeleton-line skeleton-line-long"></div>
+      <div class="skeleton-line skeleton-line-long"></div>
+    </div>
+    <div class="skeleton-image"></div>
+  </div>
+</div>
+
+<script type="module">
+  // Function to handle image aspect ratio
+  function handleImageAspectRatio() {
+    // Process all post images
+    $('.post-image').each(function() {
+      const img = $(this);
+      
+      // Create a new Image object to get the natural dimensions
+      const tempImg = new Image();
+      tempImg.src = img.attr('src');
+      
+      // When the image loads, calculate aspect ratio and apply appropriate styling
+      tempImg.onload = function() {
+        const aspectRatio = this.width / this.height;
+        
+        // Remove any previously applied classes
+        img.removeClass('post-image-wide post-image-tall');
+        
+        if (aspectRatio > 2) {
+          // Very wide image
+          img.addClass('post-image-wide');
+        } else if (aspectRatio < 0.8) {
+          // Very tall image
+          img.addClass('post-image-tall');
+        }
+        // Normal aspect ratio (0.8-2) uses default styling
+      };
+    });
+  }
+
+  // $(document).ready(function() {
+  //   // handleImageAspectRatio();
+  //   
+  // });
+</script>

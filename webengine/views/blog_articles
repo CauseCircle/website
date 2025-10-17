@@ -45,7 +45,11 @@
 
 <section class="d-flex flex-column align-items-center justify-content-center py-7 px-3 px-md-4">
   <div style="max-width: 800px" class="d-flex flex-column gap-3">
-    <p>PRODUCT</p>
+    <div class="d-flex flex-wrap gap-2 mb-2">
+      {{ each {this.tags} as blog_tag }}
+        <p class="text-uppercase">{{ blog_tag.hero_image.getImage() }}</p>
+      {{ /each }}
+    </div>
     <h2>{{ this.title }}</h2>
     {{each {this.author} as author }}
     <div class="d-flex gap-2">

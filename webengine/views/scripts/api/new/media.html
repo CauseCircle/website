@@ -1,0 +1,24 @@
+<script type="module">
+  import { MutationObserver } from 'https://esm.sh/@tanstack/query-core@5.90.2';
+
+  // ==================== MEDIA QUERIES & MUTATIONS ====================
+  // TanStack Query wrappers for media upload operations
+
+  // ==================== MUTATIONS (POST/PATCH/DELETE) ====================
+
+  /**
+   * Mutation for uploading media files
+   * @returns {MutationObserver}
+   */
+  window.createUploadMediaMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (mediaFiles) => window.newUploadMedia(mediaFiles),
+      onSuccess: (data) => {
+        // No query invalidation needed - returns uploaded media info directly
+      },
+      onError: (error) => {
+        console.error('❌ Failed to upload media:', error);
+      },
+    });
+  };
+</script>
