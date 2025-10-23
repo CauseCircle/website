@@ -319,7 +319,7 @@
   function initializeQueries() {
     const localUser = localStorage.getItem("user");
     if (!localUser) {
-      console.error("No user found in localStorage for query initialization");
+      // console.error("No user found in localStorage for query initialization");
       return;
     }
     
@@ -531,7 +531,7 @@
   // Reactive user profile subscription
   function subscribeToUserProfile() {
     if (!userProfileQuery) {
-      console.error("userProfileQuery is not available for subscription");
+      // console.error("userProfileQuery is not available for subscription");s
       return;
     }
     
@@ -555,7 +555,7 @@
   // Reactive user managed NPOs subscription
   function subscribeToUserManagedNpos() {
     if (!userManagedNposQuery) {
-      console.error("userManagedNposQuery is not available for subscription");
+      // console.error("userManagedNposQuery is not available for subscription");
       return;
     }
     
@@ -589,7 +589,7 @@
       const localUser = localStorage.getItem("user");
       
       if (!localUser) {
-        console.error("No user found in localStorage");
+        // console.error("No user found in localStorage");
         return;
       }
       

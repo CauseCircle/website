@@ -18,7 +18,7 @@
                 "zuid": "11-b896d4f9e9-lt60xm",
                 "type": "snippet",
                 "updatedAt": "2018-08-13T22:56:07Z",
-                "createdAt": "2025-10-17T13:40:38Z"
+                "createdAt": "2025-10-20T15:17:58Z"
             },
             "causes_landing_page": {
                 "zuid": "11-90cdebb7ea-hczmdx",
@@ -36,19 +36,19 @@
                 "zuid": "11-cadca9a796-f4nz2l",
                 "type": "pageset",
                 "updatedAt": "2024-03-20T20:18:58Z",
-                "createdAt": "2025-10-13T09:12:11Z"
+                "createdAt": "2025-10-20T15:57:17Z"
             },
             "stories": {
                 "zuid": "11-fafbc58abb-xd7jq6",
                 "type": "pageset",
                 "updatedAt": "2024-03-20T20:34:48Z",
-                "createdAt": "2025-10-16T16:02:42Z"
+                "createdAt": "2025-10-22T16:37:55Z"
             },
             "stories_landing_page": {
                 "zuid": "11-babdab84bf-9fxrlv",
                 "type": "templateset",
                 "updatedAt": "2024-03-20T21:36:05Z",
-                "createdAt": "2025-10-13T09:11:15Z"
+                "createdAt": "2025-10-20T15:50:05Z"
             },
             "/components/global/crumbs.html": {
                 "zuid": "11-bcd5ef9ba7-lj1njw",
@@ -132,7 +132,7 @@
                 "zuid": "11-a892ccb4d9-xsdqr7",
                 "type": "pageset",
                 "updatedAt": "2024-05-23T13:47:23Z",
-                "createdAt": "2025-10-16T15:15:27Z"
+                "createdAt": "2025-10-20T15:23:57Z"
             },
             "/components/global/fundraising_banner.html": {
                 "zuid": "11-f6f1b2f2b5-gbwtrm",
@@ -372,7 +372,7 @@
                 "zuid": "11-d0dbcba3ae-mj7n6d",
                 "type": "ajax-json",
                 "updatedAt": "2024-07-25T20:59:23Z",
-                "createdAt": "2024-07-25T21:19:40Z"
+                "createdAt": "2025-10-22T16:51:33Z"
             },
             "stories_backup": {
                 "zuid": "11-d6e0d2c4e4-025rl0",
@@ -588,7 +588,7 @@
                 "zuid": "11-d68aa2b0e0-2p97rl",
                 "type": "ajax-json",
                 "updatedAt": "2024-09-27T13:10:28Z",
-                "createdAt": "2025-10-16T13:55:59Z"
+                "createdAt": "2025-10-20T16:03:47Z"
             },
             "/components/global/HomeFeed/recommended_npos_card.html": {
                 "zuid": "11-d6a3e4facd-fcw0ml",
@@ -618,7 +618,7 @@
                 "zuid": "11-caba8fd287-lvk5zp",
                 "type": "ajax-json",
                 "updatedAt": "2024-09-27T14:28:26Z",
-                "createdAt": "2025-10-13T11:40:38Z"
+                "createdAt": "2025-10-20T15:26:22Z"
             },
             "/components/global/HomeFeed/npos_slider.html": {
                 "zuid": "11-a493ada8c8-3nlm8h",
@@ -1248,49 +1248,49 @@
                 "zuid": "11-a48cbebcfd-291b1t",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T13:58:12Z",
-                "createdAt": "2025-10-02T13:58:21Z"
+                "createdAt": "2025-10-22T16:22:18Z"
             },
             "/scripts/api/legacy/feedback.html": {
                 "zuid": "11-94d4cb8599-ht2pvr",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T13:58:50Z",
-                "createdAt": "2025-10-02T13:58:57Z"
+                "createdAt": "2025-10-22T16:22:35Z"
             },
             "/scripts/api/legacy/media.html": {
                 "zuid": "11-daa99bc1cb-j1r2kk",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T13:59:14Z",
-                "createdAt": "2025-10-02T13:59:21Z"
+                "createdAt": "2025-10-22T16:22:29Z"
             },
             "/scripts/api/legacy/npo-stats.html": {
                 "zuid": "11-98efcb8c8d-jltn13",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T13:59:40Z",
-                "createdAt": "2025-10-02T13:59:44Z"
+                "createdAt": "2025-10-22T16:22:38Z"
             },
             "/scripts/api/legacy/npo.html": {
                 "zuid": "11-ce9dedc6cc-4q6qtt",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:00:06Z",
-                "createdAt": "2025-10-02T14:00:13Z"
+                "createdAt": "2025-10-22T16:22:45Z"
             },
             "/scripts/api/legacy/stories.html": {
                 "zuid": "11-d894c1c8c4-nzv8bh",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:00:39Z",
-                "createdAt": "2025-10-02T14:01:01Z"
+                "createdAt": "2025-10-22T16:22:48Z"
             },
             "/scripts/api/legacy/users.html": {
                 "zuid": "11-f2ddc7bee3-znxpm8",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:01:18Z",
-                "createdAt": "2025-10-02T14:01:27Z"
+                "createdAt": "2025-10-22T16:25:03Z"
             },
             "/scripts/auth/auth-handlers.html": {
                 "zuid": "11-d4a9aada81-5glgrf",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:02:30Z",
-                "createdAt": "2025-10-16T15:22:23Z"
+                "createdAt": "2025-10-22T16:26:12Z"
             },
             "/scripts/auth/auth-helpers.html": {
                 "zuid": "11-9ce7caf5fb-q6fzrq",
@@ -1308,13 +1308,13 @@
                 "zuid": "11-fe9392e7e2-054lf9",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:03:35Z",
-                "createdAt": "2025-10-06T15:50:30Z"
+                "createdAt": "2025-10-22T16:26:35Z"
             },
             "/scripts/config/parsley-vars.html": {
                 "zuid": "11-a8e7cc95ed-jjs8qr",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:03:53Z",
-                "createdAt": "2025-10-06T15:50:32Z"
+                "createdAt": "2025-10-22T16:22:05Z"
             },
             "/scripts/core/auth-providers.html": {
                 "zuid": "11-989dd38c8c-bb7t1f",
@@ -1338,7 +1338,7 @@
                 "zuid": "11-88aaa5cccd-1rjffq",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:07:33Z",
-                "createdAt": "2025-10-06T15:50:48Z"
+                "createdAt": "2025-10-22T16:27:00Z"
             },
             "/scripts/api/new/todo.md": {
                 "zuid": "11-c2d0dfc98c-lx28dv",
@@ -1380,7 +1380,7 @@
                 "zuid": "11-eec6989dfd-vklcjf",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T15:38:25Z",
-                "createdAt": "2025-10-09T19:58:23Z"
+                "createdAt": "2025-10-22T16:25:39Z"
             },
             "/scripts/api/new/users.html": {
                 "zuid": "11-bef3a888ee-mcdcp5",
@@ -1434,13 +1434,13 @@
                 "zuid": "11-cccdcfa3e7-b6nbfj",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-09T13:11:29Z",
-                "createdAt": "2025-10-16T14:09:09Z"
+                "createdAt": "2025-10-20T15:37:17Z"
             },
             "/scripts/api/new/search.html": {
                 "zuid": "11-84ea98dcee-496qn6",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-09T15:16:20Z",
-                "createdAt": "2025-10-09T20:03:02Z"
+                "createdAt": "2025-10-22T16:25:28Z"
             }
         },
         "styles": {
@@ -1453,8 +1453,8 @@
             "styles/bootstrap.css": {
                 "zuid": "10-94bcc8f58f-d4wft7",
                 "type": "text/css",
-                "updatedAt": "2025-10-17T15:07:33.023215365Z",
-                "createdAt": "2025-10-17T15:07:33.02320884Z"
+                "updatedAt": "2025-10-17T15:07:32Z",
+                "createdAt": "2025-10-17T15:07:32Z"
             }
         },
         "scripts": {

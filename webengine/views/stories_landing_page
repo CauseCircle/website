@@ -679,7 +679,7 @@
       }
       
       // Default to image
-      return `<img src="${mediaUrl}" class="story-image" alt="${storyTitle}">`;
+      return `<img src="${mediaUrl}?width=250&format=webp&quality=80" class="story-image" alt="${storyTitle}">`;
     }
 
     function escapeHtml(unsafe) {
@@ -732,7 +732,7 @@
                       ? story.related_npos.data[0]?.logo?.data[0]?.url
                       : story.related_npos.data[0]?.logo || ""
                     : ""
-                }" class="story-npo-logo" alt="" />
+                }?width=22&format=webp&quality=80" class="story-npo-logo" alt="" />
                 <p class="npo-name my-auto text-truncate">${
                   story.related_npos && story.related_npos.data.length > 0
                     ? story.related_npos.data[0]?.name || ""

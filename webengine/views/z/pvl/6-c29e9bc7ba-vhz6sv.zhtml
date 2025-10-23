@@ -1,4 +1,4 @@
-<div className={styles.pvlRoot}>
+{{!-- <div className={styles.pvlRoot}>
 	<div style="display:flex" className={styles.pvlRow}>
 		<div style="flex:1" className={styles.pvlColumn}>
 			<h1 class="andres randy">{{this.title}}</h1>
@@ -40,4 +40,4 @@
 			<img src="{{this.story_image.getImage()}}" alt="@" width="100%" />
 		</div>
 	</div>
-</div>
+</div> --}}

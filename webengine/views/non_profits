@@ -1491,12 +1491,18 @@
     // Fetch and handle RSS data asynchronously (non-blocking)
     (async function fetchGlobalStories() {
       try {
-        const rssData = await fetch(
-          "https://morss.it/:format=json:cors/{{ this.website }}"
-        ).then((res) => res.json());
+        const response = await fetch(
+          "https://api.allorigins.win/get?url=" + encodeURIComponent("https://morss.it/:format=json:cors/{{ this.website }}")
+        );
 
-        const stories = rssData?.items || [];
-        hasGlobalStories = stories.length > 0;
+        // Check if response is successful
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const rssData = JSON.parse(data.contents);
+        hasGlobalStories = rssData?.items?.length > 0;
 
         if (hasGlobalStories) {
           $("#global-stories-section").removeClass("d-none");
@@ -1517,7 +1523,7 @@
           // Update the HTML with the fetched data
           const storiesContainer = $(".global-stories-container");
           storiesContainer.html(""); // Clear the existing content
-          stories.forEach((story) => {
+          rssData?.items?.forEach((story) => {
             const storyImage = extractImage(story.content);
             const storyElement = `
               <div class="col-12 col-sm-6 col-md-4 mb-4">
@@ -1565,15 +1571,16 @@
           checkAndUpdateNoStoriesMessage();
         }
       } catch (error) {
-        console.error("Error fetching RSS data:", error);
+        // Silently handle all errors without logging to console
         $("#global-stories-section").addClass("d-none");
         $("#global-stories-tab").parent().addClass("d-none");
-        hasGlobalStories = false;
         
         // Update no-stories message visibility
         checkAndUpdateNoStoriesMessage();
       }
-    })(); // Immediately invoke the async function without awaiting
+    })().catch(() => {
+      // Catch any unhandled promise rejections silently
+    });
 
     // Note: Local stories will be fetched independently and shown as they're ready
 
