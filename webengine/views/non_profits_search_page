@@ -355,6 +355,7 @@
     let currentPage = 1;
     let isSearching = false;
     let npoData = [];
+    let unfilteredNpoData = []; // Store unfiltered data for cause checkbox updates
     let hasLoadMoreBeenClicked = false;
     let isLocationSearch = false;
     let selectedCauses = new Set();
@@ -393,33 +394,53 @@
       }
     });
 
-    // Fetch causes list to render checkboxes (using causes.json endpoint)
-    $.ajax({
-      url: "{{ $base_url }}mobileapp/causes.json?zpw=causecircle",
-      method: "GET",
-      data: { limit: 999, featured: false },
-      success: function (data) {
-        if (data.data && data.data.length > 0) {
-          $causeCheckboxes.empty();
-          const uniqueTitles = Array.from(new Set(data.data.map(c => c.title))).sort((a,b)=>a.localeCompare(b));
-          uniqueTitles.forEach((title) => {
-            const id = `cause-${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
-            const checkbox = `
-              <div class="form-check">
-                <input class="form-check-input cause-check" type="checkbox" value="${title}" id="${id}" />
-                <label class="form-check-label" for="${id}">${title}</label>
-              </div>`;
-            $causeCheckboxes.append(checkbox);
+    // Update cause checkboxes based on displayed NPOs
+    function updateCauseCheckboxes(npos) {
+      const causesSet = new Set();
+      
+      npos.forEach(npo => {
+        if (npo.category?.data) {
+          npo.category.data.forEach(cat => {
+            if (cat.title) causesSet.add(cat.title);
           });
-        } else {
-          $causeCheckboxes.html('<div class="text-muted small">No causes found</div>');
         }
-      },
-      error: function (error) {
-        console.error("Error fetching causes:", error);
-        $causeCheckboxes.html('<div class="text-muted small">Failed to load causes</div>');
+      });
+
+      if (causesSet.size === 0) {
+        $causeCheckboxes.html('<div class="text-muted small">No causes found</div>');
+        return;
       }
-    });
+
+      // Preserve currently selected causes
+      const currentlySelected = new Set();
+      $(".cause-check").each(function() {
+        if ($(this).is(":checked")) {
+          currentlySelected.add($(this).val());
+        }
+      });
+
+      $causeCheckboxes.empty();
+      const sortedCauses = Array.from(causesSet).sort((a, b) => a.localeCompare(b));
+      
+      sortedCauses.forEach((title) => {
+        const id = `cause-${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
+        const isChecked = currentlySelected.has(title) ? 'checked' : '';
+        const checkbox = `
+          <div class="form-check">
+            <input class="form-check-input cause-check" type="checkbox" value="${title}" id="${id}" ${isChecked} />
+            <label class="form-check-label" for="${id}">${title}</label>
+          </div>`;
+        $causeCheckboxes.append(checkbox);
+      });
+
+      // Update selectedCauses set to reflect preserved selections
+      selectedCauses.clear();
+      currentlySelected.forEach(cause => {
+        if (causesSet.has(cause)) {
+          selectedCauses.add(cause);
+        }
+      });
+    }
 
     // Get the filter parameter from the URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -524,8 +545,8 @@
       $citySelect.val("");
       $zipSelect.val("");
       // Reset search input mode filters (keep search text as-is)
-      currentPage = 1;
-      filterNpos();
+      // Display unfiltered data
+      displayResults(unfilteredNpoData);
     });
 
     // Update URL parameter function
@@ -560,13 +581,18 @@
             if (currentPage === 1) {
               $searchNposContainer.empty();
               npoData = [];
+              unfilteredNpoData = [];
             }
             if (data.data && data.data.length > 0) {
               const existingZuids = new Set(npoData.map(n => n.meta?.zuid));
               const newNpos = data.data.filter(n => !existingZuids.has(n.meta?.zuid));
               npoData = [...npoData, ...newNpos];
+              unfilteredNpoData = [...npoData]; // Store unfiltered data
               displayResults(npoData);
-              if (currentPage === 1) populateLocationsFromData(npoData);
+              if (currentPage === 1) {
+                populateLocationsFromData(npoData);
+                updateCauseCheckboxes(npoData);
+              }
               if ((data.data.length >= limit) || !hasLoadMoreBeenClicked) {
                 addLoadMoreButton();
               } else {
@@ -576,6 +602,7 @@
               $exploreNPOsText.hide();
               removeLoadMoreButton();
               $searchNposContainer.append($noResultsMessage);
+              updateCauseCheckboxes([]);
             }
             isSearching = false;
           },
@@ -640,6 +667,7 @@
           if (currentPage === 1) {
             $searchNposContainer.empty();
             npoData = [];
+            unfilteredNpoData = [];
           }
 
           const combined = [];
@@ -665,9 +693,13 @@
               }
             }
             npoData = [...npoData, ...dedupedNew];
+            unfilteredNpoData = [...npoData]; // Store unfiltered data
 
             displayResults(npoData);
-            if (currentPage === 1) populateLocationsFromData(npoData);
+            if (currentPage === 1) {
+              populateLocationsFromData(npoData);
+              updateCauseCheckboxes(npoData);
+            }
 
             const hasMoreName = Array.isArray(nameData.data) && nameData.data.length >= limit;
             const hasMoreAddr = Array.isArray(addrData.data) && addrData.data.length >= limit;
@@ -687,6 +719,7 @@
             $exploreNPOsText.hide();
             removeLoadMoreButton();
             $searchNposContainer.append($noResultsMessage);
+            updateCauseCheckboxes([]);
           }
           isSearching = false;
         };
@@ -725,11 +758,12 @@
       const hasLocationFilter = selectedCountry || selectedState || selectedCity || selectedZip;
 
       if (!hasCauseFilter && !hasLocationFilter) {
-        displayResults(npoData);
+        displayResults(unfilteredNpoData);
         return;
       }
 
-      const filteredNpos = npoData.filter((npo) => {
+      // Filter from unfiltered data, not from already filtered npoData
+      const filteredNpos = unfilteredNpoData.filter((npo) => {
         let causeMatch = true;
         let locationMatch = true;
 
