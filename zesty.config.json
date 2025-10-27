@@ -12,13 +12,13 @@
                 "zuid": "11-94efd2f9e9-53fxwg",
                 "type": "templateset",
                 "updatedAt": "2018-08-13T22:56:07Z",
-                "createdAt": "2025-10-13T12:03:06Z"
+                "createdAt": "2025-10-22T19:27:24Z"
             },
             "loader": {
                 "zuid": "11-b896d4f9e9-lt60xm",
                 "type": "snippet",
                 "updatedAt": "2018-08-13T22:56:07Z",
-                "createdAt": "2025-10-20T15:17:58Z"
+                "createdAt": "2025-10-24T13:55:04Z"
             },
             "causes_landing_page": {
                 "zuid": "11-90cdebb7ea-hczmdx",
@@ -30,7 +30,7 @@
                 "zuid": "11-acfffcf0b1-1lbhp0",
                 "type": "ajax-json",
                 "updatedAt": "2024-03-13T21:46:21Z",
-                "createdAt": "2025-10-16T14:37:45Z"
+                "createdAt": "2025-10-24T13:33:38Z"
             },
             "users": {
                 "zuid": "11-cadca9a796-f4nz2l",
@@ -102,7 +102,7 @@
                 "zuid": "11-b6c4ecd4af-b7n215",
                 "type": "templateset",
                 "updatedAt": "2024-05-20T13:40:16Z",
-                "createdAt": "2025-10-13T10:25:17Z"
+                "createdAt": "2025-10-23T16:50:54Z"
             },
             "causes": {
                 "zuid": "11-fa92dfe3f1-63mxtc",
@@ -132,7 +132,7 @@
                 "zuid": "11-a892ccb4d9-xsdqr7",
                 "type": "pageset",
                 "updatedAt": "2024-05-23T13:47:23Z",
-                "createdAt": "2025-10-20T15:23:57Z"
+                "createdAt": "2025-10-24T14:06:27Z"
             },
             "/components/global/fundraising_banner.html": {
                 "zuid": "11-f6f1b2f2b5-gbwtrm",
@@ -660,7 +660,7 @@
                 "zuid": "11-c8abcef6ac-tdqg8f",
                 "type": "ajax-json",
                 "updatedAt": "2024-10-04T13:21:14Z",
-                "createdAt": "2025-10-16T13:48:30Z"
+                "createdAt": "2025-10-23T13:50:38Z"
             },
             "/components/global/HomeFeed/Create Story Steps/add_content.html": {
                 "zuid": "11-a482d996cc-3ksxfr",
@@ -1008,7 +1008,7 @@
                 "zuid": "11-ccc5dd8c82-fc2xnr",
                 "type": "ajax-json",
                 "updatedAt": "2025-02-03T15:05:51Z",
-                "createdAt": "2025-10-13T10:40:06Z"
+                "createdAt": "2025-10-23T14:10:00Z"
             },
             "/non-profit-directory/*/admin": {
                 "zuid": "11-9ea69fe8ad-0dxxdn",
@@ -1272,7 +1272,7 @@
                 "zuid": "11-ce9dedc6cc-4q6qtt",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:00:06Z",
-                "createdAt": "2025-10-22T16:22:45Z"
+                "createdAt": "2025-10-23T13:47:07Z"
             },
             "/scripts/api/legacy/stories.html": {
                 "zuid": "11-d894c1c8c4-nzv8bh",
@@ -1314,7 +1314,7 @@
                 "zuid": "11-a8e7cc95ed-jjs8qr",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:03:53Z",
-                "createdAt": "2025-10-22T16:22:05Z"
+                "createdAt": "2025-10-24T13:27:06Z"
             },
             "/scripts/core/auth-providers.html": {
                 "zuid": "11-989dd38c8c-bb7t1f",
@@ -1339,12 +1339,6 @@
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:07:33Z",
                 "createdAt": "2025-10-22T16:27:00Z"
-            },
-            "/scripts/api/new/todo.md": {
-                "zuid": "11-c2d0dfc98c-lx28dv",
-                "type": "ajax-json",
-                "updatedAt": "2025-10-02T14:23:26Z",
-                "createdAt": "2025-10-02T14:23:26Z"
             },
             "/scripts/api/new/core/query-client.html": {
                 "zuid": "11-e4a0f7ccaa-z9sxl8",

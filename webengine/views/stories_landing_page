@@ -743,7 +743,7 @@
             <a href="${
               story.meta.web.uri
             }" class="btn btn-secondary story-btn card-btn">
-              Read More
+              Read Story
             </a>
           </div>
         </div>
