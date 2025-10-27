@@ -311,6 +311,7 @@
       <a id="navbar-brand" class="navbar-brand position-absolute start-50 translate-middle-x" href="/">
         <img
           src="{{globals.logo.getImage()}}?width=160"
+          srcset="{{globals.logo.getImage()}}?width=160 1x, {{globals.logo.getImage()}}?width=240 2x"
           style="max-width: 160px"
           alt="cause circle brand logo"
         />
@@ -325,6 +326,7 @@
       <a id="navbar-brand-desktop" class="navbar-brand" href="/">
         <img
           src="{{globals.logo.getImage()}}?width=160"
+          srcset="{{globals.logo.getImage()}}?width=160 1x, {{globals.logo.getImage()}}?width=240 2x"
           style="max-width: 160px"
           alt="cause circle brand logo"
         />
@@ -432,6 +434,14 @@
               href="{{user_settings.first().getUrl()}}"
               class="menu-item"
               ><i class="bi bi-person"></i> Edit Profile</a
+            >
+          </div>
+          <div id="stage-environment-menu" class="menu-section d-none">
+            <div id="stage-environment-menu-header" class="menu-header">STAGE ENVIRONMENT</div>
+            <a
+              id="stage-environment-menu-item"
+              class="menu-item"
+              ><i class="bi bi-cloud"></i> Stage Environment</a
             >
           </div>
           <div class="menu-section d-none">
@@ -698,7 +708,7 @@
             Stories
           </a>
         </li>
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown d-none">
           <a
             class="nav-link dropdown-toggle"
             href="#"
@@ -727,7 +737,7 @@
             </li>
           </ul>
         </li>       
-        <li class="nav-item dropdown">
+        <li class="nav-item dropdown d-none">
           <a
             href="#"
             class="nav-link dropdown-toggle"
@@ -863,10 +873,25 @@
         $("#profile-header-link-offcanvas").attr("href", zestyUser.meta.web.uri);
         $("#profile-header-link").attr("href", zestyUser.meta.web.uri);
         $(".view-profile-link").attr("href", zestyUser.meta.web.uri);
-        $(".view-profile-link-offcanvas").attr("href", zestyUser.meta.web.uri);
+        $(".view-profile-link-offcanvas").attr("href", zestyUser.meta.web.uri); 
         
     $("#edit-profile-btn").attr("href", `{{user_settings.first().getUrl()}}`);
     $("#create-post-btn").removeClass("d-none");
+    
+    // Show stage environment menu only for @zesty.io users
+    if (zestyUser.email && zestyUser.email.endsWith('@zesty.io')) {
+      $("#stage-environment-menu").removeClass("d-none");
+
+      if (window.location.hostname === "4xxglxlj-dev.preview.stage.zesty.io") {
+        $("#stage-environment-menu-header").text("PREVIEW ENVIRONMENT");
+        $("#stage-environment-menu-item").html('<i class="bi bi-cloud"></i> Switch to Production');
+        $("#stage-environment-menu-item").attr("href", "https://causecircle.org");
+      } else if (window.location.hostname === "4xxglxlj-dev.webengine.zesty.io" || window.location.hostname === "causecircle.org") {
+        $("#stage-environment-menu-header").text("STAGE ENVIRONMENT");
+        $("#stage-environment-menu-item").html('<i class="bi bi-cloud"></i> Switch to Stage');
+        $("#stage-environment-menu-item").attr("href", "https://4xxglxlj-dev.preview.stage.zesty.io");
+      }
+    }
   }
 
   // Helper function to update managed NPOs UI

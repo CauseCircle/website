@@ -681,7 +681,7 @@
 
 <section class="container my-4">
   <div class="card pb-0">
-    <img class="hero-img mb-4" src="{{ $heroImage }}" alt="" />
+    <img class="hero-img mb-4" src="{{ $heroImage }}?width=1000&format=webp&quality=80" alt="" />
     <div class="row">
       <div class="col-12 col-md-5 col-lg-6">
         <div class="d-flex gap-3">
@@ -1597,7 +1597,7 @@
                 ${mediaElement}
                 <div class="d-flex flex-column gap-2 h-100">
                   <div class="d-flex align-items-end gap-2">
-                    <img src="${typeof story?.author?.data[0]?.profile_image === 'string' ? story?.author?.data[0]?.profile_image : story?.author?.data[0]?.profile_image?.data[0]?.url || 'https://www.gravatar.com/avatar/?d=mp'}?width=300" class="story-npo-logo" alt="${story?.author?.data[0]?.first_name}">
+                    <img src="${typeof story?.author?.data[0]?.profile_image === 'string' ? story?.author?.data[0]?.profile_image : story?.author?.data[0]?.profile_image?.data[0]?.url || 'https://www.gravatar.com/avatar/?d=mp'}?width=22&format=webp&quality=80" class="story-npo-logo" alt="${story?.author?.data[0]?.first_name}">
                     <p class="npo-name my-auto">${story?.author?.data[0]?.first_name} ${story?.author?.data[0]?.last_name}</p>
                   </div>
                   <div class="flex-grow-1">
@@ -1774,7 +1774,7 @@
         
         return `
           <div class="card d-flex flex-column h-100 p-3 gap-2 npo-card" data-story-url="${npo.meta?.web?.url || '#'}">
-            <img src="${heroImage}?width=300" class="npo-image" alt="${npo.name || 'NPO'}" />
+            <img src="${heroImage}?width=22&format=webp&quality=80" class="npo-image" alt="${npo.name || 'NPO'}" />
             <div class="d-flex flex-column gap-2 h-100">
               <div class="d-flex flex-grow-1 align-items-center gap-2">
                 <img src="${logoImage}?width=300" class="npo-npo-logo" alt="${npo.name || 'NPO'} logo" />

@@ -519,7 +519,7 @@
       </a>
     </div>
 
-    <div class="container d-flex align-items-center justify-content-center">
+    <div class="container d-flex align-items-center justify-content-center d-none">
       <div class="search-bar">
         <button id="npo-search-btn" type="button">
           <i class="bi bi-search"></i>
@@ -532,6 +532,22 @@
           class="form-control"
         />
       </div>
+    </div>
+    <div class="container d-flex align-items-center justify-content-center gap-2 mt-4">
+      <a
+        href="{{ claim_listing_page.first().getUrl() }}"
+        class="btn btn-primary d-flex align-items-center justify-content-center"
+        style="height: 48px;"
+      >
+        Get Started
+      </a>
+      <a
+        href="{{ demo_page.first().getUrl() }}"
+        class="btn btn-secondary d-flex align-items-center justify-content-center"
+        style="height: 48px;"
+      >
+        Contact Us
+      </a>
     </div>
   </div>
 </section>
@@ -590,7 +606,7 @@
     <div class="col-md-6 mb-4 mb-md-0">
       <div class="card h-100 border-0 shadow-md" style="min-height: 340px;">
         <div class="card-body p-0 h-100">
-          <img src="{{this.features_hero_image.getImage()}}" alt="" class="w-100 h-100 rounded-3" style="object-fit: cover;">
+          <img src="{{this.features_hero_image.getImage()}}" alt="Features hero image" class="w-100 h-100 rounded-3" style="object-fit: cover;">
         </div>
       </div>
     </div>
@@ -604,7 +620,7 @@
             <div class="card-body p-4">
               <div class="d-flex align-items-center mb-3">
                 <div class="rounded-circle bg-purple-100 me-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 60px; height: 60px; background-color: rgba(158, 119, 237, 0.15);">
-                  <img src="{{feature.logo.getImage()}}" alt="" class="w-100 h-100" style="object-fit: cover;">
+                  <img src="{{feature.logo.getImage()}}" alt="Feature logo" class="w-100 h-100" style="object-fit: cover;">
                 </div>
                 <h5 class="card-title mb-0 fs-6">{{feature.title}}</h5>
               </div>
@@ -660,6 +676,7 @@
   <div class="row d-none d-sm-flex mt-5">
     <div class="col-12 col-md-6">
       <img
+        alt="Use case image"
         src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
@@ -699,6 +716,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
+        alt="Use case image"
         src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
@@ -725,6 +743,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
+        alt="Use case image"
         src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
@@ -788,6 +807,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
+        alt="Use case image"
         src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
@@ -838,6 +858,7 @@
   <div class="row d-none d-sm-flex mt-5">
     <div class="col-12 col-md-6">
       <img
+        alt="Use case image"
         src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
@@ -877,6 +898,7 @@
     </div>
     <div class="col-12 col-md-6">
       <img
+        alt="Use case image"
         src="{{ usecase.image.getImage() }}?width=600"
         alt=""
         class="img-fluid w-100 usecase-image"
@@ -903,8 +925,8 @@
     </div>
     <div class="col-12 col-md-6">
       <img
+        alt="Use case image"
         src="{{ usecase.image.getImage() }}?width=600"
-        alt=""
         class="img-fluid w-100 usecase-image"
       />
     </div>
@@ -930,6 +952,7 @@
           {{ this.fundraising_title_description }}
         </div>
         <a
+          href="#demo-section" 
           data-target="#demo-section"
           class="btn btn-primary mt-4 scroll-to-demo"
           style="align-self: start"
@@ -942,6 +965,7 @@
         style="height: 100%; border-radius: 0px 30px 30px 0px"
       >
         <img
+          alt="Fundraising banner image"
           src="{{ this.fundraising_image.getImage() }}"
           style="
             width: 100%;
@@ -1011,24 +1035,26 @@
           <!--Name-->
           <div class="row gap-4 mt-5 mt-sm-0">
             <div class="col-md-12">
-              <div class="w-100 d-flex flex-column gap-2">
-                <label>First Name</label>
-                <input
-                  class="form-input"
-                  type="text"
-                  maxlength="255"
-                  name="Name_First"
-                  fieldType="7"
-                  placeholder=""
-                  required
-                />
-                <small class="text-danger" id="firstNameError"></small>
-              </div>
+          <div class="w-100 d-flex flex-column gap-2">
+            <label for="firstName">First Name</label>
+            <input
+              id="firstName"
+              class="form-input"
+              type="text"
+              maxlength="255"
+              name="Name_First"
+              fieldType="7"
+              placeholder=""
+              required
+            />
+            <small class="text-danger" id="firstNameError"></small>
+          </div>
             </div>
             <div class="col-md-12">
               <div class="w-100 d-flex flex-column gap-2">
-                <label>Last Name</label>
+                <label for="lastName">Last Name</label>
                 <input
+                  id="lastName"
                   class="form-input"
                   type="text"
                   maxlength="255"
@@ -1042,8 +1068,9 @@
             </div>
             <div class="col-md-12">
               <div class="w-100 d-flex flex-column gap-2">
-                <label> Work Email </label>
+                <label for="workEmail"> Work Email </label>
                 <input
+                  id="workEmail"
                   class="form-input"
                   type="email"
                   maxlength="255"
@@ -1058,8 +1085,9 @@
             </div>
             <div class="col-md-12">
               <div class="w-100 d-flex flex-column gap-2">
-                <label> Organization Name</label>
+                <label for="organizationName"> Organization Name</label>
                 <input
+                  id="organizationName"
                   class="form-input"
                   type="text"
                   name="SingleLine"
@@ -1123,7 +1151,7 @@
     });
 
     // Logo animation setup
-    setupLogoAnimation();
+    // setupLogoAnimation();
 
     // Set referrer field value
     $("#referrer-name").val(window.location.href);
