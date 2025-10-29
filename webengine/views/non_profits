@@ -672,7 +672,7 @@
 {{ if {this.claimed} != '1' }}
 <div
   id="claim-listing-section"
-  class="container d-flex flex-column align-items-center justify-content-center pt-7"
+  class="container d-flex flex-column align-items-center justify-content-center pt-7 d-none"
 >
   <!--prettier-ignore-->
   {{ $image = {non_profits_landing_page.first().claim_npo_hero_image.getImage()} }}
@@ -1366,7 +1366,16 @@
 
   // Legacy getNPOAdminProfile function removed - now using TanStack Query
 
-  const userData = JSON.parse(localStorage.getItem("user"));
+  const userDataStr = localStorage.getItem("user");
+  let userData = null;
+  if (userDataStr) {
+    try {
+      userData = JSON.parse(userDataStr);
+    } catch (error) {
+      console.error("Error parsing user data from localStorage:", error);
+      userData = null;
+    }
+  }
   const claimListingRedirectBool = window.location.search.includes(
     "claim-listing-redirect"
   );
@@ -1984,7 +1993,7 @@
                       <div class="story-subtitle">${story?.story_body}</div>
                       ${hashtagsHtml}
                     </div>
-                    <a href="{{ $base_url }}${story?.meta?.web?.uri}" class="btn btn-secondary story-btn card-btn" aria-label="Read more about ${story?.title}">Read More</a>
+                    <a href="{{ $base_url }}${story?.meta?.web?.uri}" class="btn btn-secondary story-btn card-btn" aria-label="Read the full story about ${story?.title}">Read Full Story</a>
                   </div>
                 </div>
               </div>
