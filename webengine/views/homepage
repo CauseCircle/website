@@ -393,7 +393,7 @@
 <!--Logo section-->
 <section
   id="logo-section"
-  class="container-fluid py-5 d-flex flex-column gap-3"
+  class="container-fluid py-5 d-flex flex-column gap-3 d-none"
 >
   <p class="text-center mx-auto hero-description">
     {{ this.logos_title }}
@@ -425,7 +425,7 @@
       {{ this.npo_description }}
     </div>
     <div class="row pt-3 row-gap-3">
-      {{each {this.npos} as npo limit 4 }}
+      {{each non_profits as npo WHERE npo.claimed = "1" limit {instance.date.date(m)}, 4 }}
       <div class="col-12 col-sm-6 col-md-3">
         <!--prettier-ignore-->
         {{ include /components/global/npo_card.html }}
@@ -459,7 +459,7 @@
 </section>
 
 <!--Causes section-->
-<section id="causes-section" class="py-5">
+<section id="causes-section" class="py-5 d-none">
   <div class="container">
     <div class="d-flex flex-column gap-3">
       <p class="section-title text-white">{{ this.causes_title }}</p>
@@ -513,7 +513,7 @@
 </section>
 
 <!--Use Cases section-->
-<section id="use-cases-section" class="container py-5">
+<section id="use-cases-section" class="container py-5 d-none">
   <div class="d-flex flex-column gap-3">
     <p class="section-title">{{ this.use_cases_title }}</p>
     <div class="hero-description mx-auto">
