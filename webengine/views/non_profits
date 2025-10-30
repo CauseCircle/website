@@ -672,7 +672,7 @@
 {{ if {this.claimed} != '1' }}
 <div
   id="claim-listing-section"
-  class="container d-flex flex-column align-items-center justify-content-center pt-7"
+  class="container d-flex flex-column align-items-center justify-content-center pt-7 d-none"
 >
   <!--prettier-ignore-->
   {{ $image = {non_profits_landing_page.first().claim_npo_hero_image.getImage()} }}
