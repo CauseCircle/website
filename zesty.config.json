@@ -1435,6 +1435,12 @@
                 "type": "ajax-json",
                 "updatedAt": "2025-10-09T15:16:20Z",
                 "createdAt": "2025-10-22T16:25:28Z"
+            },
+            "/components/global/Homepage/hero_banner.html": {
+                "zuid": "11-da9ea5bca0-zh12h6",
+                "type": "ajax-json",
+                "updatedAt": "2025-11-03T14:03:34.391057486Z",
+                "createdAt": "2025-11-03T14:03:34.391050432Z"
             }
         },
         "styles": {

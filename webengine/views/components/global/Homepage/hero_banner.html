@@ -332,10 +332,10 @@
       }
   }
 
-  @media (min-width: 1440px) {
+  @media (min-width: 1441px) {
       .phone-mockups {
-          right: -3rem !important;
-          top: 65% !important;
+          right: clamp(0%, 5%, 5%) !important;
+          top: clamp(60%, 65%, 70%) !important;
       }
   }
 
@@ -404,10 +404,9 @@
       }
       
       .hero-section-v2 {
-          height: auto;
           padding-bottom: 2rem;
-          height: auto;
-          max-height: 100%;
+          overflow: visible;
+          min-height: auto;
       }
       
       .hero-split-container {
@@ -437,7 +436,7 @@
           justify-content: center;
           /* height: 100%; */
           height: auto;
-          min-height: 561px;
+          min-height: 400px;
           overflow: hidden;
       }
       
@@ -560,9 +559,9 @@
               <div class="hero-image-section">
                   <div class="hero-image-wrapper info-card">
                       <!-- Info Card Overlay -->
-                      <div class="info-card-content">
-                          <h3 class="text-white">CauseCircle enables supporters to share authentic stories and media about your nonprofit organization.</h3>
-                          <h3 class="text-white">Share what's happening, who's involved, and how your NPO drives change day to day.</p>
+                      <div class="info-card-content d-flex flex-column gap-2">
+                          <p class="text-white">CauseCircle enables supporters to share authentic stories and media about your nonprofit organization.</p>
+                          <p class="text-white">Share what's happening, who's involved, and how your NPO drives change day to day.</p>
                       </div>
                       
                       <!-- Phone Mockups Image -->
@@ -570,7 +569,7 @@
                           <img src="https://4xxglxlj.media.zestyio.com/507164627-09245327-e8a0-4eed-bc0f-0bec10c0f174.png" alt="CauseCircle App Mockups" class="mockups-image">
                       </div>
                   </div>
-              </div>
+              </div> 
           </div>
       </div>
   </div>
