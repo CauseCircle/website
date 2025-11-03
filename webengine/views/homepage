@@ -1,3 +1,4 @@
+
 <style>
   .hero-title p,
   .hero-title {
@@ -155,9 +156,9 @@
       color: var(--bs-gray-600);
     }
   }
-  .hero-container {
+  /* .hero-container {
     max-width: 750px;
-  }
+  } */
   .hero-image {
     width: 100%;
     height: 100%;
@@ -214,10 +215,9 @@
     text-align: start;
   }
 
-  #hero-section {
-    /* min-height: 680px; */
+  /* #hero-section {
     background: linear-gradient(to bottom, white, #f7d7fe);
-  }
+  } */
 
   /* NPO Location Search Styles */
   .location-search-bar {
@@ -304,91 +304,15 @@
       width: 100%;
     }
     
-    #npo-cta {
+    #npo-cta { 
       width: 100%;
       max-width: 100%;
     }
   }
 </style>
 
-<!--Hero section-->
-<section id="hero-section" class="container-fluid">
-  <div class="container py-5">
-    <div
-      class="d-flex flex-column align-items-center gap-4 hero-container mx-auto"
-    >
-      <div class="hero-title">
-        {{ this.title }}
-      </div>
-      <div class="hero-description hero-description-text">
-        {{ this.description }}
-      </div>
-      <div class="d-flex gap-2 d-none">
-        <a
-          href="{{ login_page.first().getUrl() }}"
-          class="btn btn-primary signin-btn d-none"
-        >
-          {{ this.primary_cta_label }}
-        </a>
-      </div>
-      <div class="search-bar d-none">
-        <button id="homepage-search-btn" type="button">
-          <i class="bi bi-search"></i>
-        </button>
-        <input
-          id="homepage-search"
-          type="text"
-          placeholder="Search nonprofits by cause or name"
-          aria-label="Search"
-        />
-        <ul id="homepage-search-results" class="dropdown-menu"></ul>
-      </div>
-      <div class="d-flex gap-2 mt-3">
-        <a
-          href="{{ claim_listing_page.first().getUrl() }}"
-          class="btn btn-primary d-flex align-items-center justify-content-center"
-          style="height: 48px;"
-        >
-          Get Started
-        </a>
-        <a
-          href="{{ demo_page.first().getUrl() }}"
-          class="btn btn-secondary d-flex align-items-center justify-content-center"
-          style="height: 48px;"
-        >
-          Contact Us
-        </a>
-      </div>
-      <div id="download-buttons" class="d-flex justify-content-center gap-3 w-100 d-none">
-        <a
-          href="https://play.google.com/store/apps/details?id=causecircle.org&pcampaignid=web_share"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src="https://4xxglxlj.media.zestyio.com/google_download.png"
-            alt="Get it on Google Play"
-            class="store-button"
-          />
-        </a>
-        <a
-          href="https://apps.apple.com/us/app/causecircle/id6593386907"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            src="https://4xxglxlj.media.zestyio.com/apple_download.png"
-            alt="Download on the App Store"
-            class="store-button"
-          />
-        </a>
-        <a href="{{ demo_page.first().path_full }}" class="btn btn-secondary align-items-center d-none">
-          <span class="">{{ this.secondary_cta_label }}</span>
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
+<!--Hero section v2-->
+{{include /components/global/Homepage/hero_banner.html}}
 
 <!--Logo section-->
 <section
