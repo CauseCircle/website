@@ -546,6 +546,7 @@
     let selectedRole,
       selectedCauses = [],
       selectedNPOs = [];
+    let npoSearchQuery;
 
     function updateStepUI() {
       $(".step").removeClass("active");
@@ -745,69 +746,75 @@
     }
 
     function loadNPOs(searchTerm) {
-      const limit = searchTerm ? 5 : 25;
+      // Helper function to render NPO cards
+      function renderNPOCards(npos) {
+        const npoContainer = $("#npo-container");
+        npoContainer.empty();
+
+        npos.forEach((npo) => {
+          const imageUrl =
+            npo.logo && npo.logo.data && npo.logo.data[0]
+              ? npo.logo.data[0].url
+              : "https://placehold.co/100x100";
+          const description = npo.cause_description
+            ? npo.cause_description.substring(0, 100) + "..."
+            : "No description available";
+
+          const npoCard = `
+            <div class="card npo-card" data-npo-id="${npo.meta.zuid}">
+              <div class="d-flex gap-2 align-items-center p-3">
+                <img src="${imageUrl}" alt="${npo.name}" style="width: 60px; height: 60px; object-fit: cover;">
+                <div class="card-content">
+                  <p class="fs-5 mb-0 cause-title" style="font-size: 14px">${npo.name}</p>
+                  <div class="text-muted mb-0 cause-description" style="font-size: 12px">${description}</div>
+                </div>
+              </div>
+            </div>
+          `;
+          npoContainer.append(npoCard);
+        });
+
+        // Add click event for NPO selection
+        $(".npo-card").click(function () {
+          const npoId = $(this).data("npo-id");
+          $(this).toggleClass("selected");
+          if ($(this).hasClass("selected")) {
+            selectedNPOs.push(npoId);
+          } else {
+            selectedNPOs = selectedNPOs.filter((id) => id !== npoId);
+          }
+        });
+      }
+
+      // Determine limit based on search term
+      const limit = searchTerm && searchTerm.trim().length > 0 ? 5 : 25;
+      const trimmedSearchTerm = searchTerm ? searchTerm.trim() : '';
 
       // Show loading indicator
       $("#npo-loading").removeClass("d-none");
       $("#npo-container").addClass("d-none");
 
-      $.ajax({
-        url: "{{ $base_url }}mobileapp/npos.json",
-        method: "GET",
-        data: {
-          limit: limit,
-          search: searchTerm,
-          page: 1,
-        },
-        success: function (response) {
-          const npos = response.data;
-          const npoContainer = $("#npo-container");
-          npoContainer.empty();
+      // Create search query with optional parameters
+      npoSearchQuery = window.createSearchNposQuery(trimmedSearchTerm, { limit, page: 1 });
 
-          npos.forEach((npo) => {
-            const imageUrl =
-              npo.logo && npo.logo.data && npo.logo.data[0]
-                ? npo.logo.data[0].url
-                : "https://placehold.co/100x100";
-            const description = npo.cause_description
-              ? npo.cause_description.substring(0, 100) + "..."
-              : "No description available";
-
-            const npoCard = `
-              <div class="card npo-card" data-npo-id="${npo.meta.zuid}">
-                <div class="d-flex gap-2 align-items-center p-3">
-                  <img src="${imageUrl}" alt="${npo.name}" style="width: 60px; height: 60px; object-fit: cover;">
-                  <div class="card-content">
-                    <p class="fs-5 mb-0 cause-title" style="font-size: 14px">${npo.name}</p>
-                    <div class="text-muted mb-0 cause-description" style="font-size: 12px">${description}</div>
-                  </div>
-                </div>
-              </div>
-            `;
-            npoContainer.append(npoCard);
-          });
-
-          // Add click event for NPO selection
-          $(".npo-card").click(function () {
-            const npoId = $(this).data("npo-id");
-            $(this).toggleClass("selected");
-            if ($(this).hasClass("selected")) {
-              selectedNPOs.push(npoId);
-            } else {
-              selectedNPOs = selectedNPOs.filter((id) => id !== npoId);
-            }
-          });
-
+      // Subscribe to query results
+      npoSearchQuery.subscribe((result) => {
+        if (result.isLoading) {
+          // Loading state already shown
+          $("#npo-loading").removeClass("d-none");
+          $("#npo-container").addClass("d-none");
+        } else if (result.isSuccess) {
+          const npos = result.data?.data || [];
+          renderNPOCards(npos);
           // Hide loading indicator and show results
           $("#npo-loading").addClass("d-none");
           $("#npo-container").removeClass("d-none");
-        },
-        error: function (error) {
-          console.error("Error fetching NPOs:", error);
+        } else if (result.isError) {
+          console.error("Error fetching NPOs:", result.error);
           // Hide loading indicator on error
           $("#npo-loading").addClass("d-none");
           $("#npo-container").removeClass("d-none");
-        },
+        }
       });
     }
 

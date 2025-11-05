@@ -21,6 +21,9 @@
       rel="stylesheet"
     />
     <link rel="icon" href="https://4xxglxlj.media.zestyio.com/cause-circle-icon-color.png" type="image/png" sizes="196x196">
+    {{if {npo.claimed} != '1' }}
+      <meta name="robots" content="noindex">
+    {{/if}}
     
     <style>
       .left-side {

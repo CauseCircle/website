@@ -8,16 +8,36 @@
 
   /**
    * Query for searching NPOs
-   * @param {string} query - Search query
+   * @param {string} query - Search query (optional)
+   * @param {object} options - Optional parameters
+   * @param {number} options.limit - Number of items per page (default: 25)
+   * @param {number} options.page - Page number (default: 1)
+   * @param {string} options.claimed - Claimed status (default: '1')
    * @returns {QueryObserver}
    */
-  window.createSearchNposQuery = (query) => {
+  window.createSearchNposQuery = (query, options = {}) => {
+    const { limit = query ? 5 : 25, page = 1, claimed = '1' } = options;
+    const searchTerm = query ? query.trim() : '';
+    
+    // Build query key with all parameters
+    const queryKey = ['search', 'npos', searchTerm, limit, page, claimed];
+    
+    // Build URL parameters object
+    const params = {
+      limit: limit,
+      page: page,
+      claimed: claimed
+    };
+    if (searchTerm) {
+      params.search = searchTerm;
+    }
+    
     return new QueryObserver(window.queryClient, {
-      queryKey: ['search', 'npos', query],
-      queryFn: () => $.getJSON(`${BASE_URL}/npos/search?search=${encodeURIComponent(query)}`),
+      queryKey: queryKey,
+      queryFn: () => $.getJSON(`${BASE_URL}/npos`, params), // TODO: Replace with faster API endpoint /npos/search
       staleTime: 0, // Always stale - search results should be fresh
       cacheTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
-      enabled: !!query && query.length > 0,
+      enabled: true, // Always enabled, even without search term
     });
   };
 

@@ -18,6 +18,8 @@
 {{$search = WHERE FIND_IN_SET (npo._zuid, '{get_var.followed}')  }}
 {{else-if {get_var.featured} }}
 {{$search = WHERE npo.featured = '{get_var.featured}'  }}
+{{else-if {get_var.claimed} }}
+{{$search = WHERE npo.claimed = '{get_var.claimed}'  }}
 {{else-if {get_var.zuid} }}
 {{$search = WHERE npo.zuid = '{get_var.zuid}' }}
 {{else-if {get_var.admin_zuid} }}
