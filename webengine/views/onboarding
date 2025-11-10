@@ -307,7 +307,7 @@
       <img
         src="{{ globals.logo.getImage() }}"
         style="max-width: 160px"
-        alt="brand logo"
+        alt="cause circle brand logo"
       />
     </div>
 
@@ -363,7 +363,7 @@
       <img
         src="{{ globals.logo.getImage() }}"
         style="max-width: 160px"
-        alt="brand logo"
+        alt="cause circle brand logo"
       />
     </div>
 
