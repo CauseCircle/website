@@ -1379,24 +1379,28 @@
   const claimListingRedirectBool = window.location.search.includes(
     "claim-listing-redirect"
   );
-  const followNpoBool = window.location.search.includes("follow");
 
   if (!userData) {
     $(".claim-listing-btn").each(function () {
       // $(this).attr("data-bs-target", "#loginPromptModal");
-      $(this).attr("data-bs-target", "");
+      // $(this).attr("data-bs-target", "");
+      $(this).attr("data-bs-toggle", "modal");
+      $(this).attr("data-bs-target", "#loginModal");
       $(this).on("click", function () {
         const redirectUrl = window.location.pathname;
         localStorage.setItem("claimListingRedirectUrl", redirectUrl);
-        window.location.pathname = "{{login_page.first().getUrl()}}";
+        // window.location.pathname = "{{login_page.first().getUrl()}}";
       });
     });
   }
 
-  if (followNpoBool && !userData) {
-    localStorage.setItem("followNpo", "{{this.zuid}}");
-    window.location.href =
-      "{{login_page.first().getUrl()}}?follow_npo={{this.zuid}}";
+  // Handle follow NPO redirect from auth flow
+  const followNpoRedirectUrl = localStorage.getItem("followNpoRedirectUrl");
+  const hasFollowParam = window.location.search.includes("follow");
+  
+  // Clean up localStorage if we have the follow param
+  if (hasFollowParam && followNpoRedirectUrl) {
+    localStorage.removeItem("followNpoRedirectUrl");
   }
 
   $(document).ready(async function () {
@@ -1407,7 +1411,10 @@
     const viewNpoProfileMutation = window.createViewNpoProfileMutation();
     viewNpoProfileMutation.mutate("{{this.zuid}}");
 
-    if (followNpoBool && userData) {
+    // Remove old modal-based follow flow - now handled by auto-triggering follow button
+    if (false) {
+      // User is logged in and came from follow flow, handle follow action
+      localStorage.removeItem("followNpoRedirectUrl");
       const userZuid = userData.zuid;
       const npoZuid = "{{this.zuid}}";
 
@@ -1597,11 +1604,11 @@
     if (!userData) {
       $(".claim-listing-btn").each(function () {
         // $(this).attr("data-bs-target", "#loginPromptModal");
-        $(this).attr("data-bs-target", "");
+        // $(this).attr("data-bs-target", "");
         $(this).on("click", function () {
           const redirectUrl = window.location.pathname;
           localStorage.setItem("claimListingRedirectUrl", redirectUrl);
-          window.location.pathname = "{{login_page.first().getUrl()}}";
+          // window.location.pathname = "{{login_page.first().getUrl()}}";
         });
       });
     }
@@ -1685,12 +1692,12 @@
     if (!localUser?.zuid) {
       // Show button for non-logged in users
       followBtn.removeClass("d-none");
-      // If user is not logged in, clicking follow redirects to login
+      // If user is not logged in, clicking follow opens login modal
       followBtn.on("click", function () {
-        showLoading(true);
-        localStorage.setItem("followNpo", "{{this.zuid}}");
-        window.location.href =
-          "{{login_page.first().getUrl()}}?follow_npo={{this.zuid}}";
+        const redirectUrl = window.location.pathname;
+        localStorage.setItem("followNpoRedirectUrl", redirectUrl);
+        const loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+        loginModal.show();
       });
 
       // Create Story Button
@@ -1767,6 +1774,14 @@
               showLoading(false);
             }, 1000); // 1 second delay to show loading state
           });
+
+          // Auto-trigger follow button if page has ?follow param and user is not already following
+          if (hasFollowParam && !isFollowing) {
+            // Small delay to ensure button is fully initialized and click handler is attached
+            setTimeout(() => {
+              followBtn.trigger("click");
+            }, 100);
+          }
         }
       });
       

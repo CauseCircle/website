@@ -306,7 +306,7 @@
           class="dropdown-profile-image m-0 offcanvas-profile-button-image"
         />
       </button>
-      
+
       <!-- Centered logo for mobile -->
       <a id="navbar-brand" class="navbar-brand position-absolute start-50 translate-middle-x" href="/">
         <img
@@ -454,12 +454,14 @@
           >
         </div>
       </div>
-      <a
-        href="{{login_page.first().getUrl()}}"
+      <button
+        type="button"
         class="btn btn-primary text-nowrap signin-btn d-none"
+        data-bs-toggle="modal"
+        data-bs-target="#loginModal"
       >
         Sign In
-      </a>
+      </button>
     </div>
     
     <!-- Mobile hamburger button -->
@@ -823,6 +825,9 @@
 <!-- prettier-ignore -->
 {{include /components/global/HomeFeed/create_story_modal.html}}
 
+<!-- prettier-ignore -->
+{{include /components/global/Modals/login_modal.html}}
+
 <script type="module">
   const localUser = JSON.parse(localStorage.getItem("user"));
 
@@ -880,7 +885,7 @@
     
     // Show stage environment menu only for @zesty.io users
     if (zestyUser.email && zestyUser.email.endsWith('@zesty.io')) {
-      $("#stage-environment-menu").removeClass("d-none");
+      // $("#stage-environment-menu").removeClass("d-none");
 
       if (window.location.hostname === "4xxglxlj-dev.preview.stage.zesty.io") {
         $("#stage-environment-menu-header").text("PREVIEW ENVIRONMENT");
@@ -1125,7 +1130,7 @@
     if (!localUser) {
       // When no user is logged in on mobile, replace the profile button with a Sign In button.
       $('button[data-bs-target="#offcanvasProfile"]').replaceWith(
-        '<a href="{{login_page.first().getUrl()}}" class="btn d-lg-none btn-primary">Sign In</a>'
+        '<button type="button" class="btn d-lg-none btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Sign In</button>'
       );
       // Remove the offcanvas profile element since it is not needed.
       $('#offcanvasProfile').remove();
