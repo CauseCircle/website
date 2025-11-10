@@ -1,18 +1,41 @@
-<!-- Modal -->
+<style>
+  .login-modal .login-btn {
+    min-width: 7.625rem;
+    height: 2.5rem;
+    border-radius: 10px;
+    border: 1px solid #e1e4ea;
+    box-shadow: 0px 1px 2px 0px #0a0d1408;
+    background-color: #fff;
+    transition: box-shadow 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-modal .login-btn:hover {
+    box-shadow: 0px 4px 8px 0px #0a0d1420;
+    background-color: #f5f7fa;
+  }
+  .login-modal .modal-dialog {
+    max-width: 420px;
+  }
+  .login-modal .modal-content {
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+</style>
 
+<!-- Login Modal -->
 <div
-  class="modal fade"
+  class="modal fade login-modal"
   id="loginModal"
   tabindex="-1"
   aria-labelledby="loginModalLabel"
   aria-hidden="true"
 >
-  <div
-    class="modal-dialog modal-dialog-centered"
-    style="width: 100%; max-width: 586px"
-  >
-    <div class="modal-content p-3 gap-3">
-      <div class="w-100 d-flex justify-content-end">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- Close Button -->
+      <div class="d-flex justify-content-end mb-3">
         <button
           type="button"
           class="btn-close"
@@ -21,19 +44,95 @@
         ></button>
       </div>
 
-      <div class="d-flex flex-column gap-5 p-3">
-        <div
-          class="d-flex flex-column align-items-center justify-content-center"
+      <!-- Logo -->
+      <div class="d-flex justify-content-center mt-4">
+        <img
+          src="{{globals.modal_logo.getImage()}}?width=160&quality=60&format=webp"
+          srcset="
+            {{globals.modal_logo.getImage()}}?width=120&quality=60&format=webp 120w,
+            {{globals.modal_logo.getImage()}}?width=240&quality=60&format=webp 240w"
+          sizes="120px"
+          style="max-width: 120px"
+          width="120"
+          loading="lazy"
+          decoding="async"
+          alt="CauseCircle logo"
+        />
+      </div>
+
+      <!-- Dynamic Title and Description -->
+      <div class="text-center mb-4 d-none">
+        <h5 id="login-modal-title" class="fw-medium mb-2">Welcome to CauseCircle</h5>
+        <p id="login-modal-description" class="text-muted mb-0">Sign in to continue</p>
+      </div>
+
+      <!-- OAuth Buttons -->
+      <div class="d-flex flex-column gap-2 mx-auto my-5" style="max-width: 300px">
+        <!-- Google -->
+        <button
+          type="button"
+          class="login-btn btn btn-light w-100"
+          id="google-signin-btn-modal"
         >
-          <h4>Unlock Your Amplify the Cause Opportubity</h4>
-          <p>Empower communities with you generosity</p>
-        </div>
-        <div class="w-100 text-center">
-          <button class="btn btn-secondary w-100">
-            <i class="bi bi-facebook me-2 fs-5" style="color: #1877f2"></i> Sign
-            in with Facebook
-          </button>
-        </div>
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path
+              fill="#EA4335"
+              d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27006974,0 3.1977497,2.69829785 1.23999023,6.65002441 L5.26620003,9.76452941 Z"
+            />
+            <path
+              fill="#34A853"
+              d="M16.0407269,18.0125889 C14.9509167,18.7163016 13.5660892,19.0909091 12,19.0909091 C8.86648613,19.0909091 6.21911939,17.076871 5.27698177,14.2678769 L1.23746264,17.3349879 C3.19279051,21.2936293 7.26500293,24 12,24 C14.9328362,24 17.7353462,22.9573905 19.834192,20.9995801 L16.0407269,18.0125889 Z"
+            />
+            <path
+              fill="#4A90E2"
+              d="M19.834192,20.9995801 C22.0291676,18.9520994 23.4545455,15.903663 23.4545455,12 C23.4545455,11.2909091 23.3454545,10.5272727 23.1818182,9.81818182 L12,9.81818182 L12,14.4545455 L18.4363636,14.4545455 C18.1187732,16.013626 17.2662994,17.2212117 16.0407269,18.0125889 L19.834192,20.9995801 Z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.27698177,14.2678769 C5.03832634,13.556323 4.90909091,12.7937589 4.90909091,12 C4.90909091,11.2182781 5.03443647,10.4668121 5.26620003,9.76452941 L1.23999023,6.65002441 C0.43658717,8.26043162 0,10.0753848 0,12 C0,13.9195484 0.444780743,15.7301709 1.23746264,17.3349879 L5.27698177,14.2678769 Z"
+            />
+          </svg>
+          <span class="ms-2">Continue with Google</span>
+        </button>
+
+        <!-- Apple -->
+        <button
+          type="button"
+          class="login-btn btn btn-light w-100"
+          id="apple-signin-btn-modal"
+        >
+          <i class="bi bi-apple" style="font-size: 20px"></i>
+          <span class="ms-2">Continue with Apple</span>
+        </button>
+
+        <!-- Microsoft -->
+        <button
+          type="button"
+          class="login-btn btn btn-light w-100"
+          id="microsoft-signin-btn-modal"
+        >
+          <svg width="20" height="20" viewBox="0 0 23 23">
+            <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
+            <path fill="#f35325" d="M1 1h10v10H1z"></path>
+            <path fill="#81bc06" d="M12 1h10v10H12z"></path>
+            <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
+            <path fill="#ffba08" d="M12 12h10v10H12z"></path>
+          </svg>
+          <span class="ms-2">Continue with Microsoft</span>
+        </button>
+
+        <!-- Facebook -->
+        <button
+          type="button"
+          class="login-btn btn btn-light w-100"
+          id="continue-with-fb-btn-modal"
+        >
+          <i
+            class="bi bi-facebook"
+            style="font-size: 20px; color: #448afd"
+          ></i>
+          <span class="ms-2">Continue with Facebook</span>
+        </button>
       </div>
     </div>
   </div>
@@ -41,9 +140,68 @@
 
 <script type="module">
   $(document).ready(function () {
-    $("#loginModal .btn-secondary").click(function () {
-      // loginWithFacebook();
-      $("#loginModal").modal("hide");
+    const $loginModal = $("#loginModal");
+    const $modalTitle = $("#login-modal-title");
+    const $modalDescription = $("#login-modal-description");
+
+    // Update modal content dynamically when shown
+    $loginModal.on("show.bs.modal", function () {
+      const claimListingRedirectUrl = localStorage.getItem("claimListingRedirectUrl");
+      const followNpoRedirectUrl = localStorage.getItem("followNpoRedirectUrl");
+      const followUserRedirectUrl = localStorage.getItem("followUserRedirectUrl");
+
+      if (claimListingRedirectUrl) {
+        $modalTitle.text("Sign Up to Claim Your Listing");
+        $modalDescription.text(
+          "This will allow you to manage and edit your Nonprofit, invite admins and followers, and review stories."
+        );
+      } else if (followNpoRedirectUrl) {
+        $modalTitle.text("Sign In to Follow");
+        $modalDescription.text("Sign in to follow this organization and stay updated with their stories and impact.");
+      } else if (followUserRedirectUrl) {
+        $modalTitle.text("Sign In to Follow");
+        $modalDescription.text("Sign in to follow this user and see their stories and activity.");
+      } else {
+        $modalTitle.text("Welcome to CauseCircle");
+        $modalDescription.text("Sign in to continue");
+      }
+    });
+
+    // Wire up OAuth buttons
+    $("#google-signin-btn-modal").on("click", function () {
+      $loginModal.modal("hide");
+      if (typeof window.signInWithGoogle === "function") {
+        window.signInWithGoogle();
+      } else {
+        console.error("signInWithGoogle function not available");
+      }
+    });
+
+    $("#apple-signin-btn-modal").on("click", function () {
+      $loginModal.modal("hide");
+      if (typeof window.signInWithApple === "function") {
+        window.signInWithApple();
+      } else {
+        console.error("signInWithApple function not available");
+      }
+    });
+
+    $("#microsoft-signin-btn-modal").on("click", function () {
+      $loginModal.modal("hide");
+      if (typeof window.signInWithMicrosoft === "function") {
+        window.signInWithMicrosoft();
+      } else {
+        console.error("signInWithMicrosoft function not available");
+      }
+    });
+
+    $("#continue-with-fb-btn-modal").on("click", function () {
+      $loginModal.modal("hide");
+      if (typeof window.signInWithFacebook === "function") {
+        window.signInWithFacebook();
+      } else {
+        console.error("signInWithFacebook function not available");
+      }
     });
   });
 </script>
