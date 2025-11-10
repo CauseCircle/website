@@ -333,7 +333,15 @@
       />
     </div>
 
-    <button class="nextBtn btn btn-primary">Next</button>
+    <div class="d-flex align-items-center gap-3">
+      <button
+        class="skipBtn btn btn-link p-0 border-0 text-decoration-none"
+        style="color: #525866"
+      >
+        Skip
+      </button>
+      <button class="nextBtn btn btn-primary selectedCauses-btn">Save</button>
+    </div>
   </div>
   <div class="py-4">
     <div
@@ -389,7 +397,15 @@
       />
     </div>
 
-    <button class="nextBtn btn btn-primary">Next</button>
+    <div class="d-flex align-items-center gap-3">
+      <button
+        class="skipBtn btn btn-link p-0 border-0 text-decoration-none"
+        style="color: #525866"
+      >
+        Skip
+      </button>
+      <button class="nextBtn btn btn-primary selectedNPOs-btn">Save</button>
+    </div>
   </div>
   <div class="py-4">
     <div
@@ -682,6 +698,11 @@
       }
     });
 
+    $(".skipBtn").click(function () {
+      currentStep++;
+      updateStepUI();
+    });
+
     // Email validation function
     function isValidEmail(email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -767,7 +788,15 @@
             } else {
               selectedCauses = selectedCauses.filter((id) => id !== causeId); // Remove from selected causes
             }
+
+            if (selectedCauses.length > 0) {
+              $(".selectedCauses-btn").prop("disabled", false);
+            } else {
+              $(".selectedCauses-btn").prop("disabled", true);
+            }
           });
+
+          $(".selectedCauses-btn").prop("disabled", true);
 
           // Hide loading indicator and show results
           $("#cause-loading").addClass("d-none");
@@ -843,7 +872,15 @@
             } else {
               selectedNPOs = selectedNPOs.filter((id) => id !== npoId);
             }
+
+            if (selectedNPOs.length > 0) {
+              $(".selectedNPOs-btn").prop("disabled", false);
+            } else {
+              $(".selectedNPOs-btn").prop("disabled", true);
+            }
           });
+
+          $(".selectedNPOs-btn").prop("disabled", true);
 
           // Hide loading indicator and show results
           $("#npo-loading").addClass("d-none");
