@@ -40,25 +40,25 @@
   #stepsIndicator {
     font-size: 0.875rem;
   }
-  
+
   /* Hide stepsIndicator on mobile devices */
   @media (max-width: 768px) {
     #stepsIndicator {
       display: none !important;
     }
-    
+
     /* Hide horizontal rule on mobile */
     hr {
       display: none !important;
     }
-    
+
     /* Center logo on mobile */
     header .position-absolute {
       position: static !important;
       text-align: center;
       margin-bottom: 1rem;
     }
-    
+
     header .d-flex {
       flex-direction: column;
       text-align: center;
@@ -111,74 +111,31 @@
   }
 </style>
 
-<header>
+<hr class="p-0 m-0" />
+
+<section id="personalInfo" class="container">
   <div
-    class="d-flex justify-content-start align-items-center p-4 position-relative"
+    class="d-flex justify-content-between align-items-center p-4 position-relative"
   >
-    <div class="position-absolute" style="left: 1.5rem; top: 1.5rem">
+    <div class="position-absolute top-50 start-50 translate-middle">
       <img
         src="{{ globals.logo.getImage() }}"
         style="max-width: 160px"
         alt="cause circle brand logo"
       />
     </div>
-
-    <div
-      class="d-flex gap-2 align-items-center justify-content-center flex-grow-1"
-    >
-      <!-- steps indicator here -->
-      <div id="stepsIndicator" class="d-flex align-items-center">
-        <div class="step-item" data-step="1">
-          <span class="step-icon">1</span>
-          <span class="step-text">Personal Info</span>
-        </div>
-        <div class="step-separator"></div>
-        <div class="step-item" data-step="2">
-          <span class="step-icon">2</span>
-          <span class="step-text">Role</span>
-        </div>
-        <div class="step-separator"></div>
-        <div class="step-item" data-step="3">
-          <span class="step-icon">3</span>
-          <span class="step-text">Select Cause</span>
-        </div>
-        <div class="step-separator"></div>
-        <div class="step-item" data-step="4">
-          <span class="step-icon">4</span>
-          <span class="step-text">Select NPO</span>
-        </div>
-        <div class="step-separator"></div>
-        <div class="step-item" data-step="5">
-          <span class="step-icon">5</span>
-          <span class="step-text">Summary</span>
-        </div>
-      </div>
-    </div>
   </div>
-</header>
-
-<hr class="p-0 m-0" />
-
-<div class="container">
-  <div style="height: 38px" class="mt-4">
-    <button class="prevBtn btn btn-link p-0 border-0"><i class="bi bi-arrow-left fs-3"></i></button>
-  </div>
-</div>
-
-<section id="personalInfo" class="container">
-  <div class="py-4">
+  <div class="py-4 mt-4">
     <div
       class="d-flex flex-column gap-2 justify-content-center align-items-center"
     >
       <img
-        src="https://4xxglxlj.media.zestyio.com/role.png"
-        style="max-width: 160px"
+        src="https://4xxglxlj.media.zestyio.com/create-profile.png"
+        style="max-width: 90px"
       />
       <div class="d-flex flex-column gap-2 align-items-center">
-        <p class="fs-1 fw-normal mb-0">Tell Us About Yourself</p>
-        <p class="fs-5 text-muted mb-0">
-          We'd like to know a bit more about you.
-        </p>
+        <p class="fs-4 fw-normal mb-0">Create your profile</p>
+        <p class="fs-6 text-muted mb-0">Add your contact details</p>
       </div>
     </div>
   </div>
@@ -186,54 +143,71 @@
     <div class="mb-4" style="width: 380px">
       <div class="d-flex flex-column gap-3">
         <div class="form-group">
-          <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+          <label for="firstName" class="form-label">First Name </label>
           <input
             type="text"
             class="form-control"
             id="firstName"
-            placeholder="Enter your first name"
+            placeholder="Your first name"
             required
           />
         </div>
         <div class="form-group">
-          <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+          <label for="lastName" class="form-label">Last Name </label>
           <input
             type="text"
             class="form-control"
             id="lastName"
-            placeholder="Enter your last name"
+            placeholder="Your last name"
             required
           />
         </div>
         <div class="form-group">
-          <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+          <label for="email" class="form-label">Email </label>
           <input
             type="email"
             class="form-control"
             id="email"
-            placeholder="Enter your email address"
+            placeholder="Your email address"
             required
           />
         </div>
       </div>
-      <button class="nextBtn btn btn-primary w-100 mt-4">Next</button>
+      <button class="nextBtn btn btn-primary w-100 mt-4">Create Profile</button>
+      <div class="text-center mt-3">
+        <p class="mb-0">
+          By continuing you agree to our <u>Terms and Conditions</u> and
+          <u>Privacy Policy</u>
+        </p>
+      </div>
     </div>
   </div>
 </section>
 
 <section id="roleSelection" class="container d-none">
-  <div class="py-4">
+  <div
+    class="d-flex justify-content-between align-items-center p-4 position-relative"
+  >
+    <div class="position-absolute top-50 start-50 translate-middle">
+      <img
+        src="{{ globals.logo.getImage() }}"
+        style="max-width: 160px"
+        alt="cause circle brand logo"
+      />
+    </div>
+  </div>
+  <div class="py-4 mt-4">
     <div
       class="d-flex flex-column gap-2 justify-content-center align-items-center"
     >
       <img
-        src="https://4xxglxlj.media.zestyio.com/role.png"
-        style="max-width: 160px"
+        src="https://4xxglxlj.media.zestyio.com/role-select.png"
+        style="max-width: 90px"
       />
       <div class="d-flex flex-column gap-2 align-items-center">
-        <p class="fs-1 fw-normal mb-0">Choose Your Role</p>
-        <p class="fs-5 text-muted mb-0">
-          Select the role that best describes you.
+        <p class="fs-4 fw-normal mb-0">Your account has been saved</p>
+        <p class="fs-6 text-muted mb-0">
+          Select the role that best describes you
         </p>
       </div>
     </div>
@@ -247,12 +221,15 @@
               class="p-2 rounded-circle d-flex align-items-center justify-content-center"
               style="background-color: #f8f4ff; width: 40px; height: 40px"
             >
-              <i class="bi bi-people"></i>
+              <img
+                src="https://4xxglxlj.media.zestyio.com/volunteer-icon.png"
+                style="max-width: 40px"
+              />
             </div>
             <div>
               <p class="fs-5 mb-0" style="font-size: 14px">Volunteer</p>
               <p class="text-muted mb-0" style="font-size: 12px">
-                Contribute your time and skills to causes.
+                You contribute time & skills to NPOs
               </p>
             </div>
           </div>
@@ -263,13 +240,16 @@
               class="p-2 rounded-circle d-flex align-items-center justify-content-center"
               style="background-color: #f8f4ff; width: 40px; height: 40px"
             >
-              <i class="bi bi-briefcase"></i>
+              <img
+                src="https://4xxglxlj.media.zestyio.com/staff-icon.png"
+                style="max-width: 40px"
+              />
             </div>
             <div>
               <p class="fs-5 mb-0" style="font-size: 14px">Staff</p>
 
               <p class="text-muted mb-0" style="font-size: 12px">
-                Work professionally for nonprofit organizations.
+                You are employed by a non-profit organization
               </p>
             </div>
           </div>
@@ -280,12 +260,15 @@
               class="p-2 rounded-circle d-flex align-items-center justify-content-center"
               style="background-color: #f8f4ff; width: 40px; height: 40px"
             >
-              <i class="bi bi-heart"></i>
+              <img
+                src="https://4xxglxlj.media.zestyio.com/donor-icon.png"
+                style="max-width: 40px"
+              />
             </div>
             <div>
               <p class="fs-5 mb-0" style="font-size: 14px">Donor</p>
               <p class="text-muted mb-0" style="font-size: 12px">
-                Support causes through financial contributions.
+                You support causes with financial contributions
               </p>
             </div>
           </div>
@@ -296,12 +279,15 @@
               class="p-2 rounded-circle d-flex align-items-center justify-content-center"
               style="background-color: #f8f4ff; width: 40px; height: 40px"
             >
-              <i class="bi bi-person-circle"></i>
+              <img
+                src="https://4xxglxlj.media.zestyio.com/supporter-icon.png"
+                style="max-width: 40px"
+              />
             </div>
             <div>
-              <p class="fs-5 mb-0" style="font-size: 14px">Individual</p>
+              <p class="fs-5 mb-0" style="font-size: 14px">Supporter</p>
               <p class="text-muted mb-0" style="font-size: 12px">
-                Support causes as an individual through various means.
+                You advocate for nonprofit causes
               </p>
             </div>
           </div>
@@ -312,12 +298,15 @@
               class="p-2 rounded-circle d-flex align-items-center justify-content-center"
               style="background-color: #f8f4ff; width: 40px; height: 40px"
             >
-              <i class="bi bi-hand-thumbs-up"></i>
+              <img
+                src="https://4xxglxlj.media.zestyio.com/benificiary-icon.png"
+                style="max-width: 40px"
+              />
             </div>
             <div>
               <p class="fs-5 mb-0" style="font-size: 14px">Beneficiary</p>
               <p class="text-muted mb-0" style="font-size: 12px">
-                Connect with organizations and receive support for your needs.
+                You receive benefits through NPO efforts
               </p>
             </div>
           </div>
@@ -329,18 +318,43 @@
 </section>
 
 <section id="causeSelection" class="container d-none">
+  <div
+    class="d-flex justify-content-between align-items-center p-4 position-relative"
+  >
+    <button class="prevBtn btn btn-link p-0 border-0" style="color: #525866">
+      <i class="bi bi-arrow-left fs-3"></i>
+    </button>
+
+    <div class="position-absolute top-50 start-50 translate-middle">
+      <img
+        src="{{ globals.logo.getImage() }}"
+        style="max-width: 160px"
+        alt="cause circle brand logo"
+      />
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <button
+        class="skipBtn btn btn-link p-0 border-0 text-decoration-none"
+        style="color: #525866"
+      >
+        Skip
+      </button>
+      <button class="nextBtn btn btn-primary selectedCauses-btn">Save</button>
+    </div>
+  </div>
   <div class="py-4">
     <div
       class="d-flex flex-column gap-2 justify-content-center align-items-center"
     >
       <img
-        src="https://4xxglxlj.media.zestyio.com/role.png"
-        style="max-width: 160px"
+        src="https://4xxglxlj.media.zestyio.com/categories-select.png"
+        style="max-width: 90px"
       />
       <div class="d-flex flex-column gap-2 align-items-center">
-        <p class="fs-1 fw-normal mb-0">Select a Cause</p>
-        <p class="fs-5 text-muted mb-0 text-center">
-          Pick a cause that you are passionate about.
+        <p class="fs-4 fw-normal mb-0">Follow cause categories</p>
+        <p class="fs-6 text-muted mb-0 text-center">
+          Choose what story categories you want to see
         </p>
       </div>
     </div>
@@ -361,26 +375,50 @@
       <div
         id="cause-container"
         class="d-flex flex-column gap-3 overflow-auto w-100"
-        style="max-height: 300px"
+        style="max-height: 450px"
       ></div>
-      <button class="nextBtn btn btn-primary w-100 mt-4">Next</button>
     </div>
   </div>
 </section>
 
 <section id="npoSelection" class="container d-none">
+  <div
+    class="d-flex justify-content-between align-items-center p-4 position-relative"
+  >
+    <button class="prevBtn btn btn-link p-0 border-0" style="color: #525866">
+      <i class="bi bi-arrow-left fs-3"></i>
+    </button>
+
+    <div class="position-absolute top-50 start-50 translate-middle">
+      <img
+        src="{{ globals.logo.getImage() }}"
+        style="max-width: 160px"
+        alt="cause circle brand logo"
+      />
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <button
+        class="skipBtn btn btn-link p-0 border-0 text-decoration-none"
+        style="color: #525866"
+      >
+        Skip
+      </button>
+      <button class="nextBtn btn btn-primary selectedNPOs-btn">Save</button>
+    </div>
+  </div>
   <div class="py-4">
     <div
       class="d-flex flex-column gap-2 justify-content-center align-items-center"
     >
       <img
-        src="https://4xxglxlj.media.zestyio.com/role.png"
-        style="max-width: 160px"
+        src="https://4xxglxlj.media.zestyio.com/subscribe-npo.png"
+        style="max-width: 90px"
       />
       <div class="d-flex flex-column gap-2 align-items-center">
-        <p class="fs-1 fw-normal mb-0">Follow Nonprofits</p>
-        <p class="fs-5 text-muted mb-0 text-center">
-          Choose Nonprofits to follow and engage with.
+        <p class="fs-4 fw-normal mb-0">Subscribe to nonprofits</p>
+        <p class="fs-6 text-muted mb-0 text-center">
+          Choose which nonprofits you want to follow
         </p>
       </div>
     </div>
@@ -401,9 +439,8 @@
       <div
         id="npo-container"
         class="d-flex flex-column gap-3 overflow-auto w-100"
-        style="max-height: 300px"
+        style="max-height: 450px"
       ></div>
-      <button class="nextBtn btn btn-primary w-100 mt-4">Next</button>
     </div>
   </div>
 </section>
@@ -421,8 +458,8 @@
         style="max-width: 160px"
       />
       <div class="d-flex flex-column gap-2 align-items-center">
-        <p class="fs-1 fw-normal mb-0">Welcome to CauseCircle!</p>
-        <p class="fs-5 text-muted mb-0">
+        <p class="fs-4 fw-normal mb-0">Welcome to CauseCircle!</p>
+        <p class="fs-6 text-muted mb-0">
           Your journey begins here. Explore and make a difference.
         </p>
       </div>
@@ -455,28 +492,30 @@
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         const userData = JSON.parse(localStorage.getItem("user"));
         const zuid = userData?.zuid;
-        
+
         if (zuid) {
           console.log(`ZUID found after ${attempt} attempts`);
           return zuid;
         }
-        
-        console.log(`ZUID not available yet, attempt ${attempt}/${maxAttempts}`);
-        
+
+        console.log(
+          `ZUID not available yet, attempt ${attempt}/${maxAttempts}`
+        );
+
         if (attempt < maxAttempts) {
-          await new Promise(resolve => setTimeout(resolve, interval));
+          await new Promise((resolve) => setTimeout(resolve, interval));
         }
       }
-      
-      console.error('ZUID not available after maximum attempts');
+
+      console.error("ZUID not available after maximum attempts");
       return null;
     }
 
     // Wait for ZUID to become available
     const zuid = await waitForZuid();
-    
+
     if (!zuid) {
-      console.error('Unable to proceed without ZUID');
+      console.error("Unable to proceed without ZUID");
       return;
     }
 
@@ -498,28 +537,48 @@
 
       // Edit the user data
       currentUser.user_type = selectedRole;
-      
+
       // Handle existing favorite_causes if it's a relationship object
-      if (currentUser.favorite_causes?.data && Array.isArray(currentUser.favorite_causes.data)) {
+      if (
+        currentUser.favorite_causes?.data &&
+        Array.isArray(currentUser.favorite_causes.data)
+      ) {
         // Extract existing ZUIDs that aren't in the selected list to preserve them
-        const existingCauseZuids = currentUser.favorite_causes.data.map(cause => cause.meta.zuid);
-        const preservedCauseZuids = existingCauseZuids.filter(zuid => !selectedCauses.includes(zuid));
-        
+        const existingCauseZuids = currentUser.favorite_causes.data.map(
+          (cause) => cause.meta.zuid
+        );
+        const preservedCauseZuids = existingCauseZuids.filter(
+          (zuid) => !selectedCauses.includes(zuid)
+        );
+
         // Combine preserved ZUIDs with newly selected ones
-        currentUser.favorite_causes = [...preservedCauseZuids, ...selectedCauses].join(",");
+        currentUser.favorite_causes = [
+          ...preservedCauseZuids,
+          ...selectedCauses,
+        ].join(",");
       } else {
         // If it's not a relationship object or doesn't exist, simply set the new value
         currentUser.favorite_causes = selectedCauses.join(",");
       }
-      
+
       // Handle existing favorite_npos if it's a relationship object
-      if (currentUser.favorite_npos?.data && Array.isArray(currentUser.favorite_npos.data)) {
+      if (
+        currentUser.favorite_npos?.data &&
+        Array.isArray(currentUser.favorite_npos.data)
+      ) {
         // Extract existing ZUIDs that aren't in the selected list to preserve them
-        const existingNpoZuids = currentUser.favorite_npos.data.map(npo => npo.meta.zuid);
-        const preservedNpoZuids = existingNpoZuids.filter(zuid => !selectedNPOs.includes(zuid));
-        
+        const existingNpoZuids = currentUser.favorite_npos.data.map(
+          (npo) => npo.meta.zuid
+        );
+        const preservedNpoZuids = existingNpoZuids.filter(
+          (zuid) => !selectedNPOs.includes(zuid)
+        );
+
         // Combine preserved ZUIDs with newly selected ones
-        currentUser.favorite_npos = [...preservedNpoZuids, ...selectedNPOs].join(",");
+        currentUser.favorite_npos = [
+          ...preservedNpoZuids,
+          ...selectedNPOs,
+        ].join(",");
       } else {
         // If it's not a relationship object or doesn't exist, simply set the new value
         currentUser.favorite_npos = selectedNPOs.join(",");
@@ -527,21 +586,21 @@
 
       // Update user with the new data
       const updatedUser = await window.updateZestyUser(userZuid, {
-        "first_name": personalInfo.firstName,
-        "last_name": personalInfo.lastName,
-        "email": personalInfo.email,
-        "favorite_causes": currentUser.favorite_causes,
-        "favorite_npos": currentUser.favorite_npos,
-        "user_type": currentUser.user_type,
-        "isOnboarded": true
+        first_name: personalInfo.firstName,
+        last_name: personalInfo.lastName,
+        email: personalInfo.email,
+        favorite_causes: currentUser.favorite_causes,
+        favorite_npos: currentUser.favorite_npos,
+        user_type: currentUser.user_type,
+        isOnboarded: true,
       });
     }
 
     let currentStep = 1;
     let personalInfo = {
-      firstName: '',
-      lastName: '',
-      email: ''
+      firstName: "",
+      lastName: "",
+      email: "",
     };
     let selectedRole,
       selectedCauses = [],
@@ -551,14 +610,18 @@
       $(".step").removeClass("active");
       $(`#step${currentStep}`).addClass("active");
 
-      $("#personalInfo, #roleSelection, #causeSelection, #npoSelection, #summary").addClass(
-        "d-none"
-      );
+      $(
+        "#personalInfo, #roleSelection, #causeSelection, #npoSelection, #summary"
+      ).addClass("d-none");
       $(
         `#${
-          ["personalInfo", "roleSelection", "causeSelection", "npoSelection", "summary"][
-            currentStep - 1
-          ]
+          [
+            "personalInfo",
+            "roleSelection",
+            "causeSelection",
+            "npoSelection",
+            "summary",
+          ][currentStep - 1]
         }`
       ).removeClass("d-none");
 
@@ -607,32 +670,37 @@
         const firstName = $("#firstName").val().trim();
         const lastName = $("#lastName").val().trim();
         const email = $("#email").val().trim();
-        
+
         if (!firstName || !lastName || !email) {
           alert("Please fill in all personal information fields");
           return;
         }
-        
+
         if (!isValidEmail(email)) {
           alert("Please enter a valid email address");
           return;
         }
-        
+
         // Store personal info
         personalInfo.firstName = firstName;
         personalInfo.lastName = lastName;
         personalInfo.email = email;
       }
-      
+
       if (currentStep === 2 && !selectedRole) {
         alert("Please select a role");
         return;
       }
-      
+
       if (currentStep < 5) {
         currentStep++;
         updateStepUI();
       }
+    });
+
+    $(".skipBtn").click(function () {
+      currentStep++;
+      updateStepUI();
     });
 
     // Email validation function
@@ -687,12 +755,12 @@
           causeContainer.empty();
 
           causes.forEach((cause) => {
-            const imageUrl = 
-              typeof cause.image === 'string' && cause.image.trim() !== ''
+            const imageUrl =
+              typeof cause.image === "string" && cause.image.trim() !== ""
                 ? cause.image
-                : (cause.image && cause.image.data && cause.image.data[0]
-                    ? cause.image.data[0].url
-                    : "https://placehold.co/100x100");
+                : cause.image && cause.image.data && cause.image.data[0]
+                ? cause.image.data[0].url
+                : "https://placehold.co/100x100";
             const description = cause.description
               ? cause.description.substring(0, 100) + "..."
               : "No description available";
@@ -720,7 +788,15 @@
             } else {
               selectedCauses = selectedCauses.filter((id) => id !== causeId); // Remove from selected causes
             }
+
+            if (selectedCauses.length > 0) {
+              $(".selectedCauses-btn").prop("disabled", false);
+            } else {
+              $(".selectedCauses-btn").prop("disabled", true);
+            }
           });
+
+          $(".selectedCauses-btn").prop("disabled", true);
 
           // Hide loading indicator and show results
           $("#cause-loading").addClass("d-none");
@@ -796,7 +872,15 @@
             } else {
               selectedNPOs = selectedNPOs.filter((id) => id !== npoId);
             }
+
+            if (selectedNPOs.length > 0) {
+              $(".selectedNPOs-btn").prop("disabled", false);
+            } else {
+              $(".selectedNPOs-btn").prop("disabled", true);
+            }
           });
+
+          $(".selectedNPOs-btn").prop("disabled", true);
 
           // Hide loading indicator and show results
           $("#npo-loading").addClass("d-none");
@@ -870,7 +954,7 @@
 
     // Initial UI update
     updateStepUI();
-    
+
     // Load initial causes
     loadCauses();
 
