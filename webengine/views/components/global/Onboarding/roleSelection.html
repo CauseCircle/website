@@ -1,0 +1,132 @@
+<section id="roleSelection" class="container d-none">
+  <div
+    class="header-container d-flex justify-content-between align-items-center p-4 position-relative"
+  >
+    <div class="position-absolute top-50 start-50 translate-middle">
+      <img
+        src="{{ globals.logo.getImage() }}"
+        style="max-width: 160px"
+        alt="cause circle brand logo"
+      />
+    </div>
+  </div>
+  <div class="py-4 mt-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img
+        src="https://4xxglxlj.media.zestyio.com/role-select.png"
+        style="max-width: 90px"
+      />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="fs-4 fw-normal mb-0">Your account has been saved</p>
+        <p class="fs-6 text-muted mb-0">
+          Select the role that best describes you
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="width: 380px">
+      <div class="d-flex flex-column gap-3">
+        <div class="card role-card" data-role="volunteer">
+          <div class="d-flex gap-2 align-items-center p-3">
+            <div
+              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
+              style="background-color: #f8f4ff; width: 40px; height: 40px"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/volunteer-icon.png"
+                style="max-width: 40px"
+              />
+            </div>
+            <div>
+              <p class="fs-5 mb-0" style="font-size: 14px">Volunteer</p>
+              <p class="text-muted mb-0" style="font-size: 12px">
+                You contribute time & skills to NPOs
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="card role-card" data-role="staff">
+          <div class="d-flex gap-2 align-items-center p-3">
+            <div
+              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
+              style="background-color: #f8f4ff; width: 40px; height: 40px"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/staff-icon.png"
+                style="max-width: 40px"
+              />
+            </div>
+            <div>
+              <p class="fs-5 mb-0" style="font-size: 14px">Staff</p>
+
+              <p class="text-muted mb-0" style="font-size: 12px">
+                You are employed by a non-profit organization
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="card role-card org-hidden-role" data-role="donor">
+          <div class="d-flex gap-2 align-items-center p-3">
+            <div
+              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
+              style="background-color: #f8f4ff; width: 40px; height: 40px"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/donor-icon.png"
+                style="max-width: 40px"
+              />
+            </div>
+            <div>
+              <p class="fs-5 mb-0" style="font-size: 14px">Donor</p>
+              <p class="text-muted mb-0" style="font-size: 12px">
+                You support causes with financial contributions
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="card role-card org-hidden-role" data-role="individual">
+          <div class="d-flex gap-2 align-items-center p-3">
+            <div
+              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
+              style="background-color: #f8f4ff; width: 40px; height: 40px"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/supporter-icon.png"
+                style="max-width: 40px"
+              />
+            </div>
+            <div>
+              <p class="fs-5 mb-0" style="font-size: 14px">Supporter</p>
+              <p class="text-muted mb-0" style="font-size: 12px">
+                You advocate for nonprofit causes
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="card role-card org-hidden-role" data-role="beneficiary">
+          <div class="d-flex gap-2 align-items-center p-3">
+            <div
+              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
+              style="background-color: #f8f4ff; width: 40px; height: 40px"
+            >
+              <img
+                src="https://4xxglxlj.media.zestyio.com/benificiary-icon.png"
+                style="max-width: 40px"
+              />
+            </div>
+            <div>
+              <p class="fs-5 mb-0" style="font-size: 14px">Beneficiary</p>
+              <p class="text-muted mb-0" style="font-size: 12px">
+                You receive benefits through NPO efforts
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="nextBtn btn btn-primary w-100 mt-4">Next</button>
+    </div>
+  </div>
+</section>
