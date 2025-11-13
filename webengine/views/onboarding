@@ -21,12 +21,6 @@
 {{ include /components/global/Onboarding/summary.html }}
 
 <script type="module">
-  const urlParams = new URLSearchParams(window.location.search);
-  const onboardingType = urlParams.get('onboardingType'); //type of onboarding (org)
-  if (onboardingType) {
-    console.log('Onboarding Type:', onboardingType);
-  }
-
   $(document).ready(async function () {
     // Function to check for ZUID availability
     async function waitForZuid(maxAttempts = 30, interval = 1000) {
@@ -80,14 +74,14 @@
       currentUser.user_type = selectedRole;
 
       // Add org data to currentUser object (but exclude from API call)
-      if (onboardingType === 'org' && orgDetails) {
+      if (isNPOFlow() && orgDetails) {
         currentUser.orgDetails = orgDetails;
       }
       // Sync orgMedia from window if it exists (set by orgMedia.html script)
-      if (onboardingType === 'org' && window.orgMedia) {
+      if (isNPOFlow() && window.orgMedia) {
         orgMedia = window.orgMedia;
       }
-      if (onboardingType === 'org' && orgMedia) {
+      if (isNPOFlow() && orgMedia) {
         currentUser.orgMedia = orgMedia;
       }
 
@@ -162,9 +156,14 @@
       orgDetails = null,
       orgMedia = null;
 
-    // Define step arrays based on onboarding type and choices
+    // Helper function to determine if NPO flow should be used
+    function isNPOFlow() {
+      return selectedRole === 'volunteer' || selectedRole === 'staff';
+    }
+
+    // Define step arrays based on selected role and choices
     function getStepArray() {
-      if (onboardingType === 'org') {
+      if (isNPOFlow()) {
         if (npoChoice === 'add-npo') {
           // Branch A: Add NPO flow
           return [
@@ -724,11 +723,6 @@
     $(".completeBtn").click(function () {
       // Handle completion
     });
-
-    // Hide roles when onboardingType=org
-    if (onboardingType === 'org') {
-      $(".org-hidden-role").addClass("d-none");
-    }
 
     // Initial UI update
     updateStepUI();
