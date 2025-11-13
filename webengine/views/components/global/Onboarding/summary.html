@@ -1,0 +1,39 @@
+<section
+  id="summary"
+  class="container d-none h-100 d-flex align-items-center justify-content-center flex-column"
+>
+  <div class="py-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img
+        src="https://4xxglxlj.media.zestyio.com/check.png"
+        style="max-width: 160px"
+      />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="fs-4 fw-normal mb-0">Welcome to CauseCircle!</p>
+        <p class="fs-6 text-muted mb-0">
+          Your journey begins here. Explore and make a difference.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="width: 380px">
+      <a
+        id="createContentBtn"
+        href="{{ home_feed.first().getUrl() }}"
+        class="completeBtn btn btn-primary w-100 mt-4"
+      >
+        Create Content
+      </a>
+      <a
+        id="exploreCausesBtn"
+        href="{{ causes_landing_page.first().getUrl() }}"
+        class="btn btn-secondary w-100 mt-4"
+      >
+        Explore Causes
+      </a>
+    </div>
+  </div>
+</section>

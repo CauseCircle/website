@@ -1,0 +1,150 @@
+<style>
+  .section-title p,
+  .section-title {
+    font-size: 2rem;
+    font-weight: 500;
+    text-align: center;
+  }
+  .hero-description p,
+  .hero-description {
+    font-size: 1.125rem;
+    font-weight: 400;
+    text-align: center;
+    color: var(--bs-gray-500);
+    max-width: 53.125rem;
+  }
+  .role-card,
+  .cause-card,
+  .npo-card,
+  .npo-choice-card,
+  .org-action-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: pointer;
+  }
+  .role-card:hover,
+  .cause-card:hover,
+  .npo-card:hover,
+  .npo-choice-card:hover,
+  .org-action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  .role-card.selected,
+  .cause-card.selected,
+  .npo-card.selected {
+    border: 2px solid #7b3fee;
+    background-color: #f8f4ff;
+  }
+  .npo-choice-card.selected,
+  .org-action-card.selected {
+    border: 2px solid #7b3fee !important;
+    background-color: #f8f4ff;
+  }
+  .npo-choice-card {
+    border: 1px solid #e0e0e0;
+  }
+  .card-icon-container {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background-color: #7b3fee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-icon-container i {
+    color: white;
+    font-size: 24px;
+  }
+  .role-card .card-icon-container {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  .role-card .card-icon-container i {
+    font-size: 20px;
+  }
+  .search-input {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    padding-left: 35px;
+  }
+  #stepsIndicator {
+    font-size: 0.875rem;
+  }
+
+  /* Hide stepsIndicator on mobile devices */
+  @media (max-width: 768px) {
+    #stepsIndicator {
+      display: none !important;
+    }
+
+    /* Hide horizontal rule on mobile */
+    hr {
+      display: none !important;
+    }
+
+    /* Center logo on mobile */
+    header .position-absolute {
+      position: static !important;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    header .d-flex {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    color: var(--bs-gray-600);
+  }
+  .step-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--bs-gray-300);
+    color: var(--bs-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+  }
+  .step-separator {
+    width: 16px;
+    height: 2px;
+    background-color: var(--bs-gray-300);
+    margin: 0 8px;
+  }
+  .step-item.active {
+    color: var(--bs-primary);
+  }
+  .step-item.active .step-icon {
+    background-color: var(--bs-primary);
+  }
+  .step-item.completed .step-icon {
+    background-color: var(--bs-success);
+  }
+  .cause-card .cause-title,
+  .cause-card .cause-description,
+  .cause-card .cause-description * *,
+  .npo-card .cause-title,
+  .npo-card .cause-description,
+  .npo-card .cause-description * * {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.8em;
+    line-height: 1.4em;
+  }
+  .header-container {
+    min-height: 90px;
+  }
+</style>

@@ -1,0 +1,228 @@
+<section id="orgMedia" class="container d-none">
+  <div
+    class="header-container d-flex justify-content-between align-items-center p-4 position-relative"
+  >
+    <button class="prevBtn btn btn-link p-0 border-0" style="color: #525866">
+      <i class="bi bi-arrow-left fs-3"></i>
+    </button>
+
+    <div class="position-absolute top-50 start-50 translate-middle">
+      <img
+        src="{{ globals.logo.getImage() }}"
+        style="max-width: 160px"
+        alt="cause circle brand logo"
+      />
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <button 
+        class="skipBtn btn btn-link p-0 border-0 text-decoration-none"
+        style="color: #525866"
+      >
+        Skip
+      </button>
+    </div>
+  </div>
+  <div class="py-4 mt-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <div
+        class="p-3 rounded-circle d-flex align-items-center justify-content-center border"
+        style="background-color: white; width: 90px; height: 90px; border-color: #efebff !important; border-width: 13px !important"
+      >
+        <i class="bi bi-building" style="font-size: 32px; color: #525866"></i>
+      </div>
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="fs-4 fw-normal mb-0">Add your logo & cover image</p>
+        <p class="fs-6 text-muted mb-0">Create your org profile</p>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="width: 380px">
+      <div class="d-flex flex-column gap-3">
+        <!-- Hidden File Inputs (outside clickable areas) -->
+        <input
+          type="file"
+          id="coverImageInput"
+          class="d-none"
+          accept="image/*"
+        />
+        <input
+          type="file"
+          id="logoImageInput"
+          class="d-none"
+          accept="image/*"
+        />
+        
+        <!-- Cover Image Upload Area -->
+        <div
+          id="coverImagePreview"
+          class="cover-upload-area rounded border border-2 border-dashed d-flex align-items-center justify-content-center position-relative"
+          style="width: 100%; height: 200px; background-color: #f8f4ff; border-color: #7b3fee !important; cursor: pointer; overflow: hidden"
+        >
+          <div id="coverImagePlaceholder" class="text-center">
+            <i class="bi bi-image" style="font-size: 48px; color: #7b3fee"></i>
+            <p class="mt-2 mb-0" style="color: #7b3fee">Add cover image</p>
+          </div>
+          <img
+            id="coverImagePreviewImg"
+            class="d-none"
+            style="width: 100%; height: 100%; object-fit: cover"
+            src=""
+            alt="Cover image preview"
+          />
+          <button
+            id="removeCoverImageBtn"
+            class="btn position-absolute top-0 end-0 m-2 d-none rounded-circle bg-white"
+            style="width: 30px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); z-index: 10"
+          >
+            <i class="bi bi-x text-black" style="font-size: 14px"></i>
+          </button>
+        </div>
+        
+        <!-- Logo Upload Area -->
+        <div class="d-flex align-items-start gap-2 mt-2">
+          <div
+            id="logoImagePreview"
+            class="logo-upload-area rounded border border-2 border-dashed d-flex align-items-center justify-content-center position-relative"
+            style="width: 60px; height: 60px; background-color: #f8f4ff; border-color: #7b3fee !important; cursor: pointer; flex-shrink: 0; overflow: hidden"
+          >
+            <i id="logoImagePlaceholder" class="bi bi-plus-circle" style="font-size: 20px; color: #7b3fee"></i>
+            <img
+              id="logoImagePreviewImg"
+              class="d-none"
+              style="width: 100%; height: 100%; object-fit: cover"
+              src=""
+              alt="Logo preview"
+            />
+            <button
+              id="removeLogoImageBtn"
+              class="btn position-absolute top-0 end-0 d-none rounded-circle bg-white"
+              style="width: 18px; height: 18px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); z-index: 10; font-size: 10px"
+            >
+              <i class="bi bi-x text-black" style="font-size: 10px"></i>
+            </button>
+          </div>
+          <div class="flex-grow-1">
+            <p class="fs-5 mb-0" style="font-size: 14px" id="orgNameDisplay">Your NPO</p>
+            <p class="text-muted mb-0" style="font-size: 12px" id="orgDescriptionDisplay">
+              Add a short description about your organization
+            </p>
+          </div>
+        </div>
+      </div>
+      <button class="nextBtn btn btn-primary w-100 mt-4">Next</button>
+    </div>
+  </div>
+</section>
+
+<script type="module">
+  // Use a flag to prevent multiple initializations
+  if (!window.orgMediaHandlersInitialized) {
+    window.orgMediaHandlersInitialized = true;
+    
+    $(document).ready(function () {
+      // Use event delegation to prevent duplicate handlers
+      $(document).off("click", "#coverImagePreview").on("click", "#coverImagePreview", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#coverImageInput").click();
+      });
+
+      $(document).off("click", "#logoImagePreview").on("click", "#logoImagePreview", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#logoImageInput").click();
+      });
+
+      // Cover image change handler
+      $(document).off("change", "#coverImageInput").on("change", "#coverImageInput", function (event) {
+        const file = event.target.files[0];
+        const coverImagePreviewImg = $("#coverImagePreviewImg");
+        const coverImagePlaceholder = $("#coverImagePlaceholder");
+        const removeCoverImageBtn = $("#removeCoverImageBtn");
+        
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            coverImagePreviewImg.attr("src", e.target.result).removeClass("d-none");
+            coverImagePlaceholder.addClass("d-none");
+            removeCoverImageBtn.removeClass("d-none");
+            
+            // Store file reference (not uploading yet)
+            if (typeof window.orgMedia === 'undefined' || !window.orgMedia) {
+              window.orgMedia = {};
+            }
+            window.orgMedia.coverImage = file;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          resetCoverImagePreview();
+        }
+      });
+
+      // Logo image change handler
+      $(document).off("change", "#logoImageInput").on("change", "#logoImageInput", function (event) {
+        const file = event.target.files[0];
+        const logoImagePreviewImg = $("#logoImagePreviewImg");
+        const logoImagePlaceholder = $("#logoImagePlaceholder");
+        const removeLogoImageBtn = $("#removeLogoImageBtn");
+        
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            logoImagePreviewImg.attr("src", e.target.result).removeClass("d-none");
+            logoImagePlaceholder.addClass("d-none");
+            removeLogoImageBtn.removeClass("d-none");
+            
+            // Store file reference (not uploading yet)
+            if (typeof window.orgMedia === 'undefined' || !window.orgMedia) {
+              window.orgMedia = {};
+            }
+            window.orgMedia.logo = file;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          resetLogoImagePreview();
+        }
+      });
+
+      // Remove cover image handler
+      $(document).off("click", "#removeCoverImageBtn").on("click", "#removeCoverImageBtn", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#coverImageInput").val("");
+        resetCoverImagePreview();
+      });
+
+      // Remove logo image handler
+      $(document).off("click", "#removeLogoImageBtn").on("click", "#removeLogoImageBtn", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $("#logoImageInput").val("");
+        resetLogoImagePreview();
+      });
+
+      function resetCoverImagePreview() {
+        $("#coverImagePreviewImg").attr("src", "").addClass("d-none");
+        $("#coverImagePlaceholder").removeClass("d-none");
+        $("#removeCoverImageBtn").addClass("d-none");
+        if (window.orgMedia) {
+          window.orgMedia.coverImage = null;
+        }
+      }
+
+      function resetLogoImagePreview() {
+        $("#logoImagePreviewImg").attr("src", "").addClass("d-none");
+        $("#logoImagePlaceholder").removeClass("d-none");
+        $("#removeLogoImageBtn").addClass("d-none");
+        if (window.orgMedia) {
+          window.orgMedia.logo = null;
+        }
+      }
+    });
+  }
+</script>
+

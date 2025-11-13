@@ -1,0 +1,63 @@
+<section id="causeSelection" class="container d-none">
+  <div
+    class="header-container d-flex justify-content-between align-items-center p-4 position-relative"
+  >
+    <button class="prevBtn btn btn-link p-0 border-0" style="color: #525866">
+      <i class="bi bi-arrow-left fs-3"></i>
+    </button>
+
+    <div class="position-absolute top-50 start-50 translate-middle">
+      <img
+        src="{{ globals.logo.getImage() }}"
+        style="max-width: 160px"
+        alt="cause circle brand logo"
+      />
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <button
+        class="skipBtn btn btn-link p-0 border-0 text-decoration-none"
+        style="color: #525866"
+      >
+        Skip
+      </button>
+      <button class="nextBtn btn btn-primary selectedCauses-btn">Save</button>
+    </div>
+  </div>
+  <div class="py-4">
+    <div
+      class="d-flex flex-column gap-2 justify-content-center align-items-center"
+    >
+      <img
+        src="https://4xxglxlj.media.zestyio.com/categories-select.png"
+        style="max-width: 90px"
+      />
+      <div class="d-flex flex-column gap-2 align-items-center">
+        <p class="fs-4 fw-normal mb-0">Follow cause categories</p>
+        <p class="fs-6 text-muted mb-0 text-center">
+          Choose what story categories you want to see
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center flex-column">
+    <div class="mb-4" style="width: 380px">
+      <input
+        id="causeSearchInput"
+        type="text"
+        class="form-control search-input mb-3"
+        placeholder="Search..."
+      />
+      <div id="cause-loading" class="text-center d-none">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div
+        id="cause-container"
+        class="d-flex flex-column gap-3 overflow-auto w-100"
+        style="max-height: 450px"
+      ></div>
+    </div>
+  </div>
+</section>
