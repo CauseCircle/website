@@ -72,6 +72,11 @@
     text-align: justify;
     white-space: normal;
   }
+
+  .story-container-truncated, .story-container-truncated p {
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
   
   .author-img {
     width: 48px;
@@ -84,71 +89,6 @@
   #author-name:hover {
     color: #7b3fee !important;
     transition: color 0.2s ease;
-  }
-
-  /* Post Card Styles (matching home_feed) */
-  .post-card {
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: #fff;
-  }
-
-  .post-header {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    gap: 12px;
-    border-bottom: 1px solid #f1f1f1;
-  }
-
-  .profile-img {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-
-  .post-meta {
-    flex-grow: 1;
-    min-width: 0;
-  }
-
-  .npo-name {
-    font-size: 1rem;
-    font-weight: 500;
-    margin: 0;
-  }
-
-  .npo-name a {
-    color: inherit;
-  }
-
-  .npo-name a:hover {
-    color: #7b3fee !important;
-  }
-
-  .post-content {
-    padding: 0 16px 16px 16px;
-  }
-
-  .story-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #212529;
-  }
-
-  .story-subtitle {
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: #6c757d;
-    margin-bottom: 8px;
-  }
-
-  .story-carousel {
-    border-radius: 12px !important;
-    overflow: hidden;
   }
 
   .story-description p,
@@ -173,6 +113,100 @@
 
   .card {
     border-radius: 10px;
+    overflow: hidden;
+  }
+
+  /* Post Card Styles (matching home_feed) - must come after .card to override */
+  .post-card {
+    border-radius: 24px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0px 8px 16px 4px #0E121B14;
+    padding: 12px 16px 8px 16px;
+  }
+
+  .post-header {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 16px;
+    gap: 12px;
+    border-bottom: 1px solid #f1f1f1;
+  }
+
+  .profile-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  .post-meta {
+    /* margin-left: 12px; */
+    flex: 1;
+    min-width: 0;
+    overflow: visible;
+  }
+
+  .npo-name {
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .npo-name a {
+    color: inherit;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .npo-name a:hover {
+    color: #7b3fee !important;
+  }
+
+  .post-content {
+    padding: 0 16px 16px;
+  }
+
+  .story-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #212529;
+  }
+
+  .story-title-hidden {
+    display: none;
+  }
+
+  .story-subtitle {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #6c757d;
+    margin-bottom: 8px;
+  }
+
+  .story-subtitle-truncated {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #666;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    line-height: 1.5;
+  }
+
+  .story-carousel {
+    border-radius: 12px !important;
     overflow: hidden;
   }
 
@@ -421,7 +455,6 @@
   .post-actions {
     background-color: #ffffff;
     border-radius: 0 0 10px 10px;
-    border-top: 1px solid #f1f1f1;
   }
   
   .action-btn {
@@ -441,6 +474,11 @@
   .action-btn i {
     margin-right: 6px;
   }
+
+  .action-btn svg {
+    margin-right: 6px;
+    vertical-align: middle;
+  }
   
   /* Liked button state */
   .action-btn.liked {
@@ -450,6 +488,33 @@
   
   .action-btn.liked i {
     color: #7b3fee;
+  }
+
+  .action-btn.liked svg path {
+    fill: #7b3fee;
+  }
+
+  /* Hide action button text on mobile, but show counters */
+  @media (max-width: 767px) {
+    .action-btn .action-label {
+      display: none;
+    }
+    
+    .action-btn .action-counter {
+      display: inline;
+      font-size: 0.9rem;
+      margin-left: 4px;
+    }
+    
+    .action-btn i,
+    .action-btn svg {
+      margin-right: 0;
+    }
+    
+    .action-btn {
+      padding: 12px 4px;
+      font-size: 1.1rem;
+    }
   }
 
   /* === START Comment Section CSS === */
@@ -748,9 +813,9 @@
         <!-- Single card for author, content, and image -->
         <div class="card post-card" style="position: relative; min-height: 750px;">
           <!-- Loading Skeleton Overlay (shown initially, removed by JS) -->
-          <div class="story-skeleton skeleton-pulse" id="story-loading-skeleton" style="position: absolute; top: 0; left: 0; right: 0; z-index: 10; background: white; border-radius: 10px;">
+          <div class="story-skeleton skeleton-pulse" id="story-loading-skeleton" style="position: absolute; top: 0; left: 0; right: 0; z-index: 10; background: white; border-radius: 24px;">
             <!-- Skeleton Post Header -->
-            <div class="skeleton-author" style="padding: 16px; padding-bottom: 16px; margin-bottom: 0;">
+            <div class="skeleton-author" style="padding: 12px 16px; padding-bottom: 12px; margin-bottom: 0;">
               <div class="skeleton-circle"></div>
               <div class="d-flex flex-column flex-grow-1">
                 <div class="skeleton-line skeleton-line-short"></div>
@@ -764,7 +829,7 @@
             </div>
             
             <!-- Skeleton Content -->
-            <div class="skeleton-content" style="padding: 0 16px 16px 16px;">
+            <div class="skeleton-content" style="padding: 0 16px 16px;">
               <div class="skeleton-line skeleton-line-medium"></div>
               <div class="skeleton-line skeleton-line-long"></div>
               <div class="skeleton-line skeleton-line-long"></div>
@@ -803,13 +868,13 @@
                 alt="Organization"
                 class="profile-img"
               />
-              <div class="post-meta">
-                <h5 class="mb-0 npo-name">
-                  <a id="npo-name-link" class="text-decoration-none text-primary" href="#" target="_blank"></a>
+              <div class="post-meta d-flex flex-row flex-md-column gap-2 gap-md-0 align-items-start">
+                <h5 class="mb-0 npo-name flex-grow-1 flex-md-grow-0">
+                  <a id="npo-name-link" class="text-decoration-none text-dark fw-medium" href="#" target="_blank"></a>
                   <span id="posted-by-text" class="text-muted" style="display: none;"> posted by </span>
-                  <a id="author-name" class="text-decoration-none text-primary" href="#" style="display: none;"></a>
+                  <a id="author-name" class="text-decoration-none text-dark fw-medium" href="#" style="display: none;"></a>
                 </h5>
-                <small id="story-date" class="text-muted"></small>
+                <div class="flex-shrink-0 d-flex align-items-start"><small id="story-date" class="text-muted"></small></div>
               </div>
               <div class="ms-auto">
                 <!-- Action buttons -->
@@ -880,16 +945,24 @@
             <!-- Action Buttons -->
             <div class="post-actions d-flex" onclick="event.stopPropagation()">
               <button class="btn flex-grow-1 action-btn" id="like-button" onclick="window.handleLikeClick(storyZuid, event)">
-                <i class="bi bi-hand-thumbs-up"></i> Like
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11.95 7H16.75C17.1478 7 17.5294 7.15804 17.8107 7.43934C18.092 7.72065 18.25 8.10218 18.25 8.5V10.078C18.2502 10.274 18.212 10.4682 18.1375 10.6495L15.8162 16.2858C15.7596 16.4232 15.6634 16.5407 15.5399 16.6233C15.4164 16.706 15.2711 16.7501 15.1225 16.75H2.5C2.30109 16.75 2.11032 16.671 1.96967 16.5303C1.82902 16.3897 1.75 16.1989 1.75 16V8.5C1.75 8.30109 1.82902 8.11033 1.96967 7.96967C2.11032 7.82902 2.30109 7.75 2.5 7.75H5.1115C5.23157 7.75003 5.3499 7.72124 5.45653 7.66603C5.56315 7.61082 5.65497 7.53082 5.72425 7.43275L9.814 1.6375C9.8657 1.56424 9.94194 1.51192 10.0289 1.49005C10.1159 1.46817 10.2078 1.47818 10.288 1.51825L11.6485 2.1985C12.0314 2.38988 12.3372 2.70649 12.5153 3.09574C12.6933 3.48499 12.7329 3.92345 12.6273 4.33825L11.95 7ZM6.25 8.941V15.25H14.62L16.75 10.078V8.5H11.95C11.7215 8.49997 11.4961 8.44776 11.2909 8.34735C11.0857 8.24694 10.9062 8.10098 10.766 7.92062C10.6257 7.74026 10.5286 7.53025 10.4819 7.30662C10.4352 7.08299 10.4402 6.85166 10.4965 6.63025L11.1737 3.96925C11.1949 3.88625 11.1871 3.79849 11.1515 3.72058C11.1159 3.64266 11.0546 3.57929 10.978 3.541L10.4822 3.2935L6.94975 8.2975C6.76225 8.563 6.52225 8.7805 6.25 8.941V8.941ZM4.75 9.25H3.25V15.25H4.75V9.25Z" fill="#99A0AE"/>
+                </svg><span class="action-label"> Like</span>
               </button>
               <button id="donate-button" class="btn flex-grow-1 action-btn" style="border-radius: 0;">
-                <i class="bi bi-heart"></i> Donate
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15.25 11.5V13.75H17.5V15.25H15.2493L15.25 17.5H13.75L13.7493 15.25H11.5V13.75H13.75V11.5H15.25ZM16.1823 4.56775C17.8788 6.26875 17.9373 8.97775 16.3593 10.744L15.2943 9.6805C16.2925 8.5375 16.24 6.745 15.1203 5.6275C13.993 4.50325 12.1803 4.45525 11.0028 5.51275L10.0015 6.41125L8.99952 5.5135C7.81827 4.4545 6.00627 4.501 4.87902 5.629C3.76152 6.7465 3.70527 8.53525 4.73502 9.71725L11.059 16.0518L10 17.1138L3.64002 10.7448C2.06202 8.97775 2.12127 6.26425 3.81702 4.56775C5.51577 2.86975 8.23302 2.81275 10 4.39675C11.7618 2.815 14.4843 2.8675 16.1815 4.56775H16.1823Z" fill="#99A0AE"/>
+                </svg><span class="action-label"> Donate</span>
               </button>
               <button id="comment-button" class="btn flex-grow-1 action-btn" style="border-radius: 0;" onclick="window.toggleCommentSection(storyZuid, event)">
-                 <i class="bi bi-chat"></i> <span id="comment-count-text">Comment</span>
+                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M6.46826 16.618L2.50001 17.5L3.38201 13.5317C2.80116 12.4453 2.49815 11.232 2.50001 10C2.50001 5.85775 5.85776 2.5 10 2.5C14.1423 2.5 17.5 5.85775 17.5 10C17.5 14.1422 14.1423 17.5 10 17.5C8.76802 17.5019 7.55472 17.1988 6.46826 16.618V16.618ZM6.68576 15.0332L7.17551 15.2957C8.04442 15.7601 9.0148 16.0021 10 16C11.1867 16 12.3467 15.6481 13.3334 14.9888C14.3201 14.3295 15.0892 13.3925 15.5433 12.2961C15.9974 11.1997 16.1162 9.99334 15.8847 8.82946C15.6532 7.66557 15.0818 6.59647 14.2426 5.75736C13.4035 4.91824 12.3344 4.3468 11.1705 4.11529C10.0067 3.88378 8.80026 4.0026 7.70391 4.45672C6.60755 4.91085 5.67048 5.67988 5.01119 6.66658C4.3519 7.65327 4.00001 8.81331 4.00001 10C4.00001 11.0005 4.24376 11.9635 4.70501 12.8245L4.96676 13.3142L4.47551 15.5245L6.68576 15.0332V15.0332Z" fill="#99A0AE"/>
+                 </svg> <span id="comment-count-text" class="action-label">Comment</span>
               </button>
               <button class="btn flex-grow-1 action-btn" onclick="window.handleStoryShareClick(storyZuid, event)" data-bs-toggle="modal" data-bs-target="#shareModal">
-                <i class="bi bi-share"></i> Share
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7.75 3.25V4.75H4V15.25H16V8.5H17.5V16C17.5 16.1989 17.421 16.3897 17.2803 16.5303C17.1397 16.671 16.9489 16.75 16.75 16.75H3.25C3.05109 16.75 2.86032 16.671 2.71967 16.5303C2.57902 16.3897 2.5 16.1989 2.5 16V4C2.5 3.80109 2.57902 3.61032 2.71967 3.46967C2.86032 3.32902 3.05109 3.25 3.25 3.25H7.75ZM13 4.75V1.75L18.25 6.25H11.5C11.1022 6.25 10.7206 6.40804 10.4393 6.68934C10.158 6.97064 10 7.35218 10 7.75V12.25H8.5V7.75C8.5 6.95435 8.81607 6.19129 9.37868 5.62868C9.94129 5.06607 10.7044 4.75 11.5 4.75H13Z" fill="#99A0AE"/>
+                </svg><span class="action-label"> Share</span>
               </button>
             </div>
             
@@ -999,7 +1072,7 @@
         <p class="fw-normal fs-6 py-2">Related Stories</p>
         <div class="d-flex flex-column gap-2">
           {{ each stories as story limit 5 where story.zuid != '{this.zuid}' and story.related_npos = '{this.related_npos}'}}
-          {{ $story_image = {story.story_image.getImage()} }}
+          {{ $story_image = {story.story_image.first().getImage()} }}
           {{ if {$story_image} == '' }}
           {{ $story_image = https://4xxglxlj.media.zestyio.com/Asset-2--1---1-.jpg }}
           {{ /if }}
@@ -1107,6 +1180,12 @@
 
 <script type="module">
   // === START Comment Functionality JS ===
+  
+  // Configuration for story caption display
+  const STORY_CONFIG = {
+    truncateCaption: true  // Set to true for 2-line truncated view, false for full caption
+  };
+  
   const authorCache = {}; // Simple cache for author details
   const storyZuid = '{{ this.zuid }}'; // Get story ZUID from template (will be set on hidden element as well)
   window.storyZuid = storyZuid; // Make globally accessible for onclick handlers
@@ -1171,9 +1250,24 @@
       const commentedByCurrentUser = result.data.data.some(comment => comment.authorId === currentUser?.zuid);
       
       const commentButton = $("#comment-button");
-      commentButton.html(`<i class="${commentedByCurrentUser ? 'bi bi-chat-fill text-primary' : 'bi bi-chat'}"></i> ${commentCount > 0 ? commentCount.toString() : 'Comment'}`);
+      let commentHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6.46826 16.618L2.50001 17.5L3.38201 13.5317C2.80116 12.4453 2.49815 11.232 2.50001 10C2.50001 5.85775 5.85776 2.5 10 2.5C14.1423 2.5 17.5 5.85775 17.5 10C17.5 14.1422 14.1423 17.5 10 17.5C8.76802 17.5019 7.55472 17.1988 6.46826 16.618V16.618ZM6.68576 15.0332L7.17551 15.2957C8.04442 15.7601 9.0148 16.0021 10 16C11.1867 16 12.3467 15.6481 13.3334 14.9888C14.3201 14.3295 15.0892 13.3925 15.5433 12.2961C15.9974 11.1997 16.1162 9.99334 15.8847 8.82946C15.6532 7.66557 15.0818 6.59647 14.2426 5.75736C13.4035 4.91824 12.3344 4.3468 11.1705 4.11529C10.0067 3.88378 8.80026 4.0026 7.70391 4.45672C6.60755 4.91085 5.67048 5.67988 5.01119 6.66658C4.3519 7.65327 4.00001 8.81331 4.00001 10C4.00001 11.0005 4.24376 11.9635 4.70501 12.8245L4.96676 13.3142L4.47551 15.5245L6.68576 15.0332V15.0332Z" fill="${commentedByCurrentUser ? '#7b3fee' : '#99A0AE'}"/>
+      </svg> `;
       
-      $('#comment-count-text').text(commentCount > 0 ? commentCount.toString() : 'Comment');
+      if (commentCount > 0) {
+        commentHTML += `<span id="comment-count-text" class="action-counter">${commentCount}</span>`;
+      } else {
+        commentHTML += `<span id="comment-count-text" class="action-label">Comment</span>`;
+      }
+      
+      commentButton.html(commentHTML);
+      
+      // Add or remove 'liked' class for proper styling
+      if (commentedByCurrentUser) {
+        commentButton.addClass('liked');
+      } else {
+        commentButton.removeClass('liked');
+      }
     }
   });
   
@@ -1207,23 +1301,31 @@
   // Helper function to update like button from stats data
   function updateLikeButtonFromStats(statsData, likeButton) {
     const likeCount = statsData.likedBy ? statsData.likedBy.length : 0;
-    const likeText = likeCount > 0 ? likeCount.toString() : 'Like';
     
     // Check if current user has liked the story
     const currentUser = JSON.parse(localStorage.getItem('user'));
     const isLiked = currentUser && statsData.likedBy && statsData.likedBy?.some(user => user.user_zuid || user.id === currentUser?.zuid);
     
-    // Replace button text using the filled icon if liked
-    likeButton.html(`<i class="bi ${isLiked ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up'}"></i> ${likeText}`);
+    // Build button HTML with separate classes for label and counter
+    let buttonHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M11.95 7H16.75C17.1478 7 17.5294 7.15804 17.8107 7.43934C18.092 7.72065 18.25 8.10218 18.25 8.5V10.078C18.2502 10.274 18.212 10.4682 18.1375 10.6495L15.8162 16.2858C15.7596 16.4232 15.6634 16.5407 15.5399 16.6233C15.4164 16.706 15.2711 16.7501 15.1225 16.75H2.5C2.30109 16.75 2.11032 16.671 1.96967 16.5303C1.82902 16.3897 1.75 16.1989 1.75 16V8.5C1.75 8.30109 1.82902 8.11033 1.96967 7.96967C2.11032 7.82902 2.30109 7.75 2.5 7.75H5.1115C5.23157 7.75003 5.3499 7.72124 5.45653 7.66603C5.56315 7.61082 5.65497 7.53082 5.72425 7.43275L9.814 1.6375C9.8657 1.56424 9.94194 1.51192 10.0289 1.49005C10.1159 1.46817 10.2078 1.47818 10.288 1.51825L11.6485 2.1985C12.0314 2.38988 12.3372 2.70649 12.5153 3.09574C12.6933 3.48499 12.7329 3.92345 12.6273 4.33825L11.95 7ZM6.25 8.941V15.25H14.62L16.75 10.078V8.5H11.95C11.7215 8.49997 11.4961 8.44776 11.2909 8.34735C11.0857 8.24694 10.9062 8.10098 10.766 7.92062C10.6257 7.74026 10.5286 7.53025 10.4819 7.30662C10.4352 7.08299 10.4402 6.85166 10.4965 6.63025L11.1737 3.96925C11.1949 3.88625 11.1871 3.79849 11.1515 3.72058C11.1159 3.64266 11.0546 3.57929 10.978 3.541L10.4822 3.2935L6.94975 8.2975C6.76225 8.563 6.52225 8.7805 6.25 8.941V8.941ZM4.75 9.25H3.25V15.25H4.75V9.25Z" fill="${isLiked ? '#7b3fee' : '#99A0AE'}"/>
+    </svg>`;
     
-    // Visual indication of liked state with primary color
+    if (likeCount > 0) {
+      // Show counter on both desktop and mobile
+      buttonHTML += `<span class="action-counter">${likeCount}</span>`;
+    } else {
+      // Show "Like" label on desktop only
+      buttonHTML += `<span class="action-label"> Like</span>`;
+    }
+    
+    likeButton.html(buttonHTML);
+    
+    // Visual indication of liked state
     if (isLiked) {
       likeButton.addClass('liked');
-      // Apply primary color directly to the icon
-      likeButton.find('i').css('color', '#7b3fee');
     } else {
       likeButton.removeClass('liked');
-      likeButton.find('i').css('color', '');
     }
   }
 
@@ -1244,9 +1346,10 @@
       if (!user) {
            // Set default like button state (not liked)
           if (likeButton.length > 0) {
-              likeButton.html(`<i class="bi bi-hand-thumbs-up"></i> Like`);
+              likeButton.html(`<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11.95 7H16.75C17.1478 7 17.5294 7.15804 17.8107 7.43934C18.092 7.72065 18.25 8.10218 18.25 8.5V10.078C18.2502 10.274 18.212 10.4682 18.1375 10.6495L15.8162 16.2858C15.7596 16.4232 15.6634 16.5407 15.5399 16.6233C15.4164 16.706 15.2711 16.7501 15.1225 16.75H2.5C2.30109 16.75 2.11032 16.671 1.96967 16.5303C1.82902 16.3897 1.75 16.1989 1.75 16V8.5C1.75 8.30109 1.82902 8.11033 1.96967 7.96967C2.11032 7.82902 2.30109 7.75 2.5 7.75H5.1115C5.23157 7.75003 5.3499 7.72124 5.45653 7.66603C5.56315 7.61082 5.65497 7.53082 5.72425 7.43275L9.814 1.6375C9.8657 1.56424 9.94194 1.51192 10.0289 1.49005C10.1159 1.46817 10.2078 1.47818 10.288 1.51825L11.6485 2.1985C12.0314 2.38988 12.3372 2.70649 12.5153 3.09574C12.6933 3.48499 12.7329 3.92345 12.6273 4.33825L11.95 7ZM6.25 8.941V15.25H14.62L16.75 10.078V8.5H11.95C11.7215 8.49997 11.4961 8.44776 11.2909 8.34735C11.0857 8.24694 10.9062 8.10098 10.766 7.92062C10.6257 7.74026 10.5286 7.53025 10.4819 7.30662C10.4352 7.08299 10.4402 6.85166 10.4965 6.63025L11.1737 3.96925C11.1949 3.88625 11.1871 3.79849 11.1515 3.72058C11.1159 3.64266 11.0546 3.57929 10.978 3.541L10.4822 3.2935L6.94975 8.2975C6.76225 8.563 6.52225 8.7805 6.25 8.941V8.941ZM4.75 9.25H3.25V15.25H4.75V9.25Z" fill="#99A0AE"/>
+              </svg><span class="action-label"> Like</span>`);
               likeButton.removeClass('liked');
-              likeButton.find('i').css('color', '');
           }
           return; 
       }
@@ -1417,7 +1520,7 @@
     
     // Create causes HTML with badges matching home_feed style
     const causesHtml = relatedCauses.map(cause => {
-      return `<span class="badge bg-primary bg-opacity-10 text-primary" style="flex-shrink: 0;">${escapeHtml(cause.title || '')}</span>`;
+      return `<span class="badge bg-primary bg-opacity-10 text-primary p-2" style="flex-shrink: 0;">${escapeHtml(cause.title || '')}</span>`;
     }).join(' ');
     
     causesContainer.html(`
@@ -1465,6 +1568,13 @@
     const storyTitle = $('.story-title');
     if (storyTitle.length && currentStory.title) {
       storyTitle.text(currentStory.title);
+      
+      // Hide title if caption is truncated
+      if (STORY_CONFIG.truncateCaption) {
+        storyTitle.addClass('story-title-hidden');
+      } else {
+        storyTitle.removeClass('story-title-hidden');
+      }
     }
     
     // Update story content using API data with proper processing
@@ -1472,6 +1582,13 @@
     if (storyContainer.length && currentStory.story_body) {
       const processedContent = processStoryContentForDisplay(currentStory.story_body);
       storyContainer.html(processedContent);
+      
+      // Apply truncation classes based on config
+      if (STORY_CONFIG.truncateCaption) {
+        storyContainer.addClass('story-subtitle-truncated story-container-truncated');
+      } else {
+        storyContainer.removeClass('story-subtitle-truncated story-container-truncated');
+      }
     }
     
     // Update story date using API data
@@ -2140,10 +2257,27 @@
           const commentedByCurrentUser = storyComments.some(comment => comment.authorId === currentUser?.zuid);
 
           const commentButton = $("#comment-button");
-          commentButton.html(`<i class="${commentedByCurrentUser ? 'bi bi-chat-fill text-primary' : 'bi bi-chat'}"></i> ${commentCount > 0 ? commentCount.toString() : 'Comment'}`);
+          let commentInitHTML = `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.46826 16.618L2.50001 17.5L3.38201 13.5317C2.80116 12.4453 2.49815 11.232 2.50001 10C2.50001 5.85775 5.85776 2.5 10 2.5C14.1423 2.5 17.5 5.85775 17.5 10C17.5 14.1422 14.1423 17.5 10 17.5C8.76802 17.5019 7.55472 17.1988 6.46826 16.618V16.618ZM6.68576 15.0332L7.17551 15.2957C8.04442 15.7601 9.0148 16.0021 10 16C11.1867 16 12.3467 15.6481 13.3334 14.9888C14.3201 14.3295 15.0892 13.3925 15.5433 12.2961C15.9974 11.1997 16.1162 9.99334 15.8847 8.82946C15.6532 7.66557 15.0818 6.59647 14.2426 5.75736C13.4035 4.91824 12.3344 4.3468 11.1705 4.11529C10.0067 3.88378 8.80026 4.0026 7.70391 4.45672C6.60755 4.91085 5.67048 5.67988 5.01119 6.66658C4.3519 7.65327 4.00001 8.81331 4.00001 10C4.00001 11.0005 4.24376 11.9635 4.70501 12.8245L4.96676 13.3142L4.47551 15.5245L6.68576 15.0332V15.0332Z" fill="${commentedByCurrentUser ? '#7b3fee' : '#99A0AE'}"/>
+          </svg> `;
           
-          // Update main comment button text
-          mainCommentButtonText.text(commentCount > 0 ? commentCount.toString() : 'Comment');
+          if (commentCount > 0) {
+            commentInitHTML += `<span id="comment-count-text" class="action-counter">${commentCount}</span>`;
+          } else {
+            commentInitHTML += `<span id="comment-count-text" class="action-label">Comment</span>`;
+          }
+          
+          commentButton.html(commentInitHTML);
+          
+          // Add or remove 'liked' class for proper styling
+          if (commentedByCurrentUser) {
+            commentButton.addClass('liked');
+          } else {
+            commentButton.removeClass('liked');
+          }
+          
+          // Update main comment button text (already included in HTML above)
+          // mainCommentButtonText.text(commentCount > 0 ? commentCount.toString() : 'Comment');
       
           // Only render the section details if user is logged in; keep hidden otherwise
           if (commentCount > 0) {

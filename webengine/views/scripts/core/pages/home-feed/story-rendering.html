@@ -210,35 +210,6 @@
     }
     
     const likeCount = storyStats.likedBy.length;
-    const likeText = likeCount > 0 ? likeCount.toString() : 'Like';
-    const currentUser = JSON.parse(localStorage.getItem('user'));
-    const isLiked = currentUser && storyStats.likedBy.some(like => like.user_zuid === currentUser?.zuid);
-    const commentedByCurrentUser = currentUser && storyComments.some(comment => comment.authorId === currentUser?.zuid);
-    const likedClass = isLiked ? 'liked' : '';
-    const thumbsUpIcon = isLiked ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up';
-    const iconStyle = isLiked ? 'style="color: #7b3fee;"' : '';
-
-    let donateLink = '';
-    if (relatedNPO && relatedNPO?.donate_link) {
-      donateLink = relatedNPO?.donate_link;
-    }
-
-    const commentButtonText = commentCount > 0 ? commentCount.toString() : "Comment";
-    
-    // Prepare HTML for the latest comment preview
-    let latestCommentHtml = '';
-    if (commentCount > 0) {
-      const latestCommentToPreview = storyComments[0]; // Assuming server sends them in a useful order or fetchAllData sorts them
-      if (latestCommentToPreview && latestCommentAuthorDetails) { // Ensure we have details for the preview
-          latestCommentHtml = generateCommentHtml(latestCommentToPreview, latestCommentAuthorDetails);
-      } else if (latestCommentToPreview) { // Fallback if author details failed but comment exists
-          const fallbackAuthorDetails = await getCommentAuthorDetails(latestCommentToPreview.authorId); // Try fetching again or use fallback
-          latestCommentHtml = generateCommentHtml(latestCommentToPreview, fallbackAuthorDetails);
-      }
-    }
-
-    // Determine if the toggle button should be shown
-    const showToggleBtn = commentCount > 1;
 
     const storyCardHtml = `
       <div class="post-card mb-3" data-story-zuid="${story.meta.zuid}" data-npo-zuid="${relatedNPO.meta?.zuid || ''}" data-created-at="${createdAt || ''}" onclick="window.location.href='{{ $base_url }}${story.meta.web.uri}'" style="cursor: pointer">
@@ -248,13 +219,13 @@
             alt="${relatedNPO.name || 'Organization'}"
             class="profile-img"
           />
-          <div class="post-meta d-flex flex-wrap gap-1">
+          <div class="post-meta d-flex flex-row flex-md-column gap-2 gap-md-0 align-items-start">
             ${storyAuthorType !== 'users' ? `
-              <h5 class="mb-0 npo-name"><a class="text-decoration-none" href="{{ $base_url }}${relatedNPO.meta?.web?.uri || '#'}" target="_blank" onclick="event.stopPropagation()">${relatedNPO.name || "Organization"}</a></h5>
+              <h5 class="mb-0 npo-name flex-grow-1 flex-md-grow-0"><a class="text-decoration-none text-dark fw-medium" href="{{ $base_url }}${relatedNPO.meta?.web?.uri || '#'}" target="_blank" onclick="event.stopPropagation()">${relatedNPO.name || "Organization"}</a></h5>
             ` : `
-              <h5 class="mb-0 npo-name"><a class="text-decoration-none" href="{{ $base_url }}${relatedNPO.meta?.web?.uri || '#'}" target="_blank" onclick="event.stopPropagation()">${relatedNPO.name || "Organization"}</a> <span class="text-muted">posted by</span> <a class="text-decoration-none" href="{{ $base_url }}${storyAuthorDetails?.meta?.web?.uri || '#'}" target="_blank" onclick="event.stopPropagation()">${(storyAuthorDetails.first_name + " " + storyAuthorDetails.last_name) || "User"}</a></h5>
+              <h5 class="mb-0 npo-name flex-grow-1 flex-md-grow-0"><a class="text-decoration-none text-dark fw-medium" href="{{ $base_url }}${relatedNPO.meta?.web?.uri || '#'}" target="_blank" onclick="event.stopPropagation()">${relatedNPO.name || "Organization"}</a> <span class="text-muted">posted by</span> <a class="text-decoration-none text-dark fw-medium" href="{{ $base_url }}${storyAuthorDetails?.meta?.web?.uri || '#'}" target="_blank" onclick="event.stopPropagation()">${(storyAuthorDetails.first_name + " " + storyAuthorDetails.last_name) || "User"}</a></h5>
             `}
-            <small class="text-muted">${timeAgo}</small>
+            <div class="flex-shrink-0 d-flex align-items-start"><small class="text-muted">${timeAgo}</small></div>
           </div>
         </div>
         <div class="pb-3 px-3">
@@ -276,52 +247,17 @@
           </div>
         </div>
         <div class="post-content">
-          <h4 class="story-title">${window.escapeHtml(story.title)}</h4>
           <div class="story-subtitle" style="white-space: pre-wrap;">${window.escapeHtml(story.description || story.story_body || '')}</div>
           ${hashtagsHtml}
           ${relatedCauses.length > 0 ? `
             <div class="my-2 d-flex gap-2" style="overflow-x: auto; white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;">
-              ${relatedCauses.map(cause => `<span class="badge bg-primary bg-opacity-10 text-primary" style="flex-shrink: 0;">${cause?.title}</span>`).join(' ')}
+              ${relatedCauses.map(cause => `<span class="badge bg-primary bg-opacity-10 text-primary p-2" style="flex-shrink: 0;">${cause?.title}</span>`).join(' ')}
             </div>
           ` : ''}
         </div>
-        <div class="post-actions d-flex" onclick="event.stopPropagation()">
-          <button class="btn flex-grow-1 action-btn ${likedClass}" onclick="window.handleLikeClick('${story.meta.zuid}', event)">
-            <i class="bi ${thumbsUpIcon}" ${iconStyle}></i> ${likeText}
-          </button>
-          <button class="btn flex-grow-1 action-btn" style="border-radius: 0;" onclick="window.handleDonateClick('${relatedNPO.meta?.zuid || ''}', '${donateLink}', event)">
-            <i class="bi bi-heart"></i> Donate
-          </button>
-          <button class="btn flex-grow-1 action-btn ${commentedByCurrentUser ? 'liked' : ''}" style="border-radius: 0;" onclick="window.toggleCommentSection && window.toggleCommentSection('${story.meta.zuid}', event)">
-            <i class="${commentedByCurrentUser ? 'bi bi-chat-fill text-primary' : 'bi bi-chat'}"></i> ${commentButtonText}
-          </button>
-          <button class="btn flex-grow-1 action-btn" onclick="window.openShareModal('{{ $base_url }}${story.meta.web.uri}', '${story.meta.zuid}', event)">
-            <i class="bi bi-share"></i> Share
-          </button>
-        </div>
-        
-        <!-- Comments Section (initially shown if comments exist) -->
-        <div class="story-comments" id="comments-${story.meta.zuid}" onclick="event.stopPropagation()" data-visible="${commentCount > 0 ? 'true' : 'false'}" style="${commentCount > 0 ? '' : 'display: none;'}">
-          <div class="comment-input-container">
-            <input type="text" class="comment-input" placeholder="Add a Comment..." onkeydown="if(event.key === 'Enter' && window.handleCommentSubmit) window.handleCommentSubmit('${story.meta.zuid}', this, event)">
-          </div>
-          
-          <!-- Container for the latest comment preview (always shown if comments exist) -->
-          <div class="latest-comment-container" style="${commentCount > 0 ? '' : 'display: none;'}">
-            ${latestCommentHtml}
-          </div>
-
-          <!-- Container for all comments (initially hidden and empty) -->
-          <div class="all-comments-container" style="display: none;">
-             <!-- All comments will be loaded here -->
-          </div>
-
-          <!-- Toggle Comments Button (only shown if > 1 comment) -->
-          ${showToggleBtn ? `
-            <button class="toggle-comments-btn" data-loaded="false" data-count="${commentCount}" onclick="window.toggleAllComments && window.toggleAllComments('${story.meta.zuid}', this, event)">
-              <i class="bi bi-chevron-down"></i> View All ${commentCount} Comments
-            </button>
-          ` : ''}
+        <div class="story-stats px-4">
+          <span class="story-stat-likes" data-story-zuid="${story.meta.zuid}"><i class="bi bi-hand-thumbs-up-fill fs-6"></i> ${likeCount}</span>
+          <span class="story-stat-comments" data-story-zuid="${story.meta.zuid}"><i class="bi bi-chat-fill fs-6"></i> ${commentCount}</span>
         </div>
       </div>
     `;
@@ -435,21 +371,10 @@
           const d = stats.data;
           const likedByArr = Array.isArray(d.likedBy) ? d.likedBy : [];
           const likeCount = d?.totalLikes || likedByArr?.length;
-          const likeText = likeCount > 0 ? likeCount.toString() : 'Like';
           
-          const currentUser = JSON.parse(localStorage.getItem('user'));
-          const isLiked = currentUser && d?.likedBy?.map(user => user.user_zuid || user.id).includes(currentUser?.zuid);
-          
-          // Update like button
-          const likeButton = storyCard.find('.action-btn').first();
-          likeButton.html(`<i class="bi ${isLiked ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up'}"></i> ${likeText}`);
-          if (isLiked) {
-            likeButton.addClass('liked');
-            likeButton.find('i').css('color', '#7b3fee');
-          } else {
-            likeButton.removeClass('liked');
-            likeButton.find('i').css('color', '');
-          }
+          // Update like count display
+          const likeStatDisplay = storyCard.find('.story-stat-likes');
+          likeStatDisplay.html(`<i class="bi bi-hand-thumbs-up"></i> ${likeCount}`);
         }
       }
     });
@@ -462,18 +387,9 @@
         const storyComments = commentsData.data || [];
         const commentCount = storyComments.length;
         
-        // Update comment button
-        const commentButton = storyCard.find('.action-btn').filter((i, btn) => $(btn).find('.bi-chat').length > 0);
-        const commentButtonText = commentCount > 0 ? commentCount.toString() : "Comment";
-        commentButton.html(`<i class="bi bi-chat"></i> ${commentButtonText}`);
-        
-        // Update comment section visibility
-        const commentsSection = storyCard.find(`#comments-${storyZuid}`);
-        if (commentCount > 0) {
-          commentsSection.show().attr('data-visible', 'true');
-        } else {
-          commentsSection.hide().attr('data-visible', 'false');
-        }
+        // Update comment count display
+        const commentStatDisplay = storyCard.find('.story-stat-comments');
+        commentStatDisplay.html(`<i class="bi bi-chat-fill fs-6"></i> ${commentCount}`);
       }
     });
 
