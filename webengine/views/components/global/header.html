@@ -306,7 +306,7 @@
           class="dropdown-profile-image m-0 offcanvas-profile-button-image"
         />
       </button>
-      
+
       <!-- Centered logo for mobile -->
       <a id="navbar-brand" class="navbar-brand position-absolute start-50 translate-middle-x" href="/">
         <img
@@ -358,9 +358,37 @@
     
     <!-- Right section: Profile and admin buttons (desktop only) -->
     <div class="d-none d-lg-flex gap-2 align-items-center">
-      <button id="create-post-btn" class="btn btn-primary d-none">
-        <i class="bi bi-pencil-square"></i> Post
-      </button>
+      <div class="dropdown">
+        <button
+          id="create-post-btn"
+          class="btn btn-primary dropdown-toggle d-none"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <i class="bi bi-plus-lg me-1"></i> Post
+        </button>
+        <ul class="dropdown-menu dropdown-menu-start">
+          <li>
+            <button class="dropdown-item create-post-option py-2" type="button" data-story-type="text-only">
+              <i class="bi bi-card-text me-2"></i>
+              <span class="text-muted">Text-Only Story</span>
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item create-post-option py-2" type="button" data-story-type="with-media">
+              <i class="bi bi-image me-2"></i>
+              <span class="text-muted">Photo/Video Story</span>
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item create-post-option py-2" type="button" data-story-type="shared-link">
+              <i class="bi bi-link-45deg me-2"></i>
+              <span class="text-muted">Shared Link Story</span>
+            </button>
+          </li>
+        </ul>
+      </div>
       
       <div class="dropdown">
         <button
@@ -454,12 +482,14 @@
           >
         </div>
       </div>
-      <a
-        href="{{login_page.first().getUrl()}}"
+      <button
+        type="button"
         class="btn btn-primary text-nowrap signin-btn d-none"
+        data-bs-toggle="modal"
+        data-bs-target="#loginModal"
       >
         Sign In
-      </a>
+      </button>
     </div>
     
     <!-- Mobile hamburger button -->
@@ -823,6 +853,9 @@
 <!-- prettier-ignore -->
 {{include /components/global/HomeFeed/create_story_modal.html}}
 
+<!-- prettier-ignore -->
+{{include /components/global/Modals/login_modal.html}}
+
 <script type="module">
   const localUser = JSON.parse(localStorage.getItem("user"));
 
@@ -880,7 +913,7 @@
     
     // Show stage environment menu only for @zesty.io users
     if (zestyUser.email && zestyUser.email.endsWith('@zesty.io')) {
-      $("#stage-environment-menu").removeClass("d-none");
+      // $("#stage-environment-menu").removeClass("d-none");
 
       if (window.location.hostname === "4xxglxlj-dev.preview.stage.zesty.io") {
         $("#stage-environment-menu-header").text("PREVIEW ENVIRONMENT");
@@ -1125,7 +1158,7 @@
     if (!localUser) {
       // When no user is logged in on mobile, replace the profile button with a Sign In button.
       $('button[data-bs-target="#offcanvasProfile"]').replaceWith(
-        '<a href="{{login_page.first().getUrl()}}" class="btn d-lg-none btn-primary">Sign In</a>'
+        '<button type="button" class="btn d-lg-none btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">Sign In</button>'
       );
       // Remove the offcanvas profile element since it is not needed.
       $('#offcanvasProfile').remove();
@@ -1148,29 +1181,46 @@
       $("#feedbackModal").modal("show");
     });
 
-    // Handle create post button click
-    $("#create-post-btn").on("click", async function(e) {
-      e.preventDefault();
-      
-      const $btn = $(this);
-      const originalText = $btn.html();
-      
-      // Show loading state
-      $btn.prop("disabled", true).html(`
-        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        Checking...
-      `);
-      
+    async function handleCreateStoryAction($trigger) {
+      const originalText = $trigger.html();
+
+      $trigger
+        .prop("disabled", true)
+        .addClass("disabled")
+        .html(`
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          Checking...
+        `);
+
       try {
         await window.showCreateStoryModal();
       } catch (error) {
         console.error("Error showing create story modal:", error);
-        // Fallback - just show the modal
         $("#createStoryModal").modal("show");
       } finally {
-        // Restore button state
-        $btn.prop("disabled", false).html(originalText);
+        $trigger
+          .prop("disabled", false)
+          .removeClass("disabled")
+          .html(originalText);
       }
+    }
+
+    $(".create-post-option").on("click", async function(e) {
+      e.preventDefault();
+
+      const postType = $(this).data("story-type") || "with-media";
+      window.story_post_type = postType;
+      if (typeof window.setStoryPostType === "function") {
+        window.setStoryPostType(postType);
+      }
+
+      const dropdownEl = document.getElementById("create-post-btn");
+      if (dropdownEl && window.bootstrap?.Dropdown) {
+        const dropdownInstance = window.bootstrap.Dropdown.getInstance(dropdownEl) || new window.bootstrap.Dropdown(dropdownEl);
+        dropdownInstance.hide();
+      }
+
+      await handleCreateStoryAction($(this));
     });
 
     const $globalSearch = $("#global-search");

@@ -80,15 +80,33 @@
     padding: 20px;
   }
   .upload-area {
-    border: 2px dashed #ced4da;
-    border-radius: 5px;
-    padding: 20px;
-    text-align: center;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.2s;
+    background-color: #ffffff;
   }
   .upload-area:hover {
     background-color: #f8f9fa;
+    border-color: #adb5bd;
+  }
+  .upload-area.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .upload-area.disabled:hover {
+    background-color: #ffffff;
+    border-color: var(--bs-border-color);
+  }
+  .upload-info-text {
+    font-size: 14px;
+    color: #6c757d;
+    margin-top: 4px;
+    margin-bottom: 12px;
   }
   .preview-container {
     display: flex;
@@ -101,19 +119,25 @@
     height: 100px;
     position: relative;
     overflow: hidden;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    background: repeating-conic-gradient(#f8f9fa 0% 25%, #e9ecef 0% 50%) 50% / 20px 20px;
     cursor: pointer;
+  }
+  .preview-item img,
+  .preview-item video {
+    position: relative;
+    z-index: 1;
   }
   .remove-btn {
     position: absolute;
     top: 5px;
-    right: 5px;
-    background-color: rgba(255, 255, 255, 0.7);
+    left: 5px;
+    background-color: #F2F5F8;
     border: none;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     font-size: 12px;
     line-height: 1;
     cursor: pointer;
@@ -121,21 +145,63 @@
     align-items: center;
     justify-content: center;
     z-index: 10;
+    color: #6c757d;
+    opacity: 0;
+    visibility: hidden;
+    transition: background-color 0.2s, opacity 0.2s;
+  }
+  .preview-item:hover .remove-btn,
+  .preview-item:focus-within .remove-btn {
+    opacity: 1;
+    visibility: visible;
+  }
+  .upload-success-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #E0FAEC;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+  .upload-success-badge i {
+    color: #178C4E;
+    font-size: 12px;
+  }
+  .upload-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
   }
   .add-more {
     width: 100px;
     height: 100px;
-    border: 2px dashed #ced4da;
-    border-radius: 5px;
+    border: 1px dashed #adb5bd;
+    border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    background-color: #f8f9fa;
-    transition: background-color 0.3s;
+    background-color: #ffffff;
+    transition: all 0.2s;
   }
   .add-more:hover {
-    background-color: #e9ecef;
+    background-color: #f8f9fa;
+    border-color: #6c757d;
+  }
+  .add-more svg {
+    color: #6c757d;
   }
   .extra-images-overlay {
     position: absolute;
@@ -154,6 +220,49 @@
   .preview-item.dragging {
     opacity: 0.5;
     border: 2px dashed #007bff; /* Using a Bootstrap primary color for consistency */
+  }
+  .url-preview-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    transition: box-shadow 0.2s;
+  }
+  .url-preview-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  .url-preview-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background-color: #f8f9fa;
+  }
+  .url-preview-content {
+    padding: 12px;
+    background-color: #F2F5F8;
+  }
+  .url-preview-description {
+    font-size: 13px;
+    color: #6c757d;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .url-preview-url {
+    font-size: 12px;
+    color: #0d6efd;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+  .url-preview-loading {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
   }
 </style>
 
@@ -197,22 +306,20 @@
           <div class="invalid-feedback">Please select an NPO.</div>
         </div>
 
-        <div class="">
+        <div class="" id="storyMediaField">
           <label for="storyImages" class="form-label">
             Story Media <span class="text-danger">*</span>
           </label>
-          <div id="uploadArea" class="upload-area mt-3">
-            <p class="mb-1">Choose images or videos, or drag & drop them here.</p>
-            <p class="text-muted small">
-              JPEG, PNG, MP4 and other formats, up to 30 MB each. Maximum 5 media files allowed.
-            </p>
+          <p class="upload-info-text">Upload up to 20 files, up to 30MB each.</p>
+          <div id="uploadArea" class="upload-area">
             <button
               id="browseButton"
-              class="btn btn-secondary mt-2"
+              class="btn btn-secondary"
               type="button"
             >
               Browse Files
             </button>
+            <span class="text-muted" style="font-size: 14px;">or drag and drop your file here</span>
           </div>
           <input
             type="file"
@@ -221,7 +328,50 @@
             multiple
             accept="image/jpeg,image/png,image/jpg,image/webp,image/heic,image/heif,video/mp4,video/x-flv,video/quicktime"
           />
-          <div id="previewContainer" class="preview-container"></div>
+          <div id="previewContainer" class="preview-container mb-4"></div>
+        </div>
+
+        <div class="mb-4 d-none" id="storyUrlGroup">
+          <label for="storyUrl" class="form-label">
+            Website URL <span class="text-danger">*</span>
+          </label>
+          <div class="input-group">
+            <span class="input-group-text bg-white">https://</span>
+            <input
+              type="text"
+              class="form-control"
+              id="storyUrl"
+              placeholder="www.example.com"
+              aria-describedby="storyUrlHelp"
+            />
+          </div>
+          <div class="invalid-feedback">Please enter a valid URL.</div>
+          
+          <!-- URL Preview Card -->
+          <div id="urlPreviewContainer" class="mt-3 d-none">
+            <!-- Loading State -->
+            <div id="urlPreviewLoading" class="url-preview-loading d-none">
+              <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+              <span>Loading preview...</span>
+            </div>
+            
+            <!-- Preview Card -->
+            <div id="urlPreviewCard" class="url-preview-card d-none">
+              <img id="urlPreviewImage" class="url-preview-image" src="" alt="Preview" />
+              <div class="url-preview-content">
+                <a id="urlPreviewUrl" class="url-preview-url text-primary" href="#" target="_blank"></a>
+                <div id="urlPreviewDescription" class="url-preview-description"></div>
+              </div>
+            </div>
+            
+            <!-- No Preview Available -->
+            <div id="urlPreviewNoPreview" class="url-preview-card d-none">
+              <div class="url-preview-content">
+                <a id="urlPreviewUrlFallback" class="url-preview-url text-primary" href="#" target="_blank"></a>
+                <div id="urlPreviewDescriptionFallback" class="url-preview-description"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="mb-4">
@@ -651,13 +801,19 @@
     const selectedCategory = $("#selectedCategory");
     const nextBtn = $("#nextBtn");
     const storyDescription = $("#storyDescription");
+    const storyUrlInput = $("#storyUrl");
+    const storyUrlGroup = $("#storyUrlGroup");
+    const storyMediaField = $("#storyMediaField");
 
     // Add media to validation state
     window.validationState = {
       storyMedia: false,
       storyDescription: false,
-      selectedNPO: false
+      selectedNPO: false,
+      storyUrl: true
     };
+
+    window.story_post_type = window.story_post_type || "with-media";
 
     heroImageInput.on("change", function (event) {
       const file = event.target.files[0];
@@ -677,6 +833,10 @@
       }
     });
 
+    function getPostType() {
+      return window.story_post_type || "with-media";
+    }
+
     function resetImagePreview() {
       previewImage.attr("src", "").addClass("d-none");
       uploadMessage.removeClass("d-none");
@@ -694,6 +854,38 @@
         storyDescription.removeClass("is-invalid").addClass("is-valid");
         validationState.storyDescription = true;
       }
+      checkAllValid();
+    }
+
+    function validateStoryUrl() {
+      const postType = getPostType();
+      const value = storyUrlInput.val().trim();
+      const normalizedValue = value && !/^https?:\/\//i.test(value) ? `https://${value}` : value;
+      let isValid = false;
+
+      if (!normalizedValue) {
+        storyUrlInput.removeClass("is-valid is-invalid");
+        validationState.storyUrl = false;
+        checkAllValid();
+        return;
+      }
+
+      try {
+        const parsed = new URL(normalizedValue);
+        isValid = Boolean(parsed.hostname);
+      } catch (e) {
+        isValid = false;
+      }
+
+      if (isValid) {
+        storyUrlInput.removeClass("is-invalid").addClass("is-valid");
+        validationState.storyUrl = true;
+        window.story_url = normalizedValue;
+      } else {
+        storyUrlInput.addClass("is-invalid");
+        validationState.storyUrl = false;
+      }
+
       checkAllValid();
     }
 
@@ -720,7 +912,21 @@
     }
 
     function checkAllValid() {
-      const allValid = Object.values(validationState).every(Boolean);
+      const postType = getPostType();
+      const requiredFields = [
+        validationState.selectedNPO,
+        validationState.storyDescription,
+      ];
+
+      if (postType === "with-media") {
+        requiredFields.push(validationState.storyMedia);
+      }
+
+      if (postType === "shared-link") {
+        requiredFields.push(validationState.storyUrl);
+      }
+
+      const allValid = requiredFields.every(Boolean);
       updateNextButtonState(!allValid);
     }
 
@@ -1027,10 +1233,160 @@
       window.story_post_as_npo_zuid = zuid ? String(zuid) : null;
     });
 
+    // URL Preview functionality
+    let urlPreviewTimeout;
+    
+    function showUrlPreviewLoading() {
+      $("#urlPreviewContainer").removeClass("d-none");
+      $("#urlPreviewLoading").removeClass("d-none");
+      $("#urlPreviewCard").addClass("d-none");
+      $("#urlPreviewNoPreview").addClass("d-none");
+    }
+    
+    function hideUrlPreview() {
+      $("#urlPreviewContainer").addClass("d-none");
+      $("#urlPreviewLoading").addClass("d-none");
+      $("#urlPreviewCard").addClass("d-none");
+      $("#urlPreviewNoPreview").addClass("d-none");
+    }
+    
+    function showUrlPreviewCard(data) {
+      $("#urlPreviewContainer").removeClass("d-none");
+      $("#urlPreviewLoading").addClass("d-none");
+      $("#urlPreviewCard").removeClass("d-none");
+      $("#urlPreviewNoPreview").addClass("d-none");
+      
+      // Set image
+      if (data.image) {
+        $("#urlPreviewImage").attr("src", data.image).show();
+      } else {
+        $("#urlPreviewImage").hide();
+      }
+      
+      // Set URL
+      $("#urlPreviewUrl").attr("href", data.url).text(data.url);
+
+      // Set description (meta description shown beneath the link)
+      if (data.description) {
+        $("#urlPreviewDescription").text(data.description).show();
+      } else {
+        $("#urlPreviewDescription").hide();
+      }
+    }
+    
+    function showUrlPreviewNoPreview(url) {
+      $("#urlPreviewContainer").removeClass("d-none");
+      $("#urlPreviewLoading").addClass("d-none");
+      $("#urlPreviewCard").addClass("d-none");
+      $("#urlPreviewNoPreview").removeClass("d-none");
+      
+      $("#urlPreviewUrlFallback").attr("href", url).text(url);
+      $("#urlPreviewDescriptionFallback").text("No preview available");
+    }
+    
+    async function fetchUrlPreview(url) {
+      // List of CORS proxy services to try in order
+      const corsProxies = [
+        `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+      ];
+      
+      // Try each proxy with a timeout
+      for (const proxyUrl of corsProxies) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+          
+          const response = await fetch(proxyUrl, { 
+            signal: controller.signal,
+            headers: {
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            }
+          });
+          
+          clearTimeout(timeoutId);
+          
+          if (!response.ok) {
+            console.warn(`Proxy failed with status ${response.status}, trying next...`);
+            continue;
+          }
+          
+          const html = await response.text();
+          
+          // Create a temporary DOM to parse the HTML
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          
+          // Extract Open Graph tags
+          const ogTitle = doc.querySelector('meta[property="og:title"]')?.content;
+          const ogDescription = doc.querySelector('meta[property="og:description"]')?.content;
+          const ogImage = doc.querySelector('meta[property="og:image"]')?.content;
+          
+          // Fallback to standard meta tags
+          const title = ogTitle || doc.querySelector('title')?.textContent || '';
+          const description = ogDescription || doc.querySelector('meta[name="description"]')?.content || '';
+          const image = ogImage || '';
+          
+          if (title || description || image) {
+            showUrlPreviewCard({
+              url: url,
+              title: title,
+              description: description,
+              image: image
+            });
+            return; // Success, exit function
+          } else {
+            showUrlPreviewNoPreview(url);
+            return;
+          }
+        } catch (error) {
+          if (error.name === 'AbortError') {
+            console.warn(`Proxy timed out, trying next...`);
+          } else {
+            console.warn(`Proxy error: ${error.message}, trying next...`);
+          }
+          // Continue to next proxy
+        }
+      }
+      
+      // All proxies failed
+      console.error("All CORS proxies failed to fetch URL preview");
+      showUrlPreviewNoPreview(url);
+    }
+    
+    function handleUrlPreview() {
+      clearTimeout(urlPreviewTimeout);
+      
+      const rawUrl = storyUrlInput.val().trim();
+      if (!rawUrl) {
+        hideUrlPreview();
+        return;
+      }
+      
+      const normalizedUrl = rawUrl && !/^https?:\/\//i.test(rawUrl) ? `https://${rawUrl}` : rawUrl;
+      
+      // Validate URL format
+      try {
+        new URL(normalizedUrl);
+      } catch (e) {
+        hideUrlPreview();
+        return;
+      }
+      
+      // Debounce the preview fetch
+      urlPreviewTimeout = setTimeout(() => {
+        showUrlPreviewLoading();
+        fetchUrlPreview(normalizedUrl);
+      }, 800);
+    }
+
     // Validation Events
     storyDescription.on("input focus", validateStoryDescription);
     npoSearchInput.on("input focus", validateSelectedNPO);
     categorySearchInput.on("input focus", validateSelectedCategory);
+    storyUrlInput.on("input blur", validateStoryUrl);
+    storyUrlInput.on("input", handleUrlPreview);
 
     // Modify the focus event handlers to show loading state
     npoSearchInput.on("focus", function () {
@@ -1202,6 +1558,56 @@
     let uploadedFiles = [];
     let draggedItemIndex = null;
 
+    function applyStoryTypeUI() {
+      const postType = getPostType();
+      const isTextOnly = postType === "text-only";
+      const isSharedLink = postType === "shared-link";
+
+      const hideMedia = isTextOnly || isSharedLink;
+      storyMediaField.toggleClass("d-none", hideMedia);
+
+      if (hideMedia) {
+        uploadedFiles = [];
+        window.hero_image = [];
+        if (previewContainer) {
+          previewContainer.innerHTML = "";
+        }
+        validationState.storyMedia = true; // not required in these modes
+      } else {
+        // In with-media mode, always keep upload area visible
+        if (uploadArea) {
+          uploadArea.style.display = "flex";
+        }
+        validationState.storyMedia = uploadedFiles.length > 0;
+        updateUploadAreaText();
+      }
+
+      storyUrlGroup.toggleClass("d-none", !isSharedLink);
+      if (!isSharedLink) {
+        storyUrlInput.val("").removeClass("is-valid is-invalid");
+        validationState.storyUrl = true;
+        window.story_url = "";
+        hideUrlPreview();
+      } else {
+        storyUrlInput.removeClass("is-valid is-invalid");
+        validationState.storyUrl = false;
+        window.story_url = "";
+        // Trigger preview if URL already exists
+        if (storyUrlInput.val().trim()) {
+          handleUrlPreview();
+        }
+      }
+
+      checkAllValid();
+    }
+
+    window.setStoryPostType = function(type) {
+      window.story_post_type = type || "with-media";
+      applyStoryTypeUI();
+    };
+
+    applyStoryTypeUI();
+
     function handleDragStart(event, index) {
       draggedItemIndex = index;
       event.dataTransfer.effectAllowed = 'move';
@@ -1242,26 +1648,39 @@
       }
     }
 
-    uploadArea.addEventListener("click", () => fileInput.click());
+    uploadArea.addEventListener("click", () => {
+      if (uploadedFiles.length < 20) {
+        fileInput.click();
+      }
+    });
 
     browseButton.addEventListener("click", (e) => {
       e.stopPropagation();
-      fileInput.click();
+      if (uploadedFiles.length < 20) {
+        fileInput.click();
+      }
     });
 
     uploadArea.addEventListener("dragover", (e) => {
       e.preventDefault();
-      uploadArea.style.backgroundColor = "#f8f9fa";
+      if (uploadedFiles.length < 20) {
+        uploadArea.style.backgroundColor = "#f8f9fa";
+        uploadArea.style.borderColor = "#adb5bd";
+      }
     });
 
     uploadArea.addEventListener("dragleave", () => {
-      uploadArea.style.backgroundColor = "";
+      uploadArea.style.backgroundColor = "#ffffff";
+      uploadArea.style.borderColor = "#dee2e6";
     });
 
     uploadArea.addEventListener("drop", (e) => {
       e.preventDefault();
-      uploadArea.style.backgroundColor = "";
-      handleFiles(e.dataTransfer.files);
+      uploadArea.style.backgroundColor = "#ffffff";
+      uploadArea.style.borderColor = "#dee2e6";
+      if (uploadedFiles.length < 20) {
+        handleFiles(e.dataTransfer.files);
+      }
     });
 
     fileInput.addEventListener("change", () => {
@@ -1269,6 +1688,9 @@
     });
 
     function handleFiles(files) {
+      if (getPostType() !== "with-media") {
+        return;
+      }
       // Convert FileList to Array and filter for images and videos
       const newFiles = Array.from(files).filter(file => 
         file.type.startsWith("image/") || 
@@ -1277,18 +1699,18 @@
         file.type === "video/quicktime"
       );
       
-      // Check if adding these files would exceed the 5-media limit
-      if (uploadedFiles.length + newFiles.length > 5) {
+      // Check if adding these files would exceed the 20-media limit
+      if (uploadedFiles.length + newFiles.length > 20) {
         // If we exceed the limit, only take what we can fit
-        const availableSlots = 5 - uploadedFiles.length;
+        const availableSlots = 20 - uploadedFiles.length;
         if (availableSlots > 0) {
           // Add only the number of files that fit within the limit
           const filesToAdd = newFiles.slice(0, availableSlots);
           uploadedFiles = [...uploadedFiles, ...filesToAdd];
           window.hero_image = uploadedFiles;
-          alert(`You can only upload up to 5 media files. Added ${filesToAdd.length} of ${newFiles.length} selected files.`);
+          alert(`You can only upload up to 20 media files. Added ${filesToAdd.length} of ${newFiles.length} selected files.`);
         } else {
-          alert("Maximum of 5 media files allowed. Please remove some files before adding more.");
+          alert("Maximum of 20 media files allowed. Please remove some files before adding more.");
         }
       } else if (newFiles.length > 0) {
         // If we're within the limit, add all the new files
@@ -1302,16 +1724,6 @@
 
     function updatePreviews() {
       previewContainer.innerHTML = "";
-
-      // Only add the "add more" button if we have at least one file but fewer than 5
-      if (uploadedFiles.length > 0 && uploadedFiles.length < 5) {
-        const addMore = document.createElement("div");
-        addMore.classList.add("add-more");
-        addMore.innerHTML =
-          '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/></svg>';
-        addMore.addEventListener("click", () => fileInput.click());
-        previewContainer.appendChild(addMore);
-      }
 
       // Create preview elements for each uploaded file
       uploadedFiles.forEach((file, index) => {
@@ -1363,13 +1775,20 @@
           removeFile(index);
         });
 
+        // Add success badge (green checkmark)
+        const successBadge = document.createElement("div");
+        successBadge.classList.add("upload-success-badge");
+        successBadge.innerHTML = '<i class="bi bi-check"></i>';
+
         previewItem.appendChild(mediaElement);
         previewItem.appendChild(removeBtn);
+        previewItem.appendChild(successBadge);
 
         previewContainer.appendChild(previewItem);
       });
 
-      updateUploadArea();
+      // Update button text based on whether files are uploaded
+      updateUploadAreaText();
       validationState.storyMedia = uploadedFiles.length > 0;
       checkAllValid();
     }
@@ -1381,12 +1800,21 @@
       updatePreviews();
     }
 
-    function updateUploadArea() {
-      // Show upload area only if we have no media files
+    function updateUploadAreaText() {
+      // Update upload area text to show remaining slots
+      const remainingSlots = 20 - uploadedFiles.length;
       if (uploadedFiles.length === 0) {
-        uploadArea.style.display = "block";
+        browseButton.textContent = "Browse Files";
+        browseButton.disabled = false;
+        uploadArea.classList.remove("disabled");
+      } else if (uploadedFiles.length >= 20) {
+        browseButton.textContent = "Maximum Reached";
+        browseButton.disabled = true;
+        uploadArea.classList.add("disabled");
       } else {
-        uploadArea.style.display = "none";
+        browseButton.textContent = "Add More Files";
+        browseButton.disabled = false;
+        uploadArea.classList.remove("disabled");
       }
     }
 
@@ -1395,7 +1823,8 @@
       validationState = {
         storyMedia: false,
         storyDescription: false,
-        selectedNPO: false
+        selectedNPO: false,
+        storyUrl: getPostType() === "shared-link" ? false : true
       };
 
       // Reset uploaded files
@@ -1405,6 +1834,9 @@
 
       // Reset form fields
       $("#storyDetailsForm")[0].reset();
+      storyUrlInput.val("").removeClass("is-valid is-invalid");
+      window.story_url = "";
+      hideUrlPreview();
 
       // Remove validation classes
       $("#storyDetailsForm .form-control").removeClass("is-valid is-invalid");
@@ -1426,12 +1858,17 @@
       $("#categoryDropdown").hide();
 
       // Show upload area and clear preview container
-      uploadArea.style.display = "block";
+      uploadArea.style.display = "flex";
       previewContainer.innerHTML = "";
+      
+      // Reset upload area button text
+      updateUploadAreaText();
 
       // Optionally, reset any global variables or additional states
       window.npo_data = [];
       window.category_data = [];
+
+      applyStoryTypeUI();
 
       // Reset Next button state
       if (typeof updateNextButtonState === 'function') {

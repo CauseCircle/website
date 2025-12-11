@@ -254,6 +254,8 @@
   window.story_npo;
   window.story_category;
   window.story_data;
+  window.story_url = "";
+  window.story_post_type = window.story_post_type || "with-media";
 
   // TanStack Query observers
   let userProfileQuery;
@@ -392,6 +394,8 @@
       window.story_location = "";
       window.story_npo = "";
       window.story_category = "";
+      window.story_data = "";
+      window.story_url = "";
 
       $("#uploadArea").val("");
       $("#fileInput").val(""); // Reset file input
@@ -426,6 +430,7 @@
         switch (currentStep) {
           case 1:
             // Handle story information submission
+            const postType = window.story_post_type || "with-media";
             window.story_description = $("#storyDescription").val();
 
             // Find the NPO object and get its zuid
@@ -450,32 +455,50 @@
             window.story_location = $("#location").val();
             // Handle content addition
             window.story_content = $("#storyContent").val();
+            const rawStoryUrl = $("#storyUrl").val().trim();
+            const normalizedStoryUrl = rawStoryUrl && !/^https?:\/\//i.test(rawStoryUrl) ? `https://${rawStoryUrl}` : rawStoryUrl;
+            window.story_url = normalizedStoryUrl;
+
+            const hasMedia = Array.isArray(window.hero_image) && window.hero_image.length > 0;
+
+            if (postType === "with-media" && !hasMedia) {
+              alert("Please add at least one media file.");
+              return;
+            }
+
+            if (postType === "shared-link" && !normalizedStoryUrl) {
+              alert("Please add a link to share.");
+              return;
+            }
 
             try {
               const userData = JSON.parse(localStorage.getItem("user"));
 
-              // Step 1: Upload media using TanStack Query mutation
-              const uploadMediaMutation = window.createUploadMediaMutation();
-              
-              const uploadedImages = await new Promise((resolve, reject) => {
-                const unsubscribe = uploadMediaMutation.subscribe((result) => {
-                  if (result.status === 'success') {
-                    resolve(result.data);
-                    unsubscribe();
-                  } else if (result.status === 'error') {
-                    reject(result.error);
-                    unsubscribe();
-                  }
-                });
-                uploadMediaMutation.mutate(window.hero_image);
-              });
+              let imageIds = [];
 
-              const imageIds = uploadedImages.map((img) => img.data[0].id || img.data[0].url);
+              if (postType !== "text-only" && hasMedia) {
+                // Step 1: Upload media using TanStack Query mutation
+                const uploadMediaMutation = window.createUploadMediaMutation();
+                
+                const uploadedImages = await new Promise((resolve, reject) => {
+                  const unsubscribe = uploadMediaMutation.subscribe((result) => {
+                    if (result.status === 'success') {
+                      resolve(result.data);
+                      unsubscribe();
+                    } else if (result.status === 'error') {
+                      reject(result.error);
+                      unsubscribe();
+                    }
+                  });
+                  uploadMediaMutation.mutate(window.hero_image);
+                });
+
+                imageIds = uploadedImages.map((img) => img.data[0].id || img.data[0].url);
+              }
 
               const storyData = {
                 title: window.story_title,
                 story: window.story_content || window.story_description,
-                images: imageIds.join(","),
                 cause_category: window.story_category,
                 npo: window.story_npo,
                 author: userData.zuid,
@@ -483,6 +506,14 @@
                 description: window.story_description,
                 ...(window.story_post_as_npo_zuid ? { npo_author: window.story_post_as_npo_zuid } : {}),
               };
+
+              if (imageIds.length > 0) {
+                storyData.images = imageIds.join(",");
+              }
+
+              if (postType === "shared-link" && normalizedStoryUrl) {
+                storyData.story_url = normalizedStoryUrl;
+              }
 
               // Step 2: Create story using TanStack Query mutation
               const createStoryMutation = window.createCreateStoryMutation();
@@ -507,21 +538,12 @@
                 return; // Prevent moving to the next step if uploads failed
               }
 
-              // Step 3: Get created story data reactively
-              const storyZuid = story?.meta?.story_zuid;
-              if (storyZuid) {
-                const storyQuery = window.createStoryQuery(storyZuid);
-                
-                // Subscribe to story data changes
-                storyQuery.subscribe((result) => {
-                  if (result.isSuccess) {
-                    window.story_data = result.data;
-                    $("#shareLink").val(`{{ $base_url }}${result.data?.data[0]?.meta?.web?.uri}`);
-                  }
-                });
-                
-                // Trigger initial fetch
-                storyQuery.refetch();
+              // Use the website URL from the API response and replace domain with current domain
+              if (story?.links?.website) {
+                const apiUrl = new URL(story.links.website);
+                const currentOrigin = window.location.origin;
+                const storyUrl = `${currentOrigin}${apiUrl.pathname}${apiUrl.search}${apiUrl.hash}`;
+                $("#shareLink").val(storyUrl);
               }
             } catch (error) {
               console.error("Error uploading story:", error);
