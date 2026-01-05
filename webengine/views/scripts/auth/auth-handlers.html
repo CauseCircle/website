@@ -44,7 +44,7 @@
       const googleClient = google.accounts.oauth2.initTokenClient({
         client_id: '150409629176-uo1esfhvritlt5mk19bltnnh5l7mum2a.apps.googleusercontent.com',
         scope: 'email profile openid',
-        callback: async (response) => {
+        callback: async (response) => { 
           if (response.access_token) {
             const credential = firebase.auth.GoogleAuthProvider.credential(
               null,
@@ -215,7 +215,7 @@
       );
       const loginRedirectUrl = localStorage.getItem("loginRedirectUrl");
       const followUserRedirectUrl = localStorage.getItem("followUserRedirectUrl");
-      const followNpo = localStorage.getItem("followNpo");
+      const followNpoRedirectUrl = localStorage.getItem("followNpoRedirectUrl");
       const inviteType = localStorage.getItem("invite_type");
       const npoSlug = localStorage.getItem("npoSlug");
 
@@ -237,7 +237,6 @@
       }
 
       if (!FBuserExists && !zestyUserExists) {
-        // Case 1: Neither Firebase nor Zesty user exists
         if (typeof window.updateAuthLoadingMessage === 'function') {
           window.updateAuthLoadingMessage("Creating your account...");
         }
@@ -295,7 +294,7 @@
       await window.updateUserDataInLocalStorage(user.uid);
 
       if (newUser) {
-        if (npoZuid === "") {
+        if (npoZuid === "" || npoZuid === null || npoZuid === undefined) {
           window.location.replace("{{onboarding.first().getUrl()}}");
         } else {
           localStorage.removeItem("npoZuidToFollow");
@@ -321,10 +320,9 @@
       } else if (followUserRedirectUrl) {
         localStorage.removeItem("followUserRedirectUrl");
         window.location.replace(followUserRedirectUrl);
-      } else if (followNpo) {
-        localStorage.removeItem("followNpo");
-
-        window.location.replace("{{$url}}/?follow");
+      } else if (followNpoRedirectUrl) {
+        localStorage.removeItem("followNpoRedirectUrl");
+        window.location.replace(followNpoRedirectUrl + "?follow");
       } else {
         localStorage.removeItem("npoZuidToFollow");
         localStorage.removeItem("invite_type");
@@ -506,9 +504,96 @@
     }
   }
 
+  // ==================== EMAIL MAGIC LINK ====================
+  const sendMagicLink = async (email) => {
+    try {
+      const response = await fetch(`https://api.stage.causecircle.org/auth/email/send-link?email=${encodeURIComponent(email)}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to send magic link');
+      }
+      // Store email for same-device sign-in fallback
+      localStorage.setItem('emailForSignIn', email);
+      return { success: true, message: await response.text() };
+    } catch (error) {
+      console.error("Error sending magic link:", error);
+      return { success: false, message: error.message };
+    }
+  };
+
+  // Complete email link sign-in (called when user arrives via magic link)
+  const completeEmailLinkSignIn = async () => {
+    try {
+      // Check if the current URL is a sign-in with email link
+      if (!firebase.auth().isSignInWithEmailLink(window.location.href)) {
+        return { handled: false };
+      }
+
+      // Show loading overlay if available
+      if (typeof window.showAuthLoadingOverlay === 'function') {
+        window.showAuthLoadingOverlay("Completing sign-in...");
+      }
+
+      // Get email from URL params (we pass it in the continueUrl)
+      const urlParams = new URLSearchParams(window.location.search);
+      let email = urlParams.get('email');
+      
+      // If email not in URL, check localStorage (fallback for same-device sign-in)
+      if (!email) {
+        email = localStorage.getItem('emailForSignIn');
+      }
+      
+      // If still no email, prompt the user
+      if (!email) {
+        email = window.prompt('Please provide your email for confirmation:');
+      }
+      
+      if (!email) {
+        console.error('Email is required to complete sign-in');
+        if (typeof window.hideAuthLoadingOverlay === 'function') {
+          window.hideAuthLoadingOverlay();
+        }
+        return { handled: true, success: false, message: 'Email is required' };
+      }
+
+      // Complete sign-in with Firebase
+      const result = await firebase.auth().signInWithEmailLink(email, window.location.href);
+      
+      // Clear the email from localStorage
+      localStorage.removeItem('emailForSignIn');
+      
+      // Clean up URL (remove oobCode and other params)
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+      
+      // Use the existing handleAuthResult to complete the flow
+      await window.handleAuthResult(result.user);
+      
+      return { handled: true, success: true };
+    } catch (error) {
+      console.error('Error completing email link sign-in:', error);
+      if (typeof window.hideAuthLoadingOverlay === 'function') {
+        window.hideAuthLoadingOverlay();
+      }
+      
+      // Show error in status div if it exists (jQuery)
+      const $statusDiv = $('#magic-link-status');
+      if ($statusDiv.length) {
+        $statusDiv
+          .text(error.message || 'Failed to complete sign-in. Please try again.')
+          .removeClass('d-none text-success')
+          .addClass('text-danger');
+      }
+      
+      return { handled: true, success: false, message: error.message };
+    }
+  };
+
   // Expose functions to window
   window.signInWithGoogle = signInWithGoogle;
   window.signInWithFacebook = signInWithFacebook;
   window.signInWithApple = signInWithApple;
   window.signInWithMicrosoft = signInWithMicrosoft;
+  window.sendMagicLink = sendMagicLink;
+  window.completeEmailLinkSignIn = completeEmailLinkSignIn;
 </script>

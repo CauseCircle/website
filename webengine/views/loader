@@ -23,9 +23,7 @@
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" as="style" onload="this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"></noscript>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-{{ if {this.zuid} == {login_page.first().zuid} }}
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-{{ end-if }}
 <script 
   defer
   src="https://code.jquery.com/jquery-3.7.1.min.js"
@@ -120,13 +118,13 @@ crossorigin="anonymous"
 {{$npoZuid = {npo._zuid} }}
 {{/each}}
 
-{{ if {this.zuid} != {login_page.first().zuid} && {this.zuid} != {onboarding.first().zuid} && {this.zuid} != {tradeshow.first().zuid} }}
+{{ if {this.zuid} != {login_page.first().zuid} && {this.zuid} != {onboarding.first().zuid} && {this.zuid} != {email_login_page.first().zuid} && {this.zuid} != {tradeshow.first().zuid} }}
 {{include /components/global/header.html}}
 {{end-if}}
 
 {{ current_view }}
 
-{{ if {this.zuid} != {login_page.first().zuid} && {this.zuid} != {onboarding.first().zuid} }}
+{{ if {this.zuid} != {login_page.first().zuid} && {this.zuid} != {onboarding.first().zuid} && {this.zuid} != {email_login_page.first().zuid} }}
 {{include /components/global/footer.html}}
 {{end-if}}
 
