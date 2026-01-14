@@ -221,14 +221,4 @@
       localStorage.removeItem("claimListingRedirectUrl");
     });
   }
-  // get follow-npo param
-  const followNpo = new URLSearchParams(window.location.search).get(
-    "follow_npo"
-  );
-  if (followNpo) {
-    const loginModal = new bootstrap.Modal(
-      document.getElementById("loginPromptModal")
-    );
-    loginModal.show();
-  }
 </script>

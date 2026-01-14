@@ -215,7 +215,7 @@
       );
       const loginRedirectUrl = localStorage.getItem("loginRedirectUrl");
       const followUserRedirectUrl = localStorage.getItem("followUserRedirectUrl");
-      const followNpo = localStorage.getItem("followNpo");
+      const followNpoRedirectUrl = localStorage.getItem("followNpoRedirectUrl");
       const inviteType = localStorage.getItem("invite_type");
       const npoSlug = localStorage.getItem("npoSlug");
 
@@ -321,10 +321,9 @@
       } else if (followUserRedirectUrl) {
         localStorage.removeItem("followUserRedirectUrl");
         window.location.replace(followUserRedirectUrl);
-      } else if (followNpo) {
-        localStorage.removeItem("followNpo");
-
-        window.location.replace("{{$url}}/?follow");
+      } else if (followNpoRedirectUrl) {
+        localStorage.removeItem("followNpoRedirectUrl");
+        window.location.replace(followNpoRedirectUrl + "?follow");
       } else {
         localStorage.removeItem("npoZuidToFollow");
         localStorage.removeItem("invite_type");
