@@ -194,7 +194,8 @@
   };
 
   // ==================== USER MANAGEMENT ====================
-  const db = firebase.firestore();
+  // Use the globally configured Firestore instance (named database: cause-circle-stage)
+  const db = window.db;
 
   async function createFirebaseUser(user, userZuid = null) {
     try {

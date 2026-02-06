@@ -5,8 +5,8 @@
 
   // ==================== NPO STATS ====================
   window.npoTotalStats = async (zuid) => {
-    const user = firebase.auth().currentUser;
-    const userId = user.uid;
+    const user = await window.getCurrentUser();
+    const userId = user?.uid;
 
     const options = {
       method: "GET",
@@ -26,8 +26,8 @@
   }
 
   window.npoEngagementStats = async (zuid, startDate, endDate) => {
-    const user = firebase.auth().currentUser;
-    const userId = user.uid;
+    const user = await window.getCurrentUser();
+    const userId = user?.uid;
 
     const options = {
       method: "GET",
@@ -47,8 +47,8 @@
   }
 
   window.npoStoriesStats = async (zuid, startDate, endDate) => {
-    const user = firebase.auth().currentUser;
-    const userId = user.uid;
+    const user = await window.getCurrentUser();
+    const userId = user?.uid;
 
     const options = {
       method: "GET",

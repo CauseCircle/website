@@ -31,15 +31,15 @@
     <!-- Firebase Scripts -->
     <script
       defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"
+      src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"
     ></script>
     <script
       defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"
+      src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"
     ></script>
     <script
       defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"
+      src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"
     ></script>
 
     <script type="module" src="/auth/firebase-config.js"></script>
@@ -169,6 +169,7 @@
               src="{{ globals.logo.getImage() }}"
               style="max-width: 160px"
               alt="cause circle brand logo"
+              data-image-type="cc_logo"
             />
           </div>
           <div
@@ -230,8 +231,8 @@
     <script type="module">
       const selectionHeaderTextsForStory = [
         {
-          title: "Create Story",
-          description: "Write a story for a cause you care about",
+          title: "Create Post",
+          description: "Share a photo or video and write a caption",
           icon: "https://4xxglxlj.media.zestyio.com/upload_icon.png",
         },
         {
@@ -318,33 +319,67 @@
                 window.story_content = $("#storyContent").val();
 
                 try {
-                  const uploadedHeroImages = await newUploadImages(window.hero_image);
-
-                  const imageIds = uploadedHeroImages.map((img) => img.data[0].id);
-
                   const userData = JSON.parse(localStorage.getItem("user"));
+
+                  // Step 1: Upload media using TanStack Query mutation
+                  const uploadMediaMutation = window.createUploadMediaMutation();
+                  
+                  const uploadedImages = await new Promise((resolve, reject) => {
+                    const unsubscribe = uploadMediaMutation.subscribe((result) => {
+                      if (result.status === 'success') {
+                        resolve(result.data);
+                        unsubscribe();
+                      } else if (result.status === 'error') {
+                        reject(result.error);
+                        unsubscribe();
+                      }
+                    });
+                    uploadMediaMutation.mutate(window.hero_image);
+                  });
+
+                  const imageIds = uploadedImages.map((img) => img.data[0].id || img.data[0].url);
+
                   const storyData = {
                     title: window.story_title,
                     story: window.story_content || window.story_description,
                     images: imageIds.join(","),
                     cause_category: window.story_category,
-                    // cause_category: "7-80c2e0edba-ltxdkc",
                     npo: window.story_npo,
                     author: userData.zuid,
                     date_published: new Date().toISOString(),
                     description: window.story_description,
                   };
-                  const story = await createStory(storyData);
+
+                  // Step 2: Create story using TanStack Query mutation
+                  const createStoryMutation = window.createCreateStoryMutation();
+                  
+                  const story = await new Promise((resolve, reject) => {
+                    const unsubscribe = createStoryMutation.subscribe((result) => {
+                      if (result.status === 'success') {
+                        resolve(result.data);
+                        unsubscribe();
+                      } else if (result.status === 'error') {
+                        reject(result.error);
+                        unsubscribe();
+                      }
+                    });
+                    createStoryMutation.mutate(storyData);
+                  });
 
                   if (story.data.length === 0) {
                     alert(
-                      `Failed to upload story. Your story is deemed inappropriate. Please try again.`
+                      `${story?.meta?.message || "Failed to upload story. Please try again."}`
                     );
                     return; // Prevent moving to the next step if uploads failed
                   }
 
-                  window.story_data = await window.getStory(story?.meta?.story_zuid);
-                  $("#shareLink").val(`${window.story_data[0]?.meta?.web?.url}`);
+                  // Use the website URL from the API response and replace domain with current domain
+                  if (story?.links?.website) {
+                    const apiUrl = new URL(story.links.website);
+                    const currentOrigin = window.location.origin;
+                    const storyUrl = `${currentOrigin}${apiUrl.pathname}${apiUrl.search}${apiUrl.hash}`;
+                    $("#shareLink").val(storyUrl);
+                  }
                 } catch (error) {
                   console.error("Error uploading story:", error);
                   alert("Failed to upload story. Please try again.");

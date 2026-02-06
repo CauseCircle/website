@@ -4,7 +4,8 @@
   // const BASE_URL = "http://localhost:8080";
 
   // ==================== USER MANAGEMENT ====================
-  const db = firebase.firestore();
+  // Use the globally configured Firestore instance (named database: cause-circle-stage)
+  const db = window.db;
 
   async function createFirebaseUser(user, userZuid = null) {
     try {
@@ -93,7 +94,11 @@
 
   window.deleteUser = async (zuid) => {
     const url = `${BASE_URL}/users/${zuid}`;
-    const user = firebase.auth().currentUser;
+    const user = await window.getCurrentUser();
+    if (!user) {
+      console.error("No authenticated user found for deletion");
+      return false;
+    }
     const userId = user.uid;
 
     try {
@@ -176,8 +181,8 @@
   window.followUser = async (zuid) => {
     try {
       const url = `${BASE_URL}/users/follow`;
-      const user = firebase.auth().currentUser;
-      const userId = user.uid;
+      const user = await window.getCurrentUser();
+      const userId = user?.uid;
 
       const options = {
         method: "POST",
@@ -202,8 +207,8 @@
   window.unfollowUser = async (zuid) => {
     try {
       const url = `${BASE_URL}/users/unfollow`;
-      const user = firebase.auth().currentUser;
-      const userId = user.uid;
+      const user = await window.getCurrentUser();
+      const userId = user?.uid;
 
       const options = {
         method: "POST",
@@ -228,7 +233,7 @@
   window.getUserProfile = async (zuid) => {
     try {
       const url = `${BASE_URL}/users/${zuid}`;
-      const user = firebase.auth().currentUser;
+      const user = await window.getCurrentUser();
       const userId = user?.uid;
 
       const options = {
@@ -250,8 +255,13 @@
   }
 
   window.updateZestyUser = async (zuid, data) => {
-    const user = firebase.auth().currentUser;
-    const userId = user.uid;
+    const user = await window.getCurrentUser();
+    const userId = user?.uid;
+
+    if (!userId) {
+      console.error("No authenticated user found for update");
+      throw new Error("User not authenticated");
+    }
 
     // Only include properties that are provided in the data object
     const processedData = {

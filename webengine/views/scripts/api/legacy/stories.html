@@ -6,7 +6,7 @@
   // ==================== STORY MANAGEMENT ====================
 
   window.getStory = async (zuid) => {
-    const user = firebase.auth().currentUser;
+    const user = await window.getCurrentUser();
     const userId = user?.uid;
     const url = `${BASE_URL}/stories/${zuid}`;
 
@@ -28,7 +28,7 @@
   }
 
   window.getStories = async (params) => {
-    const user = firebase.auth().currentUser;
+    const user = await window.getCurrentUser();
     const userId = user?.uid;
     const url = `${BASE_URL}/stories?${new URLSearchParams(params).toString()}`;
 
@@ -50,8 +50,8 @@
   }
 
   window.getStoryStats = async (zuid) => {
-    const user = firebase.auth().currentUser;
-    const userId = user.uid;
+    const user = await window.getCurrentUser();
+    const userId = user?.uid;
     const url = `${BASE_URL}/stories/${zuid}/stats`;
 
     const options = {
@@ -73,8 +73,8 @@
       }
     }
 
-    const user = firebase.auth().currentUser;
-    const userId = user.uid;
+    const user = await window.getCurrentUser();
+    const userId = user?.uid;
     const url = type
       ? `${BASE_URL}/admin/stats/stories/${zuid}/${type}?npo_zuid=${npo_zuid}`
       : `${BASE_URL}/admin/stats/stories/${zuid}?npo_zuid=${npo_zuid}`;
@@ -97,8 +97,8 @@
   }
 
   window.updateStoryLikes = async (zuid) => {
-    const user = firebase.auth().currentUser;
-    const userId = user.uid;
+    const user = await window.getCurrentUser();
+    const userId = user?.uid;
     const url = `${BASE_URL}/stories/${zuid}/stats/like`;
 
     const options = {
@@ -119,8 +119,8 @@
   };
 
   window.updateStoryViews = async (zuid) => {
-    const user = firebase.auth().currentUser;
-    const userId = user.uid;
+    const user = await window.getCurrentUser();
+    const userId = user?.uid;
     const url = `${BASE_URL}/stories/${zuid}/stats/view`;
 
     const options = {
@@ -141,8 +141,8 @@
   }
 
   window.updateStoryShares = async (zuid) => {
-    const user = firebase.auth().currentUser;
-    const userId = user.uid;
+    const user = await window.getCurrentUser();
+    const userId = user?.uid;
     const url = `${BASE_URL}/stories/${zuid}/stats/share`;
 
     const options = {
@@ -164,8 +164,8 @@
 
   window.updateStory = async (zuid, data) => {
     try {
-      const user = firebase.auth().currentUser;
-      const userId = user.uid;
+      const user = await window.getCurrentUser();
+      const userId = user?.uid;
       const url = `${BASE_URL}/stories/${zuid}`;
 
       const options = {
@@ -195,7 +195,10 @@
     //   related_npos = [],
     //   story_image = "",
     // } = data;
-    const user = firebase.auth().currentUser;
+    const user = await window.getCurrentUser();
+    if (!user) {
+        throw new Error("User not authenticated");
+    }
     const userId = user.uid;
     const idToken = await user.getIdToken();
     const options = {
@@ -224,7 +227,7 @@
     const MAX_VIDEO_SIZE_MB = 250; // Video file size limit (matches backend)
     const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024;
 
-    const user = firebase.auth().currentUser;
+    const user = await window.getCurrentUser();
     if (!user) {
       console.error("User not authenticated for media upload.");
       alert("You must be logged in to upload media.");
@@ -403,7 +406,10 @@
   };
 
   window.approveStory = async (zuid, status, changeRequest = null) => {
-    const user = firebase.auth().currentUser;
+    const user = await window.getCurrentUser();
+    if (!user) {
+        throw new Error("User not authenticated");
+    }
     const userId = user.uid;
     const idToken = await user.getIdToken();
     const options = {

@@ -1,0 +1,268 @@
+<!-- Global Toast Notification Component -->
+<style>
+  .cc-toast-container {
+    position: fixed;
+    bottom: 40px;
+    left: 40px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+    pointer-events: none;
+    max-width: 90vw;
+  }
+
+  .cc-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    pointer-events: auto;
+    animation: ccToastSlideIn 0.3s ease-out;
+    min-width: 280px;
+    max-width: 480px;
+  }
+
+  .cc-toast.cc-toast--hiding {
+    animation: ccToastSlideOut 0.3s ease-in forwards;
+  }
+
+  @keyframes ccToastSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes ccToastSlideOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  }
+
+  /* Toast icon */
+  .cc-toast__icon {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.125rem;
+  }
+
+  .cc-toast__icon i {
+    font-size: 1.25rem;
+  }
+
+  /* Toast content */
+  .cc-toast__content {
+    flex: 1;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .cc-toast__content a {
+    text-decoration: underline;
+  }
+
+  /* Close button */
+  .cc-toast__close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    margin-left: 0.5rem;
+    margin-top: -0.125rem;
+  }
+
+  .cc-toast__close:hover {
+    opacity: 1;
+  }
+
+  .cc-toast__close i {
+    font-size: 1rem;
+  }
+
+  /* Success variant */
+  .cc-toast--success {
+    background-color: #E8F5E9;
+    color: #1B5E20;
+  }
+
+  .cc-toast--success .cc-toast__icon {
+    color: #2E7D32;
+  }
+
+  .cc-toast--success .cc-toast__close {
+    color: #2E7D32;
+  }
+
+  .cc-toast--success a {
+    color: #1B5E20;
+  }
+
+  /* Error variant */
+  .cc-toast--error {
+    background-color: #FFEBEE;
+    color: #B71C1C;
+  }
+
+  .cc-toast--error .cc-toast__icon {
+    color: #C62828;
+  }
+
+  .cc-toast--error .cc-toast__close {
+    color: #C62828;
+  }
+
+  .cc-toast--error a {
+    color: #B71C1C;
+  }
+
+  /* Warning variant */
+  .cc-toast--warning {
+    background-color: #FFF3E0;
+    color: #E65100;
+  }
+
+  .cc-toast--warning .cc-toast__icon {
+    color: #F57C00;
+  }
+
+  .cc-toast--warning .cc-toast__close {
+    color: #F57C00;
+  }
+
+  .cc-toast--warning a {
+    color: #E65100;
+  }
+
+  /* Info variant */
+  .cc-toast--info {
+    background-color: #E3F2FD;
+    color: #0D47A1;
+  }
+
+  .cc-toast--info .cc-toast__icon {
+    color: #1976D2;
+  }
+
+  .cc-toast--info .cc-toast__close {
+    color: #1976D2;
+  }
+
+  .cc-toast--info a {
+    color: #0D47A1;
+  }
+</style>
+
+<!-- Toast Container -->
+<div id="ccToastContainer" class="cc-toast-container"></div>
+
+<script type="module">
+  // Toast icon mapping
+  const TOAST_ICONS = {
+    success: 'bi-check-circle-fill',
+    error: 'bi-x-circle-fill',
+    warning: 'bi-exclamation-triangle-fill',
+    info: 'bi-info-circle-fill',
+  };
+
+  // Default toast options
+  const DEFAULT_OPTIONS = {
+    type: 'info',
+    content: '',
+    duration: 3000, // 3 seconds
+  };
+
+  /**
+   * Show a toast notification
+   * @param {Object} options - Toast configuration
+   * @param {string} options.type - Toast type: 'success', 'error', 'warning', 'info'
+   * @param {string} options.content - HTML or text content to display
+   * @param {number} options.duration - Auto-dismiss time in ms (0 = no auto-dismiss)
+   * @returns {HTMLElement} The toast element
+   */
+  window.showToast = function(options = {}) {
+    const config = { ...DEFAULT_OPTIONS, ...options };
+    const container = document.getElementById('ccToastContainer');
+    
+    if (!container) {
+      console.error('Toast container not found');
+      return null;
+    }
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `cc-toast cc-toast--${config.type}`;
+    
+    const iconClass = TOAST_ICONS[config.type] || TOAST_ICONS.info;
+    
+    toast.innerHTML = `
+      <div class="cc-toast__icon">
+        <i class="bi ${iconClass}"></i>
+      </div>
+      <div class="cc-toast__content">${config.content}</div>
+      <button type="button" class="cc-toast__close" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    `;
+
+    // Add close button handler
+    const closeBtn = toast.querySelector('.cc-toast__close');
+    closeBtn.addEventListener('click', () => dismissToast(toast));
+
+    // Add to container
+    container.appendChild(toast);
+
+    // Auto-dismiss if duration > 0
+    if (config.duration > 0) {
+      setTimeout(() => dismissToast(toast), config.duration);
+    }
+
+    return toast;
+  };
+
+  /**
+   * Dismiss a specific toast with animation
+   * @param {HTMLElement} toast - The toast element to dismiss
+   */
+  function dismissToast(toast) {
+    if (!toast || toast.classList.contains('cc-toast--hiding')) return;
+    
+    toast.classList.add('cc-toast--hiding');
+    
+    // Remove after animation completes
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }
+
+  /**
+   * Dismiss all active toasts
+   */
+  window.dismissAllToasts = function() {
+    const container = document.getElementById('ccToastContainer');
+    if (!container) return;
+
+    const toasts = container.querySelectorAll('.cc-toast');
+    toasts.forEach(toast => dismissToast(toast));
+  };
+</script>

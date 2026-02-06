@@ -216,6 +216,138 @@
     return false;
   }
 
+  // URL Preview functionality for Home Feed
+  function showUrlPreviewLoading(storyZuid) {
+    $(`#url-preview-loading-${storyZuid}`).removeClass("d-none");
+    $(`#url-preview-content-${storyZuid}`).addClass("d-none");
+  }
+
+  function hideUrlPreview(storyZuid) {
+    $(`#url-preview-container-${storyZuid}`).addClass("d-none");
+  }
+
+  function showUrlPreviewCard(storyZuid, data) {
+    const content = $(`#url-preview-content-${storyZuid}`);
+    
+    $(`#url-preview-loading-${storyZuid}`).addClass("d-none");
+    content.removeClass("d-none");
+    
+    // Set title and fallback
+    const title = data.title || "Link Preview";
+    const description = data.description || "";
+    
+    const imageHtml = data.image ? `<img src="${data.image}" class="url-preview-image" alt="${window.escapeHtml(title)}">` : "";
+    
+    content.html(`
+      <a href="${data.url}" target="_blank" class="url-preview-card" onclick="event.stopPropagation()">
+        ${imageHtml}
+        <div class="url-preview-content">
+          <div class="url-preview-url">${data.url}</div>
+          ${description ? `<div class="url-preview-description">${window.escapeHtml(description)}</div>` : ""}
+        </div>
+      </a>
+    `);
+  }
+
+  function showUrlPreviewNoPreview(storyZuid, url) {
+    const content = $(`#url-preview-content-${storyZuid}`);
+    
+    $(`#url-preview-loading-${storyZuid}`).addClass("d-none");
+    content.removeClass("d-none");
+    
+    content.html(`
+      <a href="${url}" target="_blank" class="url-preview-card" onclick="event.stopPropagation()">
+        <div class="url-preview-content">
+          <div class="url-preview-url">${url}</div>
+          <div class="url-preview-description">No preview available</div>
+        </div>
+      </a>
+    `);
+  }
+
+  async function fetchUrlPreview(storyZuid, url) {
+    // List of CORS proxy services to try in order
+    const corsProxies = [
+      `https://corsproxy.io/?${encodeURIComponent(url)}`,
+      `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+    ];
+    
+    for (const proxyUrl of corsProxies) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+        
+        const response = await fetch(proxyUrl, { 
+          signal: controller.signal,
+          headers: {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          }
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) continue;
+        
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        const ogTitle = doc.querySelector('meta[property="og:title"]')?.content;
+        const ogDescription = doc.querySelector('meta[property="og:description"]')?.content;
+        const ogImage = doc.querySelector('meta[property="og:image"]')?.content;
+        
+        const title = ogTitle || doc.querySelector('title')?.textContent || '';
+        const description = ogDescription || doc.querySelector('meta[name="description"]')?.content || '';
+        const image = ogImage || '';
+        
+        if (title || description || image) {
+          showUrlPreviewCard(storyZuid, { url, title, description, image });
+          return;
+        } else {
+          showUrlPreviewNoPreview(storyZuid, url);
+          return;
+        }
+      } catch (error) {
+        console.warn(`Proxy error for ${proxyUrl}:`, error);
+      }
+    }
+    showUrlPreviewNoPreview(storyZuid, url);
+  }
+
+  function handleUrlPreview(storyZuid, urlInput) {
+    if (!urlInput) {
+      hideUrlPreview(storyZuid);
+      return;
+    }
+    
+    // Handle both string and Zesty object formats
+    let urlString = "";
+    if (typeof urlInput === 'string') {
+      urlString = urlInput;
+    } else if (typeof urlInput === 'object') {
+      urlString = urlInput.url || urlInput.uri || urlInput.href || "";
+    }
+    
+    urlString = urlString.trim();
+    if (!urlString) {
+      hideUrlPreview(storyZuid);
+      return;
+    }
+    
+    const normalizedUrl = urlString && !/^https?:\/\//i.test(urlString) ? `https://${urlString}` : urlString;
+    
+    try {
+      new URL(normalizedUrl);
+    } catch (e) {
+      hideUrlPreview(storyZuid);
+      return;
+    }
+    
+    showUrlPreviewLoading(storyZuid);
+    fetchUrlPreview(storyZuid, normalizedUrl);
+  }
+
   // Export functions to window for global access
   window.isVideoUrl = isVideoUrl;
   window.getVideoEmbedUrl = getVideoEmbedUrl;
@@ -224,4 +356,5 @@
   window.getCarouselItems = getCarouselItems;
   window.getCarouselIndicators = getCarouselIndicators;
   window.handleCarouselClick = handleCarouselClick;
+  window.handleUrlPreview = handleUrlPreview;
 </script>
