@@ -25,7 +25,7 @@
     const MAX_VIDEO_SIZE_MB = 250; // Video file size limit (matches backend)
     const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024;
 
-    const user = firebase.auth().currentUser;
+    const user = await window.getCurrentUser();
     if (!user) {
       console.error("User not authenticated for media upload.");
       alert("You must be logged in to upload media.");

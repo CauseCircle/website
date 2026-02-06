@@ -20,7 +20,7 @@
       }
     } else {
       if (routeMatches(window.CONFIG.AUTHENTICATED_ROUTES)) {
-        window.location.replace("/login");
+        window.location.replace("{{homepage.first().getUrl()}}"); //change to home page
       }
     }
   }
@@ -34,7 +34,7 @@
       document.cookie =
         "uid=; path=/; domain=.causecircle.org; expires=Thu, 01 Jan 1970 00:00:00 UTC; secure; samesite=strict";
       updateUIBasedOnAuthState(null);
-      window.location.replace("{{login_page.first().getUrl()}}");
+      window.location.replace("{{homepage.first().getUrl()}}"); //change to home page
     } catch (error) {
       console.error("Sign out error:", error);
     }
@@ -79,7 +79,8 @@
 
   // ==================== USER DATA UPDATE ====================
   async function updateUserDataInLocalStorage(uid) {
-    const db = firebase.firestore();
+    // Use the globally configured Firestore instance (named database: cause-circle-stage)
+    const db = window.db;
 
     async function getUserData(searchTerm = "", searchType = "uid") {
       try {
@@ -135,6 +136,34 @@
       return null;
     }
   }
+
+  // ==================== AUTH READY HELPER ====================
+  /**
+   * Promise-based helper to get the current authenticated user.
+   * Resolves immediately if currentUser is set, otherwise waits for onAuthStateChanged.
+   * @returns {Promise<firebase.User|null>}
+   */
+  window.getCurrentUser = () => {
+    return new Promise((resolve) => {
+      // Check if already available synchronously
+      if (firebase.auth().currentUser) {
+        resolve(firebase.auth().currentUser);
+        return;
+      }
+
+      // Wait for initialization from persistent storage
+      const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+        unsubscribe();
+        resolve(user);
+      });
+
+      // Safety timeout (3 seconds) to prevent hanging if SDK fails to init or no user
+      setTimeout(() => {
+        unsubscribe();
+        resolve(firebase.auth().currentUser);
+      }, 3000);
+    });
+  };
 
   // Expose functions to window
   window.handleRouting = handleRouting;
