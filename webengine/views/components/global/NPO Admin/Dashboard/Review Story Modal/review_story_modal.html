@@ -566,6 +566,8 @@
 <script type="module">
   // ==================== TANSTACK QUERY SETUP ====================
   const approveStoryMutation = window.createApproveStoryMutation();
+  // MutationObserver requires at least one subscriber for inline mutate() callbacks to fire
+  approveStoryMutation.subscribe(() => {});
 
   let currentStoryIndex = 0;
   let stories = [];
@@ -699,40 +701,41 @@
     limit: 9999
   });
 
-  // Subscribe to the query to reactively update the modal when data changes
-  // This automatically updates the UI whenever the query refetches (e.g., after story approval)
-  let isWaitingForRefetch = false;
+  // Track whether we've recently acted on a story (to avoid stale server data overwriting optimistic updates)
+  let lastMutationTime = 0;
 
+  // Subscribe to the query to sync the local stories array when the background refetch completes
   modalPendingStoriesQuery.subscribe((result) => {
-    // Only auto-update if we're waiting for a refetch (after mutation)
-    if (isWaitingForRefetch && result.status === 'success' && !result.isFetching) {
-      isWaitingForRefetch = false;
+    if (result.status === 'success' && !result.isFetching) {
+      const freshStories = result.data?.data || [];
 
-      // Update local stories array with fresh data
-      const pendingStories = result.data?.data || [];
-      stories = pendingStories;
+      // If a mutation happened recently, the server may still return stale data
+      // that includes the story we just acted on. Only accept server data that has
+      // fewer or equal stories (confirming the removal) — never revert to more.
+      const recentlyMutated = (Date.now() - lastMutationTime) < 15000;
 
-      // If we still have stories to review, show them
-      if (stories.length > 0) {
-        // Keep index if possible, or reset to 0
-        if (currentStoryIndex >= stories.length) {
-          currentStoryIndex = Math.max(0, stories.length - 1);
+      if (recentlyMutated && freshStories.length > stories.length) {
+        return;
+      }
+
+      if (freshStories.length !== stories.length) {
+        stories = freshStories;
+
+        if (stories.length > 0) {
+          if (currentStoryIndex >= stories.length) {
+            currentStoryIndex = Math.max(0, stories.length - 1);
+          }
+          renderCurrentStory();
+          updateNavigationButtons();
+        } else {
+          $("#story-content").html(`
+            <div class="text-center py-5">
+              <h4 class="text-muted">No more stories to review</h4>
+              <p class="text-muted">Great job! All stories have been reviewed.</p>
+            </div>
+          `);
+          $(".action-buttons button").prop("disabled", true);
         }
-        renderCurrentStory();
-        updateNavigationButtons();
-
-        // Clean and restructure content after DOM has been updated
-        setTimeout(cleanAndRestructureContent, 100);
-      } else {
-        // No more stories to review
-        $("#story-content").html(`
-          <div class="text-center py-5">
-            <h4 class="text-muted">No more stories to review</h4>
-            <p class="text-muted">Great job! All stories have been reviewed.</p>
-          </div>
-        `);
-        // Disable action buttons
-        $(".action-buttons button").prop("disabled", true);
       }
     }
   });
@@ -782,14 +785,17 @@
     // Enable all action buttons since we have a story
     actionButtons.prop("disabled", false);
 
+    // Expose current story ZUID for cross-module access (e.g., report modal)
+    window._reviewModalCurrentStoryZuid = story?.meta?.zuid;
+
     // Handle story_image - can be either a string or an object with data array
     let mediaData = [];
     if (typeof story.story_image === 'string') {
       // story_image is a simple string URL
-      mediaData = [{ url: story.story_image }];
+      mediaData = [{ url: story?.story_image }];
     } else if (story.story_image?.data && Array.isArray(story.story_image.data)) {
       // story_image is an object with data array
-      mediaData = story.story_image.data;
+      mediaData = story?.story_image?.data;
     }
     
     // Get the author profile image
@@ -831,7 +837,7 @@
               </div>
               <div class="d-flex flex-column justify-content-center">
                 <a href="${authorProfileUrl}" id="author-name" class="fs-6 fw-medium mb-0 text-decoration-none text-reset">
-                  ${escapeHtml(story.author.data[0].first_name)} ${escapeHtml(story.author.data[0].last_name)}
+                  ${escapeHtml(story?.author?.data[0]?.first_name)} ${escapeHtml(story?.author?.data[0]?.last_name)}
                 </a>
                 <!-- Time ago display -->
                 <p class="fs-6 text-muted mb-0">${timeAgo}</p>
@@ -839,8 +845,8 @@
             </div>
 
             <!-- Story title and content -->
-            <h2 class="fs-5 fw-medium mb-0">${escapeHtml(story.title)}</h2>
-            <div class="story-container text-muted">${formatStoryBody(story.story_body)}</div>
+            <h2 class="fs-5 fw-medium mb-0">${escapeHtml(story?.title)}</h2>
+            <div class="story-container text-muted">${formatStoryBody(story?.story_body)}</div>
             
             <!-- Hashtags from story body -->
             ${hashtagsHtml}
@@ -852,7 +858,7 @@
           <div id="storyImageCarousel" class="carousel slide" data-bs-touch="true">
             ${hasMultipleMedia ? `
             <div class="carousel-indicators">
-              ${mediaData.filter(item => item.url || item.zuid || item).map((item, index) => `
+              ${mediaData.filter(item => item?.url || item?.zuid || item).map((item, index) => `
                 <button type="button" 
                   data-bs-target="#storyImageCarousel" 
                   data-bs-slide-to="${index}" 
@@ -864,7 +870,7 @@
             <div class="carousel-inner">
               ${mediaData.map((item, index) => {
                 // Handle different formats: object with url/zuid, or direct string
-                const mediaUrl = item.url || item.zuid || (typeof item === 'string' ? item : '');
+                const mediaUrl = item?.url || item?.zuid || (typeof item === 'string' ? item : '');
                 if (!mediaUrl) return ''; // Skip invalid items
                 
                 const isVideo = isVideoUrl(mediaUrl);
@@ -904,7 +910,7 @@
                   <div class="carousel-item image-item ${isActive}">
                     <img id="${index === 0 ? 'active-story' : ''}" class="d-block w-100 carousel-image" 
                         src="${mediaUrl}?width=500" 
-                        alt="${escapeHtml(story.title)} - Slide ${index + 1}"
+                        alt="${escapeHtml(story?.title)} - Slide ${index + 1}"
                         ${index === 0 ? `data-zuid="${story?.meta?.zuid}"` : ''}>
                   </div>
                 `;
@@ -1115,34 +1121,38 @@
 
   // Make handleStoryAction globally accessible for request_changes.html
   window.handleStoryAction = function(action, changeRequest = null) {
-    const zuid = $("#active-story").data("zuid");
+    const story = stories[currentStoryIndex];
+    const zuid = story?.meta?.zuid;
+
+    if (!zuid) {
+      console.error('Story ZUID is undefined, cannot perform action:', action);
+      return;
+    }
 
     // Determine which button to manage based on action type
     const button = action === "approved" ? $("#approve-story") :
                   action === "rejected" ? $("#reject-story") :
                   action === "changes_requested" ? $("#submitChanges") : null;
 
-    // Helper function to reset button state
+    // Helper function to reset button state — queries DOM fresh each time
     const resetButtonState = () => {
-      if (button) {
-        const icon = button.find(".bi");
-        const spinner = button.find(".spinner-border");
-
-        button.prop("disabled", false);
-        icon.removeClass("d-none");
-        spinner.addClass("d-none");
+      const btnId = action === "approved" ? "#approve-story" :
+                    action === "rejected" ? "#reject-story" :
+                    action === "changes_requested" ? "#submitChanges" : null;
+      if (btnId) {
+        const $btn = $(btnId);
+        $btn.prop("disabled", false);
+        $btn.find(".bi").removeClass("d-none");
+        $btn.find(".spinner-border").addClass("d-none");
       }
     };
 
-    // Helper function to set button loading state
+    // Helper function to set button loading state — queries DOM fresh each time
     const setButtonLoading = () => {
       if (button) {
-        const icon = button.find(".bi");
-        const spinner = button.find(".spinner-border");
-
         button.prop("disabled", true);
-        icon.addClass("d-none");
-        spinner.removeClass("d-none");
+        button.find(".bi").addClass("d-none");
+        button.find(".spinner-border").removeClass("d-none");
       }
     };
 
@@ -1166,26 +1176,42 @@
       }, 5000);
     }
 
-    // Set flag to enable reactive updates when query refetches
-    isWaitingForRefetch = true;
+    // Trigger the mutation — callbacks fire only for this specific call
+    approveStoryMutation.mutate({
+      zuid: zuid,
+      status: action,
+      changeRequest: changeRequest
+    }, {
+      onSuccess: () => {
+        stories.splice(currentStoryIndex, 1);
+        lastMutationTime = Date.now();
 
-    // Subscribe to mutation state for error handling and button state management
-    const unsubscribe = approveStoryMutation.subscribe((result) => {
-      if (result.status === 'success') {
-        // Success! The mutation's onSuccess (with 5s delay) will invalidate queries
-        // The query subscription above will automatically update UI when refetch completes
+        if (stories.length > 0) {
+          if (currentStoryIndex >= stories.length) {
+            currentStoryIndex = stories.length - 1;
+          }
+          renderCurrentStory();
+          updateNavigationButtons();
+          setTimeout(cleanAndRestructureContent, 100);
+        } else {
+          $("#story-content").html(`
+            <div class="text-center py-5">
+              <h4 class="text-muted">No more stories to review</h4>
+              <p class="text-muted">Great job! All stories have been reviewed.</p>
+            </div>
+          `);
+          $(".action-buttons button").prop("disabled", true);
+        }
 
+        // Reset button loading state after rendering to ensure it's not overwritten
         resetButtonState();
-        unsubscribe();
-      } else if (result.status === 'error') {
-        console.error(`Error ${action} story:`, result.error);
-        isWaitingForRefetch = false; // Cancel waiting for refetch
+      },
+      onError: (error) => {
+        console.error(`Error ${action} story:`, error);
 
-        // Handle errors for changes_requested specially
         if (action === "changes_requested") {
           alert("Failed to submit change request. Please try again.");
         } else {
-          // Show error message in the story content area for other actions
           $("#story-content").html(`
             <div class="text-center py-5">
               <h4 class="text-danger">Error ${action} story</h4>
@@ -1194,19 +1220,8 @@
           `);
         }
 
-        // Reset button state
         resetButtonState();
-
-        // Unsubscribe after handling error
-        unsubscribe();
       }
-    });
-
-    // Trigger the mutation
-    approveStoryMutation.mutate({
-      zuid: zuid,
-      status: action,
-      changeRequest: changeRequest
     });
   }
 
