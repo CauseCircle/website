@@ -1,3 +1,84 @@
+<script>
+  // ==================== IMAGE FALLBACK SYSTEM ====================
+  (function() {
+    // Only run on specific domain
+    if (window.location.hostname !== '4xxglxlj-dev.preview.stage.zesty.io') return;
+
+    // PREDEFINED FALLBACK IMAGE URL
+    const FALLBACK_IMAGE = 'https://4xxglxlj.media.zestyio.com/stories-fallback-image.jpg?width=150'; 
+    const FALLBACK_CC_LOGO = 'https://4xxglxlj.media.zestyio.com/Asset-2--1-.png?width=160';
+    const FALLBACK_CC_LOGO_2 = 'https://4xxglxlj.media.zestyio.com/Frame-7.png?width=160&quality=60&format=webp'
+    const FALLBACK_USER_IMAGE = 'https://www.gravatar.com/avatar/?d=mp';
+    const FALLBACK_CC_HERO_IMAGE = 'https://4xxglxlj.media.zestyio.com/CC-Login-Image.png?width=800&quality=60&format=webp'
+
+    function isValidUrl(url) {
+        if (!url || url.trim() === '' || url === 'undefined' || url === 'null') return false;
+        // Basic check: must have a protocol or start with /
+        return /^(https?:\/\/|\/|data:)/.test(url);
+    }
+
+    function getFallbackUrl(img) {
+        const type = img.getAttribute('data-image-type');
+        if (type === 'cc_logo') return FALLBACK_CC_LOGO;
+        if (type === 'cc_logo_2') return FALLBACK_CC_LOGO_2;
+        if (type === 'user_image') return FALLBACK_USER_IMAGE;
+        if (type === 'cc_hero_image') return FALLBACK_CC_HERO_IMAGE;
+        return FALLBACK_IMAGE;
+    }
+
+    function fixImage(img) {
+        const src = img.getAttribute('src');
+        if (!isValidUrl(src)) {
+            img.removeAttribute('srcset'); // Remove broken srcset
+            img.src = getFallbackUrl(img);
+        }
+    }
+
+    // 1. Initial scan for images already in the DOM
+    document.querySelectorAll('img').forEach(fixImage);
+
+    // 2. Global listener for broken images (network errors)
+    // Use capture phase (true) because 'error' events on elements don't bubble
+    window.addEventListener('error', function(e) {
+        if (e.target && e.target.tagName === 'IMG') {
+            const fallback = getFallbackUrl(e.target);
+            // Check if current src is already the fallback to avoid infinite loops
+            if (e.target.src !== window.location.origin + fallback && e.target.src !== fallback) {
+                e.target.removeAttribute('srcset'); // Remove broken srcset on error
+                e.target.src = fallback;
+            }
+        }
+    }, true);
+
+    // 3. MutationObserver to handle dynamically added images or attribute changes
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) { // ELEMENT_NODE
+                        if (node.tagName === 'IMG') {
+                            fixImage(node);
+                        } else {
+                            node.querySelectorAll('img').forEach(fixImage);
+                        }
+                    }
+                });
+            } else if (mutation.type === 'attributes' && (mutation.attributeName === 'src' || mutation.attributeName === 'srcset')) {
+                fixImage(mutation.target);
+            }
+        });
+    });
+
+    // Start observing immediately
+    observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['src', 'srcset']
+    });
+  })();
+</script>
+
 <script type="module">
   // ==================== APP INITIALIZATION ====================
 

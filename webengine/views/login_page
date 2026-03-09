@@ -12,7 +12,7 @@
     gap: 4rem;
   }
   .login-btn {
-    min-width: 7.625rem;
+    min-width: 7.625rem; 
     height: 2.5rem;
     border-radius: 10px;
     border: 1px solid #e1e4ea;
@@ -52,6 +52,7 @@
               decoding="async"
               fetchpriority="high"
               alt="cause circle brand logo"
+              data-image-type="cc_logo"
             /></a>
         </div>
 
@@ -111,7 +112,7 @@
                 d="M5.27698177,14.2678769 C5.03832634,13.556323 4.90909091,12.7937589 4.90909091,12 C4.90909091,11.2182781 5.03443647,10.4668121 5.26620003,9.76452941 L1.23999023,6.65002441 C0.43658717,8.26043162 0,10.0753848 0,12 C0,13.9195484 0.444780743,15.7301709 1.23746264,17.3349879 L5.27698177,14.2678769 Z"
               />
             </svg>
-            <span class="ms-2">Sign in with Google</span>
+            <span class="ms-2">Continue with Google</span>
           </button>
           <button
             type="button"
@@ -122,7 +123,7 @@
               class="bi bi-facebook"
               style="font-size: 20px; color: #448afd"
             ></i>
-            <span class="ms-2">Sign in with Facebook</span>
+            <span class="ms-2">Continue with Facebook</span>
           </button>
           <button
             type="button"
@@ -136,7 +137,7 @@
               <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
               <path fill="#ffba08" d="M12 12h10v10H12z"></path>
             </svg>
-            <span class="ms-2">Sign in with Microsoft</span>
+            <span class="ms-2">Continue with Microsoft</span>
           </button>
           <button
             type="button"
@@ -144,8 +145,19 @@
             id="apple-signin-btn"
           >
             <i class="bi bi-apple" style="font-size: 20px"></i>
-            <span class="ms-2">Sign in with Apple</span>
+            <span class="ms-2">Continue with Apple</span>
           </button>
+
+          <!-- Email Login Link -->
+          <a
+            href="{{email_login_page.first().getUrl()}}"
+            class="login-btn btn btn-light w-100"
+            id="email-signin-btn"
+          >
+            <i class="bi bi-envelope" style="font-size: 20px"></i>
+            <span class="ms-2">Continue with Email</span>
+          </a>
+          <div id="magic-link-status" class="text-center mt-2 d-none small"></div>
         </div>
       </div>
       <div class="d-flex justify-content-between align-items-center p-4">
@@ -167,6 +179,7 @@
           {{ this.hero_image.getImage() }}?width=800&quality=60&format=webp 800w"
         sizes="(max-width: 600px) 400px, (max-width: 1200px) 800px, 1200px"
         alt="Hero Image"
+        data-image-type="cc_hero_image"
         class="img-fluid"
         decoding="async"
       />
@@ -185,50 +198,46 @@
 {{include /components/global/Login/LoginPromptModal/login_prompt_modal.html}}
 
 <script type="module">
-  // Toggle hero image loading/fetch priority for mobile vs desktop
+  // ==================== EMAIL LINK SIGN-IN CHECK ====================
+  // Check if user arrived via magic link and complete sign-in
+  $(document).ready(async function() {
+    // Try to complete email link sign-in if applicable
+    if (typeof window.completeEmailLinkSignIn === 'function') {
+      await window.completeEmailLinkSignIn();
+    }
+  });
+
+  // ==================== HERO IMAGE HANDLING ====================
   (function () {
     try {
-      const heroImg = document.getElementById("hero-img");
-      if (!heroImg) return;
+      const $heroImg = $('#hero-img');
+      if (!$heroImg.length) return;
 
       const setLoadingHints = () => {
         const isMobile = window.matchMedia("(max-width: 991.98px)").matches;
         if (isMobile) {
-          heroImg.setAttribute("loading", "lazy");
-          heroImg.removeAttribute("fetchpriority");
+          $heroImg.attr("loading", "lazy").removeAttr("fetchpriority");
         } else {
-          heroImg.removeAttribute("loading");
-          heroImg.setAttribute("fetchpriority", "high");
+          $heroImg.removeAttr("loading").attr("fetchpriority", "high");
         }
       };
 
       setLoadingHints();
-      window.addEventListener("resize", setLoadingHints);
+      $(window).on("resize", setLoadingHints);
     } catch (_) {}
   })();
-  const claimListingRedirectUrl = localStorage.getItem(
-    "claimListingRedirectUrl"
-  );
 
+  // ==================== CLAIM LISTING MESSAGE ====================
+  const claimListingRedirectUrl = localStorage.getItem("claimListingRedirectUrl");
   if (claimListingRedirectUrl) {
     $("#login-title").text("Sign Up to Claim Your Listing");
     $("#login-description").text(
       "This will allow you to manage and edit your Nonprofit, invite admins and followers, and review stories."
     );
-
-    // Clear the localStorage item when the page is unloaded
-    window.addEventListener("unload", () => {
+    $(window).on("unload", () => {
       localStorage.removeItem("claimListingRedirectUrl");
     });
   }
-  // get follow-npo param
-  const followNpo = new URLSearchParams(window.location.search).get(
-    "follow_npo"
-  );
-  if (followNpo) {
-    const loginModal = new bootstrap.Modal(
-      document.getElementById("loginPromptModal")
-    );
-    loginModal.show();
-  }
+
+
 </script>

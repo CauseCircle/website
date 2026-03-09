@@ -6,8 +6,8 @@
   // ==================== COMMENT MANAGEMENT ====================
 
   window.postComment = async (zuid, data) => {
-    const user = firebase.auth().currentUser;
-    const userId = user.uid;
+    const user = await window.getCurrentUser();
+    const userId = user?.uid;
     const url = `${BASE_URL}/stories/${zuid}/comments`;
 
     const options = {
@@ -30,7 +30,7 @@
   };
 
   window.getStoryComments = async (zuid) => {
-    const user = firebase.auth().currentUser;
+    const user = await window.getCurrentUser();
     const userId = user?.uid;
     const url = `${BASE_URL}/stories/${zuid}/comments`;
 

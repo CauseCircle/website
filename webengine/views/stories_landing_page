@@ -9,7 +9,7 @@
     font-size: 14px;
     color: #666;
   }
-  .search-bar { 
+  .search-bar {
     display: flex;
     gap: 10px;
   }
@@ -57,7 +57,6 @@
     margin-left: 6px;
   }
 </style>
-
 
 <style>
   .story-image {
@@ -146,7 +145,7 @@
     margin-right: 8px;
     cursor: pointer;
   }
-  
+
   .hashtag-item:hover {
     text-decoration: underline;
     color: #5a2bb8;
@@ -178,25 +177,60 @@
             aria-label="Search"
           />
           <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle w-100 w-md-auto" type="button" id="causeFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              Causes <span id="cause-selected-count" class="badge text-bg-secondary filter-badge d-none">0</span>
+            <button
+              class="btn btn-secondary dropdown-toggle w-100 w-md-auto"
+              type="button"
+              id="causeFilterDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Causes
+              <span
+                id="cause-selected-count"
+                class="badge text-bg-secondary filter-badge d-none"
+                >0</span
+              >
             </button>
-            <div class="dropdown-menu p-2 filter-dropdown-menu" aria-labelledby="causeFilterDropdown">
-              <div class="filter-dropdown-header d-flex justify-content-between align-items-center">
+            <div
+              class="dropdown-menu p-2 filter-dropdown-menu"
+              aria-labelledby="causeFilterDropdown"
+            >
+              <div
+                class="filter-dropdown-header d-flex justify-content-between align-items-center"
+              >
                 <span>Select causes</span>
-                <button id="clear-cause-filters" class="btn btn-sm btn-link">Clear</button>
+                <button id="clear-cause-filters" class="btn btn-sm btn-link">
+                  Clear
+                </button>
               </div>
-              <div id="cause-checkboxes" class="d-flex flex-column gap-2 p-2"></div>
+              <div
+                id="cause-checkboxes"
+                class="d-flex flex-column gap-2 p-2"
+              ></div>
             </div>
           </div>
           <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle w-100 w-md-auto" type="button" id="locationFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <button
+              class="btn btn-secondary dropdown-toggle w-100 w-md-auto"
+              type="button"
+              id="locationFilterDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
               Location
             </button>
-            <div class="dropdown-menu p-3 filter-dropdown-menu" aria-labelledby="locationFilterDropdown" style="min-width: 320px;">
-              <div class="filter-dropdown-header d-flex justify-content-between align-items-center">
+            <div
+              class="dropdown-menu p-3 filter-dropdown-menu"
+              aria-labelledby="locationFilterDropdown"
+              style="min-width: 320px"
+            >
+              <div
+                class="filter-dropdown-header d-flex justify-content-between align-items-center"
+              >
                 <span>Filter by location</span>
-                <button id="reset-location-filters" class="btn btn-sm btn-link">Clear</button>
+                <button id="reset-location-filters" class="btn btn-sm btn-link">
+                  Clear
+                </button>
               </div>
               <select id="country-select" class="form-select my-2">
                 <option value="">Select Country</option>
@@ -310,7 +344,7 @@
     );
     let selectedCauses = new Set();
     let allStories = [];
-    
+
     function setFiltersEnabled(enabled) {
       const $causeBtn = $("#causeFilterDropdown");
       const $locationBtn = $("#locationFilterDropdown");
@@ -398,7 +432,6 @@
         populateLocationsFromData(allStories);
         filterAndRender();
         setFiltersEnabled(true);
-
       } catch (error) {
         console.error("Error fetching search results:", error);
         $searchStoriesContainer
@@ -413,7 +446,7 @@
 
     async function loadFeaturedStories() {
       const $featuredContainer = $("#featured-stories-container");
-      
+
       try {
         if (!window.getStories) {
           throw new Error("window.getStories not available");
@@ -423,7 +456,7 @@
           limit: 4,
           featured: "1",
           approved: 1,
-          status: "approved"
+          status: "approved",
         });
 
         $featuredContainer.empty();
@@ -433,17 +466,21 @@
             $featuredContainer.append($storyCard);
           });
         } else {
-          $featuredContainer.html('<div class="col-12"><p class="text-muted text-center">No featured stories available.</p></div>');
+          $featuredContainer.html(
+            '<div class="col-12"><p class="text-muted text-center">No featured stories available.</p></div>'
+          );
         }
       } catch (error) {
         console.error("Error fetching featured stories:", error);
-        $featuredContainer.html('<div class="col-12"><p class="text-danger text-center">Error loading featured stories.</p></div>');
+        $featuredContainer.html(
+          '<div class="col-12"><p class="text-danger text-center">Error loading featured stories.</p></div>'
+        );
       }
     }
 
     async function loadLatestStories() {
       const $latestContainer = $("#latest-stories-container");
-      
+
       try {
         if (!window.getStories) {
           throw new Error("window.getStories not available");
@@ -454,7 +491,7 @@
           approved: "1",
           status: "approved",
           sort: "created_at",
-          order: "desc"
+          order: "desc",
         });
 
         $latestContainer.empty();
@@ -464,174 +501,190 @@
             $latestContainer.append($storyCard);
           });
         } else {
-          $latestContainer.html('<div class="col-12"><p class="text-muted text-center">No stories available.</p></div>');
+          $latestContainer.html(
+            '<div class="col-12"><p class="text-muted text-center">No stories available.</p></div>'
+          );
         }
       } catch (error) {
         console.error("Error fetching latest stories:", error);
-        $latestContainer.html('<div class="col-12"><p class="text-danger text-center">Error loading latest stories.</p></div>');
+        $latestContainer.html(
+          '<div class="col-12"><p class="text-danger text-center">Error loading latest stories.</p></div>'
+        );
       }
     }
 
-      // Function to format a date in a human-readable time-ago format
-  function formatUTCTimeAgo(dateString) {
-    if (!dateString) return '';
-    
-    try {
-      let date;
-      
-      // Check if dateString is already in ISO format (includes 'T' and ends with 'Z' or timezone)
-      if (dateString.includes('T') && (dateString.includes('Z') || dateString.includes('+') || dateString.includes('-'))) {
-        // ISO format with timezone info - parse directly
-        date = new Date(dateString);
-      } else {
-        // Legacy format without timezone - treat as UTC
-        date = new Date(dateString + ' UTC');
+    // Function to format a date in a human-readable time-ago format
+    function formatUTCTimeAgo(dateString) {
+      if (!dateString) return "";
+
+      try {
+        let date;
+
+        // Check if dateString is already in ISO format (includes 'T' and ends with 'Z' or timezone)
+        if (
+          dateString.includes("T") &&
+          (dateString.includes("Z") ||
+            dateString.includes("+") ||
+            dateString.includes("-"))
+        ) {
+          // ISO format with timezone info - parse directly
+          date = new Date(dateString);
+        } else {
+          // Legacy format without timezone - treat as UTC
+          date = new Date(dateString + " UTC");
+        }
+
+        // Validate the date
+        if (isNaN(date.getTime())) {
+          throw new Error("Invalid date");
+        }
+
+        const now = new Date();
+        const diffInMilliseconds = now - date;
+        const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        const diffInDays = Math.floor(diffInHours / 24);
+        const diffInMonths = Math.floor(diffInDays / 30);
+        const diffInYears = Math.floor(diffInDays / 365);
+
+        if (diffInSeconds < 60) {
+          return diffInSeconds <= 1 ? "just now" : `${diffInSeconds}s ago`;
+        } else if (diffInMinutes < 60) {
+          return `${diffInMinutes}m ago`;
+        } else if (diffInHours < 24) {
+          return `${diffInHours}h ago`;
+        } else if (diffInDays < 30) {
+          return `${diffInDays}d ago`;
+        } else if (diffInMonths < 12) {
+          return `${diffInMonths}mo ago`;
+        } else {
+          return `${diffInYears}y ago`;
+        }
+      } catch (error) {
+        console.error("Error formatting time:", error, "Input:", dateString);
+        return "";
       }
-      
-      // Validate the date
-      if (isNaN(date.getTime())) {
-        throw new Error('Invalid date');
-      }
-      
-      const now = new Date();
-      const diffInMilliseconds = now - date;
-      const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
-      const diffInMinutes = Math.floor(diffInSeconds / 60);
-      const diffInHours = Math.floor(diffInMinutes / 60);
-      const diffInDays = Math.floor(diffInHours / 24);
-      const diffInMonths = Math.floor(diffInDays / 30);
-      const diffInYears = Math.floor(diffInDays / 365);
-      
-      if (diffInSeconds < 60) {
-        return diffInSeconds <= 1 ? 'just now' : `${diffInSeconds}s ago`;
-      } else if (diffInMinutes < 60) {
-        return `${diffInMinutes}m ago`;
-      } else if (diffInHours < 24) {
-        return `${diffInHours}h ago`;
-      } else if (diffInDays < 30) {
-        return `${diffInDays}d ago`;
-      } else if (diffInMonths < 12) {
-        return `${diffInMonths}mo ago`;
-      } else {
-        return `${diffInYears}y ago`;
-      }
-    } catch (error) {
-      console.error('Error formatting time:', error, 'Input:', dateString);
-      return '';
     }
-  }
 
-  // Function to decode HTML entities
-  function decodeHtmlEntities(text) {
-    if (!text) return '';
-    
-    // Create a temporary div element to decode HTML entities
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = text;
-    return tempDiv.textContent || tempDiv.innerText || '';
-  }
+    // Function to decode HTML entities
+    function decodeHtmlEntities(text) {
+      if (!text) return "";
 
-  // Function to extract hashtags from story text
-  function extractHashtagsFromText(text) {
-    if (!text) return [];
-    
-    // First decode HTML entities (like &#39; &#32; etc.)
-    const decodedText = decodeHtmlEntities(text);
-    
-    // Regular expression to find hashtags (#word)
-    const hashtagRegex = /#[a-zA-Z0-9_]+/g;
-    const hashtags = decodedText.match(hashtagRegex);
-    
-    if (!hashtags || hashtags.length === 0) return [];
-    
-    // Remove duplicates and clean up
-    const uniqueHashtags = [...new Set(hashtags.map(tag => tag.toLowerCase()))];
-    
-    return uniqueHashtags;
-  }
+      // Create a temporary div element to decode HTML entities
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = text;
+      return tempDiv.textContent || tempDiv.innerText || "";
+    }
 
-  // Function to generate hashtag HTML for story cards
-  function generateHashtagsHtml(storyText) {
-    const hashtags = extractHashtagsFromText(storyText);
-    
-    if (hashtags.length === 0) return '';
-    
-    // Create hashtag HTML with proper links
-    const hashtagsHtml = hashtags.map(hashtag => {
-      const encodedHashtag = encodeURIComponent(hashtag);
-      return `<a href="/stories/?search=${encodedHashtag}" class="hashtag-item" target="_blank" rel="noopener noreferrer">${hashtag}</a>`;
-    }).join('');
-    
-    return `<div class="hashtags-container">${hashtagsHtml}</div>`;
-  }
+    // Function to extract hashtags from story text
+    function extractHashtagsFromText(text) {
+      if (!text) return [];
 
-  // Function to detect if a URL is a video
-  function isVideoUrl(url) {
-    if (!url) return false;
-    const videoPatterns = [
-      /vimeo\.com\/video\/\d+/i,
-      /vimeo\.com\/\d+/i,
-      /player\.vimeo\.com\/video\/\d+/i,
-      /youtube\.com\/watch\?v=/i,
-      /youtu\.be\//i,
-      /\.mp4$/i,
-      /\.webm$/i,
-      /\.ogg$/i,
-      /\.mov$/i,
-      /\.avi$/i
-    ];
-    return videoPatterns.some(pattern => pattern.test(url));
-  }
+      // First decode HTML entities (like &#39; &#32; etc.)
+      const decodedText = decodeHtmlEntities(text);
+
+      // Regular expression to find hashtags (#word)
+      const hashtagRegex = /#[a-zA-Z0-9_]+/g;
+      const hashtags = decodedText.match(hashtagRegex);
+
+      if (!hashtags || hashtags.length === 0) return [];
+
+      // Remove duplicates and clean up
+      const uniqueHashtags = [
+        ...new Set(hashtags.map((tag) => tag.toLowerCase())),
+      ];
+
+      return uniqueHashtags;
+    }
+
+    // Function to generate hashtag HTML for story cards
+    function generateHashtagsHtml(storyText) {
+      const hashtags = extractHashtagsFromText(storyText);
+
+      if (hashtags.length === 0) return "";
+
+      // Create hashtag HTML with proper links
+      const hashtagsHtml = hashtags
+        .map((hashtag) => {
+          const encodedHashtag = encodeURIComponent(hashtag);
+          return `<a href="/stories/?search=${encodedHashtag}" class="hashtag-item" target="_blank" rel="noopener noreferrer">${hashtag}</a>`;
+        })
+        .join("");
+
+      return `<div class="hashtags-container">${hashtagsHtml}</div>`;
+    }
+
+    // Function to detect if a URL is a video
+    function isVideoUrl(url) {
+      if (!url) return false;
+      const videoPatterns = [
+        /vimeo\.com\/video\/\d+/i,
+        /vimeo\.com\/\d+/i,
+        /player\.vimeo\.com\/video\/\d+/i,
+        /youtube\.com\/watch\?v=/i,
+        /youtu\.be\//i,
+        /\.mp4$/i,
+        /\.webm$/i,
+        /\.ogg$/i,
+        /\.mov$/i,
+        /\.avi$/i,
+      ];
+      return videoPatterns.some((pattern) => pattern.test(url));
+    }
 
     // Function to get video embed URL
     function getVideoEmbedUrl(url) {
       if (!url) return null;
-      
-      
+
       // Check if it's already a Vimeo player URL
-      if (url.includes('player.vimeo.com/video/')) {
-        return url.includes('?') ? url : `${url}?autoplay=0&loop=0&muted=0`;
+      if (url.includes("player.vimeo.com/video/")) {
+        return url.includes("?") ? url : `${url}?autoplay=0&loop=0&muted=0`;
       }
-      
-          // Vimeo regular URLs - handles both /video/ID and direct /ID formats
-    const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
-    if (vimeoMatch) {
-      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=0&loop=0&muted=0`;
-    }
-      
+
+      // Vimeo regular URLs - handles both /video/ID and direct /ID formats
+      const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+      if (vimeoMatch) {
+        return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=0&loop=0&muted=0`;
+      }
+
       // YouTube
-      const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i);
+      const youtubeMatch = url.match(
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i
+      );
       if (youtubeMatch) {
         return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=0&loop=0&muted=0`;
       }
-      
+
       // Direct video files
       if (/\.(mp4|webm|ogg|mov|avi)$/i.test(url)) {
         return url;
       }
-      
+
       return null;
     }
 
     // Function to get video thumbnail URL
     function getVideoThumbnailUrl(url) {
       if (!url) return null;
-      
+
       // YouTube thumbnail
-      const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i);
+      const youtubeMatch = url.match(
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/i
+      );
       if (youtubeMatch) {
         const videoId = youtubeMatch[1];
         // Try maxresdefault first (high quality), fallback to hqdefault if needed
         return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
       }
-      
+
       // Vimeo thumbnail - we'll use a placeholder for now since Vimeo requires API call
       const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
       if (vimeoMatch) {
         // For Vimeo, we'll use a placeholder since getting thumbnails requires API
         return `https://placehold.co/600x400/7b3fee/white?text=Vimeo+Video`;
       }
-      
+
       // For direct video files, return null to show video element with poster
       return null;
     }
@@ -643,11 +696,14 @@
       }
 
       const isVideo = isVideoUrl(mediaUrl);
-      
+
       if (isVideo) {
         const embedUrl = getVideoEmbedUrl(mediaUrl);
-        
-        if (embedUrl && (embedUrl.includes('youtube.com') || embedUrl.includes('vimeo.com'))) {
+
+        if (
+          embedUrl &&
+          (embedUrl.includes("youtube.com") || embedUrl.includes("vimeo.com"))
+        ) {
           // Embedded video (YouTube/Vimeo) - show iframe with same dimensions
           return `
             <iframe 
@@ -677,32 +733,35 @@
           `;
         }
       }
-      
+
       // Default to image
-      return `<img src="${mediaUrl}?width=250&format=webp&quality=80" class="story-image" alt="${storyTitle}">`;
+      return `<img src="${mediaUrl}" class="story-image" alt="${storyTitle}">`;
     }
 
     function escapeHtml(unsafe) {
-      if (!unsafe) return '';
+      if (!unsafe) return "";
       return unsafe
-           .replace(/&/g, "&amp;")
-           .replace(/</g, "&lt;")
-           .replace(/>/g, "&gt;")
-           .replace(/"/g, "&quot;")
-           .replace(/'/g, "&#039;");
-  }
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
     function createStoryCard(story) {
       // Determine media URL - handle both string and object formats
-      let mediaUrl = '';
-      if (typeof story?.story_image === 'string') {
-        mediaUrl = story.story_image || '';
-      } else if (story?.story_image?.data && story.story_image.data.length > 0) {
-        mediaUrl = story.story_image.data[0]?.url || '';
+      let mediaUrl = "";
+      if (typeof story?.story_image === "string") {
+        mediaUrl = story.story_image || "";
+      } else if (
+        story?.story_image?.data &&
+        story.story_image.data.length > 0
+      ) {
+        mediaUrl = story.story_image.data[0]?.url || "";
       }
 
       // Create media element (image or video preview)
-      const mediaElement = createCardMediaElement(mediaUrl, story?.title || '');
+      const mediaElement = createCardMediaElement(mediaUrl, story?.title || "");
 
       return `
       <div class="col-12 col-sm-6 col-md-3">
@@ -710,7 +769,9 @@
           ${mediaElement}
           <div class="d-flex flex-column gap-2 h-100">
             <div class="d-flex justify-content-between">
-              <p class="story-date d-none">${formatUTCTimeAgo(story.meta?.createdAt)}</p>
+              <p class="story-date d-none">${formatUTCTimeAgo(
+                story.meta?.createdAt
+              )}</p>
               ${
                 story.related_causes && story.related_causes.length > 0
                   ? `<div class="story-cause d-flex align-items-center">
@@ -723,7 +784,7 @@
             </div>
             <p class="story-title">${story.title}</p>
             <div class="story-subtitle d-none">${story.description}</div>
-            ${generateHashtagsHtml(story.story_body || story.description || '')}
+            ${generateHashtagsHtml(story.story_body || story.description || "")}
             <div class="d-flex flex-grow-1 align-items-end gap-2">
               <div class="d-flex gap-2 align-items-center w-100">
                 <img src="${
@@ -732,7 +793,7 @@
                       ? story.related_npos.data[0]?.logo?.data[0]?.url
                       : story.related_npos.data[0]?.logo || ""
                     : ""
-                }?width=22&format=webp&quality=80" class="story-npo-logo" alt="" />
+                }" class="story-npo-logo" alt="" />
                 <p class="npo-name my-auto text-truncate">${
                   story.related_npos && story.related_npos.data.length > 0
                     ? story.related_npos.data[0]?.name || ""
@@ -743,23 +804,25 @@
             <a href="${
               story.meta.web.uri
             }" class="btn btn-secondary story-btn card-btn">
-              Read Story
+              Read More
             </a>
           </div>
         </div>
       </div>
     `;
     }
-    
+
     // ----- Filters (Causes + Location) -----
     function showCausesLoading() {
       const placeholders = Array.from({ length: 6 })
-        .map(() => `
+        .map(
+          () => `
           <div class="d-flex align-items-center gap-2 mb-2 placeholder-glow">
             <span class="placeholder rounded" style="width:16px;height:16px;"></span>
             <span class="placeholder col-8"></span>
           </div>
-        `)
+        `
+        )
         .join("");
       $causeCheckboxes.html(placeholders);
     }
@@ -773,9 +836,13 @@
         success: function (data) {
           if (data.data && data.data.length > 0) {
             $causeCheckboxes.empty();
-            const uniqueTitles = Array.from(new Set(data.data.map(c => c.title))).sort((a,b)=>a.localeCompare(b));
+            const uniqueTitles = Array.from(
+              new Set(data.data.map((c) => c.title))
+            ).sort((a, b) => a.localeCompare(b));
             uniqueTitles.forEach((title) => {
-              const id = `cause-${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
+              const id = `cause-${title
+                .replace(/[^a-z0-9]+/gi, "-")
+                .toLowerCase()}`;
               const checkbox = `
                 <div class="form-check">
                   <input class="form-check-input cause-check" type="checkbox" value="${title}" id="${id}" />
@@ -784,18 +851,22 @@
               $causeCheckboxes.append(checkbox);
             });
           } else {
-            $causeCheckboxes.html('<div class="text-muted small">No causes found</div>');
+            $causeCheckboxes.html(
+              '<div class="text-muted small">No causes found</div>'
+            );
           }
         },
         error: function (error) {
           console.error("Error fetching causes:", error);
-          $causeCheckboxes.html('<div class="text-muted small">Failed to load causes</div>');
-        }
+          $causeCheckboxes.html(
+            '<div class="text-muted small">Failed to load causes</div>'
+          );
+        },
       });
     }
 
     // Cause checkbox change
-    $(document).on("change", ".cause-check", function() {
+    $(document).on("change", ".cause-check", function () {
       const value = $(this).val();
       if ($(this).is(":checked")) {
         selectedCauses.add(value);
@@ -806,7 +877,7 @@
       filterAndRender();
     });
 
-    $clearCauseFilters.on("click", function(e) {
+    $clearCauseFilters.on("click", function (e) {
       e.preventDefault();
       selectedCauses.clear();
       $(".cause-check").prop("checked", false);
@@ -830,15 +901,15 @@
       const cities = new Set();
       const zips = new Set();
 
-      (stories || []).forEach(story => {
+      (stories || []).forEach((story) => {
         const npo = story?.related_npos?.data?.[0];
         const addrRaw = npo?.headquarters_address || "";
-        const addr = addrRaw.split(",").map(s=>s.trim());
+        const addr = addrRaw.split(",").map((s) => s.trim());
         if (addr.length) {
           const maybeCity = addr[1] || addr[0];
           const maybeState = addr[2] || "";
           const maybeZip = addr[3] || "";
-          const maybeCountry = addr[4] || addr[addr.length-1] || "";
+          const maybeCountry = addr[4] || addr[addr.length - 1] || "";
           if (maybeCountry) countries.add(maybeCountry);
           if (maybeState) states.add(maybeState);
           if (maybeCity) cities.add(maybeCity);
@@ -849,9 +920,11 @@
       function setOptions($select, values, placeholder) {
         const current = $select.val();
         $select.empty().append(`<option value="">${placeholder}</option>`);
-        Array.from(values).sort((a,b)=>a.localeCompare(b)).forEach(v=>{
-          $select.append(`<option value="${v}">${v}</option>`);
-        });
+        Array.from(values)
+          .sort((a, b) => a.localeCompare(b))
+          .forEach((v) => {
+            $select.append(`<option value="${v}">${v}</option>`);
+          });
         if (current && values.has(current)) $select.val(current);
       }
 
@@ -866,7 +939,7 @@
     $citySelect.on("change", filterAndRender);
     $zipSelect.on("change", filterAndRender);
 
-    $resetLocationFilters.on("click", function() {
+    $resetLocationFilters.on("click", function () {
       $countrySelect.val("");
       $stateSelect.val("");
       $citySelect.val("");
@@ -884,29 +957,48 @@
 
       // Filter by causes
       if (selectedCauses.size > 0) {
-        filtered = filtered.filter(story => {
-          const titles = (story?.related_causes?.data || []).map(c => c.title);
-          return Array.from(selectedCauses).every(c => titles.includes(c));
+        filtered = filtered.filter((story) => {
+          const titles = (story?.related_causes?.data || []).map(
+            (c) => c.title
+          );
+          return Array.from(selectedCauses).every((c) => titles.includes(c));
         });
       }
 
       // Filter by location (based on related NPO's headquarters_address)
-      const hasLocationFilter = selectedCountry || selectedState || selectedCity || selectedZip;
+      const hasLocationFilter =
+        selectedCountry || selectedState || selectedCity || selectedZip;
       if (hasLocationFilter) {
-        filtered = filtered.filter(story => {
+        filtered = filtered.filter((story) => {
           const npo = story?.related_npos?.data?.[0];
           const address = (npo?.headquarters_address || "").toLowerCase();
-          if (selectedCountry && !address.includes(String(selectedCountry).toLowerCase())) return false;
-          if (selectedState && !address.includes(String(selectedState).toLowerCase())) return false;
-          if (selectedCity && !address.includes(String(selectedCity).toLowerCase())) return false;
-          if (selectedZip && !address.includes(String(selectedZip).toLowerCase())) return false;
+          if (
+            selectedCountry &&
+            !address.includes(String(selectedCountry).toLowerCase())
+          )
+            return false;
+          if (
+            selectedState &&
+            !address.includes(String(selectedState).toLowerCase())
+          )
+            return false;
+          if (
+            selectedCity &&
+            !address.includes(String(selectedCity).toLowerCase())
+          )
+            return false;
+          if (
+            selectedZip &&
+            !address.includes(String(selectedZip).toLowerCase())
+          )
+            return false;
           return true;
         });
       }
 
       $searchStoriesContainer.empty();
       if (filtered.length > 0) {
-        filtered.forEach(story => {
+        filtered.forEach((story) => {
           const $storyCard = createStoryCard(story);
           $searchStoriesContainer.append($storyCard);
         });

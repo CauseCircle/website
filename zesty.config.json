@@ -12,13 +12,13 @@
                 "zuid": "11-94efd2f9e9-53fxwg",
                 "type": "templateset",
                 "updatedAt": "2018-08-13T22:56:07Z",
-                "createdAt": "2025-10-22T19:27:24Z"
+                "createdAt": "2025-11-03T14:37:20Z"
             },
             "loader": {
                 "zuid": "11-b896d4f9e9-lt60xm",
                 "type": "snippet",
                 "updatedAt": "2018-08-13T22:56:07Z",
-                "createdAt": "2025-10-24T13:55:04Z"
+                "createdAt": "2026-01-26T17:20:38Z"
             },
             "causes_landing_page": {
                 "zuid": "11-90cdebb7ea-hczmdx",
@@ -30,25 +30,25 @@
                 "zuid": "11-acfffcf0b1-1lbhp0",
                 "type": "ajax-json",
                 "updatedAt": "2024-03-13T21:46:21Z",
-                "createdAt": "2025-10-24T13:33:38Z"
+                "createdAt": "2026-02-02T14:08:37Z"
             },
             "users": {
                 "zuid": "11-cadca9a796-f4nz2l",
                 "type": "pageset",
                 "updatedAt": "2024-03-20T20:18:58Z",
-                "createdAt": "2025-10-20T15:57:17Z"
+                "createdAt": "2025-11-10T16:30:17Z"
             },
             "stories": {
                 "zuid": "11-fafbc58abb-xd7jq6",
                 "type": "pageset",
                 "updatedAt": "2024-03-20T20:34:48Z",
-                "createdAt": "2025-10-22T16:37:55Z"
+                "createdAt": "2026-02-18T15:09:51Z"
             },
             "stories_landing_page": {
                 "zuid": "11-babdab84bf-9fxrlv",
                 "type": "templateset",
                 "updatedAt": "2024-03-20T21:36:05Z",
-                "createdAt": "2025-10-20T15:50:05Z"
+                "createdAt": "2025-10-27T14:08:44Z"
             },
             "/components/global/crumbs.html": {
                 "zuid": "11-bcd5ef9ba7-lj1njw",
@@ -60,7 +60,7 @@
                 "zuid": "11-e0b092ba89-5z992p",
                 "type": "ajax-json",
                 "updatedAt": "2024-03-20T22:08:02Z",
-                "createdAt": "2025-10-16T13:39:19Z"
+                "createdAt": "2026-01-15T17:00:49Z"
             },
             "member_directory": {
                 "zuid": "11-befc97c4da-plt7c7",
@@ -102,7 +102,7 @@
                 "zuid": "11-b6c4ecd4af-b7n215",
                 "type": "templateset",
                 "updatedAt": "2024-05-20T13:40:16Z",
-                "createdAt": "2025-10-23T16:50:54Z"
+                "createdAt": "2025-10-27T14:03:34Z"
             },
             "causes": {
                 "zuid": "11-fa92dfe3f1-63mxtc",
@@ -132,7 +132,7 @@
                 "zuid": "11-a892ccb4d9-xsdqr7",
                 "type": "pageset",
                 "updatedAt": "2024-05-23T13:47:23Z",
-                "createdAt": "2025-10-24T14:06:27Z"
+                "createdAt": "2025-11-10T16:00:04Z"
             },
             "/components/global/fundraising_banner.html": {
                 "zuid": "11-f6f1b2f2b5-gbwtrm",
@@ -390,7 +390,7 @@
                 "zuid": "11-a6bcaf85fe-qg4rpr",
                 "type": "ajax-json",
                 "updatedAt": "2024-07-26T19:41:38Z",
-                "createdAt": "2025-08-13T13:58:04Z"
+                "createdAt": "2025-11-05T18:05:19Z"
             },
             "/mobileapp/user_profile.json": {
                 "zuid": "11-96fe99fdfb-844z62",
@@ -408,7 +408,7 @@
                 "zuid": "11-bebfd59db3-tfqnhf",
                 "type": "ajax-json",
                 "updatedAt": "2024-07-30T15:51:58Z",
-                "createdAt": "2025-10-13T09:14:17Z"
+                "createdAt": "2026-01-16T14:30:54Z"
             },
             "/mobileapp/story.json": {
                 "zuid": "11-ded0ced3a0-fb96tf",
@@ -426,13 +426,13 @@
                 "zuid": "11-ea98f5e690-3j1hxp",
                 "type": "ajax-json",
                 "updatedAt": "2024-08-05T07:24:16Z",
-                "createdAt": "2025-10-13T09:14:30Z"
+                "createdAt": "2025-11-06T17:29:50Z"
             },
             "onboarding": {
                 "zuid": "11-d0f9ccfbf3-ktsj8q",
                 "type": "templateset",
                 "updatedAt": "2024-08-05T15:38:59Z",
-                "createdAt": "2025-10-13T09:09:46Z"
+                "createdAt": "2026-01-28T13:53:47Z"
             },
             "onboarding_steps": {
                 "zuid": "11-e8db84edad-x2s838",
@@ -510,7 +510,7 @@
                 "zuid": "11-909f9392f4-2g0x3b",
                 "type": "ajax-json",
                 "updatedAt": "2024-09-06T13:31:59Z",
-                "createdAt": "2025-10-16T14:38:56Z"
+                "createdAt": "2025-11-05T13:34:45Z"
             },
             "/components/global/causes_card.html": {
                 "zuid": "11-808ae5ebdc-9wcw0m",
@@ -540,7 +540,7 @@
                 "zuid": "11-fca6b7cf90-cmj81d",
                 "type": "ajax-json",
                 "updatedAt": "2024-09-13T15:29:09Z",
-                "createdAt": "2025-10-16T13:49:47Z"
+                "createdAt": "2025-10-29T18:08:13Z"
             },
             "/components/global/usecases_card.html": {
                 "zuid": "11-8af98de896-wm0hp0",
@@ -558,7 +558,7 @@
                 "zuid": "11-a8e98cc58d-jp69lt",
                 "type": "ajax-json",
                 "updatedAt": "2024-09-17T12:14:17Z",
-                "createdAt": "2025-09-26T15:17:16Z"
+                "createdAt": "2026-01-16T17:21:28Z"
             },
             "/auth/facebook.js": {
                 "zuid": "11-d2e6d3f882-pvs5n3",
@@ -570,13 +570,13 @@
                 "zuid": "11-cec9ecabbf-wckmb5",
                 "type": "templateset",
                 "updatedAt": "2024-09-20T14:01:04Z",
-                "createdAt": "2025-10-16T14:08:21Z"
+                "createdAt": "2025-10-27T14:29:16Z"
             },
             "login_page": {
                 "zuid": "11-acb3dad3ab-t90pt9",
                 "type": "templateset",
                 "updatedAt": "2024-09-24T12:24:56Z",
-                "createdAt": "2025-10-16T13:37:24Z"
+                "createdAt": "2026-01-16T14:35:32Z"
             },
             "home_feed": {
                 "zuid": "11-bea8c4faa9-8wzqfp",
@@ -594,13 +594,13 @@
                 "zuid": "11-d6a3e4facd-fcw0ml",
                 "type": "ajax-json",
                 "updatedAt": "2024-09-27T13:11:00Z",
-                "createdAt": "2025-10-13T12:28:43Z"
+                "createdAt": "2025-11-05T13:33:42Z"
             },
             "/components/global/HomeFeed/big_story_card.html": {
                 "zuid": "11-8efcb18dbc-7wkw0c",
                 "type": "ajax-json",
                 "updatedAt": "2024-09-27T13:11:14Z",
-                "createdAt": "2025-10-09T10:54:03Z"
+                "createdAt": "2025-11-27T16:13:39Z"
             },
             "/components/global/HomeFeed/stats_card.html": {
                 "zuid": "11-e08fe08fa4-8znz45",
@@ -636,19 +636,19 @@
                 "zuid": "11-c8a180b5eb-fw26ql",
                 "type": "ajax-json",
                 "updatedAt": "2024-10-01T10:37:08Z",
-                "createdAt": "2025-10-02T11:40:31Z"
+                "createdAt": "2026-02-18T14:47:43Z"
             },
             "/components/global/Users/sidebar.html": {
                 "zuid": "11-98a3f399a8-2g6837",
                 "type": "ajax-json",
                 "updatedAt": "2024-10-04T11:20:23Z",
-                "createdAt": "2025-10-16T14:38:59Z"
+                "createdAt": "2025-11-05T13:34:49Z"
             },
             "/components/global/HomeFeed/create_story_modal.html": {
                 "zuid": "11-eea284b78c-bl7h4m",
                 "type": "ajax-json",
                 "updatedAt": "2024-10-04T12:06:08Z",
-                "createdAt": "2025-10-09T18:51:57Z"
+                "createdAt": "2026-02-09T14:35:11Z"
             },
             "/components/global/HomeFeed/Create Story Steps/upload_hero.html": {
                 "zuid": "11-bab5f4ddea-sdc5kq",
@@ -660,7 +660,7 @@
                 "zuid": "11-c8abcef6ac-tdqg8f",
                 "type": "ajax-json",
                 "updatedAt": "2024-10-04T13:21:14Z",
-                "createdAt": "2025-10-23T13:50:38Z"
+                "createdAt": "2026-02-09T14:34:00Z"
             },
             "/components/global/HomeFeed/Create Story Steps/add_content.html": {
                 "zuid": "11-a482d996cc-3ksxfr",
@@ -673,24 +673,6 @@
                 "type": "ajax-json",
                 "updatedAt": "2024-10-04T13:21:53Z",
                 "createdAt": "2025-10-16T13:48:30Z"
-            },
-            "/components/global/Onboarding/cause_selection.html": {
-                "zuid": "11-90a185c5aa-0l939t",
-                "type": "ajax-json",
-                "updatedAt": "2024-10-08T14:18:20Z",
-                "createdAt": "2024-10-08T14:18:20Z"
-            },
-            "/components/global/Onboarding/role_selection.html": {
-                "zuid": "11-c0e1b8cbf9-3r44kt",
-                "type": "ajax-json",
-                "updatedAt": "2024-10-08T14:18:30Z",
-                "createdAt": "2024-10-08T14:18:30Z"
-            },
-            "/components/global/Onboarding/npo_selection.html": {
-                "zuid": "11-b4de8a85d3-5h2nvz",
-                "type": "ajax-json",
-                "updatedAt": "2024-10-08T14:18:42Z",
-                "createdAt": "2024-10-08T14:18:42Z"
             },
             "/components/global/Nonprofits/Claimlisting Modal/claim_listing_modal.html": {
                 "zuid": "11-d4f6dbf5e7-wg3sgg",
@@ -774,7 +756,7 @@
                 "zuid": "11-d4a6f4d6b7-mlq20n",
                 "type": "ajax-json",
                 "updatedAt": "2024-10-28T16:13:13Z",
-                "createdAt": "2025-10-13T09:14:12Z"
+                "createdAt": "2025-11-10T16:00:04Z"
             },
             "/components/global/UserSettings/General/general_settings.html": {
                 "zuid": "11-fe83f7d78d-qldlcb",
@@ -786,7 +768,7 @@
                 "zuid": "11-a8b1bfd290-z9thq2",
                 "type": "ajax-json",
                 "updatedAt": "2024-10-29T15:31:00Z",
-                "createdAt": "2025-10-13T09:16:16Z"
+                "createdAt": "2025-11-10T15:04:18Z"
             },
             "tradeshow": {
                 "zuid": "11-c0c2a4cac2-0bkmt8",
@@ -876,7 +858,7 @@
                 "zuid": "11-d4d9ccabf7-hr0wbq",
                 "type": "ajax-json",
                 "updatedAt": "2024-12-09T16:21:06Z",
-                "createdAt": "2025-10-13T14:48:40Z"
+                "createdAt": "2026-02-17T12:51:23Z"
             },
             "/components/global/NPO Admin/Followers/npo_admin_followers.html": {
                 "zuid": "11-d6a1c1deaf-fcsbkq",
@@ -888,7 +870,7 @@
                 "zuid": "11-82ece79de6-f1zrxc",
                 "type": "ajax-json",
                 "updatedAt": "2024-12-09T16:31:23Z",
-                "createdAt": "2025-10-13T14:49:27Z"
+                "createdAt": "2026-02-17T13:08:31Z"
             },
             "/components/global/NPO Admin/Profile/npo_admin_profile.html": {
                 "zuid": "11-f2afa785a0-zbvw77",
@@ -900,13 +882,13 @@
                 "zuid": "11-90c699858b-6vgflp",
                 "type": "ajax-json",
                 "updatedAt": "2024-12-17T15:49:20Z",
-                "createdAt": "2025-10-09T03:55:59Z"
+                "createdAt": "2026-02-18T14:17:51Z"
             },
             "/components/global/NPO Admin/Dashboard/Review Story Modal/report_modal.html": {
                 "zuid": "11-dcdc929beb-vmzphh",
                 "type": "ajax-json",
                 "updatedAt": "2024-12-23T16:03:37Z",
-                "createdAt": "2025-10-09T03:49:29Z"
+                "createdAt": "2026-02-17T12:57:39Z"
             },
             "/components/global/NPO Admin/Dashboard/Review Story Modal/request_changes.html": {
                 "zuid": "11-9ab19b80f5-fp6qk7",
@@ -942,7 +924,7 @@
                 "zuid": "11-a6d3d5a699-ftl6cl",
                 "type": "ajax-json",
                 "updatedAt": "2025-01-13T15:34:48Z",
-                "createdAt": "2025-10-13T09:40:40Z"
+                "createdAt": "2026-01-16T16:21:28Z"
             },
             "/components/global/HomeFeed/download_app_modal.html": {
                 "zuid": "11-84bedb9c8e-wh90t9",
@@ -984,13 +966,13 @@
                 "zuid": "11-968198f9e5-8zdbtl",
                 "type": "ajax-json",
                 "updatedAt": "2025-01-30T14:42:45Z",
-                "createdAt": "2025-10-16T13:48:31Z"
+                "createdAt": "2025-11-13T20:11:17Z"
             },
             "/components/global/Nonprofits/CreateStory/create_story.html": {
                 "zuid": "11-cad6a3eebe-tv05ft",
                 "type": "ajax-json",
                 "updatedAt": "2025-01-30T15:27:37Z",
-                "createdAt": "2025-10-13T09:41:49Z"
+                "createdAt": "2026-02-09T14:33:44Z"
             },
             "/components/global/Nonprofits/CreateStory/share_story.html": {
                 "zuid": "11-80e392ae8d-vr1czp",
@@ -1008,7 +990,7 @@
                 "zuid": "11-ccc5dd8c82-fc2xnr",
                 "type": "ajax-json",
                 "updatedAt": "2025-02-03T15:05:51Z",
-                "createdAt": "2025-10-23T14:10:00Z"
+                "createdAt": "2026-01-28T14:06:46Z"
             },
             "/non-profit-directory/*/admin": {
                 "zuid": "11-9ea69fe8ad-0dxxdn",
@@ -1020,7 +1002,7 @@
                 "zuid": "11-c4c1c4d2a4-2rvg1c",
                 "type": "ajax-json",
                 "updatedAt": "2025-02-10T16:00:54Z",
-                "createdAt": "2025-10-13T09:41:36Z"
+                "createdAt": "2026-01-16T16:21:46Z"
             },
             "/components/global/Nonprofits/Join/usecases_card.html": {
                 "zuid": "11-e6e3cbeda3-xqhrww",
@@ -1242,61 +1224,61 @@
                 "zuid": "11-c290fcbb90-gwp2jb",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T13:11:51Z",
-                "createdAt": "2025-10-16T14:52:53Z"
+                "createdAt": "2026-02-02T16:14:01Z"
             },
             "/scripts/api/legacy/comments.html": {
                 "zuid": "11-a48cbebcfd-291b1t",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T13:58:12Z",
-                "createdAt": "2025-10-22T16:22:18Z"
+                "createdAt": "2026-01-26T17:21:39Z"
             },
             "/scripts/api/legacy/feedback.html": {
                 "zuid": "11-94d4cb8599-ht2pvr",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T13:58:50Z",
-                "createdAt": "2025-10-22T16:22:35Z"
+                "createdAt": "2026-01-26T17:22:19Z"
             },
             "/scripts/api/legacy/media.html": {
                 "zuid": "11-daa99bc1cb-j1r2kk",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T13:59:14Z",
-                "createdAt": "2025-10-22T16:22:29Z"
+                "createdAt": "2026-01-26T17:22:04Z"
             },
             "/scripts/api/legacy/npo-stats.html": {
                 "zuid": "11-98efcb8c8d-jltn13",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T13:59:40Z",
-                "createdAt": "2025-10-22T16:22:38Z"
+                "createdAt": "2026-01-26T17:22:18Z"
             },
             "/scripts/api/legacy/npo.html": {
                 "zuid": "11-ce9dedc6cc-4q6qtt",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:00:06Z",
-                "createdAt": "2025-10-23T13:47:07Z"
+                "createdAt": "2026-01-26T17:21:38Z"
             },
             "/scripts/api/legacy/stories.html": {
                 "zuid": "11-d894c1c8c4-nzv8bh",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:00:39Z",
-                "createdAt": "2025-10-22T16:22:48Z"
+                "createdAt": "2026-02-18T15:05:35Z"
             },
             "/scripts/api/legacy/users.html": {
                 "zuid": "11-f2ddc7bee3-znxpm8",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:01:18Z",
-                "createdAt": "2025-10-22T16:25:03Z"
+                "createdAt": "2026-01-27T04:17:05Z"
             },
             "/scripts/auth/auth-handlers.html": {
                 "zuid": "11-d4a9aada81-5glgrf",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:02:30Z",
-                "createdAt": "2025-10-22T16:26:12Z"
+                "createdAt": "2026-02-19T14:56:16Z"
             },
             "/scripts/auth/auth-helpers.html": {
                 "zuid": "11-9ce7caf5fb-q6fzrq",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:02:47Z",
-                "createdAt": "2025-10-06T15:50:24Z"
+                "createdAt": "2026-01-26T17:20:45Z"
             },
             "/scripts/auth/auth-ui.html": {
                 "zuid": "11-a8d196e68c-5vdzbp",
@@ -1308,13 +1290,13 @@
                 "zuid": "11-fe9392e7e2-054lf9",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:03:35Z",
-                "createdAt": "2025-10-22T16:26:35Z"
+                "createdAt": "2026-01-27T15:35:40Z"
             },
             "/scripts/config/parsley-vars.html": {
                 "zuid": "11-a8e7cc95ed-jjs8qr",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:03:53Z",
-                "createdAt": "2025-10-24T13:27:06Z"
+                "createdAt": "2026-02-23T16:11:31Z"
             },
             "/scripts/core/auth-providers.html": {
                 "zuid": "11-989dd38c8c-bb7t1f",
@@ -1326,19 +1308,19 @@
                 "zuid": "11-dcc7f7a4c1-fffv8r",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:06:39Z",
-                "createdAt": "2025-10-16T15:22:22Z"
+                "createdAt": "2026-01-16T17:08:50Z"
             },
             "/scripts/init/app-init.html": {
                 "zuid": "11-cefcd2aa9b-kv7m38",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:07:09Z",
-                "createdAt": "2025-10-15T16:07:21Z"
+                "createdAt": "2026-01-16T14:36:01Z"
             },
             "/scripts/services/fcm.html": {
                 "zuid": "11-88aaa5cccd-1rjffq",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T14:07:33Z",
-                "createdAt": "2025-10-22T16:27:00Z"
+                "createdAt": "2026-01-26T17:36:27Z"
             },
             "/scripts/api/new/core/query-client.html": {
                 "zuid": "11-e4a0f7ccaa-z9sxl8",
@@ -1368,13 +1350,13 @@
                 "zuid": "11-b6be8898f4-tr1506",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T15:38:07Z",
-                "createdAt": "2025-10-13T10:20:39Z"
+                "createdAt": "2025-11-19T14:45:33Z"
             },
             "/scripts/api/new/stories.html": {
                 "zuid": "11-eec6989dfd-vklcjf",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-02T15:38:25Z",
-                "createdAt": "2025-10-22T16:25:39Z"
+                "createdAt": "2026-02-17T13:13:23Z"
             },
             "/scripts/api/new/users.html": {
                 "zuid": "11-bef3a888ee-mcdcp5",
@@ -1392,7 +1374,7 @@
                 "zuid": "11-e294f8a8ec-k6dk5x",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-09T10:32:35Z",
-                "createdAt": "2025-10-09T10:32:45Z"
+                "createdAt": "2026-02-02T15:51:29Z"
             },
             "/scripts/core/pages/home-feed/comments.html": {
                 "zuid": "11-e4fec0b2a8-0xfc89",
@@ -1416,7 +1398,7 @@
                 "zuid": "11-a0e38294e8-w2ks3s",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-09T13:11:12Z",
-                "createdAt": "2025-10-16T14:12:15Z"
+                "createdAt": "2026-01-26T14:40:50Z"
             },
             "/scripts/core/pages/home-feed/onboarding.html": {
                 "zuid": "11-a2c6c883c6-d1k5d0",
@@ -1428,19 +1410,133 @@
                 "zuid": "11-cccdcfa3e7-b6nbfj",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-09T13:11:29Z",
-                "createdAt": "2025-10-20T15:37:17Z"
+                "createdAt": "2026-02-02T15:51:32Z"
             },
             "/scripts/api/new/search.html": {
                 "zuid": "11-84ea98dcee-496qn6",
                 "type": "ajax-json",
                 "updatedAt": "2025-10-09T15:16:20Z",
-                "createdAt": "2025-10-22T16:25:28Z"
+                "createdAt": "2025-11-17T15:40:03Z"
+            },
+            "/components/global/Homepage/hero.html": {
+                "zuid": "11-f0d1e8ccfa-mhbfb7",
+                "type": "ajax-json",
+                "updatedAt": "2025-10-30T15:36:25Z",
+                "createdAt": "2025-11-13T00:09:08Z"
             },
             "/components/global/Homepage/hero_banner.html": {
                 "zuid": "11-da9ea5bca0-zh12h6",
                 "type": "ajax-json",
-                "updatedAt": "2025-11-03T14:03:34.391057486Z",
-                "createdAt": "2025-11-03T14:03:34.391050432Z"
+                "updatedAt": "2025-11-03T14:03:34Z",
+                "createdAt": "2025-11-13T00:10:22Z"
+            },
+            "/components/global/Onboarding/styles.html": {
+                "zuid": "11-bae6dc95cc-7h60d1",
+                "type": "ajax-json",
+                "updatedAt": "2025-11-13T13:22:36Z",
+                "createdAt": "2025-11-17T17:18:54Z"
+            },
+            "/components/global/Onboarding/personalInfo.html": {
+                "zuid": "11-accdefe7a3-vxmps8",
+                "type": "ajax-json",
+                "updatedAt": "2025-11-13T13:23:56Z",
+                "createdAt": "2026-01-27T14:39:15Z"
+            },
+            "/components/global/Onboarding/roleSelection.html": {
+                "zuid": "11-cadee3adb6-87bhbs",
+                "type": "ajax-json",
+                "updatedAt": "2025-11-13T13:24:33Z",
+                "createdAt": "2026-01-19T14:15:08Z"
+            },
+            "/components/global/Onboarding/causeSelection.html": {
+                "zuid": "11-da82e18fb7-t044vl",
+                "type": "ajax-json",
+                "updatedAt": "2025-11-13T13:25:25Z",
+                "createdAt": "2026-01-19T14:14:30Z"
+            },
+            "/components/global/Onboarding/npoSelection.html": {
+                "zuid": "11-eaa5beabd3-h360q8",
+                "type": "ajax-json",
+                "updatedAt": "2025-11-13T13:25:46Z",
+                "createdAt": "2026-01-19T14:14:47Z"
+            },
+            "/components/global/Onboarding/summary.html": {
+                "zuid": "11-e4acd7d7bf-bhfmgt",
+                "type": "ajax-json",
+                "updatedAt": "2025-11-13T13:26:35Z",
+                "createdAt": "2025-11-17T14:18:08Z"
+            },
+            "/components/global/Onboarding/npoAdditionChoice.html": {
+                "zuid": "11-fec48fffad-b8xwpt",
+                "type": "ajax-json",
+                "updatedAt": "2025-11-13T13:54:19Z",
+                "createdAt": "2026-01-19T14:14:42Z"
+            },
+            "/components/global/Onboarding/orgDetails.html": {
+                "zuid": "11-88e1dff3e6-1r5pf3",
+                "type": "ajax-json",
+                "updatedAt": "2025-11-13T13:54:26Z",
+                "createdAt": "2026-01-28T13:59:11Z"
+            },
+            "/components/global/Onboarding/orgMedia.html": {
+                "zuid": "11-e2e38f85ac-bzj121",
+                "type": "ajax-json",
+                "updatedAt": "2025-11-13T13:54:36Z",
+                "createdAt": "2026-02-09T14:25:47Z"
+            },
+            "/components/global/Onboarding/orgReview.html": {
+                "zuid": "11-c0cdbcfff3-f2l8qx",
+                "type": "ajax-json",
+                "updatedAt": "2025-11-13T13:54:45Z",
+                "createdAt": "2026-01-19T14:15:07Z"
+            },
+            "email_login_page": {
+                "zuid": "11-d8cbbc95d9-q0295s",
+                "type": "templateset",
+                "updatedAt": "2025-12-22T16:30:01Z",
+                "createdAt": "2026-01-16T14:31:32Z"
+            },
+            "/.well-known/apple-app-site-association": {
+                "zuid": "11-deabf7c986-8l62s6",
+                "type": "ajax-json",
+                "updatedAt": "2026-01-09T14:41:44Z",
+                "createdAt": "2026-01-09T14:44:15Z"
+            },
+            "/.well-known/assetlinks.json": {
+                "zuid": "11-cc828dc0e7-w7p6rr",
+                "type": "ajax-json",
+                "updatedAt": "2026-01-12T14:14:03Z",
+                "createdAt": "2026-02-11T15:03:23Z"
+            },
+            "/auth/magic-link.html": {
+                "zuid": "11-9ef991dfe0-q0tx90",
+                "type": "ajax-json",
+                "updatedAt": "2026-01-14T15:27:32Z",
+                "createdAt": "2026-01-14T17:02:57Z"
+            },
+            "/components/global/toast1 copy.html": {
+                "zuid": "11-9ec2d0b5fd-8zw1lv",
+                "type": "ajax-json",
+                "updatedAt": "2026-02-02T16:28:58Z",
+                "createdAt": "2026-02-02T16:28:58Z"
+            },
+            "/components/global/toast.html": {
+                "zuid": "11-908b9beefb-6w7wwr",
+                "type": "ajax-json",
+                "updatedAt": "2026-02-02T16:29:32Z",
+                "createdAt": "2026-02-02T16:31:44Z"
+            },
+            "/partner_signup.html": {
+                "zuid": "11-d284db9aa9-2243jx",
+                "type": "ajax-json",
+                "updatedAt": "2026-02-12T16:14:03Z",
+                "createdAt": "2026-02-27T20:22:57Z"
+            },
+            "/partner_signup_demo.html": {
+                "zuid": "11-9c92c9f0c2-zmw5h5",
+                "type": "ajax-json",
+                "updatedAt": "2026-03-05T17:16:32Z",
+                "createdAt": "2026-03-05T17:16:41Z"
             }
         },
         "styles": {

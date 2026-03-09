@@ -1,492 +1,30 @@
-<style>
-  .section-title p,
-  .section-title {
-    font-size: 2rem;
-    font-weight: 500;
-    text-align: center;
-  }
-  .hero-description p,
-  .hero-description {
-    font-size: 1.125rem;
-    font-weight: 400;
-    text-align: center;
-    color: var(--bs-gray-500);
-    max-width: 53.125rem;
-  }
-  .role-card,
-  .cause-card,
-  .npo-card {
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    cursor: pointer;
-  }
-  .role-card:hover,
-  .cause-card:hover,
-  .npo-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
-  .role-card.selected,
-  .cause-card.selected,
-  .npo-card.selected {
-    border: 2px solid #7b3fee;
-    background-color: #f8f4ff;
-  }
-  .search-input {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>');
-    background-repeat: no-repeat;
-    background-position: 10px center;
-    padding-left: 35px;
-  }
-  #stepsIndicator {
-    font-size: 0.875rem;
-  }
-
-  /* Hide stepsIndicator on mobile devices */
-  @media (max-width: 768px) {
-    #stepsIndicator {
-      display: none !important;
-    }
-
-    /* Hide horizontal rule on mobile */
-    hr {
-      display: none !important;
-    }
-
-    /* Center logo on mobile */
-    header .position-absolute {
-      position: static !important;
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-
-    header .d-flex {
-      flex-direction: column;
-      text-align: center;
-    }
-  }
-  .step-item {
-    display: flex;
-    align-items: center;
-    color: var(--bs-gray-600);
-  }
-  .step-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background-color: var(--bs-gray-300);
-    color: var(--bs-white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 8px;
-  }
-  .step-separator {
-    width: 16px;
-    height: 2px;
-    background-color: var(--bs-gray-300);
-    margin: 0 8px;
-  }
-  .step-item.active {
-    color: var(--bs-primary);
-  }
-  .step-item.active .step-icon {
-    background-color: var(--bs-primary);
-  }
-  .step-item.completed .step-icon {
-    background-color: var(--bs-success);
-  }
-  .cause-card .cause-title,
-  .cause-card .cause-description,
-  .cause-card .cause-description * *,
-  .npo-card .cause-title,
-  .npo-card .cause-description,
-  .npo-card .cause-description * * {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-height: 2.8em;
-    line-height: 1.4em;
-  }
-</style>
+{{ include /components/global/Onboarding/styles.html }}
 
 <hr class="p-0 m-0" />
 
-<section id="personalInfo" class="container">
-  <div
-    class="d-flex justify-content-between align-items-center p-4 position-relative"
-  >
-    <div class="position-absolute top-50 start-50 translate-middle">
-      <img
-        src="{{ globals.logo.getImage() }}"
-        style="max-width: 160px"
-        alt="cause circle brand logo"
-      />
-    </div>
-  </div>
-  <div class="py-4 mt-4">
-    <div
-      class="d-flex flex-column gap-2 justify-content-center align-items-center"
-    >
-      <img
-        src="https://4xxglxlj.media.zestyio.com/create-profile.png"
-        style="max-width: 90px"
-      />
-      <div class="d-flex flex-column gap-2 align-items-center">
-        <p class="fs-4 fw-normal mb-0">Create your profile</p>
-        <p class="fs-6 text-muted mb-0">Add your contact details</p>
-      </div>
-    </div>
-  </div>
-  <div class="d-flex justify-content-center align-items-center flex-column">
-    <div class="mb-4" style="width: 380px">
-      <div class="d-flex flex-column gap-3">
-        <div class="form-group">
-          <label for="firstName" class="form-label">First Name </label>
-          <input
-            type="text"
-            class="form-control"
-            id="firstName"
-            placeholder="Your first name"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="lastName" class="form-label">Last Name </label>
-          <input
-            type="text"
-            class="form-control"
-            id="lastName"
-            placeholder="Your last name"
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="email" class="form-label">Email </label>
-          <input
-            type="email"
-            class="form-control"
-            id="email"
-            placeholder="Your email address"
-            required
-          />
-        </div>
-      </div>
-      <button class="nextBtn btn btn-primary w-100 mt-4">Create Profile</button>
-      <div class="text-center mt-3">
-        <p class="mb-0">
-          By continuing you agree to our <u>Terms and Conditions</u> and
-          <u>Privacy Policy</u>
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
+{{ include /components/global/Onboarding/personalInfo.html }}
 
-<section id="roleSelection" class="container d-none">
-  <div
-    class="d-flex justify-content-between align-items-center p-4 position-relative"
-  >
-    <div class="position-absolute top-50 start-50 translate-middle">
-      <img
-        src="{{ globals.logo.getImage() }}"
-        style="max-width: 160px"
-        alt="cause circle brand logo"
-      />
-    </div>
-  </div>
-  <div class="py-4 mt-4">
-    <div
-      class="d-flex flex-column gap-2 justify-content-center align-items-center"
-    >
-      <img
-        src="https://4xxglxlj.media.zestyio.com/role-select.png"
-        style="max-width: 90px"
-      />
-      <div class="d-flex flex-column gap-2 align-items-center">
-        <p class="fs-4 fw-normal mb-0">Your account has been saved</p>
-        <p class="fs-6 text-muted mb-0">
-          Select the role that best describes you
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="d-flex justify-content-center align-items-center flex-column">
-    <div class="mb-4" style="width: 380px">
-      <div class="d-flex flex-column gap-3">
-        <div class="card role-card" data-role="volunteer">
-          <div class="d-flex gap-2 align-items-center p-3">
-            <div
-              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
-              style="background-color: #f8f4ff; width: 40px; height: 40px"
-            >
-              <img
-                src="https://4xxglxlj.media.zestyio.com/volunteer-icon.png"
-                style="max-width: 40px"
-              />
-            </div>
-            <div>
-              <p class="fs-5 mb-0" style="font-size: 14px">Volunteer</p>
-              <p class="text-muted mb-0" style="font-size: 12px">
-                You contribute time & skills to NPOs
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="card role-card" data-role="staff">
-          <div class="d-flex gap-2 align-items-center p-3">
-            <div
-              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
-              style="background-color: #f8f4ff; width: 40px; height: 40px"
-            >
-              <img
-                src="https://4xxglxlj.media.zestyio.com/staff-icon.png"
-                style="max-width: 40px"
-              />
-            </div>
-            <div>
-              <p class="fs-5 mb-0" style="font-size: 14px">Staff</p>
+{{ include /components/global/Onboarding/roleSelection.html }}
 
-              <p class="text-muted mb-0" style="font-size: 12px">
-                You are employed by a non-profit organization
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="card role-card" data-role="donor">
-          <div class="d-flex gap-2 align-items-center p-3">
-            <div
-              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
-              style="background-color: #f8f4ff; width: 40px; height: 40px"
-            >
-              <img
-                src="https://4xxglxlj.media.zestyio.com/donor-icon.png"
-                style="max-width: 40px"
-              />
-            </div>
-            <div>
-              <p class="fs-5 mb-0" style="font-size: 14px">Donor</p>
-              <p class="text-muted mb-0" style="font-size: 12px">
-                You support causes with financial contributions
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="card role-card" data-role="individual">
-          <div class="d-flex gap-2 align-items-center p-3">
-            <div
-              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
-              style="background-color: #f8f4ff; width: 40px; height: 40px"
-            >
-              <img
-                src="https://4xxglxlj.media.zestyio.com/supporter-icon.png"
-                style="max-width: 40px"
-              />
-            </div>
-            <div>
-              <p class="fs-5 mb-0" style="font-size: 14px">Supporter</p>
-              <p class="text-muted mb-0" style="font-size: 12px">
-                You advocate for nonprofit causes
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="card role-card" data-role="beneficiary">
-          <div class="d-flex gap-2 align-items-center p-3">
-            <div
-              class="p-2 rounded-circle d-flex align-items-center justify-content-center"
-              style="background-color: #f8f4ff; width: 40px; height: 40px"
-            >
-              <img
-                src="https://4xxglxlj.media.zestyio.com/benificiary-icon.png"
-                style="max-width: 40px"
-              />
-            </div>
-            <div>
-              <p class="fs-5 mb-0" style="font-size: 14px">Beneficiary</p>
-              <p class="text-muted mb-0" style="font-size: 12px">
-                You receive benefits through NPO efforts
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <button class="nextBtn btn btn-primary w-100 mt-4">Next</button>
-    </div>
-  </div>
-</section>
+{{ include /components/global/Onboarding/npoAdditionChoice.html }}
 
-<section id="causeSelection" class="container d-none">
-  <div
-    class="d-flex justify-content-between align-items-center p-4 position-relative"
-  >
-    <button class="prevBtn btn btn-link p-0 border-0" style="color: #525866">
-      <i class="bi bi-arrow-left fs-3"></i>
-    </button>
+{{ include /components/global/Onboarding/orgDetails.html }}
 
-    <div class="position-absolute top-50 start-50 translate-middle">
-      <img
-        src="{{ globals.logo.getImage() }}"
-        style="max-width: 160px"
-        alt="cause circle brand logo"
-      />
-    </div>
+{{ include /components/global/Onboarding/orgMedia.html }}
 
-    <div class="d-flex align-items-center gap-3">
-      <button
-        class="skipBtn btn btn-link p-0 border-0 text-decoration-none"
-        style="color: #525866"
-      >
-        Skip
-      </button>
-      <button class="nextBtn btn btn-primary selectedCauses-btn">Save</button>
-    </div>
-  </div>
-  <div class="py-4">
-    <div
-      class="d-flex flex-column gap-2 justify-content-center align-items-center"
-    >
-      <img
-        src="https://4xxglxlj.media.zestyio.com/categories-select.png"
-        style="max-width: 90px"
-      />
-      <div class="d-flex flex-column gap-2 align-items-center">
-        <p class="fs-4 fw-normal mb-0">Follow cause categories</p>
-        <p class="fs-6 text-muted mb-0 text-center">
-          Choose what story categories you want to see
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="d-flex justify-content-center align-items-center flex-column">
-    <div class="mb-4" style="width: 380px">
-      <input
-        id="causeSearchInput"
-        type="text"
-        class="form-control search-input mb-3"
-        placeholder="Search..."
-      />
-      <div id="cause-loading" class="text-center d-none">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>
-      <div
-        id="cause-container"
-        class="d-flex flex-column gap-3 overflow-auto w-100"
-        style="max-height: 450px"
-      ></div>
-    </div>
-  </div>
-</section>
+{{ include /components/global/Onboarding/orgReview.html }}
 
-<section id="npoSelection" class="container d-none">
-  <div
-    class="d-flex justify-content-between align-items-center p-4 position-relative"
-  >
-    <button class="prevBtn btn btn-link p-0 border-0" style="color: #525866">
-      <i class="bi bi-arrow-left fs-3"></i>
-    </button>
+{{ include /components/global/Onboarding/causeSelection.html }}
 
-    <div class="position-absolute top-50 start-50 translate-middle">
-      <img
-        src="{{ globals.logo.getImage() }}"
-        style="max-width: 160px"
-        alt="cause circle brand logo"
-      />
-    </div>
-
-    <div class="d-flex align-items-center gap-3">
-      <button
-        class="skipBtn btn btn-link p-0 border-0 text-decoration-none"
-        style="color: #525866"
-      >
-        Skip
-      </button>
-      <button class="nextBtn btn btn-primary selectedNPOs-btn">Save</button>
-    </div>
-  </div>
-  <div class="py-4">
-    <div
-      class="d-flex flex-column gap-2 justify-content-center align-items-center"
-    >
-      <img
-        src="https://4xxglxlj.media.zestyio.com/subscribe-npo.png"
-        style="max-width: 90px"
-      />
-      <div class="d-flex flex-column gap-2 align-items-center">
-        <p class="fs-4 fw-normal mb-0">Subscribe to nonprofits</p>
-        <p class="fs-6 text-muted mb-0 text-center">
-          Choose which nonprofits you want to follow
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="d-flex justify-content-center align-items-center flex-column">
-    <div class="mb-4" style="width: 380px">
-      <input
-        id="npoSearchInput"
-        type="text"
-        class="form-control search-input mb-3"
-        placeholder="Search..."
-      />
-      <div id="npo-loading" class="text-center d-none">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>
-      <div
-        id="npo-container"
-        class="d-flex flex-column gap-3 overflow-auto w-100"
-        style="max-height: 450px"
-      ></div>
-    </div>
-  </div>
-</section>
-
-<section
-  id="summary"
-  class="container d-none h-100 d-flex align-items-center justify-content-center flex-column"
->
-  <div class="py-4">
-    <div
-      class="d-flex flex-column gap-2 justify-content-center align-items-center"
-    >
-      <img
-        src="https://4xxglxlj.media.zestyio.com/check.png"
-        style="max-width: 160px"
-      />
-      <div class="d-flex flex-column gap-2 align-items-center">
-        <p class="fs-4 fw-normal mb-0">Welcome to CauseCircle!</p>
-        <p class="fs-6 text-muted mb-0">
-          Your journey begins here. Explore and make a difference.
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="d-flex justify-content-center align-items-center flex-column">
-    <div class="mb-4" style="width: 380px">
-      <a
-        id="createContentBtn"
-        href="{{ home_feed.first().getUrl() }}"
-        class="completeBtn btn btn-primary w-100 mt-4"
-      >
-        Create Content
-      </a>
-      <a
-        id="exploreCausesBtn"
-        href="{{ causes_landing_page.first().getUrl() }}"
-        class="btn btn-secondary w-100 mt-4"
-      >
-        Explore Causes
-      </a>
-    </div>
-  </div>
-</section>
+{{ include /components/global/Onboarding/npoSelection.html }}
+ 
+{{ include /components/global/Onboarding/summary.html }}
 
 <script type="module">
   $(document).ready(async function () {
+    // Show loading indicator at the start
+    $("#personalInfoLoading").removeClass("d-none");
+
     // Function to check for ZUID availability
     async function waitForZuid(maxAttempts = 30, interval = 1000) {
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -511,12 +49,41 @@
       return null;
     }
 
+    // Function to wait for TanStack Query functions to be available
+    async function waitForQueryFunctions(maxAttempts = 30, interval = 100) {
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        if (window.createCreateNpoMutation && typeof window.createCreateNpoMutation === 'function') {
+          console.log(`TanStack Query functions loaded after ${attempt} attempts`);
+          return true;
+        }
+
+        console.log(
+          `TanStack Query functions not available yet, attempt ${attempt}/${maxAttempts}`
+        );
+
+        if (attempt < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, interval));
+        }
+      }
+
+      console.error("TanStack Query functions not available after maximum attempts");
+      return false;
+    }
+
     // Wait for ZUID to become available
     const zuid = await waitForZuid();
 
     if (!zuid) {
       console.error("Unable to proceed without ZUID");
+      // Hide loading indicator even on error
+      $("#personalInfoLoading").addClass("d-none");
       return;
+    }
+
+    // Wait for TanStack Query functions to be available
+    const queryFunctionsReady = await waitForQueryFunctions();
+    if (!queryFunctionsReady) {
+      console.error("TanStack Query functions not available, some features may not work");
     }
 
     let userData = await window.getUserProfile(zuid); //first_name, last_name
@@ -526,8 +93,11 @@
       const user = userData.data[0];
       if (user.first_name) $("#firstName").val(user.first_name);
       if (user.last_name) $("#lastName").val(user.last_name);
-      if (user.email) $("#email").val(user.email);
+      if (user.email) $("#email").val(user.email).prop("disabled", true);
     }
+
+    // Hide loading indicator after data is loaded
+    $("#personalInfoLoading").addClass("d-none");
 
     async function updateUserProfile(zuid) {
       if (!userData?.data[0]) return;
@@ -537,6 +107,18 @@
 
       // Edit the user data
       currentUser.user_type = selectedRole;
+
+      // Add org data to currentUser object (but exclude from API call)
+      if (isNPOFlow() && orgDetails) {
+        currentUser.orgDetails = orgDetails;
+      }
+      // Sync orgMedia from window if it exists (set by orgMedia.html script)
+      if (isNPOFlow() && window.orgMedia) {
+        orgMedia = window.orgMedia;
+      }
+      if (isNPOFlow() && orgMedia) {
+        currentUser.orgMedia = orgMedia;
+      }
 
       // Handle existing favorite_causes if it's a relationship object
       if (
@@ -584,7 +166,7 @@
         currentUser.favorite_npos = selectedNPOs.join(",");
       }
 
-      // Update user with the new data
+      // Update user with the new data (exclude org data from API call)
       const updatedUser = await window.updateZestyUser(userZuid, {
         first_name: personalInfo.firstName,
         last_name: personalInfo.lastName,
@@ -604,31 +186,81 @@
     };
     let selectedRole,
       selectedCauses = [],
-      selectedNPOs = [];
+      selectedNPOs = [],
+      npoChoice = null, // 'add-npo' or 'customize-storyhub'
+      orgDetails = null,
+      orgMedia = null;
+    
+    // Multi-select cause filter state
+    let selectedCauseZuidsForFilter = []; // Array of cause ZUIDs for filtering NPOs
+    let persistentSelectedNPOsData = {}; // Object to store full NPO data for selected items (keyed by ZUID)
 
-    function updateStepUI() {
-      $(".step").removeClass("active");
-      $(`#step${currentStep}`).addClass("active");
+    // Helper function to determine if NPO flow should be used
+    function isNPOFlow() {
+      return selectedRole === 'volunteer' || selectedRole === 'staff';
+    }
 
-      $(
-        "#personalInfo, #roleSelection, #causeSelection, #npoSelection, #summary"
-      ).addClass("d-none");
-      $(
-        `#${
-          [
+    // Define step arrays based on selected role and choices
+    function getStepArray() {
+      if (isNPOFlow()) {
+        if (npoChoice === 'add-npo') {
+          // Branch A: Add NPO flow
+          return [
             "personalInfo",
             "roleSelection",
+            "npoAdditionChoice",
+            "orgDetails",
+            "orgMedia",
+            "orgReview",
             "causeSelection",
-            "npoSelection",
-            "summary",
-          ][currentStep - 1]
-        }`
-      ).removeClass("d-none");
+            "npoSelection"
+          ];
+        } else if (npoChoice === 'customize-storyhub') {
+          // Branch B: Customize StoryHub flow
+          return [
+            "personalInfo",
+            "roleSelection",
+            "npoAdditionChoice",
+            "causeSelection",
+            "npoSelection"
+          ];
+        } else {
+          // Before choice is made
+          return [
+            "personalInfo",
+            "roleSelection",
+            "npoAdditionChoice"
+          ];
+        }
+      } else {
+        // Regular flow
+        return [
+          "personalInfo",
+          "roleSelection",
+          "causeSelection",
+          "npoSelection"
+        ];
+      }
+    }
 
-      $("#prevBtn").toggleClass("d-none", currentStep === 1);
-      $("#nextBtn").text(currentStep === 5 ? "Complete" : "Next");
+    function updateStepUI() {
+      const stepArray = getStepArray();
+      const currentStepId = stepArray[currentStep - 1];
+      const totalSteps = stepArray.length;
 
-      // Update steps indicator
+      // Hide all sections
+      $(
+        "#personalInfo, #roleSelection, #npoAdditionChoice, #orgDetails, #orgMedia, #orgReview, #causeSelection, #npoSelection, #summary"
+      ).addClass("d-none");
+
+      // Show current step
+      $(`#${currentStepId}`).removeClass("d-none");
+
+      // Update prev/next buttons
+      $(".prevBtn").toggleClass("d-none", currentStep === 1);
+      $("#nextBtn").text(currentStep === totalSteps ? "Complete" : "Next");
+
+      // Update steps indicator (if exists)
       $("#stepsIndicator .step-item").each(function () {
         const stepNumber = $(this).data("step");
         $(this).removeClass("active completed");
@@ -642,31 +274,77 @@
           $(this).find(".step-icon").text(stepNumber);
         }
       });
-      if (currentStep === 1) {
-        $(".prevBtn").addClass("d-none");
-      } else {
-        $(".prevBtn").removeClass("d-none");
-      }
-      if (currentStep === 3) loadCauses();
-      if (currentStep === 4) loadNPOs();
-      if (currentStep === 5) {
-        const localUser = localStorage.getItem("user");
 
-        if (localUser) {
-          updateUserProfile(JSON.parse(localUser).zuid);
+      // Handle step-specific logic
+      if (currentStepId === "causeSelection") {
+        loadCauses();
+      }
+      if (currentStepId === "npoSelection") {
+        // Initialize filter with all selected causes from causeSelection step
+        selectedCauseZuidsForFilter = [...selectedCauses];
+        loadCausesDropdown(selectedCauseZuidsForFilter);
+        loadNPOs(selectedCauseZuidsForFilter);
+      }
+      if (currentStepId === "orgDetails") {
+        loadCauseAreaDropdown();
+      }
+      if (currentStepId === "orgMedia") {
+        // Initialize window.orgMedia if not already set
+        if (!window.orgMedia) {
+          window.orgMedia = orgMedia || { logo: null, coverImage: null };
+        }
+        if (orgDetails) {
+          // Update org name and description display
+          $("#orgNameDisplay").text(orgDetails.name || "Your NPO");
+          $("#orgDescriptionDisplay").text(orgDetails.description || "Add a short description about your organization");
         }
       }
     }
 
     $(".role-card").click(function () {
-      $(".role-card").removeClass("selected");
-      $(this).addClass("selected");
-      selectedRole = $(this).data("role");
+      const $card = $(this);
+      const $iconContainer = $card.find(".p-2.rounded-circle");
+      const $img = $iconContainer.find("img");
+      
+      // Remove selected state from all role cards
+      $(".role-card").each(function() {
+        const $otherCard = $(this);
+        const $otherIconContainer = $otherCard.find(".p-2.rounded-circle");
+        const $otherImg = $otherIconContainer.find("img");
+        const originalSrc = $otherCard.data("original-img-src");
+        
+        if ($otherCard.hasClass("selected") && originalSrc) {
+          // Restore original image
+          $otherIconContainer.html(`<img src="${originalSrc}" style="max-width: 40px" />`);
+        }
+        $otherCard.removeClass("selected");
+      });
+      
+      // Store original image source if not already stored
+      if (!$card.data("original-img-src")) {
+        $card.data("original-img-src", $img.attr("src"));
+      }
+      
+      // Replace image with purple box and check icon
+      $iconContainer.html('<i class="bi bi-check text-white"></i>');
+      $iconContainer.css({
+        "background-color": "#7b3fee",
+        "width": "40px",
+        "height": "40px"
+      });
+      
+      $card.addClass("selected");
+      selectedRole = $card.data("role");
     });
 
-    $(".nextBtn").click(function () {
-      if (currentStep === 1) {
-        // Validate personal info
+    $(".nextBtn").click(async function () {
+      const stepArray = getStepArray();
+      const currentStepId = stepArray[currentStep - 1];
+      const totalSteps = stepArray.length;
+      const isLastStep = currentStep === totalSteps;
+
+      // Validate personal info
+      if (currentStepId === "personalInfo") {
         const firstName = $("#firstName").val().trim();
         const lastName = $("#lastName").val().trim();
         const email = $("#email").val().trim();
@@ -681,26 +359,299 @@
           return;
         }
 
-        // Store personal info
         personalInfo.firstName = firstName;
         personalInfo.lastName = lastName;
         personalInfo.email = email;
       }
 
-      if (currentStep === 2 && !selectedRole) {
+      // Validate role selection
+      if (currentStepId === "roleSelection" && !selectedRole) {
         alert("Please select a role");
         return;
       }
 
-      if (currentStep < 5) {
+      // Validate NPO choice
+      if (currentStepId === "npoAdditionChoice" && !npoChoice) {
+        alert("Please select an option");
+        return;
+      }
+
+      // Validate org details
+      if (currentStepId === "orgDetails") {
+        const npoName = $("#npoName").val().trim();
+        const npoDescription = $("#npoDescription").val().trim();
+        const causeAreaZuid = $("#causeArea").val().trim();
+        const causeAreaName = $("#causeAreaInput").val().trim();
+        const adminTerms = $("#adminTerms").is(":checked");
+
+        if (!npoName || !npoDescription || !adminTerms) {
+          alert("Please fill in all required fields and agree to the Admin Terms");
+          return;
+        }
+
+        orgDetails = {
+          name: npoName,
+          description: npoDescription,
+          causeArea: causeAreaName, // Store the name for display purposes
+          causeAreaZuid: causeAreaZuid, // Store the ZUID for API purposes
+          termsAccepted: adminTerms
+        };
+      }
+
+      // Handle NPO creation when transitioning from orgMedia to orgReview
+      if (currentStepId === "orgMedia") {
+        const $nextBtn = $(".nextBtn");
+        const originalBtnText = $nextBtn.html();
+        
+        try {
+          // Set loading state
+          $nextBtn.prop("disabled", true);
+          $nextBtn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Creating organization...');
+          
+          // Clear any previous NPO creation errors
+          window.npoCreationError = null;
+          window.npoCreationData = null;
+          
+          let logoId = "";
+          let heroImageId = "";
+          
+          // Upload images if they exist
+          if (window.orgMedia) {
+            // Upload logo if exists
+            if (window.orgMedia.logo) {
+              try {
+                const logoResult = await window.newUploadImages([window.orgMedia.logo]);
+                if (logoResult && logoResult.length > 0 && logoResult[0].data && logoResult[0].data[0]) {
+                  logoId = logoResult[0].data[0].id;
+                }
+              } catch (error) {
+                console.error("Error uploading logo:", error);
+                // Continue without logo
+              }
+            }
+            
+            // Upload cover image if exists
+            if (window.orgMedia.coverImage) {
+              try {
+                const heroResult = await window.newUploadImages([window.orgMedia.coverImage]);
+                if (heroResult && heroResult.length > 0 && heroResult[0].data && heroResult[0].data[0]) {
+                  heroImageId = heroResult[0].data[0].id;
+                }
+              } catch (error) {
+                console.error("Error uploading cover image:", error);
+                // Continue without cover image
+              }
+            }
+          }
+          
+          // Create NPO using mutation
+          if (!window.createCreateNpoMutation || typeof window.createCreateNpoMutation !== 'function') {
+            throw new Error("TanStack Query functions not loaded. Please refresh the page.");
+          }
+          
+          const createNpoMutation = window.createCreateNpoMutation();
+          
+          // Create a promise to wait for mutation result
+          const npoCreationPromise = new Promise((resolve, reject) => {
+            const unsubscribe = createNpoMutation.subscribe((result) => {
+              if (result.status === 'success') {
+                console.log("NPO created successfully:", result.data);
+                // Store NPO creation data for later use
+                window.npoCreationData = result.data;
+                unsubscribe();
+                resolve(result.data);
+              } else if (result.status === 'error') {
+                console.error("NPO creation failed:", result.error);
+                window.npoCreationError = result.error.message || "Failed to create organization";
+                unsubscribe();
+                resolve(null); // Resolve with null to continue anyway
+              }
+            });
+            
+            // Trigger the mutation
+            createNpoMutation.mutate({
+              name: orgDetails.name,
+              category: orgDetails.causeAreaZuid,
+              cause_description: orgDetails.description,
+              logo: logoId,
+              hero_image: heroImageId,
+              admins: zuid || ""
+            });
+          });
+          
+          // Wait for NPO creation to complete (or fail)
+          await npoCreationPromise;
+          
+        } catch (error) {
+          console.error("Error in NPO creation flow:", error);
+          window.npoCreationError = error.message || "An unexpected error occurred";
+          // Continue to orgReview anyway
+        } finally {
+          // Restore button state
+          $nextBtn.prop("disabled", false);
+          $nextBtn.html(originalBtnText);
+        }
+        
+        // Proceed to next step (orgReview)
+        if (currentStep < stepArray.length) {
+          currentStep++;
+          updateStepUI();
+        }
+        return;
+      }
+
+      // If this is the last step, update profile and redirect
+      if (isLastStep) {
+        const $nextBtn = $(".nextBtn");
+        const originalBtnText = $nextBtn.html();
+        
+        // Set loading state
+        $nextBtn.prop("disabled", true);
+        $nextBtn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...');
+        
+        const localUser = localStorage.getItem("user");
+        if (localUser) {
+          try {
+            await updateUserProfile(JSON.parse(localUser).zuid);
+            // Redirect to home feed after profile update completes
+            window.location.replace("{{ home_feed.first().getUrl() }}");
+          } catch (error) {
+            console.error("Error updating user profile:", error);
+            // Restore button state on error
+            $nextBtn.prop("disabled", false);
+            $nextBtn.html(originalBtnText);
+            alert("There was an error completing your onboarding. Please try again.");
+          }
+        } else {
+          // If no user in localStorage, still redirect (shouldn't happen normally)
+          window.location.replace("{{ home_feed.first().getUrl() }}");
+        }
+        return;
+      }
+
+      // Move to next step
+      if (currentStep < stepArray.length) {
         currentStep++;
         updateStepUI();
       }
     });
 
-    $(".skipBtn").click(function () {
-      currentStep++;
-      updateStepUI();
+    $(".skipBtn").click(async function () {
+      const stepArray = getStepArray();
+      const currentStepId = stepArray[currentStep - 1];
+      const totalSteps = stepArray.length;
+      const isLastStep = currentStep === totalSteps;
+
+      // Handle skip for orgMedia
+      if (currentStepId === "orgMedia") {
+        orgMedia = {
+          logo: null,
+          coverImage: null
+        };
+        window.orgMedia = orgMedia;
+        
+        // Create NPO without images when skipping orgMedia
+        const $skipBtn = $(".skipBtn");
+        const originalBtnText = $skipBtn.html();
+        
+        try {
+          // Set loading state
+          $skipBtn.prop("disabled", true);
+          $skipBtn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Creating organization...');
+          
+          // Clear any previous NPO creation errors
+          window.npoCreationError = null;
+          window.npoCreationData = null;
+          
+          // Create NPO using mutation (without images)
+          if (!window.createCreateNpoMutation || typeof window.createCreateNpoMutation !== 'function') {
+            throw new Error("TanStack Query functions not loaded. Please refresh the page.");
+          }
+          
+          const createNpoMutation = window.createCreateNpoMutation();
+          
+          // Create a promise to wait for mutation result
+          const npoCreationPromise = new Promise((resolve, reject) => {
+            const unsubscribe = createNpoMutation.subscribe((result) => {
+              if (result.status === 'success') {
+                console.log("NPO created successfully:", result.data);
+                // Store NPO creation data for later use
+                window.npoCreationData = result.data;
+                unsubscribe();
+                resolve(result.data);
+              } else if (result.status === 'error') {
+                console.error("NPO creation failed:", result.error);
+                window.npoCreationError = result.error.message || "Failed to create organization";
+                unsubscribe();
+                resolve(null); // Resolve with null to continue anyway
+              }
+            });
+            
+            // Trigger the mutation
+            createNpoMutation.mutate({
+              name: orgDetails.name,
+              category: orgDetails.causeAreaZuid,
+              cause_description: orgDetails.description,
+              logo: "",
+              hero_image: "",
+              admins: zuid || ""
+            });
+          });
+          
+          // Wait for NPO creation to complete (or fail)
+          await npoCreationPromise;
+          
+        } catch (error) {
+          console.error("Error in NPO creation flow:", error);
+          window.npoCreationError = error.message || "An unexpected error occurred";
+          // Continue to orgReview anyway
+        } finally {
+          // Restore button state
+          $skipBtn.prop("disabled", false);
+          $skipBtn.html(originalBtnText);
+        }
+        
+        // Proceed to next step (orgReview)
+        if (currentStep < stepArray.length) {
+          currentStep++;
+          updateStepUI();
+        }
+        return;
+      }
+
+      // If this is the last step, update profile and redirect
+      if (isLastStep) {
+        const $skipBtn = $(".skipBtn");
+        const originalBtnText = $skipBtn.html();
+        
+        // Set loading state
+        $skipBtn.prop("disabled", true);
+        $skipBtn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...');
+        
+        const localUser = localStorage.getItem("user");
+        if (localUser) {
+          try {
+            await updateUserProfile(JSON.parse(localUser).zuid);
+            // Redirect to home feed after profile update completes
+            window.location.replace("{{ home_feed.first().getUrl() }}");
+          } catch (error) {
+            console.error("Error updating user profile:", error);
+            // Restore button state on error
+            $skipBtn.prop("disabled", false);
+            $skipBtn.html(originalBtnText);
+            alert("There was an error completing your onboarding. Please try again.");
+          }
+        } else {
+          // If no user in localStorage, still redirect (shouldn't happen normally)
+          window.location.replace("{{ home_feed.first().getUrl() }}");
+        }
+        return;
+      }
+
+      if (currentStep < stepArray.length) {
+        currentStep++;
+        updateStepUI();
+      }
     });
 
     // Email validation function
@@ -710,206 +661,754 @@
     }
 
     $(".prevBtn").click(function () {
-      currentStep--;
-      updateStepUI();
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepUI();
+      }
     });
 
-    function searchNPOs(searchTerm) {
-      const limit = searchTerm ? 5 : 100;
+    // Handle NPO choice card clicks
+    $(document).on("click", ".npo-choice-card", function () {
+      const $card = $(this);
+      const choice = $card.data("choice");
 
-      $.ajax({
-        url: "{{ $base_url }}mobileapp/npos.json",
-        method: "GET",
-        data: {
-          limit: limit,
-          search: searchTerm,
-          page: 1,
-        },
-        success: function (data) {
-          //logic here
-        },
-        error: function (error) {
-          //logic here
-        },
-      });
-    }
+      // Remove selected state from all choice cards
+      $(".npo-choice-card").removeClass("selected");
 
-    function loadCauses(searchTerm) {
-      const limit = searchTerm ? 5 : 25;
+      // Add selected state to clicked card
+      $card.addClass("selected");
+      npoChoice = choice;
+
+      // Auto-advance to next step
+      setTimeout(() => {
+        const stepArray = getStepArray();
+        if (currentStep < stepArray.length) {
+          currentStep++;
+          updateStepUI();
+        }
+      }, 300);
+    });
+
+    // Handle org review action card clicks
+    $(document).on("click", ".org-action-card", async function () {
+      const $card = $(this);
+      const action = $card.data("action");
+
+      if (action === "manage-npo") {
+        // Save user profile before redirecting to NPO management
+        const localUser = localStorage.getItem("user");
+        
+        if (!localUser) {
+          console.error("No user found in localStorage");
+          alert("Unable to save your profile. Please try again.");
+          return;
+        }
+
+        try {
+          // Disable the card to prevent multiple clicks
+          $card.css("pointer-events", "none").css("opacity", "0.6");
+          
+          // Show loading indicator with backdrop
+          const $loadingIndicator = $(`
+            <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index: 9999; background-color: rgba(255, 255, 255, 0.9); min-height: 100vh;">
+              <div class="d-flex flex-column align-items-center gap-3">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="text-dark mb-0 fw-medium">Saving your profile...</p>
+              </div>
+            </div>
+          `);
+          $("body").append($loadingIndicator);
+          
+          // Update user profile with current data
+          await updateUserProfile(JSON.parse(localUser).zuid);
+          
+          // Remove loading indicator
+          $loadingIndicator.remove();
+          
+          // Redirect to NPO website if available
+          if (window.npoCreationData && window.npoCreationData.links && window.npoCreationData.links.website) {
+            window.location.href = `${window.npoCreationData.links.website}admin`;
+          } else {
+            console.error("NPO website URL not available");
+            alert("NPO profile URL not available. Please try again later.");
+            $card.css("pointer-events", "auto").css("opacity", "1");
+          }
+        } catch (error) {
+          console.error("Error saving user profile:", error);
+          alert("There was an error saving your profile. Please try again.");
+          
+          // Re-enable the card
+          $card.css("pointer-events", "auto").css("opacity", "1");
+          
+          // Remove loading indicator if it exists
+          $(".position-fixed.top-50.start-50").remove();
+        }
+        return;
+      } else if (action === "customize-storyhub") {
+        // Remove selected state from all action cards
+        $(".org-action-card").removeClass("selected");
+        $card.addClass("selected");
+
+        // Navigate to causeSelection
+        const stepArray = getStepArray();
+        const causeIndex = stepArray.indexOf("causeSelection");
+        if (causeIndex !== -1) {
+          currentStep = causeIndex + 1;
+          updateStepUI();
+        }
+      }
+    });
+
+    // Handle description character counter
+    $(document).on("input", "#npoDescription", function () {
+      const length = $(this).val().length;
+      $("#descriptionCharCount").text(length);
+    });
+
+    // Variables to store query observers and unsubscribe functions
+    let nposQueryObserver = null;
+    let nposUnsubscribe = null;
+    let causesQueryObserver = null;
+    let causesUnsubscribe = null;
+    let causesDropdownQueryObserver = null;
+    let causesDropdownUnsubscribe = null;
+    let causeAreaDropdownQueryObserver = null;
+    let causeAreaDropdownUnsubscribe = null;
+
+    function loadCauses() {
+      // Unsubscribe from previous query if exists
+      if (causesUnsubscribe) {
+        causesUnsubscribe();
+        causesUnsubscribe = null;
+      }
 
       // Show loading indicator
       $("#cause-loading").removeClass("d-none");
       $("#cause-container").addClass("d-none");
 
-      $.ajax({
-        url: "{{ $base_url }}mobileapp/causes.json",
-        method: "GET",
-        data: {
-          limit: limit,
-          search: searchTerm,
-          page: 1,
-        },
-        success: function (response) {
-          const causes = response.data;
-          const causeContainer = $("#cause-container");
-          causeContainer.empty();
+      // Create query observer
+      causesQueryObserver = window.createAllCausesQuery({ limit: 9999, skip: 0 });
 
-          causes.forEach((cause) => {
-            const imageUrl =
-              typeof cause.image === "string" && cause.image.trim() !== ""
-                ? cause.image
-                : cause.image && cause.image.data && cause.image.data[0]
-                ? cause.image.data[0].url
-                : "https://placehold.co/100x100";
-            const description = cause.description
-              ? cause.description.substring(0, 100) + "..."
-              : "No description available";
+      // Helper function to render causes
+      const renderCauses = (causes) => {
+        const causeContainer = $("#cause-container");
+        causeContainer.empty();
 
-            const causeCard = `
-              <div class="card cause-card" data-cause-id="${cause.zuid}">
-                <div class="d-flex gap-2 align-items-center p-3">
-                  <img src="${imageUrl}" alt="${cause.title}" style="width: 60px; height: 60px; object-fit: cover;">
-                  <div class="flex-grow-1">
-                    <p class="fs-5 mb-0 cause-title" style="font-size: 14px">${cause.title}</p>
-                    <div class="text-muted mb-0 cause-description" style="font-size: 12px">${description}</div>
-                  </div>
+        causes.forEach((cause) => {
+          const imageUrl =
+            typeof cause.image === "string" && cause.image.trim() !== ""
+              ? cause.image
+              : cause.image && cause.image.data && cause.image.data[0]
+              ? cause.image.data[0].url
+              : "https://placehold.co/100x100";
+          const description = cause.description
+            ? cause.description.substring(0, 100) + "..."
+            : "No description available";
+
+          const isSelected = selectedCauses.includes(cause.zuid);
+
+          const causeCard = `
+            <div class="card cause-card ${isSelected ? 'selected' : ''}" data-cause-id="${cause.zuid}">
+              <div class="d-flex gap-2 align-items-center p-3">
+                ${isSelected 
+                  ? '<div class="card-icon-container"><i class="bi bi-check"></i></div>'
+                  : `<img src="${imageUrl}" alt="${cause.title}" style="width: 60px; height: 60px; object-fit: cover;">`
+                }
+                <div class="flex-grow-1">
+                  <p class="fs-5 mb-0 cause-title" style="font-size: 14px">${cause.title}</p>
+                  <div class="text-muted mb-0 cause-description" style="font-size: 12px">${description}</div>
                 </div>
               </div>
-            `;
-            causeContainer.append(causeCard);
-          });
+            </div>
+          `;
+          const $card = $(causeCard);
+          if (isSelected) {
+            $card.data("original-img-src", imageUrl);
+          }
+          causeContainer.append($card);
+        });
 
-          // Add click event for cause selection
-          $(".cause-card").click(function () {
-            const causeId = $(this).data("cause-id");
-            $(this).toggleClass("selected"); // Toggle selection on click
-            if ($(this).hasClass("selected")) {
+        // Update button state based on current selections
+        if (selectedCauses.length > 0) {
+          $(".selectedCauses-btn").removeClass("d-none");
+          $(".skipBtn").addClass("d-none");
+        } else {
+          $(".selectedCauses-btn").addClass("d-none");
+          $(".skipBtn").removeClass("d-none");
+        }
+
+        // Add click event for cause selection
+        $(".cause-card").click(function () {
+          const $card = $(this);
+          const causeId = $card.data("cause-id");
+          const $img = $card.find("img");
+          const originalSrc = $card.data("original-img-src") || $img.attr("src");
+          
+          // Store original image source if not already stored
+          if (!$card.data("original-img-src")) {
+            $card.data("original-img-src", originalSrc);
+          }
+          
+          $card.toggleClass("selected"); // Toggle selection on click
+          if ($card.hasClass("selected")) {
+            // Replace image with purple box and check icon
+            if ($img.length) {
+              $img.replaceWith(`
+                <div class="card-icon-container">
+                  <i class="bi bi-check"></i>
+                </div>
+              `);
+            }
+            if (!selectedCauses.includes(causeId)) {
               selectedCauses.push(causeId); // Add to selected causes
-            } else {
-              selectedCauses = selectedCauses.filter((id) => id !== causeId); // Remove from selected causes
             }
+          } else {
+            // Restore original image
+            $card.find(".card-icon-container").replaceWith(`<img src="${originalSrc}" alt="${$card.find('.cause-title').text()}" style="width: 60px; height: 60px; object-fit: cover;">`);
+            selectedCauses = selectedCauses.filter((id) => id !== causeId); // Remove from selected causes
+          }
 
-            if (selectedCauses.length > 0) {
-              $(".selectedCauses-btn").prop("disabled", false);
-            } else {
-              $(".selectedCauses-btn").prop("disabled", true);
-            }
-          });
+          if (selectedCauses.length > 0) {
+            $(".selectedCauses-btn").removeClass("d-none");
+            $(".skipBtn").addClass("d-none");
+          } else {
+            $(".selectedCauses-btn").addClass("d-none");
+            $(".skipBtn").removeClass("d-none");
+          }
+        });
 
-          $(".selectedCauses-btn").prop("disabled", true);
+        // Hide loading indicator and show results
+        $("#cause-loading").addClass("d-none");
+        $("#cause-container").removeClass("d-none");
+      };
 
-          // Hide loading indicator and show results
-          $("#cause-loading").addClass("d-none");
-          $("#cause-container").removeClass("d-none");
-        },
-        error: function (error) {
-          console.error("Error fetching causes:", error);
+      // Check for cached result immediately
+      const cachedResult = causesQueryObserver.getCurrentResult();
+      if (cachedResult && cachedResult.status === 'success' && cachedResult.data) {
+        const causes = cachedResult.data.data || [];
+        renderCauses(causes);
+      }
+
+      // Subscribe to query state changes for future updates
+      causesUnsubscribe = causesQueryObserver.subscribe((result) => {
+        if (result.status === 'pending') {
+          // Show loading state
+          $("#cause-loading").removeClass("d-none");
+          $("#cause-container").addClass("d-none");
+          return;
+        }
+
+        if (result.status === 'success' && result.data) {
+          const causes = result.data.data || [];
+          renderCauses(causes);
+        } else if (result.status === 'error') {
+          console.error("Error fetching causes:", result.error);
           // Hide loading indicator on error
           $("#cause-loading").addClass("d-none");
           $("#cause-container").removeClass("d-none");
-        },
+        }
       });
     }
 
-    // Debounce function for search input
-    function debounce(func, wait) {
-      let timeout;
-      return function (...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), wait);
+    function loadCausesDropdown(preselectedCauseZuids = []) {
+      const dropdown = $("#causeFilterDropdown");
+      const input = $("#causeFilterInput");
+      
+      // Ensure dropdown exists
+      if (dropdown.length === 0) {
+        console.warn("Cause filter dropdown not found");
+        return;
+      }
+
+      // Always keep input showing "Choose one"
+      input.val("Choose one");
+
+      // Unsubscribe from previous query if exists
+      if (causesDropdownUnsubscribe) {
+        causesDropdownUnsubscribe();
+        causesDropdownUnsubscribe = null;
+      }
+
+      // Create query observer
+      causesDropdownQueryObserver = window.createAllCausesQuery({ limit: 9999, skip: 0 });
+
+      // Initialize selectedCauseZuidsForFilter with preselected causes on first load
+      if (preselectedCauseZuids.length > 0 && selectedCauseZuidsForFilter.length === 0) {
+        selectedCauseZuidsForFilter = [...preselectedCauseZuids];
+        $("#selectedCauseZuids").val(selectedCauseZuidsForFilter.join(","));
+      }
+
+      // Helper function to populate dropdown
+      const populateDropdown = (causes) => {
+        if (!causes || causes.length === 0) {
+          console.warn("No causes found to populate dropdown");
+          return;
+        }
+        
+        // Clear existing items
+        dropdown.empty();
+
+        // Populate dropdown with causes (multi-select with checkboxes)
+        causes.forEach((cause) => {
+          const listItem = $("<li></li>");
+          const isSelected = selectedCauseZuidsForFilter.includes(cause.zuid);
+          
+          const label = $("<label></label>")
+            .attr("class", "dropdown-item d-flex align-items-center gap-2 mb-0")
+            .css("cursor", "pointer");
+          
+          const checkbox = $("<input>")
+            .attr("type", "checkbox")
+            .attr("class", "form-check-input m-0")
+            .attr("data-cause-zuid", cause.zuid)
+            .prop("checked", isSelected);
+          
+          const text = $("<span></span>")
+            .text(cause.title)
+            .addClass("text-truncate");
+          
+          label.append(checkbox).append(text);
+          listItem.append(label);
+          dropdown.append(listItem);
+        });
       };
+
+      // Check for cached result immediately
+      const cachedResult = causesDropdownQueryObserver.getCurrentResult();
+      if (cachedResult && cachedResult.status === 'success' && cachedResult.data) {
+        const causes = cachedResult.data.data || [];
+        populateDropdown(causes);
+      }
+
+      // Subscribe to query state changes
+      causesDropdownUnsubscribe = causesDropdownQueryObserver.subscribe((result) => {
+        console.log("Causes dropdown query result:", result.status);
+        if (result.status === 'success' && result.data) {
+          const causes = result.data.data || [];
+          populateDropdown(causes);
+        } else if (result.status === 'error') {
+          console.error("Error fetching causes for dropdown:", result.error);
+        }
+      });
+
+      // Handle input click/focus to show dropdown (unbind first to prevent duplicates)
+      input.off("click.causeFilter focus.causeFilter").on("click.causeFilter focus.causeFilter", function() {
+        if (dropdown.children().length > 0) {
+          dropdown.show();
+        }
+      });
+
+      // Handle checkbox change for multi-select (unbind first to prevent duplicates)
+      dropdown.off("change.causeFilter", "input[type='checkbox']").on("change.causeFilter", "input[type='checkbox']", function(e) {
+        const causeZuid = $(this).data("cause-zuid") || "";
+        const isChecked = $(this).prop("checked");
+
+        // Toggle cause in selectedCauseZuidsForFilter array
+        if (isChecked && !selectedCauseZuidsForFilter.includes(causeZuid)) {
+          // Add to array
+          selectedCauseZuidsForFilter.push(causeZuid);
+        } else if (!isChecked && selectedCauseZuidsForFilter.includes(causeZuid)) {
+          // Remove from array
+          selectedCauseZuidsForFilter = selectedCauseZuidsForFilter.filter(id => id !== causeZuid);
+        }
+
+        // Update hidden field
+        $("#selectedCauseZuids").val(selectedCauseZuidsForFilter.join(","));
+        
+        // Reload NPOs with updated filter
+        loadNPOs(selectedCauseZuidsForFilter);
+        
+        // Keep input text as "Choose one"
+        input.val("Choose one");
+      });
+
+      // Handle input blur (with delay to allow dropdown clicks)
+      input.off("blur.causeFilter").on("blur.causeFilter", function(e) {
+        setTimeout(function() {
+          if (!$(document.activeElement).closest('#causeFilterDropdown').length) {
+            dropdown.hide();
+          }
+        }, 150);
+      });
+
+      // Prevent dropdown from closing when clicking on labels/checkboxes
+      dropdown.off("click.preventClose").on("click.preventClose", function(e) {
+        e.stopPropagation();
+      });
     }
 
-    function loadNPOs(searchTerm) {
-      const limit = searchTerm ? 5 : 25;
+    function loadCauseAreaDropdown() {
+      const dropdown = $("#causeAreaDropdown");
+      const input = $("#causeAreaInput");
+      
+      // Ensure dropdown exists
+      if (dropdown.length === 0) {
+        console.warn("Cause area dropdown not found");
+        return;
+      }
+
+      // Unsubscribe from previous query if exists
+      if (causeAreaDropdownUnsubscribe) {
+        causeAreaDropdownUnsubscribe();
+        causeAreaDropdownUnsubscribe = null;
+      }
+
+      // Create query observer
+      causeAreaDropdownQueryObserver = window.createAllCausesQuery({ limit: 9999, skip: 0 });
+
+      // Helper function to populate dropdown
+      const populateDropdown = (causes) => {
+        if (!causes || causes.length === 0) {
+          console.warn("No causes found to populate dropdown");
+          return;
+        }
+        
+        // Clear existing items
+        dropdown.empty();
+        const currentSelectedZuid = $("#causeArea").val();
+
+        // Populate dropdown with causes
+        causes.forEach((cause) => {
+          const listItem = $("<li></li>");
+          const isSelected = currentSelectedZuid === cause.zuid;
+          const link = $("<a></a>")
+            .attr("class", `dropdown-item ${isSelected ? 'active' : ''}`)
+            .attr("href", "#")
+            .attr("data-cause-zuid", cause.zuid)
+            .text(cause.title)
+            .addClass("text-truncate");
+          if (isSelected) {
+            link.append(' <i class="bi bi-check"></i>');
+          }
+          listItem.append(link);
+          dropdown.append(listItem);
+        });
+      };
+
+      // Check for cached result immediately
+      const cachedResult = causeAreaDropdownQueryObserver.getCurrentResult();
+      if (cachedResult && cachedResult.status === 'success' && cachedResult.data) {
+        const causes = cachedResult.data.data || [];
+        populateDropdown(causes);
+      }
+
+      // Subscribe to query state changes
+      causeAreaDropdownUnsubscribe = causeAreaDropdownQueryObserver.subscribe((result) => {
+        console.log("Cause area dropdown query result:", result.status);
+        if (result.status === 'success' && result.data) {
+          const causes = result.data.data || [];
+          populateDropdown(causes);
+        } else if (result.status === 'error') {
+          console.error("Error fetching causes for dropdown:", result.error);
+        }
+      });
+
+      // Handle input click/focus to show dropdown (unbind first to prevent duplicates)
+      input.off("click.causeArea focus.causeArea").on("click.causeArea focus.causeArea", function() {
+        if (dropdown.children().length > 0) {
+          dropdown.show();
+        }
+      });
+
+      // Handle dropdown item click (unbind first to prevent duplicates)
+      dropdown.off("click.causeArea", "a.dropdown-item").on("click.causeArea", "a.dropdown-item", function(e) {
+        e.preventDefault();
+        const causeZuid = $(this).data("cause-zuid") || "";
+        const causeName = $(this).text();
+
+        // Update input and hidden field
+        input.val(causeName);
+        $("#causeArea").val(causeZuid);
+        dropdown.hide();
+        
+        // Repopulate dropdown to update visual state
+        const cachedResult = causeAreaDropdownQueryObserver.getCurrentResult();
+        if (cachedResult && cachedResult.status === 'success' && cachedResult.data) {
+          const causes = cachedResult.data.data || [];
+          populateDropdown(causes);
+        }
+      });
+
+      // Handle input blur (with delay to allow dropdown clicks)
+      input.off("blur.causeArea").on("blur.causeArea", function(e) {
+        setTimeout(function() {
+          if (!$(document.activeElement).closest('#causeAreaDropdown').length) {
+            dropdown.hide();
+          }
+        }, 150);
+      });
+    }
+
+    function loadNPOs(causeZuids = []) {
+      // Unsubscribe from previous queries if they exist
+      if (nposUnsubscribe) {
+        if (Array.isArray(nposUnsubscribe)) {
+          nposUnsubscribe.forEach(unsub => unsub());
+        } else {
+          nposUnsubscribe();
+        }
+        nposUnsubscribe = null;
+      }
 
       // Show loading indicator
       $("#npo-loading").removeClass("d-none");
       $("#npo-container").addClass("d-none");
 
-      $.ajax({
-        url: "{{ $base_url }}mobileapp/npos.json",
-        method: "GET",
-        data: {
-          limit: limit,
-          search: searchTerm,
-          page: 1,
-        },
-        success: function (response) {
-          const npos = response.data;
-          const npoContainer = $("#npo-container");
-          npoContainer.empty();
+      // Helper function to render NPOs
+      const renderNPOs = (npos) => {
+        const npoContainer = $("#npo-container");
+        npoContainer.empty();
 
-          npos.forEach((npo) => {
-            const imageUrl =
-              npo.logo && npo.logo.data && npo.logo.data[0]
-                ? npo.logo.data[0].url
-                : "https://placehold.co/100x100";
-            const description = npo.cause_description
-              ? npo.cause_description.substring(0, 100) + "..."
-              : "No description available";
+        // Check for empty NPO results when cause filters are active
+        if (npos.length === 0 && causeZuids.length > 0) {
+          const emptyMessage = `
+            <div class="text-center py-4">
+              <i class="bi bi-search" style="font-size: 48px; color: #ccc;"></i>
+              <p class="text-muted mt-3">No nonprofits found for the selected cause areas</p>
+              <p class="text-muted small">Try selecting different causes from the filter above</p>
+            </div>
+          `;
+          npoContainer.html(emptyMessage);
+          // Still hide loading, show container
+          $("#npo-loading").addClass("d-none");
+          $("#npo-container").removeClass("d-none");
+          return; // Exit early
+        }
 
-            const npoCard = `
-              <div class="card npo-card" data-npo-id="${npo.meta.zuid}">
-                <div class="d-flex gap-2 align-items-center p-3">
-                  <img src="${imageUrl}" alt="${npo.name}" style="width: 60px; height: 60px; object-fit: cover;">
-                  <div class="card-content">
-                    <p class="fs-5 mb-0 cause-title" style="font-size: 14px">${npo.name}</p>
-                    <div class="text-muted mb-0 cause-description" style="font-size: 12px">${description}</div>
-                  </div>
+        npos.forEach((npo) => {
+          const imageUrl =
+            npo.logo && npo.logo.data && npo.logo.data[0]
+              ? npo.logo.data[0].url
+              : "https://placehold.co/100x100";
+          const description = npo.cause_description
+            ? npo.cause_description.substring(0, 100) + "..."
+            : "No description available";
+
+          const npoId = npo.meta.zuid;
+          const isSelected = selectedNPOs.includes(npoId);
+
+          const npoCard = `
+            <div class="card npo-card ${isSelected ? 'selected' : ''}" data-npo-id="${npoId}">
+              <div class="d-flex gap-2 align-items-center p-3">
+                ${isSelected 
+                  ? '<div class="card-icon-container"><i class="bi bi-check"></i></div>'
+                  : `<img src="${imageUrl}" alt="${npo.name}" style="width: 60px; height: 60px; object-fit: cover;">`
+                }
+                <div class="card-content">
+                  <p class="fs-5 mb-0 cause-title" style="font-size: 14px">${npo.name}</p>
+                  <div class="text-muted mb-0 cause-description" style="font-size: 12px">${description}</div>
                 </div>
               </div>
-            `;
-            npoContainer.append(npoCard);
-          });
+            </div>
+          `;
+          const $card = $(npoCard);
+          if (isSelected) {
+            $card.data("original-img-src", imageUrl);
+          }
+          npoContainer.append($card);
+        });
 
-          // Add click event for NPO selection
-          $(".npo-card").click(function () {
-            const npoId = $(this).data("npo-id");
-            $(this).toggleClass("selected");
-            if ($(this).hasClass("selected")) {
+        // Add click event for NPO selection
+        $(".npo-card").click(function () {
+          const $card = $(this);
+          const npoId = $card.data("npo-id");
+          const $img = $card.find("img");
+          const originalSrc = $card.data("original-img-src") || $img.attr("src");
+          
+          // Store original image source if not already stored
+          if (!$card.data("original-img-src")) {
+            $card.data("original-img-src", originalSrc);
+          }
+          
+          $card.toggleClass("selected");
+          if ($card.hasClass("selected")) {
+            // Replace image with purple box and check icon
+            if ($img.length) {
+              $img.replaceWith(`
+                <div class="card-icon-container">
+                  <i class="bi bi-check"></i>
+                </div>
+              `);
+            }
+            if (!selectedNPOs.includes(npoId)) {
               selectedNPOs.push(npoId);
-            } else {
-              selectedNPOs = selectedNPOs.filter((id) => id !== npoId);
+              // Store NPO data in persistent storage for later retrieval
+              const npoData = npos.find(n => n.meta.zuid === npoId);
+              if (npoData) {
+                persistentSelectedNPOsData[npoId] = npoData;
+              }
             }
+          } else {
+            // Restore original image
+            $card.find(".card-icon-container").replaceWith(`<img src="${originalSrc}" alt="${$card.find('.cause-title').text()}" style="width: 60px; height: 60px; object-fit: cover;">`);
+            selectedNPOs = selectedNPOs.filter((id) => id !== npoId);
+            // Remove from persistent storage if not in current filter
+            const npoInCurrentResults = npos.some(n => n.meta.zuid === npoId);
+            if (!npoInCurrentResults) {
+              delete persistentSelectedNPOsData[npoId];
+            }
+          }
 
-            if (selectedNPOs.length > 0) {
-              $(".selectedNPOs-btn").prop("disabled", false);
-            } else {
-              $(".selectedNPOs-btn").prop("disabled", true);
+          if (selectedNPOs.length > 0) {
+            $(".selectedNPOs-btn").removeClass("d-none");
+            $(".skipBtn").addClass("d-none");
+          } else {
+            $(".selectedNPOs-btn").addClass("d-none");
+            $(".skipBtn").removeClass("d-none");
+          }
+        });
+
+        // Update button state based on current selections
+        if (selectedNPOs.length > 0) {
+          $(".selectedNPOs-btn").removeClass("d-none");
+          $(".skipBtn").addClass("d-none");
+        } else {
+          $(".selectedNPOs-btn").addClass("d-none");
+          $(".skipBtn").removeClass("d-none");
+        }
+
+        // Hide loading indicator and show results
+        $("#npo-loading").addClass("d-none");
+        $("#npo-container").removeClass("d-none");
+      };
+
+      // If no cause filters, load all claimed NPOs
+      if (causeZuids.length === 0) {
+        const options = {
+          limit: 25,
+          page: 1,
+          claimed: '1'
+        };
+        
+        nposQueryObserver = window.createSearchNposQuery('', options);
+        
+        // Check for cached result immediately
+        const cachedResult = nposQueryObserver.getCurrentResult();
+        if (cachedResult && cachedResult.status === 'success' && cachedResult.data) {
+          const npos = cachedResult.data.data || [];
+          // Merge with persistent selected NPOs
+          const mergedNpos = mergeWithPersistentNPOs(npos);
+          renderNPOs(mergedNpos);
+        }
+        
+        // Subscribe to query state changes
+        nposUnsubscribe = nposQueryObserver.subscribe((result) => {
+          if (result.status === 'pending') {
+            $("#npo-loading").removeClass("d-none");
+            $("#npo-container").addClass("d-none");
+            return;
+          }
+          
+          if (result.status === 'success' && result.data) {
+            const npos = result.data.data || [];
+            // Merge with persistent selected NPOs
+            const mergedNpos = mergeWithPersistentNPOs(npos);
+            renderNPOs(mergedNpos);
+          } else if (result.status === 'error') {
+            console.error("Error fetching NPOs:", result.error);
+            $("#npo-loading").addClass("d-none");
+            $("#npo-container").removeClass("d-none");
+          }
+        });
+      } else {
+        // Multiple cause filters - create parallel queries
+        const queryObservers = causeZuids.map(causeZuid => {
+          const options = {
+            limit: 25,
+            page: 1,
+            claimed: '1',
+            cause_zuid: causeZuid
+          };
+          return window.createSearchNposQuery('', options);
+        });
+        
+        // Track query states
+        let queryResults = new Array(queryObservers.length).fill(null);
+        let queryStates = new Array(queryObservers.length).fill('pending');
+        
+        // Helper function to check if all queries are done
+        const checkAndRender = () => {
+          const allDone = queryStates.every(state => state === 'success' || state === 'error');
+          if (allDone) {
+            // Merge and deduplicate results from all queries
+            const allNpos = queryResults.filter(result => result !== null).flat();
+            const deduplicatedNpos = deduplicateNPOs(allNpos);
+            // Merge with persistent selected NPOs
+            const mergedNpos = mergeWithPersistentNPOs(deduplicatedNpos);
+            renderNPOs(mergedNpos);
+          }
+        };
+        
+        // Check cached results immediately
+        let hasCachedResults = false;
+        queryObservers.forEach((observer, index) => {
+          const cachedResult = observer.getCurrentResult();
+          if (cachedResult && cachedResult.status === 'success' && cachedResult.data) {
+            queryResults[index] = cachedResult.data.data || [];
+            queryStates[index] = 'success';
+            hasCachedResults = true;
+          }
+        });
+        
+        if (hasCachedResults) {
+          checkAndRender();
+        }
+        
+        // Subscribe to all query observers
+        const unsubscribes = queryObservers.map((observer, index) => {
+          return observer.subscribe((result) => {
+            if (result.status === 'success' && result.data) {
+              queryResults[index] = result.data.data || [];
+              queryStates[index] = 'success';
+              checkAndRender();
+            } else if (result.status === 'error') {
+              console.error(`Error fetching NPOs for cause ${causeZuids[index]}:`, result.error);
+              queryResults[index] = [];
+              queryStates[index] = 'error';
+              checkAndRender();
             }
           });
-
-          $(".selectedNPOs-btn").prop("disabled", true);
-
-          // Hide loading indicator and show results
-          $("#npo-loading").addClass("d-none");
-          $("#npo-container").removeClass("d-none");
-        },
-        error: function (error) {
-          console.error("Error fetching NPOs:", error);
-          // Hide loading indicator on error
-          $("#npo-loading").addClass("d-none");
-          $("#npo-container").removeClass("d-none");
-        },
+        });
+        
+        nposUnsubscribe = unsubscribes;
+      }
+    }
+    
+    // Helper function to deduplicate NPOs by ZUID
+    function deduplicateNPOs(npos) {
+      const npoMap = new Map();
+      npos.forEach(npo => {
+        const zuid = npo.meta.zuid;
+        if (!npoMap.has(zuid)) {
+          npoMap.set(zuid, npo);
+        }
       });
+      return Array.from(npoMap.values());
+    }
+    
+    // Helper function to merge with persistent selected NPOs
+    function mergeWithPersistentNPOs(currentNpos) {
+      const npoMap = new Map();
+      
+      // Add all current NPOs
+      currentNpos.forEach(npo => {
+        npoMap.set(npo.meta.zuid, npo);
+      });
+      
+      // Add persistent selected NPOs that aren't already in current results
+      Object.keys(persistentSelectedNPOsData).forEach(zuid => {
+        if (!npoMap.has(zuid) && selectedNPOs.includes(zuid)) {
+          npoMap.set(zuid, persistentSelectedNPOsData[zuid]);
+        }
+      });
+      
+      return Array.from(npoMap.values());
     }
 
-    $("#causeSearchInput").on(
-      "input",
-      debounce(function () {
-        const searchTerm = $(this).val().trim();
-        loadCauses(searchTerm);
-      }, 300)
-    );
-
-    $("#npoSearchInput").on(
-      "input",
-      debounce(function () {
-        const searchTerm = $(this).val().trim();
-        loadNPOs(searchTerm);
-      }, 300)
-    );
+    // Cause filter dropdown change is now handled in loadCausesDropdown() 
+    // via the dropdown item click handler
 
     function showSummary() {
       const summaryContent = $("#summaryContent");
@@ -955,8 +1454,23 @@
     // Initial UI update
     updateStepUI();
 
-    // Load initial causes
-    loadCauses();
+    // Handle click outside to close cause filter dropdown
+    $(document).on("click.causeFilter", function(e) {
+      const dropdown = $("#causeFilterDropdown");
+      const input = $("#causeFilterInput");
+      if (!$(e.target).closest('#causeFilterDropdown, #causeFilterInput').length && dropdown.is(":visible")) {
+        dropdown.hide();
+      }
+    });
+
+    // Handle click outside to close cause area dropdown
+    $(document).on("click.causeArea", function(e) {
+      const dropdown = $("#causeAreaDropdown");
+      const input = $("#causeAreaInput");
+      if (!$(e.target).closest('#causeAreaDropdown, #causeAreaInput').length && dropdown.is(":visible")) {
+        dropdown.hide();
+      }
+    });
 
     const claimListingRedirectUrl = localStorage.getItem(
       "claimListingRedirectUrl"

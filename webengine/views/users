@@ -2141,34 +2141,6 @@
       followUserBtn.removeClass("d-none");
       updateUserFollowButtonState(isFollowing);
 
-      // Handle redirect after login for follow action
-      if (followUserParam && followUserParam === userPageZUID) {
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.delete("follow_user");
-        window.history.replaceState({}, document.title, currentUrl.href);
-
-        if (isFollowing) {
-          $('#userAlreadyFollowedModal').modal('show');
-        } else {
-          // Attempt to follow directly if redirected and not already following
-          showUserFollowLoading(true);
-          window.followUser(userPageZUID)
-            .then(() => {
-              isFollowing = true;
-              updateUserFollowButtonState(true);
-              // toastr.success("Successfully followed {{ this.first_name }}");
-            })
-            .catch(apiError => {
-              console.error("Error following user after redirect:", apiError);
-              // toastr.error("Failed to follow user. Please try again.");
-              updateUserFollowButtonState(false); // Revert button if follow failed
-            })
-            .finally(() => {
-              showUserFollowLoading(false);
-            });
-        }
-      }
-
       // Click handler for the follow/unfollow button
       followUserBtn.off('click').on('click', async function () {
         if (!loggedInUserZUID) { // Should not happen if button is visible and not own profile
@@ -2201,19 +2173,42 @@
         }
       });
 
+      // Auto-trigger follow button if page has ?follow_user param
+      // Wait for user data to load (isFollowing is already determined above)
+      if (followUserParam && followUserParam === userPageZUID) {
+        // Clean up URL
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.delete("follow_user");
+        window.history.replaceState({}, document.title, currentUrl.href);
+        
+        if (isFollowing) {
+          // Show already followed modal
+          $('#userAlreadyFollowedModal').modal('show');
+        } else {
+          // Small delay to ensure button is fully initialized and click handler is attached
+          setTimeout(() => {
+            followUserBtn.trigger("click");
+          }, 200);
+        }
+      }
+
     } else { // User is not logged in
       followUserBtn.removeClass("d-none");
       updateUserFollowButtonState(false); // Show 'Follow' state
       followUserBtn.off('click').on('click', function () {
-        localStorage.setItem("followUserRedirectUrl", window.location.href + (window.location.search ? "&" : "?") + "follow_user=" + userPageZUID);
-        window.location.href = '{{login_page.first().getUrl()}}';
+        const redirectUrl = window.location.href.split('?')[0] + "?follow_user=" + userPageZUID;
+        localStorage.setItem("followUserRedirectUrl", redirectUrl);
+        const loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+        loginModal.show();
       });
     }
 
     // Handle Sign In button click within the login prompt modal (this modal is less used now for follow)
     $('#userFollowLoginBtn').off('click').on('click', function () {
-      localStorage.setItem("followUserRedirectUrl", window.location.href + (window.location.search ? "&" : "?") + "follow_user=" + userPageZUID);
-      window.location.href = '{{login_page.first().getUrl()}}';
+      const redirectUrl = window.location.href.split('?')[0] + "?follow_user=" + userPageZUID;
+      localStorage.setItem("followUserRedirectUrl", redirectUrl);
+      const loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+      loginModal.show();
     });
 
     // Confirmation modal 'Follow' button handler

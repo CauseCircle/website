@@ -1,9 +1,6 @@
 <!-- this first parsley logic is necessary for determining the base url -->
 <!--prettier-ignore-->
 {{ $url = {home_feed.first().getUrl()} }}
-{{if {get_var.follow_npo} }}
-  {{$url = {non_profits.filter({get_var.follow_npo}).getUrl()} }}
-{{end-if}}
 
 {{$base_url = }}
 {{$base_api_url = }}
@@ -11,10 +8,10 @@
   {{$base_url = https://{instance.host_live}/ }}
   {{$base_api_url = https://api.causecircle.org }}
 {{else if {instance.env} = dev }}
-  {{$base_url = https://{instance.host_env}/ }} 
+  {{$base_url = https://{instance.host_env}/ }}
   {{$base_api_url = https://api.causecircle.org }}
 
   {{if {instance.host_env} == "4xxglxlj-dev.preview.stage.zesty.io" }}
-    {{$base_api_url = https://api-stage-150409629176.us-central1.run.app }}
+    {{$base_api_url = https://api.stage.causecircle.org }}
   {{end-if}}
 {{end-if}}

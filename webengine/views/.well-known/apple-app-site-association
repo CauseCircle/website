@@ -1,0 +1,21 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "22J28SN6UJ.causecircle.org",
+        "paths": ["/auth/magic-link"]
+      },
+      {
+        "appID": "22J28SN6UJ.staging.causecircle.org",
+        "paths": ["/auth/magic-link"]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": ["22J28SN6UJ.causecircle.org", "22J28SN6UJ.staging.causecircle.org"]
+  },
+  "webcredentials": {
+    "apps": ["22J28SN6UJ.causecircle.org", "22J28SN6UJ.staging.causecircle.org"]
+  }
+}

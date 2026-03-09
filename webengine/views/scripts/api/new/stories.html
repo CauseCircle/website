@@ -75,12 +75,40 @@
   window.createCreateStoryMutation = () => {
     return new MutationObserver(window.queryClient, {
       mutationFn: (data) => window.createStory(data),
-      onSuccess: () => {
+      onSuccess: (data) => {
         // Invalidate all stories list
         window.queryClient.invalidateQueries({ queryKey: ['stories', 'list'] });
+        
+        // Build story URL from response
+        let storyPath = '/my-posts';
+        if (data?.links?.website) {
+          try {
+            const apiUrl = new URL(data.links.website);
+            storyPath = apiUrl.pathname;
+          } catch (e) {
+            console.warn('Could not parse story URL:', e);
+          }
+        }
+        
+        // Show success toast
+        if (window.showToast) {
+          window.showToast({
+            type: 'success',
+            content: `Your post has been sent to the tagged NPO for approval. <a href="${storyPath}">Manage your post</a>`,
+            duration: 50000,
+          });
+        }
       },
       onError: (error) => {
         console.error('❌ Failed to create story:', error);
+        
+        // Show error toast
+        if (window.showToast) {
+          window.showToast({
+            type: 'error',
+            content: 'Failed to create story. Please try again.',
+          });
+        }
       },
     });
   };
@@ -131,7 +159,7 @@
       onSuccess: async (data, variables) => {
         // Wait 5 seconds for API to process the changes before invalidating
         // This ensures the backend has time to update the story status
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 10000));
 
         // Invalidate ALL story queries to ensure both pending and approved lists update
         window.queryClient.invalidateQueries({ queryKey: ['stories'] });

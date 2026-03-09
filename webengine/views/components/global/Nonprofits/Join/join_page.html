@@ -21,6 +21,9 @@
       rel="stylesheet"
     />
     <link rel="icon" href="https://4xxglxlj.media.zestyio.com/cause-circle-icon-color.png" type="image/png" sizes="196x196">
+    {{if {npo.claimed} != '1' }}
+      <meta name="robots" content="noindex">
+    {{/if}}
     
     <style>
       .left-side {
@@ -94,15 +97,15 @@
     <!-- Firebase Scripts -->
     <script
       defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"
+      src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"
     ></script>
     <script
       defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"
+      src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"
     ></script>
     <script
       defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"
+      src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"
     ></script>
 
     <script type="module" src="/auth/firebase-config.js"></script>
@@ -111,6 +114,13 @@
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+
+    <script 
+      defer
+      src="https://code.jquery.com/jquery-3.7.1.min.js"
+      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"
     ></script>
 
@@ -265,14 +275,6 @@
         </div>
       </section>
     </div>
-
-    <!-- Add required scripts -->
-    <script
-      defer
-      src="https://code.jquery.com/jquery-3.7.1.min.js"
-      integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-      crossorigin="anonymous"
-    ></script>
 
     <script type="module">
       document.addEventListener("DOMContentLoaded", async function () {

@@ -19,9 +19,9 @@
 </style>
 
 <div class="card p-3">
-  <p class="fw-medium mb-3">Recommended NPOs</p>
+  <p class="fw-medium mb-3">Recommended Nonprofits</p>
   <div class="d-flex flex-column gap-2">
-    {{ each non_profits as npo where npo.featured = '1' limit 5 }}
+    {{ each non_profits as npo where npo.featured = '1' and npo.claimed = '1' limit 5 }}
     <a href="{{npo.getUrl()}}" class="text-decoration-none text-reset">
       <div class="d-flex align-items-center gap-2">
         <img

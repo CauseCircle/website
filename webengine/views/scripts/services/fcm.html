@@ -4,8 +4,12 @@
   // const BASE_URL = "http://localhost:8080";
 
   // Generate a unique device ID using browser characteristics
-  function generateUniqueDeviceId() {
+  function generateUniqueDeviceId(userId) {
     try {
+      if (!userId) {
+        throw new Error("userId is required for device ID generation");
+      }
+      
       // Collect browser characteristics
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -51,15 +55,11 @@
         hash = hash & hash; // Convert to 32-bit integer
       }
 
-      // hash the user.uid
-      const userId = firebase.auth().currentUser.uid;
-
       // Convert to positive hex string and add prefix
       const deviceId = `web_${Math.abs(hash).toString(16)}_${userId}`;
 
       // console.log('Generated device ID:', deviceId);
       return deviceId;
-
     } catch (error) {
       console.error('Error generating device ID:', error);
       // Fallback to simpler method
@@ -117,7 +117,7 @@
 
   // Register FCM token with backend
   window.registerFCMToken = async (token) => {
-    const user = firebase.auth().currentUser;
+    const user = await window.getCurrentUser();
     if (!user) {
       console.warn('User not authenticated for FCM token registration');
       return false;
@@ -128,7 +128,7 @@
     // Generate a unique device ID using multiple browser characteristics
     let deviceId = localStorage.getItem('fcm_device_id');
     if (!deviceId) {
-      deviceId = generateUniqueDeviceId();
+      deviceId = generateUniqueDeviceId(userId);
       localStorage.setItem('fcm_device_id', deviceId);
     }
 
@@ -166,7 +166,7 @@
       return;
     }
 
-    const user = firebase.auth().currentUser;
+    const user = await window.getCurrentUser();
     if (!user) {
       console.warn('User not authenticated for FCM initialization');
       return;
@@ -214,7 +214,7 @@
 
   // Sync FCM token for authenticated users
   window.syncFCMToken = async () => {
-    const user = firebase.auth().currentUser;
+    const user = await window.getCurrentUser();
     if (!user || !window.firebaseMessaging) {
       return;
     }

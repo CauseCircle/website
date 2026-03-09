@@ -187,7 +187,7 @@
   $(document).ready(function () {
     // Handle report button click in the review modal
     $("#report-story").click(function () {
-      currentStoryZuid = $("#active-story").data("zuid");
+      currentStoryZuid = window._reviewModalCurrentStoryZuid || null;
       $("#reportStoryModal").modal("show");
     });
 

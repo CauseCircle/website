@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Opening CauseCircle…</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <p id="status">Redirecting to the CauseCircle app…</p>
+
+    <script>
+      const statusEl = document.getElementById("status");
+
+      const params = new URLSearchParams(window.location.search);
+      const query = params.toString();
+
+      const ua = navigator.userAgent || "";
+      const isAndroid = /Android/i.test(ua);
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+      if (isAndroid) {
+        const intentUrl = `
+intent://auth/magic-link?${query}
+#Intent;
+scheme=cause-circle;
+end`;
+
+        window.location.href = intentUrl;
+      } else if (isIOS) {
+        const iosSchemeUrl = `cause-circle:///auth/magic-link?${query}`;
+
+        window.location.href = iosSchemeUrl;
+
+        setTimeout(() => {
+          statusEl.innerHTML = `
+    If the app didn’t open, please open CauseCircle manually.<br /><br />
+    <a href="${iosSchemeUrl}">Try opening the app again</a>
+  `;
+        }, 1000);
+      } else {
+        document.getElementById("status").textContent =
+          "This link can only be opened on a mobile device.";
+
+        setTimeout(() => {
+          window.location.href = "https://causecircle.org";
+        }, 1500);
+      }
+    </script>
+  </body>
+</html>

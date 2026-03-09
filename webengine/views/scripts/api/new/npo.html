@@ -147,6 +147,23 @@
   };
 
   /**
+   * Mutation for creating a new NPO
+   * @returns {MutationObserver}
+   */
+  window.createCreateNpoMutation = () => {
+    return new MutationObserver(window.queryClient, {
+      mutationFn: (data) => window.createNpo(data),
+      onSuccess: (data) => {
+        // Invalidate NPO queries
+        window.queryClient.invalidateQueries({ queryKey: ['npo'] });
+      },
+      onError: (error) => {
+        console.error('❌ Failed to create NPO:', error);
+      },
+    });
+  };
+
+  /**
    * Mutation for updating NPO profile
    * @returns {MutationObserver}
    */

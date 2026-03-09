@@ -17,7 +17,7 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
       rel="stylesheet"
-    />
+    /> 
 
     <link rel="icon" href="https://4xxglxlj.media.zestyio.com/cause-circle-icon-color.png" type="image/png" sizes="196x196">
 
@@ -31,15 +31,15 @@
 
     <script
       defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"
+      src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"
     ></script>
     <script
       defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"
+      src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"
     ></script>
     <script
       defer
-      src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"
+      src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"
     ></script>
 
     <script type="module" src="/auth/firebase-config.js"></script>
@@ -127,9 +127,64 @@
         font-weight: 500;
       }
     
-      .nav-link:hover:not(.active) {
+      .nav-link.active:hover {
+        color: white !important;
+      }
+    
+      .nav-link:hover:not(.active):not(.disabled) {
         background-color: #f8f9fa;
         color: #7b3fee;
+      }
+    
+      .nav-link.disabled {
+        color: #adb5bd !important;
+        pointer-events: none;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    
+      .nav-link.disabled:hover {
+        background-color: transparent;
+        color: #adb5bd !important;
+      }
+    
+      /* Pending Banner Styles */
+      .pending-banner {
+        background-color: #fef2f0;
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 20px;
+      }
+    
+      .pending-banner-icon {
+        width: 40px;
+        height: 40px;
+        background-color: #ff7a59;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+    
+      .pending-banner-icon i {
+        color: white;
+        font-size: 18px;
+      }
+    
+      .pending-banner-content h6 {
+        color: #ff7a59;
+        font-weight: 600;
+        margin-bottom: 2px;
+        font-size: 14px;
+      }
+    
+      .pending-banner-content p {
+        margin: 0;
+        font-size: 13px;
       }
     
       .metrics-card {
@@ -588,6 +643,7 @@
     </div>
 
     <section id="npo-admin-page" class="container" style="display: none;">
+      <div id="pending-banner"></div>
       <div class="row mb-3">
         <!-- Sidebar -->
         <div class="col-12 col-md-3 col-lg-3 sidebar">
@@ -608,7 +664,7 @@
                   {{ npo.name }}
                 </h5>
               </a >
-              <div class="nav flex-md-column">
+              <div class="nav flex-md-column" data-npo-claimed="{{npo.claimed}}">
                 <a class="nav-link active" href="#dashboard" data-bs-toggle="tab">
                   <i class="bi bi-grid"></i> <span>Dashboard</span>
                 </a>
@@ -757,11 +813,13 @@
 
     <!--prettier-ignore-->
     {{include /components/global/NPO Admin/Dashboard/Review Story Modal/review_story_modal.html}}
+    {{include /components/global/Modals/share_story_modal.html}}
 
     <!-- Add required scripts -->
 
     <script type="module">
       const currentNpo = "{{$zuid}}";
+      const npoClaimed = "{{npo.claimed}}" === "1" ? true : false;
 
       $(document).ready(async function() {
         const localUser = JSON.parse(localStorage.getItem("user"));
@@ -779,11 +837,48 @@
             $('#loading-overlay').remove();
             $('#npo-admin-page').show();
 
+            // Hide tabs and QR code if NPO is not claimed (empty or null)
+            if (!npoClaimed) {
+              // Show pending banner
+              $('#pending-banner').html(`
+                <div class="pending-banner">
+                  <div class="pending-banner-icon">
+                    <i class="bi bi-exclamation-circle"></i>
+                  </div>
+                  <div class="pending-banner-content">
+                    <h6>Your Nonprofit Profile is pending</h6>
+                    <p class="text-muted">Our team will review your profile within a few days</p>
+                  </div>
+                </div>
+              `);
+              
+              // Tabs that should remain visible
+              const allowedTabs = ['#profile', '/docs'];
+              
+              // Hide nav links that are not in the allowed list using jQuery
+              $('.nav.flex-md-column .nav-link').each(function() {
+                const href = $(this).attr('href');
+                if (!allowedTabs.some(tab => href === tab || href.startsWith(tab))) {
+                  $(this).hide();
+                }
+              });
+              
+              // Hide the QR code container
+              $('#qr-code-container').removeClass('d-md-flex').addClass('d-none');
+              
+              // Switch to profile tab by default
+              const profileTab = $('a[href="#profile"]');
+              if (profileTab.length) {
+                new bootstrap.Tab(profileTab[0]).show();
+              }
+            }
+
             // Check if this is the first time visiting this NPO admin page
             const onboardingKey = `npo_onboarding_${currentNpo}`;
             const hasSeenOnboarding = localStorage.getItem(onboardingKey);
             
-            if (!hasSeenOnboarding) {
+            // Only show onboarding modal if NPO is claimed
+            if (!hasSeenOnboarding && npoClaimed) {
               // Show onboarding modal after a short delay
               setTimeout(() => {
                 const onboardingModal = new bootstrap.Modal(document.getElementById('onboardingModal'));

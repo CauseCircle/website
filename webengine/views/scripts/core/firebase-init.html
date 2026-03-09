@@ -1,4 +1,6 @@
 <script type="module">
   // ==================== USER MANAGEMENT ====================
-  const db = firebase.firestore();
+  // Use the globally configured Firestore instance (configured in firebase-config.js)
+  // This points to the named database "cause-circle-stage"
+  const db = window.db;
 </script>

@@ -80,7 +80,7 @@
 <div class="my-3 d-flex flex-column gap-2">
   <div><h4 class="fs-5">Featured Nonprofits</h4></div>
   <div class="d-flex flex-column gap-3">
-    {{ each non_profits as npo where npo.featured = '1' limit 5 }}
+    {{ each non_profits as npo where npo.featured = '1' and npo.claimed = '1' limit 5 }}
     <a href="{{npo.getUrl()}}" class="text-decoration-none text-reset">
       <div class="d-flex align-items-center gap-2">
         <img
