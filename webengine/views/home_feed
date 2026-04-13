@@ -220,8 +220,6 @@
       <!-- prettier-ignore -->
       {{ include /components/global/HomeFeed/causes_slider.html }}
       <!-- prettier-ignore -->
-      {{ include /components/global/HomeFeed/npos_slider.html }}
-      <!-- prettier-ignore -->
       {{ include /components/global/HomeFeed/big_story_card.html }}
       <!-- prettier-ignore -->
       {{ include /components/global/HomeFeed/stories_slider.html }}
