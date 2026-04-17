@@ -282,6 +282,22 @@
       margin: 0 auto;
     }
   }
+
+    .fab-btn {
+      width: 56px;
+      height: 56px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fab-post {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 99999;
+    }
 </style>
 
 <nav
@@ -358,20 +374,20 @@
       </div>
     </div>
     
-    <!-- Right section: Profile and admin buttons (desktop only) -->
-    <div class="d-none d-lg-flex gap-2 align-items-center">
+    <!-- POST (DESKTOP ONLY) -->
+    <div class="d-none d-lg-block me-2">
       <div class="dropdown">
         <button
           id="create-post-btn"
-          class="btn btn-primary dropdown-toggle d-none"
+          class="btn btn-primary dropdown-toggle"
           type="button"
           data-bs-toggle="dropdown"
-          aria-expanded="false"
         >
           <i class="bi bi-plus-lg me-1"></i> Post
         </button>
+
         <ul class="dropdown-menu dropdown-menu-end">
-          <li class="">
+          <li>
             <button class="dropdown-item create-post-option py-2" type="button" data-story-type="text-only">
               <i class="bi bi-card-text me-2"></i>
               <span class="text-muted">Text-Only Story</span>
@@ -383,7 +399,7 @@
               <span class="text-muted">Photo/Video Story</span>
             </button>
           </li>
-          <li class="">
+          <li>
             <button class="dropdown-item create-post-option py-2" type="button" data-story-type="shared-link">
               <i class="bi bi-link-45deg me-2"></i>
               <span class="text-muted">Shared Link Story</span>
@@ -391,7 +407,10 @@
           </li>
         </ul>
       </div>
-      
+    </div>
+
+    <!-- Right section: Profile and admin buttons (desktop only) -->
+    <div class="d-none d-lg-flex gap-2 align-items-center">
       <div class="dropdown">
         <button
           class="btn dropdown-toggle d-none"
@@ -414,6 +433,7 @@
           </div>
         </div>
       </div>
+
       <!-- Profile dropdown -->
       <div class="dropdown">
         <button
@@ -717,6 +737,39 @@
   </div>
 </nav>
 
+  <div class="fab-post d-lg-none">
+      <div class="dropdown">
+        <button
+          class="btn btn-primary rounded-circle shadow fab-btn"
+          type="button"
+          data-bs-toggle="dropdown"
+        >
+          <i class="bi bi-plus-lg"></i>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li>
+            <button class="dropdown-item create-post-option py-2" type="button" data-story-type="text-only">
+              <i class="bi bi-card-text me-2"></i>
+              <span class="text-muted">Text-Only Story</span>
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item create-post-option py-2" type="button" data-story-type="with-media">
+              <i class="bi bi-image me-2"></i>
+              <span class="text-muted">Photo/Video Story</span>
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item create-post-option py-2" type="button" data-story-type="shared-link">
+              <i class="bi bi-link-45deg me-2"></i>
+              <span class="text-muted">Shared Link Story</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
 <!-- New Secondary Navigation Row -->
 <nav class="secondary-nav d-none d-lg-block py-0">
   <div class="container-lg">
@@ -849,6 +902,7 @@
   </div>
 </nav>
 
+
 <!-- prettier-ignore -->
 {{include /components/global/feedback_modal.html}}
 
@@ -949,15 +1003,19 @@
         const logoUrl = typeof npo.logo === "string"
           ? npo.logo
           : npo.logo?.data[0]?.url || "https://placehold.co/24x24";
-        
+
+        // Use pathname only so links work on staging/preview domains
+        let npoPath = '';
+        try { npoPath = new URL(npo.meta?.web?.url).pathname; } catch (e) { npoPath = npo.meta?.web?.uri || ''; }
+
         $("#manage-menu-items").append(
-          `<a href="${npo.meta?.web?.url}/admin" class="menu-item">
+          `<a href="${npoPath}/admin" class="menu-item">
             <img src="${logoUrl}?width=40" alt="${npo.name} logo" class="dropdown-profile-image me-2">
             ${npo.name}
           </a>`
         );
         $("#manage-menu-items-offcanvas").append(
-          `<a href="${npo.meta?.web?.url}/admin" class="menu-item">
+          `<a href="${npoPath}/admin" class="menu-item">
             <img src="${logoUrl}?width=40" alt="${npo.name} logo" class="dropdown-profile-image me-2">
             ${npo.name}
           </a>`
@@ -966,25 +1024,30 @@
     }
   }
 
-  // Subscribe to user profile changes
-  userProfileQuery.subscribe((result) => {
-    if (result.isLoading) {
-      // Show loading state for profile elements
-      $("#profileDropdown .profile-name").text("Loading...");
-    } else if (result.isSuccess) {
+  // Optimistic: populate profile immediately from cached data (no network wait)
+  try {
+    const cachedZestyUser = JSON.parse(localStorage.getItem("zestyUser"));
+    if (cachedZestyUser) {
+      updateUserProfileUI(cachedZestyUser);
+    }
+  } catch (e) {}
+
+  // TanStack Query updates in background if data changed
+  window.safeSubscribe(userProfileQuery, (result) => {
+    if (result.isSuccess) {
       const zestyUser = result.data?.data[0];
       if (zestyUser) {
         updateUserProfileUI(zestyUser);
+        // Keep zestyUser localStorage in sync for next page load's optimistic render
+        try { localStorage.setItem("zestyUser", JSON.stringify(zestyUser)); } catch (e) {}
       }
     } else if (result.isError) {
       console.error("Error loading user profile:", result.error);
-      // Show fallback UI
-      $("#profileDropdown .profile-name").text("User");
     }
   });
 
   // Subscribe to managed NPOs changes
-  managedNposQuery.subscribe((result) => {
+  window.safeSubscribe(managedNposQuery, (result) => {
     if (result.isLoading) {
           // Show loading state
       $("#manage-menu-items").html('<div class="menu-item text-muted">Loading...</div>');
