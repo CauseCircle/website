@@ -1077,15 +1077,15 @@
       initializeSearchUI();
 
       // Subscribe to each search result independently
-      nposSearchQuery.subscribe((result) => {
+      window.safeSubscribe(nposSearchQuery, (result) => {
         updateNposSection(result);
       });
 
-      causesSearchQuery.subscribe((result) => {
+      window.safeSubscribe(causesSearchQuery, (result) => {
         updateCausesSection(result);
       });
 
-      storiesSearchQuery.subscribe((result) => {
+      window.safeSubscribe(storiesSearchQuery, (result) => {
         updateStoriesSection(result);
       });
         } else {
@@ -1326,4 +1326,13 @@
       }, 200); // Delay to allow click events to register
     });
   });
+
+    const currentPath = window.location.pathname;
+    const fab = document.querySelector(".fab-post");
+
+    if (currentPath.startsWith("/home-feed") && localUser) {
+      fab?.classList.remove("d-none");
+    } else {
+      fab?.classList.add("d-none");
+    }
 </script>
